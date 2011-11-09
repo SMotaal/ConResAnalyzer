@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>ConResIJ</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>ImageJ</name>
+			<type>2</type>
+			<location>/Users/daflair/Downloads/ImageJ/source</location>
+		</link>
+		<link>
+			<name>src/ConResAnalyzerPlugInA0.java</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Downloads/ImageJ/ImageJ/plugins/Analyze/ConResAnalyzerPlugIn.java</locationURI>
+		</link>
+	</linkedResources>
+</projectDescription>
