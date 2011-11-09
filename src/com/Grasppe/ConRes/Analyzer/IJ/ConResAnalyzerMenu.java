@@ -14,9 +14,8 @@
  */
 package com.Grasppe.ConRes.Analyzer.IJ;
 
+import com.Grasppe.Components;
 import com.Grasppe.Components.AbstractCommand;
-
-import ij.IJ;
 
 import ij.plugin.frame.PlugInFrame;
 
@@ -46,6 +45,8 @@ import javax.swing.border.EmptyBorder;
  *
  */
 public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
+
+    protected Components	components = new Components();
 
     /** Field description */
     protected Hashtable<Actions, PluginMenuAction>	actionMap;
@@ -173,8 +174,10 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
         PluginMenuItem	thisButton = new PluginMenuItem(command);
 
         // buttonMap.put((command, thisButton);
-        IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
-                       + thisButton.toString());
+        components.debugText("Menu Button Created", components.lastSplit(thisButton.toString()));
+
+//      IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
+//                     + thisButton.toString());
         pluginBar.add(thisButton);
         pack();
     }
@@ -193,14 +196,19 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             PluginMenuAction	thisAction = new PluginMenuAction(this, action.toString());
 
             actionMap.put(action, thisAction);
-            IJ.showMessage(this.getClass().getSimpleName() + " Menu Action Created: "
-                           + thisAction.toString());
+            components.debugText("Menu Action Created",
+                                 components.lastSplit(thisAction.toString()));
 
+//          IJ.showMessage(this.getClass().getSimpleName() + " Menu Action Created: "
+//                         + thisAction.toString());
             PluginMenuItem	thisButton = new PluginMenuItem(thisAction);
 
             buttonMap.put(action, thisButton);
-            IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
-                           + thisButton.toString());
+            components.debugText("Menu Button Created",
+                                 components.lastSplit(thisButton.toString()));
+
+//          IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
+//                         + thisButton.toString());
             pluginBar.add(thisButton);
         }
 
@@ -279,9 +287,34 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             m_inactive = new EmptyBorder(2, 2, 2, 2);
             setBorder(m_inactive);
             setMargin(new Insets(1, 1, 1, 1));
-            setToolTipText(action.toString());
             addMouseListener(this);
             setRequestFocusEnabled(false);
+
+            String	actionName,	actionDescription;
+
+            // Tooltip Text
+            try {
+                actionDescription = (String)action.getValue(TOOL_TIP_TEXT_KEY);
+            } catch (Exception exception) {
+                actionDescription = action.toString();
+            }
+
+            setToolTipText(actionDescription);
+
+            // Button Text
+            try {
+                actionName = ((AbstractCommand)action).getName();
+                components.debugText("Command Menu Item",
+                                     "getName ==>" + actionName + " ==> "
+                                     + components.humanCase(actionName), 3);
+            } catch (Exception exception) {
+                actionName = action.toString();
+                components.debugText("Command Menu Item",
+                                     "toString ==>" + actionName + " ==> "
+                                     + components.humanCase(actionName), 3);
+            }
+
+            setText(components.humanCase(actionName, true));
         }
 
         /**

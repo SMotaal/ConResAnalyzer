@@ -52,7 +52,10 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Deprecated
     public void delayedExit() {
-        IJ.showMessage(name, "Exiting if no windows are open in 10 seconds!");
+
+        // IJ.showMessage(name, "");
+        components.debugText("Delayed Exit (" + name + ")",
+                             "Exiting if no windows are open in 10 seconds!", 2);
 
         int				delay         = 10000;		// milliseconds
         ActionListener	taskPerformer = new ActionListener() {
@@ -103,7 +106,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowActivated(WindowEvent e) {
-        IJ.showMessage(name, e.toString());
+        components.debugText("Window Activated (" + name + ")", e.toString());
     }
 
     /**
@@ -113,6 +116,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowClosed(WindowEvent e) {
+        components.debugText("Window Closed (" + name + ")", e.toString());
         if (Frame.getFrames().length == 0) delayedExit();
     }
 
@@ -123,7 +127,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowClosing(WindowEvent e) {
-        IJ.showMessage(name, e.toString());
+        components.debugText("Window Closing (" + name + ")", e.toString());
     }
 
     /**
@@ -133,8 +137,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowDeactivated(WindowEvent e) {
-
-        // TODO Auto-generated method stub
+        components.debugText("Window Deactivated (" + name + ")", e.toString());
     }
 
     /**
@@ -144,8 +147,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowDeiconified(WindowEvent e) {
-
-        // TODO Auto-generated method stub
+        components.debugText("Window Deiconified (" + name + ")", e.toString());
     }
 
     /**
@@ -155,8 +157,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowIconified(WindowEvent e) {
-
-        // TODO Auto-generated method stub
+        components.debugText("Window Iconified (" + name + ")", e.toString());
     }
 
     /**
@@ -166,8 +167,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowOpened(WindowEvent e) {
-
-        // TODO Auto-generated method stub
+        components.debugText("Window Opened (" + name + ")", e.toString());
     }
 
     /**
@@ -223,110 +223,69 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public CaseManager(CaseManagerModel model) {
             components.super(model);
-            updateCommands();
         }
 
+//      /**
+//       * Method description
+//       *
+//       * @param e
+//       */
+//      @Override
+//      public void actionPerformed(ActionEvent e) {
+//          try {
+//              getCommand(e.getActionCommand()).execute();
+//          } catch (Exception exception) {
+//              IJ.showMessage(this.getClass().getSimpleName(),
+//                             this.getClass().getSimpleName() + " Command Not Found: "
+//                             + e.getActionCommand());
+//          }
+//
+//          if (actionListener != null) actionListener.actionPerformed(e);
+//      }
+//
+//      /**
+//       * Method description
+//       *
+//       * @param command
+//       */
+//      public void putCommand(AbstractCommand command) {
+//          commands.put(command.getName(), command);
+//          IJ.showMessage(this.getClass().getSimpleName(),
+//                         this.getClass().getSimpleName() + " Command Added: " + command.getName()
+//                         + " :: " + command.toString());
+//      }
+
         /**
-         * Method description
-         *
-         * @param e
+         * Create and populate all commands from scratch.
          */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                getCommand(e.getActionCommand()).execute();
-            } catch (Exception exception) {
-                IJ.showMessage(this.getClass().getSimpleName(),
-                               this.getClass().getSimpleName() + " Command Not Found: "
-                               + e.getActionCommand());
-            }
-
-            if (actionListener != null) actionListener.actionPerformed(e);
+        public void createCommands() {
+            commands = new LinkedHashMap<String, Components.AbstractCommand>();
+            putCommand(new NewCase(this));
+            putCommand(new OpenCase(this));
+            putCommand(new CloseCase(this));
         }
 
-        /**
-         * Method description
-         */
-        public void printCommandKeys() {
-
-            /*
-             * Enumeration<String> keys = commands.keys();
-             *
-             * System.out.print("Command keys:\t");
-             *
-             * while (keys.hasMoreElements()) {
-             *
-             * /              str = (String) names.nextElement();
-             *   System.out.print((String)keys.nextElement() + "\n\t");
-             * }
-             *
-             * System.out.println("");
-             */
-        }
-
-        /**
-         * Method description
-         *
-         * @param command
-         */
-        public void putCommand(AbstractCommand command) {
-            commands.put(command.getName(), command);
-            IJ.showMessage(this.getClass().getSimpleName(),
-                           this.getClass().getSimpleName() + " Command Added: " + command.getName()
-                           + " :: " + command.toString());
-        }
+//
+//      /**
+//       * Method description
+//       *
+//       * @param name
+//       *
+//       * @return
+//       */
+//      public AbstractCommand getCommand(String name) {
+//          return commands.get(name);
+//      }
+//
+//      /**
+//       * @return the commands
+//       */
+//      public LinkedHashMap<String, AbstractCommand> getCommands() {
+//          return commands;
+//      }
 
         /**
-         * Method description
-         */
-        public void updateCommands() {
-            if (commands == null) {
-
-                // Create all commands from scratch
-                commands = new LinkedHashMap<String, Components.AbstractCommand>();		// <String, AbstractCommand>
-
-                // commands.put(NewCase.name, new NewCase(this));
-                // commands.put(CloseCase.name, new CloseCase(this));
-                // commands.put(OpenCase.name, new OpenCase(this));
-                putCommand(new NewCase(this));
-                putCommand(new OpenCase(this));
-                putCommand(new CloseCase(this));
-            }
-        }
-
-        /**
-         * Method description
-         *
-         * @param listener
-         *
-         * @return
-         */
-        public CaseManager withActionListener(ActionListener listener) {
-            actionListener = listener;
-
-            return this;
-        }
-
-        /**
-         * Method description
-         *
-         * @param name
-         *
-         * @return
-         */
-        public AbstractCommand getCommand(String name) {
-            return commands.get(name);
-        }
-
-        /**
-         * @return the commands
-         */
-        public LinkedHashMap<String, AbstractCommand> getCommands() {
-            return commands;
-        }
-
-        /**
-         * Method description
+         * Return the controller's correctly-cast model
          *
          * @return
          */
@@ -336,7 +295,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
         }
 
         /**
-         * Method description
+         * Sets controller's model to a CaseManagerModel and not any AbstractModel.
          *
          * @param newModel
          *
@@ -347,47 +306,26 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
         }
 
         /**
-         * Class description
+         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
          *
          * @version        $Revision: 1.0, 11/11/08
          * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
          */
-        public class CloseCase extends AbstractCommand {
-
-            protected static final String	name = "CloseCase";
+        public abstract class CaseManagerCommand extends AbstractCommand {
 
             /**
              * Constructs a realization of AbstractCommand.
              *
              * @param listener
+             * @param name
              */
-            public CloseCase(ActionListener listener) {
+            public CaseManagerCommand(ActionListener listener, String name) {
                 components.super(listener, name, false);
+                setModel(((CaseManager)listener).getModel());
             }
 
             /**
-             * Method description
-             */
-            public void execute() {
-                super.execute();
-                if (!canExecute()) return;
-                IJ.showMessageWithCancel(name, "Do you want to close the current case?");
-            }
-
-            /**
-             * Method description
-             */
-            @Override
-            public void update() {
-
-                // TODO Enable if open case, else disable
-                CaseManagerModel	model = getModel();
-
-                canExecute(model.hasCurrentCase());
-            }
-
-            /**
-             * Method description
+             * Returns the correctly-cast model.
              *
              * @return
              */
@@ -398,12 +336,76 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
 
         /**
-         * Class description
+         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
          *
          * @version        $Revision: 1.0, 11/11/08
          * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
          */
-        public class NewCase extends AbstractCommand {
+        public class CloseCase extends CaseManagerCommand {
+
+            protected static final String	name = "CloseCase";
+
+            /**
+             * Constructs a realization of AbstractCommand.
+             *
+             * @param listener
+             */
+            public CloseCase(ActionListener listener) {
+                super(listener, name);
+            }
+
+            /**
+             * Performs the command operations when called by execute().
+             *
+             * @return
+             */
+            public boolean perfomCommand() {
+                boolean	canProceed = !isCaseClosed();		// canExecute();
+
+                components.debugText("Close Case Attempt", "will be checking isCaseClosed()", 4);
+                if (!canProceed) return true;		// Action responded to in alternative scenario
+                canProceed = IJ.showMessageWithCancel(name,
+                        "Do you want to close the current case?");
+                if (!canProceed) return true;		// Action responded to in alternative scenario
+                components.debugText("Close Case Proceeds", "User confirmed close.", 3);
+                getModel().backgroundCase = getModel().currentCase;
+                getModel().currentCase    = null;
+                components.debugText("Closed Case Success",
+                                     "Moved current case to background and cleared current case.",
+                                     4);
+
+                return true;	// Action responded to in intended scenario
+            }
+
+            /**
+             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
+             */
+            @Override
+            public void update() {
+                super.update();
+
+                // TODO: Enable if open case, else disable
+                canExecute(!isCaseClosed());	//
+            }
+
+            /**
+             * Method description
+             *
+             * @return
+             */
+            public boolean isCaseClosed() {
+                return !getModel().hasCurrentCase();
+            }
+        }
+
+
+        /**
+         * Defines Case Manager's New Case actions and command, using the EAC pattern.
+         *
+         * @version        $Revision: 1.0, 11/11/08
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public class NewCase extends CaseManagerCommand {
 
             protected static final String	name = "NewCase";
 
@@ -413,34 +415,107 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @param listener
              */
             public NewCase(ActionListener listener) {
-                components.super(listener, name, true);
+                super(listener, name);
+                update();
             }
 
             /**
-             * Method description
+             * Performs the command operations when called by execute().
+             *
+             * @return
              */
-            public void execute() {
-                super.execute();
-                if (!canExecute()) return;
+            public boolean perfomCommand() {
+                boolean	canProceed = canExecute();
 
+                // if (!canProceed) return true;     // Action responded to in alternative scenario
                 // TODO: Show imageFolderChooser, if can create new case with images, confirm and close case before creating new case
                 // TODO: Show imageFolderChooser
                 // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
                 // TODO: Confirm and close current case before attempting to create new case
-                commandHandler.getCommand("CloseCase").execute();
+                try {
+                    CloseCase	closeCase = (CloseCase)commandHandler.getCommand("CloseCase");
+
+                    canProceed = closeCase.execute(false);		// Don't care if a case was closed
+                    canProceed = closeCase.isCaseClosed();		// Only care that no case is open!
+                } catch (IllegalStateException e) {
+                    components.debugText("New Case Attempt",
+                                         "Failed to close case or no case was open!", 3);
+                    canProceed = true;
+                } catch (Exception e) {
+
+                    // forget about current case!
+                    components.debugText("New Case Attempt",
+                                         "Failed to close case or no case was open!" + "\n\n"
+                                         + e.toString(), 2);
+                    canProceed = false;
+                }
+
+                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
 
                 // TODO: Create new case in metadata entry state
+                components.debugText("New Case Creation",
+                                     "New case will be created and passed for metadata entry", 4);
+
+                try {
+                    getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
+                    canProceed = true;
+                } catch (Exception e) {
+                    components.debugText("New Case Failure",
+                                         "Failed to create new case" + "\n\n" + e.toString(), 2);
+                    canProceed = false;
+                }
+
+                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
+
+                try {
+                    getModel().currentCase    = getModel().newCase;		// Make current the new case
+                    getModel().newCase        = null;					// Clear new case
+                    getModel().backgroundCase = null;					// clear background case
+                    canProceed                = true;
+                } catch (Exception e) {
+                    components.debugText("New Case Failure",
+                                         "Failed to reorganize cases in the case manager model."
+                                         + "\n\n" + e.toString(), 2);
+                    canProceed = false;
+                }
+
+                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
+                components.debugText(
+                    "New Case Success",
+                    "Created new case and reorganize cases in the case manager model.", 3);
+
+                return true;	// Action responded to in intended scenario
+            }
+
+            /**
+             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
+             */
+            @Override
+            public void update() {
+                super.update();
+
+                // TODO: Enable if open case, else disable
+                canExecute(true);		// getModel().hasCurrentCase());
+            }
+
+            /**
+             * Returns the correctly-cast model.
+             *
+             * @return
+             */
+            public CaseManagerModel getModel() {
+                return (CaseManagerModel)model;
             }
         }
 
 
         /**
-         * Class description
+         * Defines Case Manager's New Case actions and command, using the EAC pattern.
          *
          * @version        $Revision: 1.0, 11/11/08
          * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
          */
-        public class OpenCase extends AbstractCommand {
+        public class OpenCase extends CaseManagerCommand {
 
             protected static final String	name = "OpenCase";
 
@@ -450,19 +525,20 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @param listener
              */
             public OpenCase(ActionListener listener) {
-                components.super(listener, name, true);
+                super(listener, name);
+                executable = true;
             }
 
-            /**
-             * Method description
-             */
-            public void execute() {
-                super.execute();
-                if (!canExecute()) return;
-
-                // TODO: Show caseChooser, then confirm and close case before opening chosen case
-                // TODO: Show caseFolderChooser, if can create open case, confirm and close case before opening the new case
-            }
+//          /**
+//           * Method description
+//           */
+//          public void execute() {
+//              super.execute();
+//              if (!canExecute()) return;
+//
+//              // TODO: Show caseChooser, then confirm and close case before opening chosen case
+//              // TODO: Show caseFolderChooser, if can create open case, confirm and close case before opening the new case
+//          }
         }
     }
 
@@ -474,6 +550,9 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
     public class CaseManagerModel extends AbstractModel {
+
+        /** Holds a case that is about to close until currentCase is not null */
+        public CaseModel	backgroundCase;
 
         /** Field description */
         public CaseModel	currentCase;
@@ -502,7 +581,20 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          *
          * @return
          */
+        public CaseModel newCaseModel() {
+            return new CaseModel();
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
         public boolean hasCurrentCase() {
+            if (currentCase != null)
+                components.debugText("Current Case", currentCase.toString(), 3);
+            else components.debugText("Current Case", "null!", 3);
+
             return (currentCase != null);
         }
 
@@ -558,7 +650,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public ConResAnalyzer() {
             this(new ConResAnalyzerModel());
-            caseManager = new CaseManager().withActionListener(this);
+            caseManager = (CaseManager)new CaseManager().withActionListener(this);
         }
 
         /**
@@ -573,25 +665,12 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
         }
 
         /**
-         * Method description
-         *
-         *
-         * @param e
+         * Create and populate all commands from scratch.
          */
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        public void createCommands() {
 
-            // TODO Handle controller actions
-            IJ.showMessage(this.getClass().getSimpleName(),
-                           this.getClass().getSimpleName() + " Action Performed: "
-                           + e.getActionCommand().toString());
-        }
-
-        /**
-         * Method description
-         */
-        public void updateCommands() {
-            if (commands != null) {}
+            // commands = new LinkedHashMap<String, Components.AbstractCommand>();
+            putCommand(new Quit(this));
         }
 
         /**
@@ -600,13 +679,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @return
          */
         public LinkedHashMap<String, AbstractCommand> getCommands() {
-            LinkedHashMap<String, AbstractCommand>	allCommands = new LinkedHashMap<String,
-                                                                      AbstractCommand>();
-
-            if (commands != null) allCommands.putAll(commands);
-            if (caseManager.getCommands() != null) allCommands.putAll(caseManager.getCommands());
-
-            return allCommands;
+            return appendCommands(caseManager);
         }
 
         /**
@@ -632,6 +705,79 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
             // TODO Auto-generated method stub
             super.setModel(newModel);
+        }
+
+        /**
+         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
+         *
+         * @version        $Revision: 1.0, 11/11/08
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public abstract class ConResAnalyzerCommand extends AbstractCommand {
+
+            /**
+             * Constructs a realization of AbstractCommand.
+             *
+             * @param listener
+             * @param name
+             */
+            public ConResAnalyzerCommand(ActionListener listener, String name) {
+                components.super(listener, name, false);
+                setModel(((ConResAnalyzer)listener).getModel());
+            }
+
+            /**
+             * Returns the correctly-cast model.
+             *
+             * @return
+             */
+            public ConResAnalyzerModel getModel() {
+                return (ConResAnalyzerModel)model;
+            }
+        }
+
+
+        /**
+         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
+         *
+         * @version        $Revision: 1.0, 11/11/08
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public class Quit extends ConResAnalyzerCommand {
+
+            protected static final String	name = "Quit";
+
+            /**
+             * Constructs a realization of AbstractCommand.
+             *
+             * @param listener
+             */
+            public Quit(ActionListener listener) {
+                super(listener, name);
+                executable = true;
+            }
+
+            /**
+             * Performs the command operations when called by execute().
+             *
+             * @return
+             */
+            public boolean perfomCommand() {
+                System.exit(0);
+
+                return true;	// Action responded to in intended scenario
+            }
+
+            /**
+             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
+             */
+            @Override
+            public void update() {
+                super.update();
+
+                // TODO: Enable if open case, else disable
+                canExecute(true);
+            }
         }
     }
 
@@ -704,7 +850,9 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public boolean canFinalize() {
             finalizable = (activeCalls == 0);
-            IJ.showMessage(name + " activeCalls: " + activeCalls);
+
+            // IJ.showMessage(name + " activeCalls: " + activeCalls);
+            components.debugText("Finalize / Active Calls", activeCalls + " remaining.");
 
             return finalizable;
         }
@@ -761,9 +909,12 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
             while (commandIterator.hasNext()) {
                 AbstractCommand	command = commandIterator.next();
 
-                IJ.showMessage(this.getClass().getSimpleName(),
-                               this.getClass().getSimpleName() + " Command Added: "
-                               + command.toString());
+                components.debugText("Command Button Creation",
+                                     components.lastSplit(command.toString()), 3);
+
+//              IJ.showMessage(this.getClass().getSimpleName(),
+//                             this.getClass().getSimpleName() + " Command Added: "
+//                             + command.toString());
                 menu.createButton(command);
             }
         }
