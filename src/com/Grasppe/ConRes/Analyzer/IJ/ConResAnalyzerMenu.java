@@ -14,17 +14,23 @@
  */
 package com.Grasppe.ConRes.Analyzer.IJ;
 
-import com.Grasppe.Components;
-import com.Grasppe.Components.AbstractCommand;
+import com.Grasppe.GrasppeKit;
+import com.Grasppe.GrasppeKit.AbstractCommand;
+import com.Grasppe.GrasppeKit.Observer;
 
 import ij.plugin.frame.PlugInFrame;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -34,6 +40,7 @@ import java.awt.event.WindowListener;
 import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
@@ -46,7 +53,7 @@ import javax.swing.border.EmptyBorder;
  */
 public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
 
-    protected Components	components = new Components();
+    // protected GrasppeKit  grasppeKit = GrasppeKit.getInstance();
 
     /** Field description */
     protected Hashtable<Actions, PluginMenuAction>	actionMap;
@@ -55,8 +62,10 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
     protected Hashtable<Actions, PluginMenuItem>	buttonMap;
 
     /** Field description */
-    protected JToolBar	pluginBar = new JToolBar();
-    protected String	name      = this.getClass().getSimpleName();	// "ConResAnalyzerMenu";
+    protected JToolBar								pluginBar = new JToolBar();
+    protected String								name      = this.getClass().getSimpleName();	// "ConResAnalyzerMenu";
+    protected Hashtable<Integer, PluginMenuItem>	keyMap    = new Hashtable<Integer,
+                                                                    PluginMenuItem>();
 
     /**
      * Constructs ...
@@ -73,6 +82,11 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
         };
 
         addWindowListener(wndCloser);
+
+        // Keyboard dispatcher
+        KeyboardFocusManager	manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+        manager.addKeyEventDispatcher(new MyDispatcher());
 
         // createButtonsFromActions();
         super.add(pluginBar, BorderLayout.NORTH);
@@ -171,11 +185,16 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
          * actionMap.put(action, thisAction);
          * IJ.showMessage("ConResAnalyzerPlugInA0Menu Action Created: " + thisAction.toString());
          */
-        PluginMenuItem	thisButton = new PluginMenuItem(command);
+        PluginMenuItem	thisButton   = new PluginMenuItem(command);
+        int				thisMnemonic = thisButton.getMnemonic();
+
+        GrasppeKit.debugText("Menu Button Created",
+                             GrasppeKit.lastSplit(thisButton.getActionCommand()) + " ("
+                             + (char)thisMnemonic + " : int " + thisMnemonic + ")", 3);
+        if (thisMnemonic > 0) keyMap.put(thisMnemonic, thisButton);
 
         // buttonMap.put((command, thisButton);
-        components.debugText("Menu Button Created", components.lastSplit(thisButton.toString()));
-
+        // GrasppeKit.debugText("Menu Button Created", grasppeKit.lastSplit(thisButton.toString()));
 //      IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
 //                     + thisButton.toString());
         pluginBar.add(thisButton);
@@ -196,16 +215,16 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             PluginMenuAction	thisAction = new PluginMenuAction(this, action.toString());
 
             actionMap.put(action, thisAction);
-            components.debugText("Menu Action Created",
-                                 components.lastSplit(thisAction.toString()));
+            GrasppeKit.debugText("Menu Action Created",
+                                 GrasppeKit.lastSplit(thisAction.toString()));
 
 //          IJ.showMessage(this.getClass().getSimpleName() + " Menu Action Created: "
 //                         + thisAction.toString());
             PluginMenuItem	thisButton = new PluginMenuItem(thisAction);
 
             buttonMap.put(action, thisButton);
-            components.debugText("Menu Button Created",
-                                 components.lastSplit(thisButton.toString()));
+            GrasppeKit.debugText("Menu Button Created",
+                                 GrasppeKit.lastSplit(thisButton.toString()));
 
 //          IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
 //                         + thisButton.toString());
@@ -216,6 +235,75 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
 
         // getContentPane().add(pluginBar, BorderLayout.NORTH);
     }
+
+    /**
+     * Method description
+     *
+     * @param e
+     *
+     * @return
+     */
+    public boolean keyPressed(KeyEvent e) {
+        int	keyCode = e.getKeyCode();
+
+        if (!isActive()) return false;
+
+        String	keyString = GrasppeKit.keyEventString(e);
+
+        GrasppeKit.debugText("Key Pressed", keyString, 4);
+
+        if (keyMap.containsKey(keyCode)) {
+            PluginMenuItem	thisButton = keyMap.get(keyCode);
+
+            // thisButton.doClick();
+            thisButton.keyPressed(e);
+            GrasppeKit.debugText("Key Press Handled", keyString + " ==> " + thisButton.getText(),
+                                 3);
+
+            return true;
+        } else
+            GrasppeKit.debugText("Key Pressed Ignored", GrasppeKit.keyEventString(e) + " ==x", 3);
+
+        return false;
+    }
+
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/09
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    private class MyDispatcher implements KeyEventDispatcher {
+
+        /** Field description */
+        public int	lastKey;
+
+        /** Field description */
+        public int	lastModifier;
+
+        /**
+         * Method description
+         *
+         * @param e
+         *
+         * @return
+         */
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent e) {
+
+            // if ((e.getKeyCode() < 65) || (e.getKeyCode() > 90)) return false;     // () >= 65 &&) return false;
+            if (e.getID() == KeyEvent.KEY_PRESSED) {			// System.out.println("tester");
+                return keyPressed(e);
+            } else if (e.getID() == KeyEvent.KEY_RELEASED) {	// System.out.println("2test2");
+            } else if (e.getID() == KeyEvent.KEY_TYPED) {
+
+                // System.out.println("3test3");
+            }
+
+            return false;
+        }
+    }
+
 
     /**
      * Class description
@@ -262,7 +350,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
      * @version        Enter version here..., 11/11/06
      * @author         Enter your name here...
      */
-    public class PluginMenuItem extends JButton implements MouseListener {
+    public class PluginMenuItem extends JButton implements MouseListener, Observer {
 
         /** Field description */
         protected Border	m_raised;
@@ -272,6 +360,8 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
 
         /** Field description */
         protected Border	m_inactive;
+        protected Font		m_font        = this.getFont().deriveFont((float)14.0);
+        protected Dimension	m_minimumSize = new Dimension(100, 20);
 
         /**
          * Constructs ...
@@ -285,16 +375,21 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             m_raised   = new BevelBorder(BevelBorder.RAISED);
             m_lowered  = new BevelBorder(BevelBorder.LOWERED);
             m_inactive = new EmptyBorder(2, 2, 2, 2);
+            super.setFont(m_font);
             setBorder(m_inactive);
             setMargin(new Insets(1, 1, 1, 1));
+            super.setMinimumSize(m_minimumSize);
+            super.setMaximumSize(m_minimumSize);
+            super.setPreferredSize(m_minimumSize);
             addMouseListener(this);
             setRequestFocusEnabled(false);
 
             String	actionName,	actionDescription;
+            int		actionMnemonic;
 
             // Tooltip Text
             try {
-                actionDescription = (String)action.getValue(TOOL_TIP_TEXT_KEY);
+                actionDescription = (String)action.getValue(Action.SHORT_DESCRIPTION);
             } catch (Exception exception) {
                 actionDescription = action.toString();
             }
@@ -304,17 +399,41 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             // Button Text
             try {
                 actionName = ((AbstractCommand)action).getName();
-                components.debugText("Command Menu Item",
-                                     "getName ==>" + actionName + " ==> "
-                                     + components.humanCase(actionName), 3);
+                GrasppeKit.debugText("Command Menu Item",
+                                     "getName ==> " + actionName + " ==> "
+                                     + GrasppeKit.humanCase(actionName), 4);
             } catch (Exception exception) {
                 actionName = action.toString();
-                components.debugText("Command Menu Item",
-                                     "toString ==>" + actionName + " ==> "
-                                     + components.humanCase(actionName), 3);
+                GrasppeKit.debugText("Command Menu Item",
+                                     "toString ==> " + actionName + " ==> "
+                                     + GrasppeKit.humanCase(actionName), 4);
             }
 
-            setText(components.humanCase(actionName, true));
+            setText(GrasppeKit.humanCase(actionName, true));
+
+//          // Mnemonic
+            try {
+                actionMnemonic = ((AbstractCommand)action).getMnemonicKey();
+                GrasppeKit.debugText("Command Menu Item",
+                                     "getMnemonicKey ==> " + (char)actionMnemonic + " (int "
+                                     + actionMnemonic + ")", 4);
+            } catch (Exception exception) {
+                actionMnemonic = actionName.charAt(0);
+                GrasppeKit.debugText("Command Menu Item",
+                                     "actionName ==> " + (char)actionMnemonic + " (int "
+                                     + actionMnemonic + ")", 4);
+            }
+
+            setMnemonic(actionMnemonic);
+
+            try {
+                ((AbstractCommand)action).attachObserver(this);
+            } catch (Exception exception) {
+                GrasppeKit.debugText("Command Menu Item",
+                                     "Cannot attach menu item to observe command.", 4);
+            }
+
+            update();
         }
 
         /**
@@ -333,6 +452,25 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
          *
          * @param e
          */
+        public void keyPressed(KeyEvent e) {
+            try {
+                ((AbstractCommand)getAction()).setKeyEvent(e);		// execute(e);
+                this.doClick();
+                ((AbstractCommand)getAction()).setKeyEvent();
+                GrasppeKit.debugText("Command Menu KeyEvent Handled", GrasppeKit.keyEventString(e),
+                                     4);
+            } catch (Exception exception) {
+                GrasppeKit.debugText("Command Menu KeyEvent Exception",
+                                     GrasppeKit.keyEventString(e) + " ==> Exception thrown\n\n"
+                                     + exception.getMessage(), 2);
+            }
+        }
+
+        /**
+         * Method description
+         *
+         * @param e
+         */
         public void mouseClicked(MouseEvent e) {}
 
         /**
@@ -341,7 +479,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
          * @param e
          */
         public void mouseEntered(MouseEvent e) {
-            setBorder(m_raised);
+            if (isEnabled()) setBorder(m_raised);
         }
 
         /**
@@ -359,7 +497,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
          * @param e
          */
         public void mousePressed(MouseEvent e) {
-            setBorder(m_lowered);
+            if (isEnabled()) setBorder(m_lowered);
         }
 
         /**
@@ -369,6 +507,35 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
          */
         public void mouseReleased(MouseEvent e) {
             setBorder(m_inactive);
+        }
+
+        /*
+         *  (non-Javadoc)
+         * @see com.Grasppe.GrasppeKit.Observer#update()
+         */
+
+        /**
+         * Method description
+         */
+        @Override
+        public void update() {
+
+            // super.getAction().
+            try {
+                if (((AbstractCommand)getAction()).canExecute()) {
+                    GrasppeKit.debugText("Command Menu Update",
+                                         ((AbstractCommand)getAction()).getName()
+                                         + " menu item can execute.", 4);
+                    super.setEnabled(true);
+                } else {
+                    GrasppeKit.debugText("Command Menu Update",
+                                         ((AbstractCommand)getAction()).getName()
+                                         + " menu item cannot execute.", 3);
+                    super.setEnabled(false);
+                }
+            } catch (Exception exception) {
+                GrasppeKit.debugText("Command Menu Update", "Cannot update() menu item.", 3);
+            }
         }
 
         /**

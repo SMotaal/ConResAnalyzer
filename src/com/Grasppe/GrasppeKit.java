@@ -19,18 +19,27 @@ import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import java.io.InvalidObjectException;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.Timer;
 
 /**
  * Abstract super-classes with common design patterns.
@@ -38,10 +47,86 @@ import javax.swing.AbstractAction;
  * @version        $Revision: 0.1, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class Components {
+public class GrasppeKit {
 
     /** Field description */
     public static int	debugLevel = 3;		// default level is 3
+
+    /** Field description */
+    public static int	timestampLevel = 4;		// default level is 3
+
+    /** Field description */
+    public static final JFrame	commonFrame = new JFrame();
+
+    /**
+     * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.
+     */
+    private GrasppeKit() {
+        super();
+        setDebugTimeStamp(timestampLevel);
+    }
+
+    /**
+     * Enum description
+     *
+     */
+    public enum FileSelectionMode {
+        FILES_ONLY(JFileChooser.FILES_ONLY),
+        FILES_AND_DIRECTORIES(JFileChooser.FILES_AND_DIRECTORIES),
+        DIRECTORIES_ONLY(JFileChooser.DIRECTORIES_ONLY);
+
+        private final int	fileSelectionMode;
+
+        /**
+         * Constructs ...
+         *
+         *
+         *
+         * @param fileSelectionMode
+         */
+        FileSelectionMode(int fileSelectionMode) {
+            this.fileSelectionMode = fileSelectionMode;
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public int value() {
+            return fileSelectionMode;
+        }
+    }
+
+    /**
+     * Enum description
+     *
+     */
+    public enum KeyLocation {
+        STANDARD(KeyEvent.KEY_LOCATION_STANDARD), LEFT(KeyEvent.KEY_LOCATION_LEFT),
+        RIGHT(KeyEvent.KEY_LOCATION_RIGHT), NUMPAD(KeyEvent.KEY_LOCATION_NUMPAD),
+        UNKNOWN(KeyEvent.KEY_LOCATION_UNKNOWN);
+
+        private final int	keyLocation;
+
+        /**
+         * Constructs ...
+         *
+         * @param keyLocation
+         */
+        KeyLocation(int keyLocation) {
+            this.keyLocation = keyLocation;
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public double value() {
+            return keyLocation;
+        }
+    }
 
     /**
      * Output debug text with extended StackTraceElement details.
@@ -139,6 +224,41 @@ public class Components {
     /**
      * Method description
      *
+     * @param e
+     *
+     * @return
+     */
+    public static String keyEventString(KeyEvent e) {
+        String	modString = keyModifierString(e);
+
+        modString = (modString.isEmpty()) ? ""
+                                          : modString + "+";
+
+        String	keyString    = e.getKeyText(e.getKeyCode());
+        String	actionString = (e.isActionKey()) ? " [A]"
+                : "";
+        String	keyLocation  = humanCase(KeyLocation.values()[e.getKeyLocation()].toString());
+
+        return "'" + modString + keyString + "' (" + e.getKeyCode() + "." + e.getModifiers() + "/"
+               + keyLocation + actionString + ")";
+    }
+
+    /**
+     * Method description
+     *
+     * @param e
+     *
+     * @return
+     */
+    public static String keyModifierString(KeyEvent e) {
+        return KeyEvent.getModifiersExText(e.getModifiersEx());
+
+        // return KeyEvent.getModifiersExText(e.getModifiersEx());
+    }
+
+    /**
+     * Method description
+     *
      * @param text
      *
      * @return
@@ -176,6 +296,20 @@ public class Components {
     }
 
     /**
+     * Traverse the call stack to determine and return where a method was called from.
+     *
+     *
+     * @param index
+     * @return fourth stack trace element
+     */
+    public static StackTraceElement myCaller(int index) {
+        StackTraceElement[]	stackTraceElements = Thread.currentThread().getStackTrace();
+        StackTraceElement	caller             = stackTraceElements[index];
+
+        return caller;
+    }
+
+    /**
      * Traverse and output the call stack.
      */
     public static void showCallStack() {
@@ -195,6 +329,15 @@ public class Components {
     }
 
     /**
+     * Method description
+     *
+     * @return
+     */
+    public static String timeStamp() {
+        return "[" + getTimeString() + "]\t";
+    }
+
+    /**
      * Traverse the call stack to determine and return where a method was called from.
      *
      * @return the class name, method name, and line number of the fourth stack trace element
@@ -207,6 +350,55 @@ public class Components {
         int					lineNumber         = caller.getLineNumber();
 
         return classname + "." + methodName + ":" + lineNumber;
+    }
+
+    /**
+     * Returns a lazy initialized singleton instance of this class using the private static SingletonHolder class adopting Bill Pugh's implementation of Singleton in Java.
+     *
+     * Reference: http://en.wikipedia.org/wiki/Singleton_pattern
+     * @return
+     */
+    public static GrasppeKit getInstance() {
+        return ComponentsHolder.instance;
+    }
+
+    /**
+     * Method description
+     *
+     * @return
+     */
+    public static String getTimeString() {
+        return UniversalDateFormat.getTimeString();
+    }
+
+    /**
+     * @param level
+     */
+    public static void setDebugTimeStamp(final int level) {
+        int	delay = 10000;		// milliseconds
+
+        if (level > debugLevel) {
+            GrasppeKit.debugText("Console Timestamp Not Initialized",
+                                 timeStamp() + "Interval: " + delay
+                                 + " milliseconds\tDebug Level: " + level + "/" + debugLevel, 2);
+
+            return;
+        }
+
+        GrasppeKit.debugText("Initiating Console Timestamp",
+                             timeStamp() + "Interval: " + delay + " milliseconds\tDebug Level: "
+                             + level + "/" + debugLevel, level);
+
+        ActionListener	taskPerformer = new ActionListener() {
+
+            public void actionPerformed(ActionEvent evt) {
+                GrasppeKit.debugText(
+                    "\n" + getTimeString()
+                    + "\t\t--------------------------------------------------", level);
+            }
+        };
+
+        new Timer(delay, taskPerformer).start();
     }
 
     /**
@@ -261,9 +453,16 @@ public class Components {
         protected ActionListener	actionListener;
         protected boolean			executable = false;
         protected boolean			executed   = false;
+        protected boolean			executing  = false;
         protected boolean			useModel   = false;
         protected AbstractModel		model;
         protected Observers			observers = new Observers();
+        protected KeyEvent			keyEvent;
+
+//      protected GrasppeKit        grasppeKit     = GrasppeKit.getInstance();
+
+        /** Field description */
+        public int	mnemonicKey;
 
         /** Field description */
         public String	name = getClass().getSimpleName();
@@ -276,6 +475,11 @@ public class Components {
          */
         public AbstractCommand(ActionListener listener, String text) {
             super(text);	// , icon);
+
+//          debugText("Abstract Command",
+//                    "mnemonicKey = char '" + mnemonicKey + "'; int '" + (int)mnemonicKey + "'",
+//                    3);     // ; boolean '" + (boolean) mnemonicKey + "'",3);
+//          if (mnemonicKey != '\u0000') setMnemonicKey(mnemonicKey);
             actionListener = listener;
         }
 
@@ -299,6 +503,22 @@ public class Components {
         public void actionPerformed(ActionEvent e) {
             executed = false;
             actionListener.actionPerformed(e);
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public boolean altPressed() {
+            if (getKeyEvent() != null) return getKeyEvent().isAltDown();
+
+            return false;
+
+//          boolean   altDown     = getKeyEvent().isAltDown();
+//          boolean   controlDown = getKeyEvent().isControlDown();
+//          boolean   shiftDown   = getKeyEvent().isShiftDown();
+//          boolean   metaDown    = getKeyEvent().isMetaDown();
         }
 
         /**
@@ -359,6 +579,15 @@ public class Components {
         }
 
         /**
+         * Method description
+         *
+         * @return
+         */
+        public boolean controlPressed() {
+            return getKeyEvent().isControlDown();
+        }
+
+        /**
          * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
          *
          * @param observer
@@ -373,16 +602,14 @@ public class Components {
          * @return  true if actions completed successfully!
          */
         public final boolean execute() {
+            if (executing) return false;
             if (hasExecuted()) return false;
-
-            if (!canExecute()) {
-                update();
-                if (!canExecute())
-                    throw new IllegalStateException(getName()
-                        + " could not execute in its current state.");
-            }
-
+            if (!canExecute()) update();
+            if (!canExecute())
+                throw new IllegalStateException(getName()
+                    + " could not execute in its current state.");
             debugText("Command Execution Started", lastSplit(toString()), 3);
+            executing = true;
 
             if (!perfomCommand() ||!completed()) {
                 debugText("Command Execution Failed", lastSplit(toString()), 2);
@@ -390,7 +617,8 @@ public class Components {
                 return false;
             }
 
-            executed = true;
+            executing = false;
+            executed  = true;
             debugText("Command Execution Ends", lastSplit(toString()), 3);
 
             return executed;
@@ -417,6 +645,38 @@ public class Components {
         }
 
         /**
+         * Method description
+         *
+         * @param e
+         *
+         * @return
+         */
+        public final boolean execute(KeyEvent e) {
+            setKeyEvent(e);
+            execute();
+            setKeyEvent();
+
+            return executed;
+        }
+
+        /**
+         * Method description
+         *
+         *
+         * @param forcedAction
+         * @param e
+         *
+         * @return
+         */
+        public final boolean execute(boolean forcedAction, KeyEvent e) {
+            setKeyEvent(e);
+            execute(forcedAction);
+            setKeyEvent();
+
+            return executed;
+        }
+
+        /**
          * Detaches from the model when being finalize through garbage collection.
          *
          * @throws Throwable
@@ -439,6 +699,15 @@ public class Components {
         }
 
         /**
+         * Method description
+         *
+         * @return
+         */
+        public boolean metaPressed() {
+            return getKeyEvent().isMetaDown();
+        }
+
+        /**
          * Notifies all observer through the observers object which calls update().
          *
          */
@@ -456,11 +725,44 @@ public class Components {
         }
 
         /**
+         * Method description
+         *
+         * @return
+         */
+        public boolean shiftPressed() {
+            return getKeyEvent().isShiftDown();
+        }
+
+        /**
          * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
          */
         @Override
         public void update() {
             canExecute(!useModel || (model != null));		// either not using model or model is not empty!
+
+            if (canExecute()) {
+                debugText("Abstract Command Update", getName() + " can execute.", 3);
+            } else {
+                debugText("Abstract Command Update", getName() + " cannot execute.", 3);
+            }
+
+            notifyObservers();
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public KeyEvent getKeyEvent() {
+            return keyEvent;
+        }
+
+        /**
+         * @return the mnemonicKey
+         */
+        public int getMnemonicKey() {
+            return mnemonicKey;
         }
 
         /**
@@ -491,6 +793,33 @@ public class Components {
         }
 
         /**
+         * Method description
+         */
+        public void setKeyEvent() {
+            keyEvent = null;
+        }
+
+        /**
+         * Method description
+         *
+         * @param e
+         */
+        public void setKeyEvent(KeyEvent e) {
+            keyEvent = e;
+        }
+
+        /**
+         * @param mnemonicKey the mnemonicKey to set
+         */
+        public void setMnemonicKey(int mnemonicKey) {
+            this.mnemonicKey = mnemonicKey;
+            debugText("Setting Action Mnemonic",
+                      "The key '" + this.mnemonicKey + "' is assigned to " + getName(), 3);
+
+            // super.putValue(Action.MNEMONIC_KEY, mnemonicKey);
+        }
+
+        /**
          * Attaches the command to the specified model and calls update() to reflect the state of the model.
          *
          * @param model
@@ -517,6 +846,8 @@ public class Components {
         protected LinkedHashMap<String, AbstractCommand>	commands;
         protected ActionListener							actionListener;
         protected AbstractController						commandHandler = this;
+
+//      protected GrasppeKit                              grasppeKit     = GrasppeKit.getInstance();
 
         /**
          * Constructs ...
@@ -788,6 +1119,8 @@ public class Components {
         protected AbstractController	controller;
         protected Set<AbstractView>		views = new HashSet<AbstractView>();
 
+//      protected GrasppeKit            grasppeKit     = GrasppeKit.getInstance();
+
         /**
          * Constructs a new model object with no predefined controller.
          */
@@ -840,6 +1173,153 @@ public class Components {
 
 
     /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/09
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public class AbstractOperation extends AbstractAction {		// implements Observer, Observable {
+
+        protected boolean	executable = false;
+        protected boolean	executed   = false;
+        protected boolean	executing  = false;
+        protected double	progress   = 0.0;
+
+//      protected GrasppeKit    grasppeKit     = GrasppeKit.getInstance();
+
+        /** Field description */
+        public String	name = getClass().getSimpleName();
+
+        /**
+         * Constructs ...
+         */
+        public AbstractOperation() {
+            super();
+        }
+
+        /**
+         * @param name
+         */
+        public AbstractOperation(String name) {
+            super(name);
+        }
+
+        /**
+         * @param name
+         * @param icon
+         */
+        public AbstractOperation(String name, Icon icon) {
+            super(name, icon);
+        }
+
+        /**
+         * Method description
+         *
+         * @param arg0
+         */
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            execute();
+        }
+
+        /**
+         * Called by an initiator to performOperation(). Returns false if performOperation() did not follow the intended scenario.
+         * @return  true if execution follow intended scenario
+         */
+        public final boolean execute() {
+            if (executing) return false;
+            if (isExecuted()) return false;		// TODO: Implement duplicity resolution
+            if (!isExecutable())
+                throw new IllegalStateException(getName() + " is not currently executable.");
+            debugText("Operation Execution Started", lastSplit(toString()), 3);
+            executing = true;
+            setExecuted(perfomOperation());
+            executing = false;
+            if (isExecuted()) debugText("Operation Execution Ends", lastSplit(toString()), 3);
+            else debugText("Operation Execution Failed", lastSplit(toString()), 2);
+
+            return isExecuted();
+        }
+
+        /**
+         * Method description
+         *
+         * @param forcedAction
+         *
+         * @return
+         */
+        public final boolean execute(boolean forcedAction) {
+            debugText("Operation Execution Forced", lastSplit(toString()), 3);
+
+            // if (forcedAction)
+            setExecuted(false);
+            setExecutable(true);
+
+            return execute();
+        }
+
+        /**
+         * Called by execute to complete execution of command actions. This method must be overloaded and return true for the action to complete.
+         * @return  false unless otherwise overridden!
+         */
+        protected boolean perfomOperation() {
+            return false;
+        }
+
+        /**
+         * Returns the name of the command.
+         *
+         * @return
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return the progress
+         */
+        protected double getProgress() {
+            return progress;
+        }
+
+        /**
+         * @return the executable
+         */
+        protected boolean isExecutable() {
+            return executable;
+        }
+
+        /**
+         * @return the executed
+         */
+        protected boolean isExecuted() {
+            return executed;
+        }
+
+        /**
+         * @param executable the executable to set
+         */
+        protected void setExecutable(boolean executable) {
+            this.executable = executable;
+        }
+
+        /**
+         * @param executed the executed to set
+         */
+        protected void setExecuted(boolean executed) {
+            this.executed = executed;
+        }
+
+        /**
+         * @param progress the progress to set
+         */
+        protected void setProgress(double progress) {
+            this.progress = progress;
+        }
+    }
+
+
+    /**
      * Views handle the user interface portion of a component. A view directly accesses a controller. A view indirectly accesses a model through the controller. The controller is responsible for all attach/detach calls.
      *
      * @version        $Revision: 0.1, 11/11/08
@@ -849,6 +1329,8 @@ public class Components {
 
         protected AbstractController	controller;
         protected AbstractModel			model;
+
+//      protected GrasppeKit            grasppeKit     = GrasppeKit.getInstance();
 
         /**
          * Constructs ...
@@ -873,6 +1355,19 @@ public class Components {
         protected AbstractModel getModel() {
             return controller.getModel();
         }
+    }
+
+
+    /**
+     * SingletonHolder is loaded on the first execution of Singleton.getInstance()
+     * or the first access to SingletonHolder.INSTANCE, not before. Bill Pugh's implementation of Singleton in Java.
+     *
+     * Reference: http://en.wikipedia.org/wiki/Singleton_pattern
+     */
+    private static class ComponentsHolder {
+
+        /** Field description */
+        public static final GrasppeKit	instance = new GrasppeKit();
     }
 
 
@@ -956,13 +1451,46 @@ public class Components {
         public void notifyObservers() {
             Iterator<Observer>	observerIterator = observerSet.iterator();
 
+            if (!observerIterator.hasNext()) debugText("Observer Update Failed", toString());
+
             while (observerIterator.hasNext()) {
                 Observer	thisObserver = (Observer)observerIterator.next();
 
+                debugText("Observer Update", " ==> " + lastSplit(thisObserver.toString()));
                 thisObserver.update();
             }
 
             // TODO Implement throwing exceptions for update of missing element
+        }
+    }
+
+
+    // public static SimpleDateFormat    dateFormat = new UniversalDateFormat
+    // Private constructor prevents instantiation from other classes
+
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/10
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public static class UniversalDateFormat extends SimpleDateFormat {
+
+        /**
+         * Constructs ...
+         */
+        public UniversalDateFormat() {
+            super("yyyy-MM-dd HH:mm:ss");
+            super.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public static String getTimeString() {
+            return new UniversalDateFormat().format(Calendar.getInstance().getTime());		// date.getTime()) + "]";
         }
     }
 }

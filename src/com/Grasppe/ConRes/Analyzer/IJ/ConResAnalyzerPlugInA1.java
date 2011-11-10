@@ -11,11 +11,13 @@
 
 package com.Grasppe.ConRes.Analyzer.IJ;
 
-import com.Grasppe.Components;
-import com.Grasppe.Components.AbstractCommand;
-import com.Grasppe.Components.AbstractController;
-import com.Grasppe.Components.AbstractModel;
-import com.Grasppe.Components.AbstractView;
+import com.Grasppe.GrasppeKit;
+import com.Grasppe.GrasppeKit.AbstractCommand;
+import com.Grasppe.GrasppeKit.AbstractController;
+import com.Grasppe.GrasppeKit.AbstractModel;
+import com.Grasppe.GrasppeKit.AbstractOperation;
+import com.Grasppe.GrasppeKit.AbstractView;
+import com.Grasppe.GrasppeKit.FileSelectionMode;
 
 import ij.IJ;
 
@@ -26,16 +28,22 @@ import ij.plugin.PlugIn;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import java.io.File;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.TreeSet;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -44,8 +52,9 @@ import javax.swing.Timer;
 public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
     protected ConResAnalyzer	analyzer;
-    protected Components		components = new Components();
-    protected String			name       = this.getClass().getSimpleName();
+
+    // protected GrasppeKit      grasppeKit = GrasppeKit.getInstance();      // .getInstance();
+    protected String	name = this.getClass().getSimpleName();
 
     /**
      * @deprecated  Java exits on last window anyway!
@@ -54,7 +63,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
     public void delayedExit() {
 
         // IJ.showMessage(name, "");
-        components.debugText("Delayed Exit (" + name + ")",
+        GrasppeKit.debugText("Delayed Exit (" + name + ")",
                              "Exiting if no windows are open in 10 seconds!", 2);
 
         int				delay         = 10000;		// milliseconds
@@ -106,7 +115,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowActivated(WindowEvent e) {
-        components.debugText("Window Activated (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Activated (" + name + ")", e.toString());
     }
 
     /**
@@ -116,7 +125,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowClosed(WindowEvent e) {
-        components.debugText("Window Closed (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Closed (" + name + ")", e.toString());
         if (Frame.getFrames().length == 0) delayedExit();
     }
 
@@ -127,7 +136,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowClosing(WindowEvent e) {
-        components.debugText("Window Closing (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Closing (" + name + ")", e.toString());
     }
 
     /**
@@ -137,7 +146,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowDeactivated(WindowEvent e) {
-        components.debugText("Window Deactivated (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Deactivated (" + name + ")", e.toString());
     }
 
     /**
@@ -147,7 +156,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowDeiconified(WindowEvent e) {
-        components.debugText("Window Deiconified (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Deiconified (" + name + ")", e.toString());
     }
 
     /**
@@ -157,7 +166,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowIconified(WindowEvent e) {
-        components.debugText("Window Iconified (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Iconified (" + name + ")", e.toString());
     }
 
     /**
@@ -167,7 +176,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     @Override
     public void windowOpened(WindowEvent e) {
-        components.debugText("Window Opened (" + name + ")", e.toString());
+        GrasppeKit.debugText("Window Opened (" + name + ")", e.toString());
     }
 
     /**
@@ -222,7 +231,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param model
          */
         public CaseManager(CaseManagerModel model) {
-            components.super(model);
+            GrasppeKit.getInstance().super(model);
         }
 
 //      /**
@@ -259,7 +268,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * Create and populate all commands from scratch.
          */
         public void createCommands() {
-            commands = new LinkedHashMap<String, Components.AbstractCommand>();
+            commands = new LinkedHashMap<String, GrasppeKit.AbstractCommand>();
             putCommand(new NewCase(this));
             putCommand(new OpenCase(this));
             putCommand(new CloseCase(this));
@@ -320,7 +329,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @param name
              */
             public CaseManagerCommand(ActionListener listener, String name) {
-                components.super(listener, name, false);
+                GrasppeKit.getInstance().super(listener, name, false);
                 setModel(((CaseManager)listener).getModel());
             }
 
@@ -336,6 +345,23 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
 
         /**
+         * Class description
+         *
+         * @version        $Revision: 1.0, 11/11/09
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public abstract class CaseManagerOperation extends AbstractOperation {
+
+            /**
+             * @param name
+             */
+            public CaseManagerOperation(String name) {
+                GrasppeKit.getInstance().super(name);
+            }
+        }
+
+
+        /**
          * Defines Case Manager's Close Case actions and command, using the EAC pattern.
          *
          * @version        $Revision: 1.0, 11/11/08
@@ -343,7 +369,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public class CloseCase extends CaseManagerCommand {
 
-            protected static final String	name = "CloseCase";
+            protected static final String	name        = "CloseCase";
+            protected static final int		mnemonicKey = KeyEvent.VK_C;
 
             /**
              * Constructs a realization of AbstractCommand.
@@ -352,6 +379,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              */
             public CloseCase(ActionListener listener) {
                 super(listener, name);
+                super.mnemonicKey = mnemonicKey;
+                update();
             }
 
             /**
@@ -362,19 +391,49 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
             public boolean perfomCommand() {
                 boolean	canProceed = !isCaseClosed();		// canExecute();
 
-                components.debugText("Close Case Attempt", "will be checking isCaseClosed()", 4);
+                GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 4);
                 if (!canProceed) return true;		// Action responded to in alternative scenario
-                canProceed = IJ.showMessageWithCancel(name,
+                if (!altPressed())
+                    canProceed = IJ.showMessageWithCancel(name,
                         "Do you want to close the current case?");
                 if (!canProceed) return true;		// Action responded to in alternative scenario
-                components.debugText("Close Case Proceeds", "User confirmed close.", 3);
+                GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", 3);
                 getModel().backgroundCase = getModel().currentCase;
                 getModel().currentCase    = null;
-                components.debugText("Closed Case Success",
+                GrasppeKit.debugText("Closed Case Success",
                                      "Moved current case to background and cleared current case.",
                                      4);
+                getModel().notifyObservers();
 
+                // update();
                 return true;	// Action responded to in intended scenario
+            }
+
+            /**
+             * Method description
+             *
+             * @param keyEvent
+             *
+             * @return
+             */
+            public boolean quickClose(KeyEvent keyEvent) {
+                boolean	canProceed;
+
+                try {
+                    canProceed = execute(true, keyEvent);		// Don't care if a case was closed
+                    canProceed = isCaseClosed();				// Only care that no case is open!
+
+                    // getModel().notifyObservers();
+                } catch (Exception e) {
+
+                    // forget about current case!
+                    GrasppeKit.debugText("Close Case Attempt",
+                                         "Failed to close case or no case was open!" + "\n\n"
+                                         + e.toString(), 2);
+                    canProceed = false;
+                }
+
+                return canProceed;
             }
 
             /**
@@ -386,6 +445,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
                 // TODO: Enable if open case, else disable
                 canExecute(!isCaseClosed());	//
+
+                // notifyObservers();
             }
 
             /**
@@ -394,7 +455,119 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @return
              */
             public boolean isCaseClosed() {
-                return !getModel().hasCurrentCase();
+                boolean	value = !(getModel().hasCurrentCase());
+
+                GrasppeKit.debugText("isCaseClose", "" + value, 3);
+
+                return value;
+            }
+        }
+
+
+        /**
+         * Class description
+         *
+         * @version        $Revision: 1.0, 11/11/10
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public abstract class FileChooserOperation extends CaseManagerOperation {
+
+            String	defaultChooserPath =
+                "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
+            File				selectedFile;
+            protected boolean	executable = true;
+            JFileChooser		fileChooser;
+            FileSelectionMode	fileSelectionMode = FileSelectionMode.FILES_AND_DIRECTORIES;
+            TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
+
+            /**
+             * Constructs ...
+             *
+             * @param name
+             */
+            public FileChooserOperation(String name) {
+                super(name);
+                prepareFileChooser();
+            }
+
+            /*
+             *  (non-Javadoc)
+             * @see com.Grasppe.GrasppeKit.AbstractOperation#perfomOperation()
+             */
+
+            /**
+             * Method description
+             *
+             * @return
+             */
+            @Override
+            protected boolean perfomOperation() {
+                prepareFileChooser();
+                if (fileChooser.showOpenDialog(GrasppeKit.commonFrame)
+                        == JFileChooser.CANCEL_OPTION)
+                    return false;
+
+                // TODO: Inspect & Verify Scan Images / TDF are in selectedFile
+                selectedFile = fileChooser.getSelectedFile();
+                if (!selectedFile.isDirectory()) selectedFile = selectedFile.getParentFile();
+
+                return true;
+            }
+
+            /**
+             * Method description
+             */
+            public void prepareFileChooser() {
+                fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(fileSelectionMode.value());
+
+                // Add filters
+                while (filters.iterator().hasNext())
+                    fileChooser.addChoosableFileFilter(filters.iterator().next());
+
+                // Setting initial chooser selection
+                try {
+                    File	defaultPath = new File(defaultChooserPath);
+
+                    fileChooser.setSelectedFile(defaultPath);
+                } catch (NullPointerException exception) {
+
+                    // Not setting initial chooser selection
+                }
+            }
+
+            /**
+             * Method description
+             *
+             * @return
+             */
+            public boolean quickSelect() {
+                boolean	canProceed = false;
+                String	finalName  = GrasppeKit.humanCase(getName());
+
+                try {
+                    canProceed = execute(true);
+                } catch (Exception e) {
+                    GrasppeKit.debugText(finalName + " Failed",
+                                         finalName + " threw a " + e.getClass().getSimpleName()
+                                         + "\n\n" + e.toString(), 2);
+                }
+
+                return canProceed;
+            }
+
+            /**
+             * @return the selectedFile
+             */
+            protected File getSelectedFile() {
+                return selectedFile;
+            }
+
+            /**
+             * @param selectedFile the selectedFile to set
+             */
+            protected void setSelectedFile(File selectedFile) {
+                this.selectedFile = selectedFile;
             }
         }
 
@@ -407,7 +580,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public class NewCase extends CaseManagerCommand {
 
-            protected static final String	name = "NewCase";
+            protected static final String	name        = "NewCase";
+            protected static final int		mnemonicKey = KeyEvent.VK_N;
 
             /**
              * Constructs a realization of AbstractCommand.
@@ -416,6 +590,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              */
             public NewCase(ActionListener listener) {
                 super(listener, name);
+                super.mnemonicKey = mnemonicKey;
                 update();
             }
 
@@ -431,36 +606,39 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
                 // TODO: Show imageFolderChooser, if can create new case with images, confirm and close case before creating new case
                 // TODO: Show imageFolderChooser
                 // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
-                // TODO: Confirm and close current case before attempting to create new case
-                try {
-                    CloseCase	closeCase = (CloseCase)commandHandler.getCommand("CloseCase");
-
-                    canProceed = closeCase.execute(false);		// Don't care if a case was closed
-                    canProceed = closeCase.isCaseClosed();		// Only care that no case is open!
-                } catch (IllegalStateException e) {
-                    components.debugText("New Case Attempt",
-                                         "Failed to close case or no case was open!", 3);
-                    canProceed = true;
-                } catch (Exception e) {
-
-                    // forget about current case!
-                    components.debugText("New Case Attempt",
-                                         "Failed to close case or no case was open!" + "\n\n"
-                                         + e.toString(), 2);
-                    canProceed = false;
-                }
-
+//              try {
+//                  CloseCase closeCase = (CloseCase)commandHandler.getCommand("CloseCase");
+//
+//                  canProceed = closeCase.execute(false, getKeyEvent());     // Don't care if a case was closed
+//                  canProceed = closeCase.isCaseClosed();        // Only care that no case is open!
+//                  getModel().notifyObservers();
+//              } catch (IllegalStateException e) {
+//                  GrasppeKit.debugText("New Case Attempt",
+//                                       "Failed to close case or no case was open!", 3);
+//                  canProceed = true;
+//              } catch (Exception e) {
+//
+//                  // forget about current case!
+//                  GrasppeKit.debugText("New Case Attempt",
+//                                       "Failed to close case or no case was open!" + "\n\n"
+//                                       + e.toString(), 2);
+//                  canProceed = false;
+//              }
+                // TODO: Confirm and close current case before attempting to switching cases
+                canProceed =
+                    ((CloseCase)commandHandler.getCommand("CloseCase")).quickClose(getKeyEvent());
                 if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
 
                 // TODO: Create new case in metadata entry state
-                components.debugText("New Case Creation",
+                GrasppeKit.debugText("New Case Creation",
                                      "New case will be created and passed for metadata entry", 4);
 
                 try {
                     getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
+                    getModel().notifyObservers();
                     canProceed = true;
                 } catch (Exception e) {
-                    components.debugText("New Case Failure",
+                    GrasppeKit.debugText("New Case Failure",
                                          "Failed to create new case" + "\n\n" + e.toString(), 2);
                     canProceed = false;
                 }
@@ -472,15 +650,16 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
                     getModel().newCase        = null;					// Clear new case
                     getModel().backgroundCase = null;					// clear background case
                     canProceed                = true;
+                    getModel().notifyObservers();
                 } catch (Exception e) {
-                    components.debugText("New Case Failure",
+                    GrasppeKit.debugText("New Case Failure",
                                          "Failed to reorganize cases in the case manager model."
                                          + "\n\n" + e.toString(), 2);
                     canProceed = false;
                 }
 
                 if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-                components.debugText(
+                GrasppeKit.debugText(
                     "New Case Success",
                     "Created new case and reorganize cases in the case manager model.", 3);
 
@@ -498,14 +677,13 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
                 canExecute(true);		// getModel().hasCurrentCase());
             }
 
-            /**
-             * Returns the correctly-cast model.
-             *
-             * @return
-             */
-            public CaseManagerModel getModel() {
-                return (CaseManagerModel)model;
-            }
+//          /**
+//           * @return the mnemonicKey
+//           */
+//          @Override
+//          public int getMnemonicKey() {
+//              return mnemonicKey;
+//          }
         }
 
 
@@ -517,7 +695,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public class OpenCase extends CaseManagerCommand {
 
-            protected static final String	name = "OpenCase";
+            protected static final String	name        = "OpenCase";
+            protected static final int		mnemonicKey = KeyEvent.VK_O;
 
             /**
              * Constructs a realization of AbstractCommand.
@@ -526,7 +705,64 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              */
             public OpenCase(ActionListener listener) {
                 super(listener, name);
-                executable = true;
+                super.mnemonicKey = mnemonicKey;
+                update();
+            }
+
+            /**
+             * Performs the command operations when called by execute().
+             *
+             * @return
+             */
+            public boolean perfomCommand() {
+                boolean				canProceed       = canExecute();
+                SelectCaseFolder	selectCaseFolder = new SelectCaseFolder();
+
+                GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
+
+//              try {
+//                  canProceed = selectCaseFolder.execute(true);
+//              } catch (Exception e) {
+//                  GrasppeKit.debugText("Open Case Failed",
+//                                       "SelectCaseFolder threw a " + e.getClass().getSimpleName()
+//                                       + "\n\n" + e.toString(), 2);
+//              }
+                canProceed = selectCaseFolder.quickSelect();
+                if (canProceed)
+                    GrasppeKit.debugText("Open Case Selected",
+                                         "SelectCaseFolder returned "
+                                         + selectCaseFolder.getSelectedFile().getAbsolutePath(), 3);
+                else
+                    GrasppeKit.debugText("Open Case Cancled", "SelectCaseFolder was not completed",
+                                         3);
+                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
+
+                // TODO: Verify case folder!
+                // TODO: Confirm and close current case before attempting to switching cases
+                canProceed =
+                    ((CloseCase)commandHandler.getCommand("CloseCase")).quickClose(getKeyEvent());
+                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
+
+                // if a folder is selected!
+                getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
+                getModel().newCase.path  = selectCaseFolder.getSelectedFile().getAbsolutePath();
+                getModel().newCase.title = selectCaseFolder.getSelectedFile().getName();
+                getModel().currentCase   = getModel().newCase;
+                getModel().notifyObservers();
+                GrasppeKit.debugText("Open Case Success",
+                                     "Created new CaseModel for " + getModel().currentCase.title
+                                     + " and reorganize cases in the case manager model.", 3);
+
+                return true;
+            }
+
+            /**
+             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
+             */
+            @Override
+            public void update() {
+                super.update();
+                canExecute(true);		// getModel().hasCurrentCase());
             }
 
 //          /**
@@ -540,6 +776,41 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 //              // TODO: Show caseFolderChooser, if can create open case, confirm and close case before opening the new case
 //          }
         }
+
+
+        /**
+         * Class description
+         *
+         * @version        $Revision: 1.0, 11/11/09
+         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+         */
+        public class SelectCaseFolder extends FileChooserOperation {
+
+            protected static final String	name = "SelectCaseFolder";
+
+//          String                            defaultCaseFolder =
+//              "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
+//          File              selectedFile;
+//          protected boolean executable = true;
+            protected static final String	defaultChooserPath =
+                "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
+
+            // File              selectedFile;
+            protected boolean	executable = true;
+
+            // JFileChooser      fileChooser;
+            protected final FileSelectionMode	fileSelectionMode =
+                FileSelectionMode.DIRECTORIES_ONLY;
+
+            // TreeSet<FileFilter>   filters           = new TreeSet<FileFilter>();
+
+            /**
+             * Constructs ...
+             */
+            public SelectCaseFolder() {
+                super(name);
+            }
+        }
     }
 
 
@@ -552,19 +823,19 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
     public class CaseManagerModel extends AbstractModel {
 
         /** Holds a case that is about to close until currentCase is not null */
-        public CaseModel	backgroundCase;
+        public CaseModel	backgroundCase = null;
 
         /** Field description */
-        public CaseModel	currentCase;
+        public CaseModel	currentCase = null;
 
         /** Field description */
-        public CaseModel	newCase;
+        public CaseModel	newCase = null;
 
         /**
          * Constructs a new model object with no predefined controller.
          */
         public CaseManagerModel() {
-            components.super();
+            GrasppeKit.getInstance().super();
         }
 
         /**
@@ -573,7 +844,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param controller
          */
         public CaseManagerModel(CaseManager controller) {
-            components.super(controller);
+            GrasppeKit.getInstance().super(controller);
         }
 
         /**
@@ -592,8 +863,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public boolean hasCurrentCase() {
             if (currentCase != null)
-                components.debugText("Current Case", currentCase.toString(), 3);
-            else components.debugText("Current Case", "null!", 3);
+                GrasppeKit.debugText("Current Case", currentCase.toString(), 3);
+            else GrasppeKit.debugText("Current Case", "null!", 3);
 
             return (currentCase != null);
         }
@@ -629,7 +900,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param controller
          */
         public CaseManagerView(CaseManager controller) {
-            components.super(controller);
+            GrasppeKit.getInstance().super(controller);
         }
     }
 
@@ -651,6 +922,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
         public ConResAnalyzer() {
             this(new ConResAnalyzerModel());
             caseManager = (CaseManager)new CaseManager().withActionListener(this);
+
+            // GrasppeKit.setDebugTimeStamp(3);
         }
 
         /**
@@ -659,7 +932,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param model
          */
         public ConResAnalyzer(ConResAnalyzerModel model) {
-            components.super(model);
+            GrasppeKit.getInstance().super(model);
 
             // TODO Auto-generated constructor stub
         }
@@ -669,7 +942,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public void createCommands() {
 
-            // commands = new LinkedHashMap<String, Components.AbstractCommand>();
+            // commands = new LinkedHashMap<String, GrasppeKit.AbstractCommand>();
             putCommand(new Quit(this));
         }
 
@@ -722,7 +995,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @param name
              */
             public ConResAnalyzerCommand(ActionListener listener, String name) {
-                components.super(listener, name, false);
+                GrasppeKit.getInstance().super(listener, name, false);
                 setModel(((ConResAnalyzer)listener).getModel());
             }
 
@@ -745,7 +1018,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          */
         public class Quit extends ConResAnalyzerCommand {
 
-            protected static final String	name = "Quit";
+            protected static final String	name        = "Quit";
+            protected static final int		mnemonicKey = KeyEvent.VK_Q;
 
             /**
              * Constructs a realization of AbstractCommand.
@@ -754,7 +1028,9 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              */
             public Quit(ActionListener listener) {
                 super(listener, name);
-                executable = true;
+                super.mnemonicKey = mnemonicKey;
+                executable        = true;
+                update();
             }
 
             /**
@@ -763,7 +1039,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
              * @return
              */
             public boolean perfomCommand() {
-                System.exit(0);
+                if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
+                    System.exit(0);
 
                 return true;	// Action responded to in intended scenario
             }
@@ -794,7 +1071,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * Constructs a new model object with no predefined controller.
          */
         public ConResAnalyzerModel() {
-            components.super();
+            GrasppeKit.getInstance().super();
         }
 
         /**
@@ -803,7 +1080,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param controller
          */
         public ConResAnalyzerModel(ConResAnalyzer controller) {
-            components.super(controller);
+            GrasppeKit.getInstance().super(controller);
         }
     }
 
@@ -829,7 +1106,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param controller
          */
         public ConResAnalyzerView(ConResAnalyzer controller) {
-            components.super(controller);
+            GrasppeKit.getInstance().super(controller);
 
             // TODO Auto-generated constructor stub
         }
@@ -852,7 +1129,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
             finalizable = (activeCalls == 0);
 
             // IJ.showMessage(name + " activeCalls: " + activeCalls);
-            components.debugText("Finalize / Active Calls", activeCalls + " remaining.");
+            GrasppeKit.debugText("Finalize / Active Calls", activeCalls + " remaining.");
 
             return finalizable;
         }
@@ -909,8 +1186,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
             while (commandIterator.hasNext()) {
                 AbstractCommand	command = commandIterator.next();
 
-                components.debugText("Command Button Creation",
-                                     components.lastSplit(command.toString()), 3);
+                GrasppeKit.debugText("Command Button Creation",
+                                     GrasppeKit.lastSplit(command.toString()), 3);
 
 //              IJ.showMessage(this.getClass().getSimpleName(),
 //                             this.getClass().getSimpleName() + " Command Added: "
@@ -986,7 +1263,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param model
          */
         public TargetManager(TargetManagerModel model) {
-            components.super(model);
+            GrasppeKit.getInstance().super(model);
         }
     }
 
@@ -1003,7 +1280,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * Constructs a new model object with no predefined controller.
          */
         public TargetManagerModel() {
-            components.super();
+            GrasppeKit.getInstance().super();
         }
 
         /**
@@ -1012,7 +1289,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
          * @param controller
          */
         public TargetManagerModel(TargetManager controller) {
-            components.super(controller);
+            GrasppeKit.getInstance().super(controller);
         }
     }
 
@@ -1023,5 +1300,17 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      * @version        $Revision: 0.1, 11/11/08
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
-    public class TargetManagerViews {}
+    public class TargetManagerView extends AbstractView {
+
+        /**
+         * Constructs ...
+         *
+         * @param controller
+         */
+        public TargetManagerView(AbstractController controller) {
+            GrasppeKit.getInstance().super(controller);
+
+            // TODO Auto-generated constructor stub
+        }
+    }
 }
