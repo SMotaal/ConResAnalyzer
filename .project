@@ -16,9 +16,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>ImageJ</name>
+			<name>gestures-wrapper</name>
 			<type>2</type>
-			<location>/Users/daflair/Downloads/ImageJ/source</location>
+			<location>/Users/daflair/Documents/workspace/examples/gestures-wrapper/src/main/java</location>
 		</link>
 		<link>
 			<name>src/ConResAnalyzerPlugInA0.java</name>

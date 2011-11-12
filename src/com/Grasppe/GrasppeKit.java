@@ -20,6 +20,7 @@ import com.sun.xml.internal.ws.util.StringUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
 import java.io.InvalidObjectException;
 
@@ -58,6 +59,9 @@ public class GrasppeKit {
     /** Field description */
     public static final JFrame	commonFrame = new JFrame();
 
+    /** Field description */
+    public static boolean	debugNatively = true;
+
     /**
      * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.
      */
@@ -67,8 +71,7 @@ public class GrasppeKit {
     }
 
     /**
-     * Enum description
-     *
+     * Enumeration of javax.swing.JFileChooser file selection mode constants
      */
     public enum FileSelectionMode {
         FILES_ONLY(JFileChooser.FILES_ONLY),
@@ -78,20 +81,14 @@ public class GrasppeKit {
         private final int	fileSelectionMode;
 
         /**
-         * Constructs ...
-         *
-         *
-         *
-         * @param fileSelectionMode
+         * @param fileSelectionMode integer or constant variable for the specific enumeration
          */
         FileSelectionMode(int fileSelectionMode) {
             this.fileSelectionMode = fileSelectionMode;
         }
 
         /**
-         * Method description
-         *
-         * @return
+         * @return the integer value for a specific enumeration
          */
         public int value() {
             return fileSelectionMode;
@@ -99,8 +96,7 @@ public class GrasppeKit {
     }
 
     /**
-     * Enum description
-     *
+     * Enumeration of java.awt.event.KeyEvent constants
      */
     public enum KeyLocation {
         STANDARD(KeyEvent.KEY_LOCATION_STANDARD), LEFT(KeyEvent.KEY_LOCATION_LEFT),
@@ -110,21 +106,51 @@ public class GrasppeKit {
         private final int	keyLocation;
 
         /**
-         * Constructs ...
-         *
-         * @param keyLocation
+         * @param keyLocation   integer or constant variable for the specific enumeration
          */
         KeyLocation(int keyLocation) {
             this.keyLocation = keyLocation;
         }
 
         /**
-         * Method description
-         *
-         * @return
+         * @return the integer value for a specific enumeration
          */
         public double value() {
             return keyLocation;
+        }
+    }
+
+    /**
+     * Enumeration of java.awt.event.WindowEvent constants
+     */
+    public enum WindowEventType {								// #(WindowEvent.#), //
+        WINDOW_ACTIVATED(WindowEvent.WINDOW_ACTIVATED),			// The window-activated event type.
+        WINDOW_CLOSED(WindowEvent.WINDOW_CLOSED),				// The window closed event.
+        WINDOW_CLOSING(WindowEvent.WINDOW_CLOSING),				// The "window is closing" event.
+        WINDOW_DEACTIVATED(WindowEvent.WINDOW_DEACTIVATED),		// The window-deactivated event type.
+        WINDOW_DEICONIFIED(WindowEvent.WINDOW_DEICONIFIED),		// The window deiconified event type.
+        WINDOW_FIRST(WindowEvent.WINDOW_FIRST),					// The first number in the range of ids used for window events.
+        WINDOW_GAINED_FOCUS(WindowEvent.WINDOW_GAINED_FOCUS),		// The window-gained-focus event type.
+        WINDOW_ICONIFIED(WindowEvent.WINDOW_ICONIFIED),				// The window iconified event.
+        WINDOW_LAST(WindowEvent.WINDOW_LAST),						// The last number in the range of ids used for window events.
+        WINDOW_LOST_FOCUS(WindowEvent.WINDOW_LOST_FOCUS),		// The window-lost-focus event type.
+        WINDOW_OPENED(WindowEvent.WINDOW_OPENED),				// The window opened event.
+        WINDOW_STATE_CHANGED(WindowEvent.WINDOW_STATE_CHANGED);		// The window-state-changed event type.
+
+        private final int	windowEventType;
+
+        /**
+         * @param windowEventType   integer or constant variable for the specific enumeration
+         */
+        WindowEventType(int windowEventType) {
+            this.windowEventType = windowEventType;
+        }
+
+        /**
+         * @return the integer value for a specific enumeration
+         */
+        public int value() {
+            return windowEventType;
         }
     }
 
@@ -146,12 +172,11 @@ public class GrasppeKit {
     public static void debugText(String text, int level) {
         if (level > debugLevel) return;
 
-        StackTraceElement	caller     = myCaller();
-        String				classname  = lastSplit(caller.getClassName());
-        String				methodName = caller.getMethodName();
-        int					lineNumber = caller.getLineNumber();
+        Caller	caller = getCaller();
+        String	output = (text + "\t\t[" + getCallerString(caller) + "]");
 
-        IJ.showMessage(text + "\t\t[" + classname + "." + methodName + ":" + lineNumber + "]");		// text);
+        if (debugNatively) System.out.println(output);
+        else IJ.showMessage(output);
     }
 
     /**
@@ -176,11 +201,9 @@ public class GrasppeKit {
     }
 
     /**
-     * Converts from camel case to human readable string. Base on: http://www.malethan.com/article/humanise_camel_case_in_java.html
-     *
-     *
+     * Converts from camel case to human readable string.
+     * {@link http://www.malethan.com/article/humanise_camel_case_in_java.html}
      * @param text
-     *
      * @return
      */
     public static String humanCase(String text) {
@@ -188,8 +211,8 @@ public class GrasppeKit {
     }
 
     /**
-     * Converts from camel case to human readable string. Base on: http://www.malethan.com/article/humanise_camel_case_in_java.html
-     *
+     * Converts from camel case to human readable string.
+     * {@link http://www.malethan.com/article/humanise_camel_case_in_java.html}
      * @param text
      * @param titleCase
      *
@@ -283,31 +306,31 @@ public class GrasppeKit {
         return splitText[splitText.length - 1];
     }
 
-    /**
-     * Traverse the call stack to determine and return where a method was called from.
-     *
-     * @return fourth stack trace element
-     */
-    public static StackTraceElement myCaller() {
-        StackTraceElement[]	stackTraceElements = Thread.currentThread().getStackTrace();
-        StackTraceElement	caller             = stackTraceElements[4];
-
-        return caller;
-    }
-
-    /**
-     * Traverse the call stack to determine and return where a method was called from.
-     *
-     *
-     * @param index
-     * @return fourth stack trace element
-     */
-    public static StackTraceElement myCaller(int index) {
-        StackTraceElement[]	stackTraceElements = Thread.currentThread().getStackTrace();
-        StackTraceElement	caller             = stackTraceElements[index];
-
-        return caller;
-    }
+//  /**
+//   * Traverse the call stack to determine and return where a method was called from.
+//   *
+//   * @return fourth stack trace element
+//   */
+//  public static StackTraceElement myCaller() {
+//      StackTraceElement[]   stackTraceElements = Thread.currentThread().getStackTrace();
+//      StackTraceElement caller             = stackTraceElements[4];
+//
+//      return caller;
+//  }
+//
+//  /**
+//   * Traverse the call stack to determine and return where a method was called from.
+//   *
+//   *
+//   * @param index
+//   * @return fourth stack trace element
+//   */
+//  public static StackTraceElement myCaller(int index) {
+//      StackTraceElement[]   stackTraceElements = Thread.currentThread().getStackTrace();
+//      StackTraceElement caller             = stackTraceElements[index];
+//
+//      return caller;
+//  }
 
     /**
      * Traverse and output the call stack.
@@ -338,28 +361,57 @@ public class GrasppeKit {
     }
 
     /**
-     * Traverse the call stack to determine and return where a method was called from.
+     * Method description
      *
-     * @return the class name, method name, and line number of the fourth stack trace element
+     * @return
      */
-    public static String whoCalledMe() {
+    public static Caller getCaller() {
+        return getCaller(4);
+    }
+
+    /**
+     * Method description
+     *
+     * @param traversals
+     *
+     * @return
+     */
+    public static Caller getCaller(int traversals) {
         StackTraceElement[]	stackTraceElements = Thread.currentThread().getStackTrace();
-        StackTraceElement	caller             = stackTraceElements[4];
-        String				classname          = caller.getClassName();
+        StackTraceElement	caller             = stackTraceElements[traversals];
+        String				className          = caller.getClassName();
         String				methodName         = caller.getMethodName();
         int					lineNumber         = caller.getLineNumber();
 
-        return classname + "." + methodName + ":" + lineNumber;
+        return new Caller(stackTraceElements, caller, className, methodName,
+                                        lineNumber);
+    }
+
+    /**
+     * Traverse the call stack to determine and return where a method was called from.
+     * @return the class name, method name, and line number of the fourth stack trace element
+     */
+    public static String getCallerString() {
+        return getCallerString(getCaller());
+    }
+
+    /**
+     * Traverse the call stack to determine and return where a method was called from.
+     *
+     * @param caller
+     * @return the class name, method name, and line number of the fourth stack trace element
+     */
+    public static String getCallerString(Caller caller) {
+        return caller.simpleName + "." + caller.methodName + ":" + caller.lineNumber;
     }
 
     /**
      * Returns a lazy initialized singleton instance of this class using the private static SingletonHolder class adopting Bill Pugh's implementation of Singleton in Java.
-     *
-     * Reference: http://en.wikipedia.org/wiki/Singleton_pattern
+     * {@link http://en.wikipedia.org/wiki/Singleton_pattern}
      * @return
      */
     public static GrasppeKit getInstance() {
-        return ComponentsHolder.instance;
+        return SingletonHolder.grasppeKit;
     }
 
     /**
@@ -741,9 +793,9 @@ public class GrasppeKit {
             canExecute(!useModel || (model != null));		// either not using model or model is not empty!
 
             if (canExecute()) {
-                debugText("Abstract Command Update", getName() + " can execute.", 3);
+                debugText("Abstract Command Update", getName() + " can execute.");
             } else {
-                debugText("Abstract Command Update", getName() + " cannot execute.", 3);
+                debugText("Abstract Command Update", getName() + " cannot execute.");
             }
 
             notifyObservers();
@@ -1359,15 +1411,46 @@ public class GrasppeKit {
 
 
     /**
-     * SingletonHolder is loaded on the first execution of Singleton.getInstance()
-     * or the first access to SingletonHolder.INSTANCE, not before. Bill Pugh's implementation of Singleton in Java.
+     * Class description
      *
-     * Reference: http://en.wikipedia.org/wiki/Singleton_pattern
+     * @version        $Revision: 1.0, 11/11/11
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
-    private static class ComponentsHolder {
+    public static class Caller {
 
-        /** Field description */
-        public static final GrasppeKit	instance = new GrasppeKit();
+        public StackTraceElement[]	stackTraceElements;
+        public StackTraceElement	caller;
+        public String				className;
+        public String				simpleName;
+        public String				methodName;
+        public int					lineNumber;
+        
+        public Caller(){
+        	super();
+        }
+
+        /**
+         * @param stackTraceElements
+         * @param caller
+         * @param className
+         * @param methodName
+         * @param lineNumber
+         */
+        public Caller(StackTraceElement[] stackTraceElements, StackTraceElement caller,
+                      String className, String methodName, int lineNumber) {
+            this();
+            this.stackTraceElements = stackTraceElements;
+            this.caller             = caller;
+            this.className          = className;
+            this.simpleName         = lastSplit(className);
+            this.methodName         = methodName;
+            this.lineNumber         = lineNumber;
+        }
+        
+//        public static Caller  newCaller(StackTraceElement[] stackTraceElements, StackTraceElement caller,
+//                      String className, String methodName, int lineNumber) {
+//        	return new Caller(stackTraceElements, caller, className, methodName, lineNumber);
+//        }
     }
 
 
@@ -1465,6 +1548,18 @@ public class GrasppeKit {
     }
 
 
+    /**
+     * SingletonHolder is loaded on the first execution of Singleton.getInstance()
+     * or the first access to SingletonHolder.INSTANCE, not before. Bill Pugh's implementation of Singleton in Java.
+     * {@link http://en.wikipedia.org/wiki/Singleton_pattern}
+     */
+    private static class SingletonHolder {
+
+        /** Field description */
+        public static final GrasppeKit	grasppeKit = new GrasppeKit();
+    }
+
+
     // public static SimpleDateFormat    dateFormat = new UniversalDateFormat
     // Private constructor prevents instantiation from other classes
 
@@ -1472,7 +1567,6 @@ public class GrasppeKit {
      * Class description
      *
      * @version        $Revision: 1.0, 11/11/10
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
     public static class UniversalDateFormat extends SimpleDateFormat {
 

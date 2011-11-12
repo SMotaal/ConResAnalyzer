@@ -1,0 +1,22 @@
+package com.guigarage.gestures;
+
+/**
+ * Listener for multitouch events
+ * @author hendrikebbers
+ *
+ */
+public interface GesturePhaseListener extends GestureListener {
+
+	/**
+	 * Invoked when the user started a multitouch gesture
+	 * @param gesturePhaseEvent the occured event
+	 */
+	void gestureBegan(GesturePhaseEvent gesturePhaseEvent);
+
+	/**
+	 * Invoked when the user finished a multitouch gesture
+	 * @param gesturePhaseEvent the occured event
+	 */
+	void gestureEnded(GesturePhaseEvent gesturePhaseEvent);
+
+}

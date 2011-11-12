@@ -1,0 +1,15 @@
+package com.guigarage.gestures;
+
+/**
+ * Listener for rotation Events
+ * @author hendrikebbers
+ *
+ */
+public interface GestureRotationListener extends GestureListener {
+	
+	/**
+	 * Invoked when the user executed a rotation gesture
+	 * @param gestureRotationEvent the occured event
+	 */
+	void rotate(GestureRotationEvent gestureRotationEvent);
+}

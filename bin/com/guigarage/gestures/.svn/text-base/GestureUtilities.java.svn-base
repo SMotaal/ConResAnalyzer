@@ -1,0 +1,55 @@
+package com.guigarage.gestures;
+
+import javax.swing.JComponent;
+
+
+/**
+ * Utility class for adding and removing gesture listeners to a component.
+ * @author hendrikebbers
+ *
+ */
+public class GestureUtilities {
+	
+	private GestureUtilities() {}
+	
+	/**
+	 * Registered a GestureListener from the given component
+	 * @param comp the component
+	 * @param listener the GestureListener
+	 * @throws GesturesNotSupportedException if multitouch gestures are not supported on current system
+	 */
+	public static synchronized void registerListener(JComponent comp,
+			GestureListener listener) throws GesturesNotSupportedException {
+		if(!isSupported()) {
+			throw new GesturesNotSupportedException();
+		}
+		NativeGestureUtilities.add(comp, listener);
+	}
+	
+	/**
+	 * Deregistered a GestureListener from the given component
+	 * @param comp the component
+	 * @param listener the GestureListener
+	 * @throws GesturesNotSupportedException if multitouch gestures are not supported on current system
+	 */
+	public static synchronized void deregisterListener(JComponent comp,
+			GestureListener listener) throws GesturesNotSupportedException {
+		if(!isSupported()) {
+			throw new GesturesNotSupportedException();
+		}
+		NativeGestureUtilities.remove(comp, listener);
+	}
+	
+	/**
+	 * Method checks if multitouch gestures are supported on current system
+	 * @return true if multitouch gestures are supported on current system
+	 */
+	public static boolean isSupported() {
+		try {
+			Class.forName("com.apple.eawt.event.GestureUtilities").toString();
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+}

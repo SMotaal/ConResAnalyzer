@@ -525,12 +525,12 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
                 if (((AbstractCommand)getAction()).canExecute()) {
                     GrasppeKit.debugText("Command Menu Update",
                                          ((AbstractCommand)getAction()).getName()
-                                         + " menu item can execute.", 4);
+                                         + " menu item can execute.");
                     super.setEnabled(true);
                 } else {
                     GrasppeKit.debugText("Command Menu Update",
                                          ((AbstractCommand)getAction()).getName()
-                                         + " menu item cannot execute.", 3);
+                                         + " menu item cannot execute.");
                     super.setEnabled(false);
                 }
             } catch (Exception exception) {

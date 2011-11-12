@@ -1,0 +1,17 @@
+package com.guigarage.gestures;
+
+import java.util.EventListener;
+
+/**
+ * Basic interface for all gesture listeners
+ * 
+ * @author hendrikebbers
+ * @see GestureMagnificationListener
+ * @see GesturePhaseListener
+ * @see GestureRotationListener
+ * @see GestureSwipeListener
+ * 
+ */
+public interface GestureListener extends EventListener {
+
+}

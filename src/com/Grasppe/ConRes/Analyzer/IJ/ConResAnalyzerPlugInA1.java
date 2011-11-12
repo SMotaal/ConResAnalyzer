@@ -11,6 +11,7 @@
 
 package com.Grasppe.ConRes.Analyzer.IJ;
 
+import com.Grasppe.Common.StopWatch;
 import com.Grasppe.GrasppeKit;
 import com.Grasppe.GrasppeKit.AbstractCommand;
 import com.Grasppe.GrasppeKit.AbstractController;
@@ -20,15 +21,37 @@ import com.Grasppe.GrasppeKit.AbstractView;
 import com.Grasppe.GrasppeKit.FileSelectionMode;
 
 import ij.IJ;
+import ij.ImagePlus;
+
+import ij.gui.ImageCanvas;
+import ij.gui.ImageWindow;
+
+import ij.io.Opener;
 
 import ij.plugin.PlugIn;
 
+import ij.util.Java2;
+
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -49,28 +72,37 @@ import javax.swing.filechooser.FileFilter;
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  *
  */
-public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
 
-    protected ConResAnalyzer	analyzer;
+/**
+ * @author daflair
+ *
+ */
+public class ConResAnalyzerPlugInA1 implements PlugIn {
 
-    // protected GrasppeKit      grasppeKit = GrasppeKit.getInstance();      // .getInstance();
-    protected String	name = this.getClass().getSimpleName();
+    protected static String			name      = ConResAnalyzerPlugInA1.class.getSimpleName();
+    protected static int			exitDelay = 10 * 1000;
+    protected static ConResAnalyzer	analyzer;
 
     /**
      * @deprecated  Java exits on last window anyway!
      */
     @Deprecated
-    public void delayedExit() {
+    public static void delayedExit() {
 
-        // IJ.showMessage(name, "");
         GrasppeKit.debugText("Delayed Exit (" + name + ")",
-                             "Exiting if no windows are open in 10 seconds!", 2);
+                             "Exiting if no windows open in the next " + (exitDelay / 1000)
+                             + " seconds!", 2);
 
-        int				delay         = 10000;		// milliseconds
+        int				delay         = exitDelay;		// milliseconds
         ActionListener	taskPerformer = new ActionListener() {
 
             public void actionPerformed(ActionEvent evt) {
-                if (Frame.getFrames().length == 0) System.exit(0);
+                Frame[]	frames = Frame.getFrames();
+
+                for (Frame frame : frames)
+                    if (frame.isVisible()) return;		// visibleFrames++;
+
+                System.exit(0);
             }
         };
 
@@ -78,17 +110,291 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
     }
 
     /**
-     * Method description
-     *
      * @param args
      */
     public static void main(String[] args) {
 
-        // TODO Auto-generated method stub
-        PlugIn	plugIn = new ConResAnalyzerPlugInA1();
+        new ConResAnalyzerPlugInA1().run("");
 
-        plugIn.run("");
     }
+
+    /**
+     * @param x
+     * @param y
+     */
+    public static void moveFrame(int x, int y) {
+        if (Testing.jFrame == null) return;
+
+        JFrame		frame       = Testing.jFrame;
+        ImageWindow	imageWindow = Testing.imageWindow;
+
+        if (imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
+                y - imageWindow.getY())) {
+            frame.setLocation(x - frame.getWidth() / 2, y - frame.getHeight() / 2);
+            if (!frame.isVisible()) frame.setVisible(true);
+        } else {
+            frame.setLocation(25 - frame.getWidth(), 25 - frame.getHeight());
+            if (frame.isVisible()) frame.setVisible(false);
+        }
+    }
+
+    /**
+     * Method description
+     */
+    public static void prepareFrame() {
+        Testing.jFrame = new JFrame();		// "SpringLayout");
+        Testing.jFrame.setUndecorated(true);
+        Testing.jFrame.setSize(300, 300);
+        Testing.jFrame.setMaximumSize(Testing.jFrame.getSize());
+        Testing.jFrame.setAlwaysOnTop(true);
+        Testing.jFrame.setFocusableWindowState(false);
+        Testing.jFrame.setResizable(false);
+
+        Testing.jFrame.setBackground(Color.black);
+
+        MagnifierCanvas	zoomCanvas = new MagnifierCanvas(Testing.imageWindow.getImagePlus());
+
+        zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
+        zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
+        zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
+        zoomCanvas.setBackground(Color.black);
+
+        //Testing.imageWindow.getCanvas().zoomIn(0, 0);
+
+        Container	contentPane = Testing.jFrame.getContentPane();
+
+        contentPane.setBackground(Color.BLACK);
+
+        /** {@link http://www.java2s.com/Tutorial/Java/0240__Swing/SpringLayout.htm} */
+
+        // SpringLayout layout = new SpringLayout();
+        // contentPane.setLayout(layout);
+
+        contentPane.add(zoomCanvas);
+
+        int	padding = 0;
+
+        GrasppeKit.debugText("Zoom Frame", "Content Pane " + contentPane.getBounds().toString(), 3);
+        GrasppeKit.debugText("Zoom Frame", "Frame " + Testing.jFrame.getBounds().toString(), 3);
+        GrasppeKit.debugText("Zoom Frame", "Zoom Canvas " + zoomCanvas.getBounds().toString(), 3);
+
+//      layout.putConstraint(SpringLayout.NORTH, zoomCanvas, padding, SpringLayout.NORTH, contentPane);
+//      layout.putConstraint(SpringLayout.EAST, zoomCanvas, padding, SpringLayout.EAST, contentPane);
+//      layout.putConstraint(SpringLayout.SOUTH, zoomCanvas, padding, SpringLayout.SOUTH, contentPane);
+//        layout.putConstraint(SpringLayout.WEST, zoomCanvas, padding, SpringLayout.WEST, contentPane);
+
+        // zoomCanvas.setSize(contentPane.getWidth() - 2*padding, contentPane.getHeight() - 2*padding);
+        // zoomCanvas.setLocation(0, 0);
+
+        double	windowZoom = Testing.imageWindow.getCanvas().getMagnification();
+
+        zoomCanvas.setMagnification(windowZoom * 2.0);
+
+        Testing.jFrame.setVisible(true);
+
+        Testing.jFrame.pack();
+        Testing.jFrame.setSize(300, 300);
+
+        Testing.zoomCanvas = zoomCanvas;
+
+    }
+
+    /**
+     * Method description
+     */
+    public static void redrawFrame() {
+        if (Testing.jFrame == null) return;
+        
+        if (Testing.showZoom = false) {Testing.jFrame.setVisible(false); return;}
+
+        ImageWindow		imageWindow = Testing.imageWindow;
+        ImageCanvas		imageCanvas = imageWindow.getCanvas();
+        JFrame			zoomWindow  = Testing.jFrame;
+        MagnifierCanvas	zoomCanvas  = Testing.zoomCanvas;
+        
+        Point	zoomWindowLocation, zoomLocation = null; 
+
+        if (zoomWindow.isVisible()) {
+            zoomWindowLocation = zoomWindow.getLocationOnScreen();		// Location on screen
+            zoomLocation       = zoomCanvas.getLocationOnScreen();		// Location on screen
+        }
+
+        Point		zoomPosition        = zoomCanvas.getLocation();		// Position within component
+        Dimension	zoomSize            = zoomCanvas.getSize();
+        Double		zoomScale           = zoomCanvas.getMagnification();
+
+        Point		imageWindowLocation = imageWindow.getLocationOnScreen();
+        Point		imageLocation       = imageCanvas.getLocationOnScreen();
+        Point		imagePosition       = imageCanvas.getLocation();
+        Dimension	imageSize           = imageCanvas.getSize();
+        Double		imageScale          = imageCanvas.getMagnification();
+
+        Point		pointerCenter;
+
+        try {
+        /* Pointer Center: pointer location in image canvas in screen units */
+        if (zoomWindow.isVisible()) {
+        	pointerCenter = zoomCanvas.getMousePosition();
+        	pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
+        			zoomLocation.y - imageLocation.y + pointerCenter.y);
+        }
+        else 
+        	pointerCenter = imageCanvas.getMousePosition();
+        } catch (Exception exception){
+        	zoomWindow.setVisible(false);
+        	pointerCenter = null;
+        }
+        
+        if(pointerCenter == null) return;
+        
+        if (!zoomWindow.isVisible()) zoomWindow.setVisible(true); 
+
+        /* Source Center: pointer location in source coordinate space in source units */
+        Point	sourceCenter = new Point((int)(pointerCenter.x / imageScale),
+                                       (int)(pointerCenter.y / imageScale));
+
+        /* Source Size: source rectangle size in source units */
+        Dimension	sourceSize = new Dimension((int)(zoomSize.width / zoomScale),
+                                   (int)(zoomSize.height / zoomScale));
+        
+        /* Source Corner: source rectangle top-left in source units */
+        Point	sourceCorner = new Point((int)(sourceCenter.x - sourceSize.width/2),
+        								(int)(sourceCenter.y - sourceSize.height/2));
+        
+        /* Source Rectangle: source rectangle in source units */
+        Rectangle sourceRectangle = new Rectangle(sourceCorner,sourceSize);
+        
+        String debugString = "";        		
+        		debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
+        		debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
+        		debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
+        
+        //GrasppeKit.debugText("Magnifier", GrasppeKit.lastSplit(pointerCenter.toString()));
+        
+        Testing.zoomCanvas.setSourceRect(sourceRectangle);
+        
+        Testing.zoomCanvas.repaint(0,0,zoomSize.width, zoomSize.height);
+
+    }
+
+    /*
+     *  Center Image Position: Find zoom
+     * /            if(mousePosition==null) return;
+     * /        Point mouseLocation = new Point(mousePosition.x + zoomWindowLocation.x,
+     * /                                        mousePosition.y + zoomWindowLocation.y);
+     *
+     * /        // Canvas Offset: Find top-left/zoom canvas relative top-left/image canvas in screen units
+     * /        Point canvasOffset = new Point(zoomLocation.x - imageLocation.x,
+     * /                                       zoomLocation.y - imageLocation.y);
+     *
+     * // Center Offset: Find center/zoom canvas relative to top-left/image canvas in screen units
+     * Point   centerOffset = new Point(canvasOffset.x + zoomSize.width / 2,
+     *                              canvasOffset.y + zoomSize.height / 2);
+     *
+     * // Image Coordinates: Find image coordinates for the centerOffset in image units
+     * Point   imageCenter = new Point((int)(centerOffset.x / imageScale),
+     *                              (int)(centerOffset.y / imageScale));
+     *
+     * // Zoom Center: Find zoom coordinates for source center in screen units
+     * Point targetCenter = new Point((int)(imageCenter.x * zoomScale),(int)(imageCenter.y * zoomScale));
+     *
+     * // Zoom Offset: Find top-left/zoom canvas relative to zoom center coordinates in screen units
+     * Point   targetOffset = new Point(targetCenter.x - zoomSize.width / 2,
+     *                               targetCenter.y - zoomSize.height / 2);
+     *
+     * //GrasppeKit.debugText("Magnifier", zoomCanvas.getSrcRect().toString());
+     *
+     * /        zoomCanvas.setSourceRect(r)
+     * // Testing.zoomCanvas.setSourceRect(new Rectangle(sX,sY, (int)(dW/zoom),(int)(dH/zoom)));
+     *
+     *
+     * /      int[] sc = {cursorLocation.x - ds[0]/2, cursorLocation.y - ds[1]/2};
+     * /      int[] sx = {sc[0], sc[0]+ds[0]};
+     * /      int[] sy = {sc[1], sc[1]+ds[1]}
+     * /      Point       cursorLocation = imageCanvas.getCursorLoc();
+     * /      int cX = cursorLocation.x;
+     * /      int cY = cursorLocation.y;
+     * /      String cXY = "cXY: " + cX + ", " + cY;
+     *
+     * /      double zoom = Testing.zoomCanvas.getMagnification();
+     * /      double wZoom = Testing.imageWindow.getCanvas().getMagnification();
+     *
+     *
+     * /      //Testing.zoomCanvas.setSize(dW, dH);
+     * /      imageWindow
+     *
+     * /      ImageWindow.
+     *
+     * /      if(frameCursor==null) return;
+     * /      double mX = cursorPosition.
+     * /      double mY = frameCursor.getY();
+     * /      String mXY = "mXY: " + frameCursor.getX() + ", " + frameCursor.getY();
+     *
+     * /      Point windowPosition = Testing.imageWindow.getCanvas().getLocationOnScreen(); // .getLocation();//.getLocationOnScreen();
+     * /      double wX = windowPosition.getX();
+     * /      double wY = windowPosition.getY();
+     * /      String fXY = "fXY: " + wX + ", " + wY;
+     *
+     * /      Point zoomPosition = Testing.zoomCanvas.getLocationOnScreen(); //Testing.jFrame.getLocation();  //.getLocationOnScreen();
+     * /      double zX = zoomPosition.getX();
+     * /      double zY = zoomPosition.getY();
+     * /      String zXY = "zXY: " + zX + ", " + zY;
+     *
+     * /      double zRatio1 = zoom/wZoom;
+     * /      double zRatio2 = wZoom/zoom;
+     * /      double sW = dW/2; //(dW/2/zoom);
+     * /      double sH = dH/4;
+     * /      int sX = (int)(zX-wX);//(zX+(dW/2/zoom)-wX); //-windowPosition.getX())); //+mX-windowPosition.getX();
+     * /      sX =(int)(sX/wZoom);
+     * /      int sY = (int)(zY-wY);
+     * /      sY =(int)(sY/wZoom);
+     * /      //int sY = 0; //imageCanvas.offScreenY((int)(zY+(dH/2/zoom)-wY)); //-windowPosition.getY())); //+mY;
+     * /      String sXY = "sXY: " + sX + ", " + sY;
+     *
+     * /      //int nX = Testing.zoomCanvas.offScreenX((int)sX); //Testing.zoomCanvas.screenX(
+     * /      //int nW = Testing.zoomCanvas.offScreenX((int)ds[0]);
+     * /      //int nY = imageCanvas.offScreenY((int)sY); //Testing.zoomCanvas.screenY(
+     * ///        String nXY = "nXY: " + nX + ", " + nY;
+     *
+     * /      //Testing.zoomCanvas.setRect(nX, nY);
+     *
+     * /      Testing.zoomCanvas.setSourceRect(new Rectangle(sX,sY, (int)(dW/zoom),(int)(dH/zoom)));
+     * /      //Testing.zoomCanvas.setImageUpdated();
+     * /      Testing.zoomCanvas.repaint(0,0,dW, dH);
+     * /      //Testing.jFrame.getContentPane().repaint();
+     * /      //Testing.jFrame.repaint();
+     * /      //Testing.zoomCanvas.zoomOut(cursorLocation.x, cursorLocation.y);
+     * /      //Testing.zoomCanvas.zoomIn(cursorLocation.x, cursorLocation.y);
+     * /      //Testing.zoomCanvas.adju //setCursor(0, 0, (int)sX, (int)sY); //, dx[1]/2, dy[1]/2);
+     *
+     * // Testing.zoomCanvas.repaint();
+     *
+     * // String zR = Testing.zoomCanvas.getSrcRect().toString(); //Testing.zoomCanvas.getBounds().toString();
+     *
+     * /        GrasppeKit.debugText("Magnifier", sXY + "\t" + fXY + "\t" + zXY + "\t" + cXY, 3);     // fXY + "\t" + mXY + "\t" + sXY, 3);
+     *
+     * /      Image zoomImage = imageCanvas.getImage().
+     *
+     * // Image newImage = frame.createImage(ds[0], ds[1]);
+     * // newImage.getGraphics().dr
+     *
+     *
+     * /        ImageWindow   imageWindow    = Testing.imageWindow;
+     *
+     *
+     *
+     * /        frame.repaint();
+     * /        frame.getGraphics().drawImage(imageWindow.getImagePlus().getImage(), 0, 0, dWidth, dHeight,
+     * /                                      cursorLocation.x - dWidth / 2,
+     * /                                      cursorLocation.y - dHeight / 2,
+     * /                                      cursorLocation.x + dWidth / 2,
+     * /                                      cursorLocation.y + dHeight / 2, frame);
+     *
+     * // Testing.jFrame.paint(Testing.jFrame.getGraphics());
+     * // Testing.jFrame.update(Testing.jFrame.getGraphics());
+     *
+     * @param arg
+     */
 
     /**
      * Method description
@@ -97,86 +403,179 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
      */
     public void run(String arg) {
         IJ.showMessage(name, "Hello world!");
-        analyzer = new ConResAnalyzer();
+        
+        
+        KeyboardFocusManager	manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 
-        ConResAnalyzerModel	analyzerModel = analyzer.getModel();
-        ConResAnalyzerView	analyzerView  = new ConResAnalyzerView(analyzer);
+        manager.addKeyEventDispatcher(new MyDispatcher());
 
-        analyzerView.prepareView(this);
+        GrasppeKit.debugLevel = 4;
 
+        // testAnalyzerMenu();
+        testImageWindow();
+        testImageJMouseListeners();
+        testMagnifier();
+
+//      JFrame    Testing.jFrame = new JFrame();
+//
+//      Testing.jFrame.setSize(500, 500);
+//      Testing.jFrame.setVisible(true);
+//      JComponent
+//      GestureUtilities.registerListener(Testing.jFrame, new GesturePhaseListener() {
+//
+//          @Override
+//          public void gestureEnded(GesturePhaseEvent e) {
+//              String    eventLabel     = "Phase Ended";
+//              Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
+//
+//              GrasppeKit.debugText("Image Window Gesture Event",
+//                                   "Gesture " + eventLabel + "\t" + e.toString(), 3);
+//          }
+//          @Override
+//          public void gestureBegan(GesturePhaseEvent e) {
+//              String    eventLabel     = "Phase Began";
+//              Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
+//
+//              GrasppeKit.debugText("Image Window Gesture Event",
+//                                   "Gesture " + eventLabel + "\t" + e.toString(), 3);
+//          }
+//
+//      });
+        // Testing.imageWindow.getCanvas().addMouseListener();
+        // Testing.imageWindow.add
+        // Macro macro = new Macro();
+        // Macro_Runner macroRunner = new MacroRunner();
         // analyzerView.show();
         // analyzerView.close();
     }
 
     /**
      * Method description
-     *
-     * @param e
      */
-    @Override
-    public void windowActivated(WindowEvent e) {
-        GrasppeKit.debugText("Window Activated (" + name + ")", e.toString());
+    public void testAnalyzerMenu() {
+        if (analyzer == null) analyzer = new ConResAnalyzer();
+
+        /* Static Variables */
+
+        /* Static Members */
+        WindowListener	windowListener = TestingListeners.WindowEventListener;
+
+        /* Local Variables */
+        ConResAnalyzerModel	analyzerModel = analyzer.getModel();
+        ConResAnalyzerView	analyzerView  = new ConResAnalyzerView(analyzer);
+
+        /* Test Statements */
+        analyzerView.prepareView(windowListener);
+
+        /* Static Updates */
+
     }
 
     /**
      * Method description
-     *
-     * @param e
      */
-    @Override
-    public void windowClosed(WindowEvent e) {
-        GrasppeKit.debugText("Window Closed (" + name + ")", e.toString());
-        if (Frame.getFrames().length == 0) delayedExit();
+    public void testImageJMouseListeners() {
+
+        /* Static Variables */
+
+        /* Static Members */
+        MouseMotionListener	motionListener = TestingListeners.IJMotionListener;
+        MouseWheelListener	wheelListener  = TestingListeners.IJWheelListener;
+        MouseListener		mouseListener  = TestingListeners.IJMouseListener;
+        ImageWindow			imageWindow    = Testing.imageWindow;
+
+        /* Local Variables */
+
+        /* Test Statements */
+        imageWindow.getCanvas().addMouseListener(mouseListener);
+        imageWindow.getCanvas().addMouseMotionListener(motionListener);
+        imageWindow.getCanvas().addMouseWheelListener(wheelListener);
+
+        /* Static Updates */
+
+    }
+
+    /**
+     * Opens an ImagePlus image using Opener and creates and displays it in an ImageWindow;
+     */
+    public void testImageWindow() {
+
+        /* Static Variables */
+
+        /* Static Members */
+        ImageWindow		imageWindow    = Testing.imageWindow;
+        WindowListener	windowListener = TestingListeners.WindowEventListener;
+
+        /* Local Variables */
+        Opener		opener;
+        ImagePlus	imagePlus;
+
+        /* Test Statements */
+
+        Testing.startTimer();
+
+        opener    = new Opener();
+        imagePlus = opener.openImage(Testing.inputPath);	// .openURL(inputURL);
+        Testing.checkTimer("Opened ImagePlus " + imagePlus.getTitle());
+
+//      imagePlus.getProcessor().autoThreshold();     // 128);
+//      Testing.checkTimer("Auto Threshold " + imagePlus.getTitle());
+
+        Testing.imageWindow = new ImageWindow(imagePlus);		// Initialize static variable here
+        imageWindow         = Testing.imageWindow;
+        Testing.checkTimer("Created ImageWindow " + imagePlus.getTitle());
+
+        // imageWindow.getCanvas().zoom100Percent();
+        // Testing.checkTimer("Zoomed " + imagePlus.getTitle());
+
+        Testing.imageWindow.getCanvas().fitToWindow();
+
+        imageWindow.setVisible(true);
+        Testing.checkTimer("ImageWindow Displayed " + imagePlus.getTitle());
+
+        imageWindow.addWindowListener(windowListener);
+
+        /* Static Updates */
+
     }
 
     /**
      * Method description
-     *
-     * @param e
      */
-    @Override
-    public void windowClosing(WindowEvent e) {
-        GrasppeKit.debugText("Window Closing (" + name + ")", e.toString());
+    public void testMagnifier() {
+        prepareFrame();
+
+        /* Static Variables */
+
+        /* Static Members */
+        JFrame				frame          = Testing.jFrame;
+        ImageWindow			imageWindow    = Testing.imageWindow;
+        MouseMotionListener	motionListener = TestingListeners.IJMotionListener;
+
+        /* Local Variables */
+
+        /* Test Statements */
+        frame.addMouseMotionListener(motionListener);
+        imageWindow.getCanvas().addMouseMotionListener(motionListener);
+
+        /* Static Updates */
     }
 
     /**
      * Method description
-     *
-     * @param e
      */
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-        GrasppeKit.debugText("Window Deactivated (" + name + ")", e.toString());
-    }
+    public void testProgessBar() {
 
-    /**
-     * Method description
-     *
-     * @param e
-     */
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-        GrasppeKit.debugText("Window Deiconified (" + name + ")", e.toString());
-    }
+        /* Static Variables */
 
-    /**
-     * Method description
-     *
-     * @param e
-     */
-    @Override
-    public void windowIconified(WindowEvent e) {
-        GrasppeKit.debugText("Window Iconified (" + name + ")", e.toString());
-    }
+        /* Static Members */
 
-    /**
-     * Method description
-     *
-     * @param e
-     */
-    @Override
-    public void windowOpened(WindowEvent e) {
-        GrasppeKit.debugText("Window Opened (" + name + ")", e.toString());
+        /* Local Variables */
+
+        /* Test Statements */
+
+        /* Static Updates */
+
     }
 
     /**
@@ -1084,6 +1483,55 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
         }
     }
 
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/09
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    private static class MyDispatcher implements KeyEventDispatcher {
+
+        /** Field description */
+        public int	lastKey;
+
+        /** Field description */
+        public int	lastModifier;
+
+        /**
+         * Method description
+         *
+         * @param e
+         *
+         * @return
+         */
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent e) {
+        	
+//        	zoomFrame(e);
+
+//            // if ((e.getKeyCode() < 65) || (e.getKeyCode() > 90)) return false;     // () >= 65 &&) return false;
+//            if (e.getID() == KeyEvent.KEY_PRESSED) {			// System.out.println("tester");
+//                //return keyPressed(e);
+//            	zoomFrame(e);
+//            } else if (e.getID() == KeyEvent.KEY_RELEASED) {	// System.out.println("2test2");
+//            } else if (e.getID() == KeyEvent.KEY_TYPED) {
+//
+//                // System.out.println("3test3");
+//            }
+
+            return false;
+        }
+    }
+    
+    public static void zoomFrame (KeyEvent e) {
+    	
+//		if (e.getKeyCode() == KeyEvent.VK_ALT)
+//			if (e.getID() == KeyEvent.KEY_PRESSED)
+//    			Testing.showZoom = true;
+//			else 
+//				Testing.showZoom = false;
+//		redrawFrame();
+    }
 
     /**
      * Class description
@@ -1245,6 +1693,89 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
     /**
      * Class description
      *
+     * @version        $Revision: 1.0, 11/11/11
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public static class MagnifierCanvas extends ImageCanvas {
+
+        /**
+         * Constructs ...
+         *
+         * @param imp
+         */
+        public MagnifierCanvas(ImagePlus imp) {
+            super(imp);
+        }
+
+        /**
+         * Method description
+         *
+         * @param g
+         */
+        public void paint(Graphics g) {
+            try {
+                Java2.setBilinearInterpolation(g, true);
+                Java2.setAntialiased(g, true);
+
+                Image	img = imp.getImage();
+
+                if (img != null) g.setColor(getBackground());
+                g.fillRect(0, 0, getWidth(), getHeight());
+                g.drawImage(img, 0, 0, (int)(srcRect.width * magnification),
+                            (int)(srcRect.height * magnification), srcRect.x, srcRect.y,
+                            srcRect.x + srcRect.width, srcRect.y + srcRect.height, null);
+
+            } catch (OutOfMemoryError e) {
+                IJ.outOfMemory("Paint");
+            }
+        }
+
+        /**
+         * Method description
+         *
+         * @param x
+         * @param y
+         */
+        public void setRect(int x, int y) {
+
+            double	newMag = 1;
+
+            int		sx     = super.screenX(x);
+            int		sy     = super.screenY(y);
+
+            /* super.adjustSourceRect(1.0, sx, sy); */
+
+            // IJ.log("adjustSourceRect1: "+newMag+" "+dstWidth+"  "+dstHeight);
+            int	w = (int)Math.round(dstWidth / newMag);
+
+            if (w * newMag < dstWidth) w++;
+
+            int	h = (int)Math.round(dstHeight / newMag);
+
+            if (h * newMag < dstHeight) h++;
+            x = offScreenX(x);
+            y = offScreenY(y);
+
+            Rectangle	r = new Rectangle(x - w / 2, y - h / 2, w, h);
+
+            if (r.x < 0) r.x = 0;
+            if (r.y < 0) r.y = 0;
+            if (r.x + w > imageWidth) r.x = imageWidth - w;
+            if (r.y + h > imageHeight) r.y = imageHeight - h;
+            srcRect = r;
+
+            // setMagnification(newMag);
+            repaint();
+
+            // IJ.log("adjustSourceRect2: "+srcRect+" "+dstWidth+"  "+dstHeight);
+
+        }
+    }
+
+
+    /**
+     * Class description
+     *
      * @version        $Revision: 0.1, 11/11/08
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
@@ -1311,6 +1842,234 @@ public class ConResAnalyzerPlugInA1 implements PlugIn, WindowListener {
             GrasppeKit.getInstance().super(controller);
 
             // TODO Auto-generated constructor stub
+        }
+    }
+
+
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/11
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public static class Testing {
+
+        static ImageWindow		imageWindow;
+        static JFrame			jFrame;
+        static MagnifierCanvas	zoomCanvas;
+        static StopWatch		timer      = new StopWatch();
+        static String			rootFolder = "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples";
+        static String			caseFolder = "Approval_Scans_ConRes26_FS";
+        
+        static boolean showZoom = false;
+
+//        static String			imageName  = "CirRe27U_50t.png";
+        static String     imageName  = "CirRe27U_50i.tif";
+
+        static String	inputPath = (rootFolder + "/" + caseFolder + "/"
+                                   + imageName).replaceAll("//", "/");
+
+        /**
+         * Outputs elapsed time with generic description without stopping or reseting the timer.
+         * @param description
+         */
+        static void checkTimer(String description) {
+            GrasppeKit.debugText("Elapsed Time",
+                                 description + " in " + timer.getElapsedTime() + " ms.", 3);
+        }
+
+        /**
+         * Outputs elapsed time with generic description and resets timer.
+         */
+        static void markTimer() {
+            markTimer("Task finished in");
+        }
+
+        /**
+         * Outputs elapsed time with specified description and resets timer.
+         * @param description
+         */
+        static void markTimer(String description) {
+            checkTimer(description);
+
+//          GrasppeKit.debugText("Elapsed Time",
+//                               description + " in " + timer.getElapsedTime() + " ms.", 3);
+            startTimer();
+        }
+
+        /**
+         * Starts timer.
+         */
+        static void startTimer() {
+            timer.start();
+        }
+    }
+
+
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/11
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public static class TestingListeners {
+
+        static int	debugginLevel = 5;
+
+        /** Field description */
+        public static MouseListener	IJMouseListener = new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                debugEvent("IJMouseListener", e);
+                e.consume();
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                debugEvent("IJMouseListener", e);
+                e.consume();
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                debugEvent("IJMouseListener", e);
+                redrawFrame();
+                e.consume();
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                debugEvent("IJMouseListener", e);
+                e.consume();
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                debugEvent("IJMouseListener", e);
+                e.consume();
+            }
+        };
+
+        /** Field description */
+        public static MouseWheelListener	IJWheelListener = new MouseWheelListener() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                debugEvent("IJWheelListener", e);
+                e.consume();
+            }
+        };
+
+        // Testing.imageWindow.getCanvas().addMouseMotionListener(
+
+        /** Field description */
+        public static MouseMotionListener	IJMotionListener = new MouseMotionListener() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+
+                // e.getSource().getClass().equals(ImageCanvas.class);
+                moveFrame(e.getXOnScreen(), e.getYOnScreen());
+                redrawFrame();
+                debugEvent("IJMotionListener", e);
+                e.consume();
+            }
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                debugEvent("IJMotionListener", e);
+                e.consume();
+            }
+        };
+
+        /** Field description */
+        public static WindowListener	WindowEventListener = new WindowListener() {
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Activated (" + name + ")", e.toString());
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {
+                Frame[]	frames        = Frame.getFrames();
+
+                int		visibleFrames = 0;
+
+                for (Frame frame : frames)
+                    if (frame.isVisible()) visibleFrames++;
+
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Closed (" + name + ")", e.toString());
+                if ((visibleFrames == 1) && Testing.jFrame.isVisible()) delayedExit();
+                if (visibleFrames == 0) delayedExit();
+            }
+            @Override
+            public void windowClosing(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Closing (" + name + ")", e.toString());
+            }
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Deactivated (" + name + ")", e.toString());
+            }
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Deiconified (" + name + ")", e.toString());
+            }
+            @Override
+            public void windowIconified(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Iconified (" + name + ")", e.toString());
+            }
+            @Override
+            public void windowOpened(WindowEvent e) {
+                debugEvent("Window", e);	// GrasppeKit.debugText("Window Opened (" + name + ")", e.toString());
+            }
+        };
+
+        /**
+         * Outputs debug information and event details
+         * @param grouping
+         * @param e
+         */
+        static void debugEvent(String grouping, MouseEvent e) {
+            debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
+        }
+
+        /**
+         * Outputs debug information and event details
+         * @param grouping
+         * @param e
+         */
+        static void debugEvent(String grouping, WindowEvent e) {
+            debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
+        }
+
+        /**
+         * Outputs debug information and event details
+         * @param label
+         * @param grouping
+         * @param e
+         * @param level
+         */
+        static void debugEvent(String label, String grouping, MouseEvent e, int level) {
+            String	cursorString = "";
+
+            try {
+                Point	cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
+
+                cursorString = "\t" + cursorLocation.toString();
+            } catch (Exception exception) {}
+
+            GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + cursorString,
+                                 level);
+        }
+
+        /**
+         * Outputs debug information and event details
+         * @param label
+         * @param grouping
+         * @param e
+         * @param level
+         */
+        static void debugEvent(String label, String grouping, WindowEvent e, int level) {
+            String	testString = "";
+
+            GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + testString,
+                                 level);
         }
     }
 }

@@ -1,0 +1,15 @@
+package com.guigarage.gestures;
+
+/**
+ * Listener for magnification events
+ * @author hendrikebbers
+ *
+ */
+public interface GestureMagnificationListener extends GestureListener {
+
+	/**
+	 * Invoked when the user executed a magnification gesture
+	 * @param gestureMagnificationEvent the occured event
+	 */
+	void magnify(GestureMagnificationEvent gestureMagnificationEvent);
+}
