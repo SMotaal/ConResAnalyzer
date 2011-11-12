@@ -258,11 +258,11 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener {
             // thisButton.doClick();
             thisButton.keyPressed(e);
             GrasppeKit.debugText("Key Press Handled", keyString + " ==> " + thisButton.getText(),
-                                 3);
+                                 4);
 
             return true;
         } else
-            GrasppeKit.debugText("Key Pressed Ignored", GrasppeKit.keyEventString(e) + " ==x", 3);
+            GrasppeKit.debugText("Key Pressed Ignored", GrasppeKit.keyEventString(e) + " ==x", 4);
 
         return false;
     }

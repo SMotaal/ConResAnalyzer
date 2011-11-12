@@ -13,18 +13,19 @@ package com.Grasppe.ConRes.Analyzer.IJ;
 
 import com.Grasppe.Common.StopWatch;
 import com.Grasppe.GrasppeKit;
-import com.Grasppe.GrasppeKit.AbstractCommand;
 import com.Grasppe.GrasppeKit.AbstractController;
 import com.Grasppe.GrasppeKit.AbstractModel;
-import com.Grasppe.GrasppeKit.AbstractOperation;
 import com.Grasppe.GrasppeKit.AbstractView;
-import com.Grasppe.GrasppeKit.FileSelectionMode;
+import com.Grasppe.GrasppeKit.KeyCode;
+import com.Grasppe.GrasppeKit.KeyEventID;
 
 import ij.IJ;
 import ij.ImagePlus;
 
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
+import ij.gui.Overlay;
+import ij.gui.PointRoi;
 
 import ij.io.Opener;
 
@@ -43,6 +44,7 @@ import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,21 +54,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.TreeSet;
-
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.Timer;
-import javax.swing.filechooser.FileFilter;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -82,6 +77,72 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
     protected static String			name      = ConResAnalyzerPlugInA1.class.getSimpleName();
     protected static int			exitDelay = 10 * 1000;
     protected static ConResAnalyzer	analyzer;
+
+    /**
+     * Method description
+     *
+     * @param pointROI
+     *
+     * @return
+     */
+    public static PointRoi calculateFourthVertex(PointRoi pointROI) {
+        if (pointROI.getNCoordinates() != 3) return pointROI;
+
+        // We have three points in the clicking order!
+
+        // TODO: determine the boundary of the three points
+        Polygon	roiPolygon = pointROI.getConvexHull();
+
+        // TODO: determine point opposite hypotenuse, and the longest x offset
+        // and y offset for the other two sides.
+        double	longestDistance = 0,
+				xDistance       = 0,
+				yDistance       = 0,
+				xOffset         = 0,
+				yOffset         = 0;
+        int		rPoint          = 0,
+				xPoint          = 0,
+				yPoint          = 0;
+
+        for (int i = 0; i < 3; i++) {
+            Point	pointA = new Point(roiPolygon.xpoints[(i + 1) % 2],
+                                     roiPolygon.ypoints[(i + 1) % 2]);
+            Point	pointB = new Point(roiPolygon.xpoints[(i + 2) % 2],
+                                     roiPolygon.ypoints[(i + 2) % 2]);
+            double	deltaX   = pointA.x - pointB.x;
+            double	deltaY   = pointA.y - pointB.y;
+            double	distance = pointA.distance(pointB);
+            
+            GrasppeKit.debugText("Vertex Iteration", "\t(i:"+i+")\t" + GrasppeKit.lastSplit(pointA.toString()) + "\t"
+            		+ GrasppeKit.lastSplit(pointB.toString()),3);
+
+            if (distance > longestDistance) {
+                rPoint          = i;
+                longestDistance = distance;
+            } else {
+
+                // TODO: offset direction?
+//                if (Math.abs(deltaX) > xDistance) xOffset = deltaX;
+//                if (Math.abs(deltaY) > yDistance) yOffset = deltaY;
+//                xDistance = Math.max(Math.abs(deltaX), xDistance);
+//                yDistance = Math.max(Math.abs(deltaY), yDistance);
+            }
+        }
+
+        // TODO: offset reference point by xOffset and yOffset
+        Point	referencePoint = new Point(roiPolygon.xpoints[rPoint], roiPolygon.xpoints[rPoint]);
+        Point	lastPoint      = new Point(referencePoint);
+
+        //lastPoint.setLocation(x, y)
+
+        // TODO: added last point to polygon
+        roiPolygon.addPoint(lastPoint.x, lastPoint.y);
+
+        // TODO: create the new roi from polygon
+        PointRoi	newROI = new PointRoi(roiPolygon);
+
+        return pointROI;
+    }
 
     /**
      * @deprecated  Java exits on last window anyway!
@@ -123,34 +184,37 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
      * @param y
      */
     public static void moveFrame(int x, int y) {
-        if (Testing.jFrame == null) return;
+        updateMagnifier();
 
-        JFrame		frame       = Testing.jFrame;
+        if (Testing.zoomWindow == null) return;
+
+        JFrame		zoomWindow  = Testing.zoomWindow;
         ImageWindow	imageWindow = Testing.imageWindow;
 
-        if (imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
-                y - imageWindow.getY())) {
-            frame.setLocation(x - frame.getWidth() / 2, y - frame.getHeight() / 2);
-            if (!frame.isVisible()) frame.setVisible(true);
-        } else {
-            frame.setLocation(25 - frame.getWidth(), 25 - frame.getHeight());
-            if (frame.isVisible()) frame.setVisible(false);
-        }
+        Testing.isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x
+                - imageWindow.getX(), y - imageWindow.getY());
+
+        // Sets visible and returns updated zoomWindow.isVisible()
+
+        zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+
+        if (!Testing.isShowZoom()) return;
+        redrawFrame();
     }
 
     /**
      * Method description
      */
     public static void prepareFrame() {
-        Testing.jFrame = new JFrame();		// "SpringLayout");
-        Testing.jFrame.setUndecorated(true);
-        Testing.jFrame.setSize(300, 300);
-        Testing.jFrame.setMaximumSize(Testing.jFrame.getSize());
-        Testing.jFrame.setAlwaysOnTop(true);
-        Testing.jFrame.setFocusableWindowState(false);
-        Testing.jFrame.setResizable(false);
+        Testing.zoomWindow = new JFrame();		// "SpringLayout");
+        Testing.zoomWindow.setUndecorated(true);
+        Testing.zoomWindow.setSize(300, 300);
+        Testing.zoomWindow.setMaximumSize(Testing.zoomWindow.getSize());
+        Testing.zoomWindow.setAlwaysOnTop(true);
+        Testing.zoomWindow.setFocusableWindowState(false);
+        Testing.zoomWindow.setResizable(false);
 
-        Testing.jFrame.setBackground(Color.black);
+        Testing.zoomWindow.setBackground(Color.black);
 
         MagnifierCanvas	zoomCanvas = new MagnifierCanvas(Testing.imageWindow.getImagePlus());
 
@@ -159,9 +223,9 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
         zoomCanvas.setBackground(Color.black);
 
-        //Testing.imageWindow.getCanvas().zoomIn(0, 0);
+        // Testing.imageWindow.getCanvas().zoomIn(0, 0);
 
-        Container	contentPane = Testing.jFrame.getContentPane();
+        Container	contentPane = Testing.zoomWindow.getContentPane();
 
         contentPane.setBackground(Color.BLACK);
 
@@ -175,7 +239,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         int	padding = 0;
 
         GrasppeKit.debugText("Zoom Frame", "Content Pane " + contentPane.getBounds().toString(), 3);
-        GrasppeKit.debugText("Zoom Frame", "Frame " + Testing.jFrame.getBounds().toString(), 3);
+        GrasppeKit.debugText("Zoom Frame", "Frame " + Testing.zoomWindow.getBounds().toString(), 3);
         GrasppeKit.debugText("Zoom Frame", "Zoom Canvas " + zoomCanvas.getBounds().toString(), 3);
 
 //      layout.putConstraint(SpringLayout.NORTH, zoomCanvas, padding, SpringLayout.NORTH, contentPane);
@@ -190,10 +254,10 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
 
         zoomCanvas.setMagnification(windowZoom * 2.0);
 
-        Testing.jFrame.setVisible(true);
+        Testing.zoomWindow.setVisible(Testing.isShowZoom());
 
-        Testing.jFrame.pack();
-        Testing.jFrame.setSize(300, 300);
+        Testing.zoomWindow.pack();
+        Testing.zoomWindow.setSize(300, 300);
 
         Testing.zoomCanvas = zoomCanvas;
 
@@ -203,16 +267,17 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
      * Method description
      */
     public static void redrawFrame() {
-        if (Testing.jFrame == null) return;
-        
-        if (Testing.showZoom = false) {Testing.jFrame.setVisible(false); return;}
+        if (Testing.zoomWindow == null) return;
 
-        ImageWindow		imageWindow = Testing.imageWindow;
-        ImageCanvas		imageCanvas = imageWindow.getCanvas();
-        JFrame			zoomWindow  = Testing.jFrame;
-        MagnifierCanvas	zoomCanvas  = Testing.zoomCanvas;
-        
-        Point	zoomWindowLocation, zoomLocation = null; 
+        if (!Testing.zoomWindow.isVisible()) return;	// {Testing.zoomWindow.setVisible(false); return;}
+
+        ImageWindow		imageWindow  = Testing.imageWindow;
+        ImageCanvas		imageCanvas  = imageWindow.getCanvas();
+        JFrame			zoomWindow   = Testing.zoomWindow;
+        MagnifierCanvas	zoomCanvas   = Testing.zoomCanvas;
+
+        Point			zoomWindowLocation,
+						zoomLocation = null;
 
         if (zoomWindow.isVisible()) {
             zoomWindowLocation = zoomWindow.getLocationOnScreen();		// Location on screen
@@ -232,22 +297,22 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         Point		pointerCenter;
 
         try {
-        /* Pointer Center: pointer location in image canvas in screen units */
-        if (zoomWindow.isVisible()) {
-        	pointerCenter = zoomCanvas.getMousePosition();
-        	pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
-        			zoomLocation.y - imageLocation.y + pointerCenter.y);
+
+            /* Pointer Center: pointer location in image canvas in screen units */
+            if (zoomWindow.isVisible()) {
+                pointerCenter = zoomCanvas.getMousePosition();
+                pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
+                                          zoomLocation.y - imageLocation.y + pointerCenter.y);
+            } else
+                pointerCenter = imageCanvas.getMousePosition();
+        } catch (Exception exception) {
+            zoomWindow.setVisible(false);
+            pointerCenter = null;
         }
-        else 
-        	pointerCenter = imageCanvas.getMousePosition();
-        } catch (Exception exception){
-        	zoomWindow.setVisible(false);
-        	pointerCenter = null;
-        }
-        
-        if(pointerCenter == null) return;
-        
-        if (!zoomWindow.isVisible()) zoomWindow.setVisible(true); 
+
+        if (pointerCenter == null) return;
+
+        // if (!zoomWindow.isVisible()) zoomWindow.setVisible(true);
 
         /* Source Center: pointer location in source coordinate space in source units */
         Point	sourceCenter = new Point((int)(pointerCenter.x / imageScale),
@@ -256,145 +321,27 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         /* Source Size: source rectangle size in source units */
         Dimension	sourceSize = new Dimension((int)(zoomSize.width / zoomScale),
                                    (int)(zoomSize.height / zoomScale));
-        
+
         /* Source Corner: source rectangle top-left in source units */
-        Point	sourceCorner = new Point((int)(sourceCenter.x - sourceSize.width/2),
-        								(int)(sourceCenter.y - sourceSize.height/2));
-        
+        Point	sourceCorner = new Point((int)(sourceCenter.x - sourceSize.width / 2),
+                                       (int)(sourceCenter.y - sourceSize.height / 2));
+
         /* Source Rectangle: source rectangle in source units */
-        Rectangle sourceRectangle = new Rectangle(sourceCorner,sourceSize);
-        
-        String debugString = "";        		
-        		debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
-        		debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
-        		debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
-        
-        //GrasppeKit.debugText("Magnifier", GrasppeKit.lastSplit(pointerCenter.toString()));
-        
+        Rectangle	sourceRectangle = new Rectangle(sourceCorner, sourceSize);
+
+        String		debugString     = "";
+
+        debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
+        debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
+        debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
+
+        GrasppeKit.debugText("Magnifier", debugString, 4);
+
         Testing.zoomCanvas.setSourceRect(sourceRectangle);
-        
-        Testing.zoomCanvas.repaint(0,0,zoomSize.width, zoomSize.height);
+
+        Testing.zoomCanvas.repaint(0, 0, zoomSize.width, zoomSize.height);
 
     }
-
-    /*
-     *  Center Image Position: Find zoom
-     * /            if(mousePosition==null) return;
-     * /        Point mouseLocation = new Point(mousePosition.x + zoomWindowLocation.x,
-     * /                                        mousePosition.y + zoomWindowLocation.y);
-     *
-     * /        // Canvas Offset: Find top-left/zoom canvas relative top-left/image canvas in screen units
-     * /        Point canvasOffset = new Point(zoomLocation.x - imageLocation.x,
-     * /                                       zoomLocation.y - imageLocation.y);
-     *
-     * // Center Offset: Find center/zoom canvas relative to top-left/image canvas in screen units
-     * Point   centerOffset = new Point(canvasOffset.x + zoomSize.width / 2,
-     *                              canvasOffset.y + zoomSize.height / 2);
-     *
-     * // Image Coordinates: Find image coordinates for the centerOffset in image units
-     * Point   imageCenter = new Point((int)(centerOffset.x / imageScale),
-     *                              (int)(centerOffset.y / imageScale));
-     *
-     * // Zoom Center: Find zoom coordinates for source center in screen units
-     * Point targetCenter = new Point((int)(imageCenter.x * zoomScale),(int)(imageCenter.y * zoomScale));
-     *
-     * // Zoom Offset: Find top-left/zoom canvas relative to zoom center coordinates in screen units
-     * Point   targetOffset = new Point(targetCenter.x - zoomSize.width / 2,
-     *                               targetCenter.y - zoomSize.height / 2);
-     *
-     * //GrasppeKit.debugText("Magnifier", zoomCanvas.getSrcRect().toString());
-     *
-     * /        zoomCanvas.setSourceRect(r)
-     * // Testing.zoomCanvas.setSourceRect(new Rectangle(sX,sY, (int)(dW/zoom),(int)(dH/zoom)));
-     *
-     *
-     * /      int[] sc = {cursorLocation.x - ds[0]/2, cursorLocation.y - ds[1]/2};
-     * /      int[] sx = {sc[0], sc[0]+ds[0]};
-     * /      int[] sy = {sc[1], sc[1]+ds[1]}
-     * /      Point       cursorLocation = imageCanvas.getCursorLoc();
-     * /      int cX = cursorLocation.x;
-     * /      int cY = cursorLocation.y;
-     * /      String cXY = "cXY: " + cX + ", " + cY;
-     *
-     * /      double zoom = Testing.zoomCanvas.getMagnification();
-     * /      double wZoom = Testing.imageWindow.getCanvas().getMagnification();
-     *
-     *
-     * /      //Testing.zoomCanvas.setSize(dW, dH);
-     * /      imageWindow
-     *
-     * /      ImageWindow.
-     *
-     * /      if(frameCursor==null) return;
-     * /      double mX = cursorPosition.
-     * /      double mY = frameCursor.getY();
-     * /      String mXY = "mXY: " + frameCursor.getX() + ", " + frameCursor.getY();
-     *
-     * /      Point windowPosition = Testing.imageWindow.getCanvas().getLocationOnScreen(); // .getLocation();//.getLocationOnScreen();
-     * /      double wX = windowPosition.getX();
-     * /      double wY = windowPosition.getY();
-     * /      String fXY = "fXY: " + wX + ", " + wY;
-     *
-     * /      Point zoomPosition = Testing.zoomCanvas.getLocationOnScreen(); //Testing.jFrame.getLocation();  //.getLocationOnScreen();
-     * /      double zX = zoomPosition.getX();
-     * /      double zY = zoomPosition.getY();
-     * /      String zXY = "zXY: " + zX + ", " + zY;
-     *
-     * /      double zRatio1 = zoom/wZoom;
-     * /      double zRatio2 = wZoom/zoom;
-     * /      double sW = dW/2; //(dW/2/zoom);
-     * /      double sH = dH/4;
-     * /      int sX = (int)(zX-wX);//(zX+(dW/2/zoom)-wX); //-windowPosition.getX())); //+mX-windowPosition.getX();
-     * /      sX =(int)(sX/wZoom);
-     * /      int sY = (int)(zY-wY);
-     * /      sY =(int)(sY/wZoom);
-     * /      //int sY = 0; //imageCanvas.offScreenY((int)(zY+(dH/2/zoom)-wY)); //-windowPosition.getY())); //+mY;
-     * /      String sXY = "sXY: " + sX + ", " + sY;
-     *
-     * /      //int nX = Testing.zoomCanvas.offScreenX((int)sX); //Testing.zoomCanvas.screenX(
-     * /      //int nW = Testing.zoomCanvas.offScreenX((int)ds[0]);
-     * /      //int nY = imageCanvas.offScreenY((int)sY); //Testing.zoomCanvas.screenY(
-     * ///        String nXY = "nXY: " + nX + ", " + nY;
-     *
-     * /      //Testing.zoomCanvas.setRect(nX, nY);
-     *
-     * /      Testing.zoomCanvas.setSourceRect(new Rectangle(sX,sY, (int)(dW/zoom),(int)(dH/zoom)));
-     * /      //Testing.zoomCanvas.setImageUpdated();
-     * /      Testing.zoomCanvas.repaint(0,0,dW, dH);
-     * /      //Testing.jFrame.getContentPane().repaint();
-     * /      //Testing.jFrame.repaint();
-     * /      //Testing.zoomCanvas.zoomOut(cursorLocation.x, cursorLocation.y);
-     * /      //Testing.zoomCanvas.zoomIn(cursorLocation.x, cursorLocation.y);
-     * /      //Testing.zoomCanvas.adju //setCursor(0, 0, (int)sX, (int)sY); //, dx[1]/2, dy[1]/2);
-     *
-     * // Testing.zoomCanvas.repaint();
-     *
-     * // String zR = Testing.zoomCanvas.getSrcRect().toString(); //Testing.zoomCanvas.getBounds().toString();
-     *
-     * /        GrasppeKit.debugText("Magnifier", sXY + "\t" + fXY + "\t" + zXY + "\t" + cXY, 3);     // fXY + "\t" + mXY + "\t" + sXY, 3);
-     *
-     * /      Image zoomImage = imageCanvas.getImage().
-     *
-     * // Image newImage = frame.createImage(ds[0], ds[1]);
-     * // newImage.getGraphics().dr
-     *
-     *
-     * /        ImageWindow   imageWindow    = Testing.imageWindow;
-     *
-     *
-     *
-     * /        frame.repaint();
-     * /        frame.getGraphics().drawImage(imageWindow.getImagePlus().getImage(), 0, 0, dWidth, dHeight,
-     * /                                      cursorLocation.x - dWidth / 2,
-     * /                                      cursorLocation.y - dHeight / 2,
-     * /                                      cursorLocation.x + dWidth / 2,
-     * /                                      cursorLocation.y + dHeight / 2, frame);
-     *
-     * // Testing.jFrame.paint(Testing.jFrame.getGraphics());
-     * // Testing.jFrame.update(Testing.jFrame.getGraphics());
-     *
-     * @param arg
-     */
 
     /**
      * Method description
@@ -403,51 +350,54 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
      */
     public void run(String arg) {
         IJ.showMessage(name, "Hello world!");
-        
-        
-        KeyboardFocusManager	manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 
-        manager.addKeyEventDispatcher(new MyDispatcher());
+        // Testing.
 
-        GrasppeKit.debugLevel = 4;
+        String[]	imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
+
+        Testing.imageName = imageNames[0];
+        Testing.keyboardFocusManager.addKeyEventDispatcher(Testing.keyEventDispatch);
+
+        GrasppeKit.debugLevel = 3;
 
         // testAnalyzerMenu();
         testImageWindow();
         testImageJMouseListeners();
         testMagnifier();
 
-//      JFrame    Testing.jFrame = new JFrame();
-//
-//      Testing.jFrame.setSize(500, 500);
-//      Testing.jFrame.setVisible(true);
-//      JComponent
-//      GestureUtilities.registerListener(Testing.jFrame, new GesturePhaseListener() {
-//
-//          @Override
-//          public void gestureEnded(GesturePhaseEvent e) {
-//              String    eventLabel     = "Phase Ended";
-//              Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
-//
-//              GrasppeKit.debugText("Image Window Gesture Event",
-//                                   "Gesture " + eventLabel + "\t" + e.toString(), 3);
-//          }
-//          @Override
-//          public void gestureBegan(GesturePhaseEvent e) {
-//              String    eventLabel     = "Phase Began";
-//              Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
-//
-//              GrasppeKit.debugText("Image Window Gesture Event",
-//                                   "Gesture " + eventLabel + "\t" + e.toString(), 3);
-//          }
-//
-//      });
-        // Testing.imageWindow.getCanvas().addMouseListener();
-        // Testing.imageWindow.add
-        // Macro macro = new Macro();
-        // Macro_Runner macroRunner = new MacroRunner();
-        // analyzerView.show();
-        // analyzerView.close();
     }
+
+//  JFrame    Testing.jFrame = new JFrame();
+//
+//  Testing.jFrame.setSize(500, 500);
+//  Testing.jFrame.setVisible(true);
+//  JComponent
+//  GestureUtilities.registerListener(Testing.jFrame, new GesturePhaseListener() {
+//
+//      @Override
+//      public void gestureEnded(GesturePhaseEvent e) {
+//          String    eventLabel     = "Phase Ended";
+//          Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
+//
+//          GrasppeKit.debugText("Image Window Gesture Event",
+//                               "Gesture " + eventLabel + "\t" + e.toString(), 3);
+//      }
+//      @Override
+//      public void gestureBegan(GesturePhaseEvent e) {
+//          String    eventLabel     = "Phase Began";
+//          Point cursorLocation = Testing.imageWindow.getCanvas().getCursorLoc();
+//
+//          GrasppeKit.debugText("Image Window Gesture Event",
+//                               "Gesture " + eventLabel + "\t" + e.toString(), 3);
+//      }
+//
+//  });
+    // Testing.imageWindow.getCanvas().addMouseListener();
+    // Testing.imageWindow.add
+    // Macro macro = new Macro();
+    // Macro_Runner macroRunner = new MacroRunner();
+    // analyzerView.show();
+    // analyzerView.close();
 
     /**
      * Method description
@@ -515,7 +465,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         Testing.startTimer();
 
         opener    = new Opener();
-        imagePlus = opener.openImage(Testing.inputPath);	// .openURL(inputURL);
+        imagePlus = opener.openImage(Testing.getInputPath());		// .openURL(inputURL);
         Testing.checkTimer("Opened ImagePlus " + imagePlus.getTitle());
 
 //      imagePlus.getProcessor().autoThreshold();     // 128);
@@ -524,6 +474,8 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         Testing.imageWindow = new ImageWindow(imagePlus);		// Initialize static variable here
         imageWindow         = Testing.imageWindow;
         Testing.checkTimer("Created ImageWindow " + imagePlus.getTitle());
+
+        // imageWindow.
 
         // imageWindow.getCanvas().zoom100Percent();
         // Testing.checkTimer("Zoomed " + imagePlus.getTitle());
@@ -548,7 +500,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         /* Static Variables */
 
         /* Static Members */
-        JFrame				frame          = Testing.jFrame;
+        JFrame				frame          = Testing.zoomWindow;
         ImageWindow			imageWindow    = Testing.imageWindow;
         MouseMotionListener	motionListener = TestingListeners.IJMotionListener;
 
@@ -579,1116 +531,114 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
     }
 
     /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     * Method description
      */
-    public class CaseFileManager {}
+    public void testVertexSelectionTool() {
 
+        // testMagnifier()
 
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class CaseFileManagerModel {}
+        /* when click, mark ImageJ roi */
 
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class CaseFileManagerViews {}
-
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class CaseManager extends AbstractController implements ActionListener {
-
-        protected LinkedHashMap<String, AbstractCommand>	commands;
-        protected ActionListener							actionListener;
-        protected AbstractController						commandHandler = this;
-
-        /**
-         * Constructs ...
-         */
-        public CaseManager() {
-            this(new CaseManagerModel());
-        }
-
-        /**
-         * Constructs ...
-         *
-         * @param model
-         */
-        public CaseManager(CaseManagerModel model) {
-            GrasppeKit.getInstance().super(model);
-        }
-
-//      /**
-//       * Method description
-//       *
-//       * @param e
-//       */
-//      @Override
-//      public void actionPerformed(ActionEvent e) {
-//          try {
-//              getCommand(e.getActionCommand()).execute();
-//          } catch (Exception exception) {
-//              IJ.showMessage(this.getClass().getSimpleName(),
-//                             this.getClass().getSimpleName() + " Command Not Found: "
-//                             + e.getActionCommand());
-//          }
-//
-//          if (actionListener != null) actionListener.actionPerformed(e);
-//      }
-//
-//      /**
-//       * Method description
-//       *
-//       * @param command
-//       */
-//      public void putCommand(AbstractCommand command) {
-//          commands.put(command.getName(), command);
-//          IJ.showMessage(this.getClass().getSimpleName(),
-//                         this.getClass().getSimpleName() + " Command Added: " + command.getName()
-//                         + " :: " + command.toString());
-//      }
-
-        /**
-         * Create and populate all commands from scratch.
-         */
-        public void createCommands() {
-            commands = new LinkedHashMap<String, GrasppeKit.AbstractCommand>();
-            putCommand(new NewCase(this));
-            putCommand(new OpenCase(this));
-            putCommand(new CloseCase(this));
-        }
-
-//
-//      /**
-//       * Method description
-//       *
-//       * @param name
-//       *
-//       * @return
-//       */
-//      public AbstractCommand getCommand(String name) {
-//          return commands.get(name);
-//      }
-//
-//      /**
-//       * @return the commands
-//       */
-//      public LinkedHashMap<String, AbstractCommand> getCommands() {
-//          return commands;
-//      }
-
-        /**
-         * Return the controller's correctly-cast model
-         *
-         * @return
-         */
-        @Override
-        public CaseManagerModel getModel() {
-            return (CaseManagerModel)super.getModel();
-        }
-
-        /**
-         * Sets controller's model to a CaseManagerModel and not any AbstractModel.
-         *
-         * @param newModel
-         *
-         * @throws IllegalAccessException
-         */
-        public void setModel(CaseManagerModel newModel) throws IllegalAccessException {
-            super.setModel(newModel);
-        }
-
-        /**
-         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public abstract class CaseManagerCommand extends AbstractCommand {
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             * @param name
-             */
-            public CaseManagerCommand(ActionListener listener, String name) {
-                GrasppeKit.getInstance().super(listener, name, false);
-                setModel(((CaseManager)listener).getModel());
-            }
-
-            /**
-             * Returns the correctly-cast model.
-             *
-             * @return
-             */
-            public CaseManagerModel getModel() {
-                return (CaseManagerModel)model;
-            }
-        }
-
-
-        /**
-         * Class description
-         *
-         * @version        $Revision: 1.0, 11/11/09
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public abstract class CaseManagerOperation extends AbstractOperation {
-
-            /**
-             * @param name
-             */
-            public CaseManagerOperation(String name) {
-                GrasppeKit.getInstance().super(name);
-            }
-        }
-
-
-        /**
-         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class CloseCase extends CaseManagerCommand {
-
-            protected static final String	name        = "CloseCase";
-            protected static final int		mnemonicKey = KeyEvent.VK_C;
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             */
-            public CloseCase(ActionListener listener) {
-                super(listener, name);
-                super.mnemonicKey = mnemonicKey;
-                update();
-            }
-
-            /**
-             * Performs the command operations when called by execute().
-             *
-             * @return
-             */
-            public boolean perfomCommand() {
-                boolean	canProceed = !isCaseClosed();		// canExecute();
-
-                GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 4);
-                if (!canProceed) return true;		// Action responded to in alternative scenario
-                if (!altPressed())
-                    canProceed = IJ.showMessageWithCancel(name,
-                        "Do you want to close the current case?");
-                if (!canProceed) return true;		// Action responded to in alternative scenario
-                GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", 3);
-                getModel().backgroundCase = getModel().currentCase;
-                getModel().currentCase    = null;
-                GrasppeKit.debugText("Closed Case Success",
-                                     "Moved current case to background and cleared current case.",
-                                     4);
-                getModel().notifyObservers();
-
-                // update();
-                return true;	// Action responded to in intended scenario
-            }
-
-            /**
-             * Method description
-             *
-             * @param keyEvent
-             *
-             * @return
-             */
-            public boolean quickClose(KeyEvent keyEvent) {
-                boolean	canProceed;
-
-                try {
-                    canProceed = execute(true, keyEvent);		// Don't care if a case was closed
-                    canProceed = isCaseClosed();				// Only care that no case is open!
-
-                    // getModel().notifyObservers();
-                } catch (Exception e) {
-
-                    // forget about current case!
-                    GrasppeKit.debugText("Close Case Attempt",
-                                         "Failed to close case or no case was open!" + "\n\n"
-                                         + e.toString(), 2);
-                    canProceed = false;
-                }
-
-                return canProceed;
-            }
-
-            /**
-             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-             */
-            @Override
-            public void update() {
-                super.update();
-
-                // TODO: Enable if open case, else disable
-                canExecute(!isCaseClosed());	//
-
-                // notifyObservers();
-            }
-
-            /**
-             * Method description
-             *
-             * @return
-             */
-            public boolean isCaseClosed() {
-                boolean	value = !(getModel().hasCurrentCase());
-
-                GrasppeKit.debugText("isCaseClose", "" + value, 3);
-
-                return value;
-            }
-        }
-
-
-        /**
-         * Class description
-         *
-         * @version        $Revision: 1.0, 11/11/10
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public abstract class FileChooserOperation extends CaseManagerOperation {
-
-            String	defaultChooserPath =
-                "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
-            File				selectedFile;
-            protected boolean	executable = true;
-            JFileChooser		fileChooser;
-            FileSelectionMode	fileSelectionMode = FileSelectionMode.FILES_AND_DIRECTORIES;
-            TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
-
-            /**
-             * Constructs ...
-             *
-             * @param name
-             */
-            public FileChooserOperation(String name) {
-                super(name);
-                prepareFileChooser();
-            }
-
-            /*
-             *  (non-Javadoc)
-             * @see com.Grasppe.GrasppeKit.AbstractOperation#perfomOperation()
-             */
-
-            /**
-             * Method description
-             *
-             * @return
-             */
-            @Override
-            protected boolean perfomOperation() {
-                prepareFileChooser();
-                if (fileChooser.showOpenDialog(GrasppeKit.commonFrame)
-                        == JFileChooser.CANCEL_OPTION)
-                    return false;
-
-                // TODO: Inspect & Verify Scan Images / TDF are in selectedFile
-                selectedFile = fileChooser.getSelectedFile();
-                if (!selectedFile.isDirectory()) selectedFile = selectedFile.getParentFile();
-
-                return true;
-            }
-
-            /**
-             * Method description
-             */
-            public void prepareFileChooser() {
-                fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(fileSelectionMode.value());
-
-                // Add filters
-                while (filters.iterator().hasNext())
-                    fileChooser.addChoosableFileFilter(filters.iterator().next());
-
-                // Setting initial chooser selection
-                try {
-                    File	defaultPath = new File(defaultChooserPath);
-
-                    fileChooser.setSelectedFile(defaultPath);
-                } catch (NullPointerException exception) {
-
-                    // Not setting initial chooser selection
-                }
-            }
-
-            /**
-             * Method description
-             *
-             * @return
-             */
-            public boolean quickSelect() {
-                boolean	canProceed = false;
-                String	finalName  = GrasppeKit.humanCase(getName());
-
-                try {
-                    canProceed = execute(true);
-                } catch (Exception e) {
-                    GrasppeKit.debugText(finalName + " Failed",
-                                         finalName + " threw a " + e.getClass().getSimpleName()
-                                         + "\n\n" + e.toString(), 2);
-                }
-
-                return canProceed;
-            }
-
-            /**
-             * @return the selectedFile
-             */
-            protected File getSelectedFile() {
-                return selectedFile;
-            }
-
-            /**
-             * @param selectedFile the selectedFile to set
-             */
-            protected void setSelectedFile(File selectedFile) {
-                this.selectedFile = selectedFile;
-            }
-        }
-
-
-        /**
-         * Defines Case Manager's New Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class NewCase extends CaseManagerCommand {
-
-            protected static final String	name        = "NewCase";
-            protected static final int		mnemonicKey = KeyEvent.VK_N;
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             */
-            public NewCase(ActionListener listener) {
-                super(listener, name);
-                super.mnemonicKey = mnemonicKey;
-                update();
-            }
-
-            /**
-             * Performs the command operations when called by execute().
-             *
-             * @return
-             */
-            public boolean perfomCommand() {
-                boolean	canProceed = canExecute();
-
-                // if (!canProceed) return true;     // Action responded to in alternative scenario
-                // TODO: Show imageFolderChooser, if can create new case with images, confirm and close case before creating new case
-                // TODO: Show imageFolderChooser
-                // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
-//              try {
-//                  CloseCase closeCase = (CloseCase)commandHandler.getCommand("CloseCase");
-//
-//                  canProceed = closeCase.execute(false, getKeyEvent());     // Don't care if a case was closed
-//                  canProceed = closeCase.isCaseClosed();        // Only care that no case is open!
-//                  getModel().notifyObservers();
-//              } catch (IllegalStateException e) {
-//                  GrasppeKit.debugText("New Case Attempt",
-//                                       "Failed to close case or no case was open!", 3);
-//                  canProceed = true;
-//              } catch (Exception e) {
-//
-//                  // forget about current case!
-//                  GrasppeKit.debugText("New Case Attempt",
-//                                       "Failed to close case or no case was open!" + "\n\n"
-//                                       + e.toString(), 2);
-//                  canProceed = false;
-//              }
-                // TODO: Confirm and close current case before attempting to switching cases
-                canProceed =
-                    ((CloseCase)commandHandler.getCommand("CloseCase")).quickClose(getKeyEvent());
-                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-
-                // TODO: Create new case in metadata entry state
-                GrasppeKit.debugText("New Case Creation",
-                                     "New case will be created and passed for metadata entry", 4);
-
-                try {
-                    getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
-                    getModel().notifyObservers();
-                    canProceed = true;
-                } catch (Exception e) {
-                    GrasppeKit.debugText("New Case Failure",
-                                         "Failed to create new case" + "\n\n" + e.toString(), 2);
-                    canProceed = false;
-                }
-
-                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-
-                try {
-                    getModel().currentCase    = getModel().newCase;		// Make current the new case
-                    getModel().newCase        = null;					// Clear new case
-                    getModel().backgroundCase = null;					// clear background case
-                    canProceed                = true;
-                    getModel().notifyObservers();
-                } catch (Exception e) {
-                    GrasppeKit.debugText("New Case Failure",
-                                         "Failed to reorganize cases in the case manager model."
-                                         + "\n\n" + e.toString(), 2);
-                    canProceed = false;
-                }
-
-                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-                GrasppeKit.debugText(
-                    "New Case Success",
-                    "Created new case and reorganize cases in the case manager model.", 3);
-
-                return true;	// Action responded to in intended scenario
-            }
-
-            /**
-             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-             */
-            @Override
-            public void update() {
-                super.update();
-
-                // TODO: Enable if open case, else disable
-                canExecute(true);		// getModel().hasCurrentCase());
-            }
-
-//          /**
-//           * @return the mnemonicKey
-//           */
-//          @Override
-//          public int getMnemonicKey() {
-//              return mnemonicKey;
-//          }
-        }
-
-
-        /**
-         * Defines Case Manager's New Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class OpenCase extends CaseManagerCommand {
-
-            protected static final String	name        = "OpenCase";
-            protected static final int		mnemonicKey = KeyEvent.VK_O;
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             */
-            public OpenCase(ActionListener listener) {
-                super(listener, name);
-                super.mnemonicKey = mnemonicKey;
-                update();
-            }
-
-            /**
-             * Performs the command operations when called by execute().
-             *
-             * @return
-             */
-            public boolean perfomCommand() {
-                boolean				canProceed       = canExecute();
-                SelectCaseFolder	selectCaseFolder = new SelectCaseFolder();
-
-                GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
-
-//              try {
-//                  canProceed = selectCaseFolder.execute(true);
-//              } catch (Exception e) {
-//                  GrasppeKit.debugText("Open Case Failed",
-//                                       "SelectCaseFolder threw a " + e.getClass().getSimpleName()
-//                                       + "\n\n" + e.toString(), 2);
-//              }
-                canProceed = selectCaseFolder.quickSelect();
-                if (canProceed)
-                    GrasppeKit.debugText("Open Case Selected",
-                                         "SelectCaseFolder returned "
-                                         + selectCaseFolder.getSelectedFile().getAbsolutePath(), 3);
-                else
-                    GrasppeKit.debugText("Open Case Cancled", "SelectCaseFolder was not completed",
-                                         3);
-                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-
-                // TODO: Verify case folder!
-                // TODO: Confirm and close current case before attempting to switching cases
-                canProceed =
-                    ((CloseCase)commandHandler.getCommand("CloseCase")).quickClose(getKeyEvent());
-                if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
-
-                // if a folder is selected!
-                getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
-                getModel().newCase.path  = selectCaseFolder.getSelectedFile().getAbsolutePath();
-                getModel().newCase.title = selectCaseFolder.getSelectedFile().getName();
-                getModel().currentCase   = getModel().newCase;
-                getModel().notifyObservers();
-                GrasppeKit.debugText("Open Case Success",
-                                     "Created new CaseModel for " + getModel().currentCase.title
-                                     + " and reorganize cases in the case manager model.", 3);
-
-                return true;
-            }
-
-            /**
-             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-             */
-            @Override
-            public void update() {
-                super.update();
-                canExecute(true);		// getModel().hasCurrentCase());
-            }
-
-//          /**
-//           * Method description
-//           */
-//          public void execute() {
-//              super.execute();
-//              if (!canExecute()) return;
-//
-//              // TODO: Show caseChooser, then confirm and close case before opening chosen case
-//              // TODO: Show caseFolderChooser, if can create open case, confirm and close case before opening the new case
-//          }
-        }
-
-
-        /**
-         * Class description
-         *
-         * @version        $Revision: 1.0, 11/11/09
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class SelectCaseFolder extends FileChooserOperation {
-
-            protected static final String	name = "SelectCaseFolder";
-
-//          String                            defaultCaseFolder =
-//              "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
-//          File              selectedFile;
-//          protected boolean executable = true;
-            protected static final String	defaultChooserPath =
-                "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
-
-            // File              selectedFile;
-            protected boolean	executable = true;
-
-            // JFileChooser      fileChooser;
-            protected final FileSelectionMode	fileSelectionMode =
-                FileSelectionMode.DIRECTORIES_ONLY;
-
-            // TreeSet<FileFilter>   filters           = new TreeSet<FileFilter>();
-
-            /**
-             * Constructs ...
-             */
-            public SelectCaseFolder() {
-                super(name);
-            }
-        }
-    }
-
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class CaseManagerModel extends AbstractModel {
-
-        /** Holds a case that is about to close until currentCase is not null */
-        public CaseModel	backgroundCase = null;
-
-        /** Field description */
-        public CaseModel	currentCase = null;
-
-        /** Field description */
-        public CaseModel	newCase = null;
-
-        /**
-         * Constructs a new model object with no predefined controller.
-         */
-        public CaseManagerModel() {
-            GrasppeKit.getInstance().super();
-        }
-
-        /**
-         * Constructs a new model with a predefined controller.
-         *
-         * @param controller
-         */
-        public CaseManagerModel(CaseManager controller) {
-            GrasppeKit.getInstance().super(controller);
-        }
-
-        /**
-         * Method description
-         *
-         * @return
-         */
-        public CaseModel newCaseModel() {
-            return new CaseModel();
-        }
-
-        /**
-         * Method description
-         *
-         * @return
-         */
-        public boolean hasCurrentCase() {
-            if (currentCase != null)
-                GrasppeKit.debugText("Current Case", currentCase.toString(), 3);
-            else GrasppeKit.debugText("Current Case", "null!", 3);
-
-            return (currentCase != null);
-        }
-
-        /**
-         * Class description
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class CaseModel {
-
-            /** Field description */
-            public String	path;
-
-            /** Field description */
-            public String	title;
-        }
-    }
-
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class CaseManagerView extends AbstractView {
-
-        /**
-         * Constructs a new ConResAnalyzerView with a predefined controller.
-         *
-         * @param controller
-         */
-        public CaseManagerView(CaseManager controller) {
-            GrasppeKit.getInstance().super(controller);
-        }
-    }
-
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class ConResAnalyzer extends AbstractController implements ActionListener {
-
-        protected LinkedHashMap<String, AbstractCommand>	commands;
-        protected CaseManager								caseManager;
-
-        /**
-         * Constructs and attaches a new controller and a new model.
-         */
-        public ConResAnalyzer() {
-            this(new ConResAnalyzerModel());
-            caseManager = (CaseManager)new CaseManager().withActionListener(this);
-
-            // GrasppeKit.setDebugTimeStamp(3);
-        }
-
-        /**
-         * Constructs a new controller and attaches it to the unattached model.
-         *
-         * @param model
-         */
-        public ConResAnalyzer(ConResAnalyzerModel model) {
-            GrasppeKit.getInstance().super(model);
-
-            // TODO Auto-generated constructor stub
-        }
-
-        /**
-         * Create and populate all commands from scratch.
-         */
-        public void createCommands() {
-
-            // commands = new LinkedHashMap<String, GrasppeKit.AbstractCommand>();
-            putCommand(new Quit(this));
-        }
-
-        /**
-         * Method description
-         *
-         * @return
-         */
-        public LinkedHashMap<String, AbstractCommand> getCommands() {
-            return appendCommands(caseManager);
-        }
-
-        /**
-         * Method description
-         *
-         * @return
-         */
-        @Override
-        public ConResAnalyzerModel getModel() {
-
-            // TODO Auto-generated method stub
-            return (ConResAnalyzerModel)super.getModel();
-        }
-
-        /**
-         * Method description
-         *
-         * @param newModel
-         *
-         * @throws IllegalAccessException
-         */
-        public void setModel(ConResAnalyzerModel newModel) throws IllegalAccessException {
-
-            // TODO Auto-generated method stub
-            super.setModel(newModel);
-        }
-
-        /**
-         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public abstract class ConResAnalyzerCommand extends AbstractCommand {
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             * @param name
-             */
-            public ConResAnalyzerCommand(ActionListener listener, String name) {
-                GrasppeKit.getInstance().super(listener, name, false);
-                setModel(((ConResAnalyzer)listener).getModel());
-            }
-
-            /**
-             * Returns the correctly-cast model.
-             *
-             * @return
-             */
-            public ConResAnalyzerModel getModel() {
-                return (ConResAnalyzerModel)model;
-            }
-        }
-
-
-        /**
-         * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-         *
-         * @version        $Revision: 1.0, 11/11/08
-         * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-         */
-        public class Quit extends ConResAnalyzerCommand {
-
-            protected static final String	name        = "Quit";
-            protected static final int		mnemonicKey = KeyEvent.VK_Q;
-
-            /**
-             * Constructs a realization of AbstractCommand.
-             *
-             * @param listener
-             */
-            public Quit(ActionListener listener) {
-                super(listener, name);
-                super.mnemonicKey = mnemonicKey;
-                executable        = true;
-                update();
-            }
-
-            /**
-             * Performs the command operations when called by execute().
-             *
-             * @return
-             */
-            public boolean perfomCommand() {
-                if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
-                    System.exit(0);
-
-                return true;	// Action responded to in intended scenario
-            }
-
-            /**
-             * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-             */
-            @Override
-            public void update() {
-                super.update();
-
-                // TODO: Enable if open case, else disable
-                canExecute(true);
-            }
-        }
-    }
-
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class ConResAnalyzerModel extends AbstractModel {
-
-        /**
-         * Constructs a new model object with no predefined controller.
-         */
-        public ConResAnalyzerModel() {
-            GrasppeKit.getInstance().super();
-        }
-
-        /**
-         * Constructs a new model with a predefined controller.
-         *
-         * @param controller
-         */
-        public ConResAnalyzerModel(ConResAnalyzer controller) {
-            GrasppeKit.getInstance().super(controller);
-        }
     }
 
     /**
-     * Class description
-     *
-     * @version        $Revision: 1.0, 11/11/09
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     * Method description
      */
-    private static class MyDispatcher implements KeyEventDispatcher {
+    public static void updateMagnification() {
 
-        /** Field description */
-        public int	lastKey;
+        // boolean keyPressed = MyDispatcher.isPressed({KeyCode.VK_ALT,KeyCode.VK_EQUALS});
+        boolean	plusKey = MyDispatcher.isPressed(new KeyCode[] { KeyCode.VK_ALT,
+                              KeyCode.VK_EQUALS });
+        boolean	minusKey = MyDispatcher.isPressed(new KeyCode[] { KeyCode.VK_ALT,
+                               KeyCode.VK_MINUS });
 
-        /** Field description */
-        public int	lastModifier;
+        MagnifierCanvas	zoomCanvas   = Testing.zoomCanvas;
+        double			currentScale = zoomCanvas.getMagnification();
+        double			maxScale     = 1.0;
+        double			minScale     = Testing.imageWindow.getCanvas().getMagnification();
 
-        /**
-         * Method description
-         *
-         * @param e
-         *
-         * @return
-         */
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent e) {
-        	
-//        	zoomFrame(e);
+        if (plusKey) zoomCanvas.setMagnification(Math.min(currentScale * 1.25, maxScale));
 
-//            // if ((e.getKeyCode() < 65) || (e.getKeyCode() > 90)) return false;     // () >= 65 &&) return false;
-//            if (e.getID() == KeyEvent.KEY_PRESSED) {			// System.out.println("tester");
-//                //return keyPressed(e);
-//            	zoomFrame(e);
-//            } else if (e.getID() == KeyEvent.KEY_RELEASED) {	// System.out.println("2test2");
-//            } else if (e.getID() == KeyEvent.KEY_TYPED) {
-//
-//                // System.out.println("3test3");
-//            }
+        if (minusKey) zoomCanvas.setMagnification(Math.max(currentScale * 0.95, minScale));
+    }
 
-            return false;
+    /**
+     * Method description
+     */
+    public static void updateMagnifier() {
+
+        if (Testing.zoomWindow == null) return;
+
+        boolean	keyPressed = MyDispatcher.isDown(KeyCode.VK_ALT);
+        boolean	mouseOver  = Testing.isMouseOverImage;
+
+        Testing.setShowZoom(keyPressed && mouseOver);
+
+    }
+
+    /**
+     * Method description
+     *
+     * @param e
+     */
+    public static void updateROI(MouseEvent e) {
+        if (e.isConsumed()) return;
+        if (Testing.imageWindow == null) return;
+        if (!Testing.imageWindow.isVisible()) return;
+
+        // TODO: Add get mouse position relative to canvas
+        Point	mousePosition = Testing.imageWindow.getCanvas().getMousePosition();
+
+        if (mousePosition == null) return;
+
+        // TODO: Determine whether to add point (click) or clear points (triple click)
+        int	clickCount = e.getClickCount();
+
+        if (clickCount == 3) Testing.pointROI = null;
+
+        if ((clickCount == 1) && (Testing.pointROI == null))
+            Testing.pointROI = new PointRoi(mousePosition.x, mousePosition.y,
+                Testing.imageWindow.getImagePlus());
+        else if ((clickCount == 1) && (Testing.pointROI != null))
+                 Testing.pointROI = Testing.pointROI.addPoint(mousePosition.x, mousePosition.y);
+
+        // TODO: When 0 points are defined, clear overlay
+        if ((Testing.pointROI == null) || (Testing.pointROI.getNCoordinates() == 0)) {
+            Testing.imageWindow.getImagePlus().setOverlay(new Overlay());
+            return;
         }
+        
+        String debugStrings1 = debugPoints(Testing.pointROI);
+
+        // TODO: When 3 points are defined, calculate the fourth
+        if (Testing.pointROI.getNCoordinates() == 3)
+        	Testing.pointROI = calculateFourthVertex(Testing.pointROI);
+
+        // TODO: When 4 points are defined! We are done.
+
+        
+        // TODO: Finally, update overlay with defined points        
+        String debugStrings2 = debugPoints(Testing.pointROI);        
+        Overlay	overlay = new Overlay(Testing.pointROI);
+        overlay.drawNames(true);
+        overlay.drawLabels(true);
+        Testing.imageWindow.getImagePlus().setOverlay(overlay);
+        
+        GrasppeKit.debugText("Vertex Selection", GrasppeKit.cat(new String[]{debugStrings1, debugStrings2},"\n"),3);
     }
     
-    public static void zoomFrame (KeyEvent e) {
-    	
-//		if (e.getKeyCode() == KeyEvent.VK_ALT)
-//			if (e.getID() == KeyEvent.KEY_PRESSED)
-//    			Testing.showZoom = true;
-//			else 
-//				Testing.showZoom = false;
-//		redrawFrame();
+    public static String debugPoints(PointRoi pointROI) {
+        int pointCount = 0;
+        
+        pointCount = pointROI.getNCoordinates();
+        String strPointCount = "Points: " + pointCount;
+        String strPoints = "";
+
+        for (int i = 0; i < pointCount; i++)
+        	strPoints+="P" + i + ": (" + pointROI.getXCoordinates()[i] + ", " + pointROI.getYCoordinates()[i] + ")\t";
+        
+        return (strPointCount + "\n" + strPoints);
     }
-
-    /**
-     * Class description
-     *
-     * @version        $Revision: 0.1, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class ConResAnalyzerView extends AbstractView {
-
-        /** Field description */
-        JFrame				frame;
-        ConResAnalyzerMenu	menu;
-        String				name        = "ConResAnalyzer";
-        boolean				finalizable = true;
-        int					activeCalls = 0;
-
-        /**
-         * Constructs a new ConResAnalyzerView with a predefined controller.
-         *
-         * @param controller
-         */
-        public ConResAnalyzerView(ConResAnalyzer controller) {
-            GrasppeKit.getInstance().super(controller);
-
-            // TODO Auto-generated constructor stub
-        }
-
-        /**
-         * Method description
-         *
-         * @param listener
-         */
-        public void addWindowListener(WindowListener listener) {
-            frame.addWindowListener(listener);
-        }
-
-        /**
-         * Method description
-         *
-         * @return
-         */
-        public boolean canFinalize() {
-            finalizable = (activeCalls == 0);
-
-            // IJ.showMessage(name + " activeCalls: " + activeCalls);
-            GrasppeKit.debugText("Finalize / Active Calls", activeCalls + " remaining.");
-
-            return finalizable;
-        }
-
-        /**
-         * Method description
-         */
-        public void close() {
-            if (finalizeView()) frame.dispose();
-        }
-
-        /**
-         * Completes graphical user interface operations before closing.
-         *
-         * @return
-         */
-        public boolean finalizeView() {
-            if (!canFinalize()) return false;
-
-            return true;
-        }
-
-        /**
-         * Hides the graphical frame
-         */
-        public void hide() {
-            frame.setVisible(false);	// frame.toBack();
-        }
-
-        /**
-         * Builds the graphical user interface window.
-         */
-        public void prepareFrame() {
-            frame = new JFrame(name);
-            frame.addWindowListener(new WindowAdapter() {
-
-                public void windowClosing(WindowEvent e) {
-                    close();
-                }
-
-            });
-        }
-
-        /**
-         * Method description
-         */
-        public void prepareMenu() {
-            menu = new ConResAnalyzerMenu();
-
-            LinkedHashMap<String, AbstractCommand>	commands        = controller.getCommands();
-            Collection<AbstractCommand>				commandSet      = commands.values();
-            Iterator<AbstractCommand>				commandIterator = commandSet.iterator();
-
-            while (commandIterator.hasNext()) {
-                AbstractCommand	command = commandIterator.next();
-
-                GrasppeKit.debugText("Command Button Creation",
-                                     GrasppeKit.lastSplit(command.toString()), 3);
-
-//              IJ.showMessage(this.getClass().getSimpleName(),
-//                             this.getClass().getSimpleName() + " Command Added: "
-//                             + command.toString());
-                menu.createButton(command);
-            }
-        }
-
-        /**
-         * Builds the graphical user interface window and elements.
-         */
-        public void prepareView() {
-            this.prepareMenu();
-            this.prepareFrame();
-        }
-
-        /**
-         * Builds the graphical user interface window and elements and adds the specified WindowListener to the frame.
-         *
-         * @param listener
-         */
-        public void prepareView(WindowListener listener) {
-            this.prepareView();
-            this.addWindowListener(listener);
-        }
-
-        /**
-         * Shows the graphical frame
-         */
-        public void show() {
-            frame.setVisible(true);		// frame.toFront();
-        }
-
-        /**
-         * Method called by observable object during notifyObserver calls.
-         */
-        public void update() {}
-
-        /**
-         * @return the title
-         */
-        protected String getTitle() {
-            return frame.getTitle();
-        }
-
-        /**
-         * @param title the title to set
-         */
-        protected void setTitle(String title) {
-            frame.setTitle(title);
-        }
-    }
-
 
     /**
      * Class description
@@ -1764,11 +714,149 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
             if (r.y + h > imageHeight) r.y = imageHeight - h;
             srcRect = r;
 
-            // setMagnification(newMag);
             repaint();
 
-            // IJ.log("adjustSourceRect2: "+srcRect+" "+dstWidth+"  "+dstHeight);
+        }
+    }
 
+
+    /**
+     * Class description
+     *
+     * @version        $Revision: 1.0, 11/11/09
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    private static class MyDispatcher implements KeyEventDispatcher {
+
+        /** Field description */
+        public static HashSet<KeyCode>	pressedKeys = new HashSet<KeyCode>();
+
+        /** Field description */
+        public static boolean	newCombination = true;
+
+        /** Field description */
+        public static boolean	consumedCombination = false;
+
+        /**
+         * Method description
+         *
+         * @param e
+         *
+         * @return
+         */
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent e) {
+
+            // TODO: consume key combinations;
+//          if (pressedKeys.isEmpty()) consumedCombination = false;
+            processKey(e);
+
+//          if (!consumedCombination && pressedKeys.isEmpty()) {
+            if (!pressedKeys.isEmpty()) {
+                updateMagnifier();
+                updateMagnification();
+                redrawFrame();
+                GrasppeKit.debugText("Key Event",
+                                     GrasppeKit.keyEventString(e) + " (PressedKeys "
+                                     + pressedKeyString() + ")", 3);
+            }
+
+            return false;
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public static String pressedKeyString() {
+            if (pressedKeys.isEmpty()) return "";
+
+            String[]	pressedKeyArray = new String[pressedKeys.size()];
+
+            int			i               = 0;
+
+            for (KeyCode keyCode : pressedKeys) {
+                pressedKeyArray[i] = keyCode.toString();
+                i                  += 1;
+            }
+
+            return GrasppeKit.cat((String[])pressedKeyArray, "+");
+        }
+
+        /**
+         * Method description
+         *
+         * @param e
+         */
+        public static void processKey(KeyEvent e) {
+            KeyEventID	eventID = KeyEventID.get(e.getID());
+
+            try {
+                switch (eventID) {
+
+                case PRESSED :
+                    pressedKeys.add(KeyCode.get(e.getKeyCode()));
+                    break;
+
+                case RELEASED :
+                    pressedKeys.remove(KeyCode.get(e.getKeyCode()));
+                    break;
+                }
+            } catch (Exception exception) {}
+
+        }
+
+        /**
+         * Method description
+         *
+         * @param keyCode
+         *
+         * @return
+         */
+        public static boolean isDown(KeyCode keyCode) {
+            return pressedKeys.contains(keyCode);
+        }
+
+        /**
+         * Method description
+         *
+         * @param keyCode
+         *
+         * @return
+         */
+        public static boolean isPressed(KeyCode keyCode) {
+            if (pressedKeys.isEmpty()) return false;
+
+            if (pressedKeys.contains(keyCode) && (pressedKeys.size() == 1)) {
+                GrasppeKit.debugText("Key Combination Pressed", pressedKeyString(), 3);
+
+                // pressedKeys.clear();
+//              consumedCombination = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Method description
+         *
+         * @param keyCodes
+         *
+         * @return
+         */
+        public static boolean isPressed(KeyCode[] keyCodes) {
+            if (pressedKeys.isEmpty()) return false;
+
+            if (Arrays.asList(keyCodes).containsAll(pressedKeys)) {
+                GrasppeKit.debugText("Key Combination Pressed", pressedKeyString(), 3);
+
+                // consumedCombination = true;
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -1854,20 +942,30 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
      */
     public static class Testing {
 
+        /** Field description */
+        public static KeyboardFocusManager	keyboardFocusManager =
+            KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+        /** Field description */
+        public static MyDispatcher	keyEventDispatch = new MyDispatcher();
+
+        /** Field description */
+        public static boolean	isMouseOverImage = false;
         static ImageWindow		imageWindow;
-        static JFrame			jFrame;
+        static JFrame			zoomWindow;
         static MagnifierCanvas	zoomCanvas;
+        static PointRoi			pointROI;
         static StopWatch		timer      = new StopWatch();
         static String			rootFolder = "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples";
         static String			caseFolder = "Approval_Scans_ConRes26_FS";
-        
-        static boolean showZoom = false;
+        static boolean			showZoom   = false;
+        static String			imageName  = "CirRe27U_50i.tif";	// "CirRe27U_50t.png";
+        static String			inputPath  = getInputPath();
 
-//        static String			imageName  = "CirRe27U_50t.png";
-        static String     imageName  = "CirRe27U_50i.tif";
-
-        static String	inputPath = (rootFolder + "/" + caseFolder + "/"
-                                   + imageName).replaceAll("//", "/");
+        /**
+         * Constructs ...
+         */
+        private Testing() {}
 
         /**
          * Outputs elapsed time with generic description without stopping or reseting the timer.
@@ -1903,6 +1001,82 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
         static void startTimer() {
             timer.start();
         }
+
+        /**
+         * @return the caseFolder
+         */
+        public static String getCaseFolder() {
+            return caseFolder;
+        }
+
+        /**
+         * @return the imageName
+         */
+        public static String getImageName() {
+            return imageName;
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public static String getInputPath() {
+            return (getRootFolder() + "/" + getCaseFolder() + "/"
+                    + getImageName()).replaceAll("//", "/");
+        }
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public static KeyEventDispatcher getKeyEventDispatch() {
+            return keyEventDispatch;
+        }
+
+        /**
+         * @return the rootFolder
+         */
+        public static String getRootFolder() {
+            return rootFolder;
+        }
+
+        /**
+         * @return the showZoom
+         */
+        public static boolean isShowZoom() {
+            return showZoom;
+        }
+
+        /**
+         * @param caseFolder the caseFolder to set
+         */
+        public static void setCaseFolder(String caseFolder) {
+            Testing.caseFolder = caseFolder;
+        }
+
+        /**
+         * @param imageName the imageName to set
+         */
+        public static void setImageName(String imageName) {
+            Testing.imageName = imageName;
+        }
+
+        /**
+         * @param rootFolder the rootFolder to set
+         */
+        public static void setRootFolder(String rootFolder) {
+            Testing.rootFolder = rootFolder;
+        }
+
+        /**
+         * @param showZoom the showZoom to set
+         */
+        public static void setShowZoom(boolean showZoom) {
+            Testing.zoomWindow.setVisible(showZoom);
+            Testing.showZoom = showZoom;
+        }
     }
 
 
@@ -1922,6 +1096,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
             @Override
             public void mouseClicked(MouseEvent e) {
                 debugEvent("IJMouseListener", e);
+                updateROI(e);
                 e.consume();
             }
             @Override
@@ -1967,7 +1142,6 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
 
                 // e.getSource().getClass().equals(ImageCanvas.class);
                 moveFrame(e.getXOnScreen(), e.getYOnScreen());
-                redrawFrame();
                 debugEvent("IJMotionListener", e);
                 e.consume();
             }
@@ -1995,7 +1169,7 @@ public class ConResAnalyzerPlugInA1 implements PlugIn {
                     if (frame.isVisible()) visibleFrames++;
 
                 debugEvent("Window", e);	// GrasppeKit.debugText("Window Closed (" + name + ")", e.toString());
-                if ((visibleFrames == 1) && Testing.jFrame.isVisible()) delayedExit();
+                if ((visibleFrames == 1) && Testing.zoomWindow.isVisible()) delayedExit();
                 if (visibleFrames == 0) delayedExit();
             }
             @Override
