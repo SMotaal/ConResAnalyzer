@@ -14,20 +14,16 @@
  */
 package com.grasppe.conres.framework.imagej;
 
+import ij.ImagePlus;
+import ij.gui.ImageWindow;
+import ij.io.Opener;
+
+import java.awt.event.KeyEvent;
+
 import com.grasppe.conres.alpha.ConResBootCamp.Testing;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
-
-import ij.ImagePlus;
-
-import ij.gui.ImageWindow;
-
-import ij.io.Opener;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.event.KeyEvent;
 
 /**
  * @author daflair
@@ -78,7 +74,6 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
      *
      * @return
      */
-    @Override
     public boolean dispatchedKeyEvent(KeyEvent e) {
         return false;
     }
@@ -104,7 +99,6 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     /**
      * Method description
      */
-    @Override
     public void update() {
 
         // TODO Auto-generated method stub
