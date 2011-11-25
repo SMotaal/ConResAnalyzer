@@ -16,20 +16,55 @@ package com.grasppe.conres.io.model;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
+
 import java.net.URI;
 
 /**
+ * Verification is a quality control process that is used to evaluate whether a product, 
+ * service, or system complies with regulations, specifications, or conditions imposed at 
+ * the start of a development phase. Verification can be in development, scale-up, or 
+ * production. This is often an internal process.
+ * 
+ * Validation is a quality assurance process of establishing evidence that provides a high 
+ * degree of assurance that a product, service, or system accomplishes its intended 
+ * requirements. This often involves acceptance of fitness for purpose with end users and 
+ * other product stakeholders. This is often an external process.
+ * 
+ * {@link http://en.wikipedia.org/wiki/Verification_and_validation}
+ *
  * @author daflair
  *
  */
 public abstract class CaseFile extends File {
 
-    protected boolean		verified, validated;
-    protected FileFilter	fileFilter = new FileFilter() {
+    /**
+	 * @return the filenameFilter
+	 */
+	public static FilenameFilter getFilenameFilter() {
+		return filenameFilter;
+	}
+
+	/**
+	 * @param filenameFilter the filenameFilter to set
+	 */
+	public static void setFilenameFilter(FilenameFilter filenameFilter) {
+		CaseFile.filenameFilter = filenameFilter;
+	}
+
+	protected boolean		verified, validated;
+    protected static FileFilter	fileFilter = new FileFilter() {
 
         public boolean accept(File pathname) {
             return false;
         }
+    };
+    
+    protected static FilenameFilter filenameFilter = new FilenameFilter() {
+
+		public boolean accept(File dir, String name) {
+			return false;
+		}
     };
 
     /**
@@ -65,31 +100,33 @@ public abstract class CaseFile extends File {
     }
 
     /**
-     * Method description
-     *
+     * "Are you building the right thing?"
      * @return
      */
     public boolean validate() {
-        this.validated = false;
+        boolean	isValid = true;
 
-        return isValidated();
+        this.validated = true;
+
+        return isValid;
     }
 
     /**
-     * Method description
-     *
+     * "Are you building it right?"
      * @return
      */
     public boolean verify() {
-        this.verified = false;
+        boolean	isVerified = true;
 
-        return isVerified();
+        this.verified = true;
+
+        return isVerified;
     }
 
     /**
      * @return the fileFilter
      */
-    public FileFilter getFileFilter() {
+    public static FileFilter getFileFilter() {
         return fileFilter;
     }
 
@@ -110,7 +147,7 @@ public abstract class CaseFile extends File {
     /**
      * @param fileFilter the fileFilter to set
      */
-    public void setFileFilter(FileFilter fileFilter) {
-        this.fileFilter = fileFilter;
-    }
+    public static void setFileFilter(FileFilter newFilter) {
+        fileFilter = newFilter;
+     }
 }

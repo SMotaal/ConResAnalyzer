@@ -1,5 +1,7 @@
 package com.grasppe.conres.framework.cases.operations;
 
+import ij.IJ;
+
 import java.io.File;
 import java.util.TreeSet;
 
@@ -18,7 +20,14 @@ import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
  */
 public abstract class FileChooserOperation extends CaseManagerOperation {
 
-    String	defaultChooserPath = CaseManagerModel.defaultChooserPath;
+    /**
+	 * @return the defaultChooserPath
+	 */
+	public String getDefaultChooserPath() {
+		return defaultChooserPath;
+	}
+
+	String	defaultChooserPath = CaseManagerModel.defaultChooserPath;
     File				selectedFile;
     protected boolean	executable = true;
     JFileChooser		fileChooser;
@@ -48,18 +57,29 @@ public abstract class FileChooserOperation extends CaseManagerOperation {
     @Override
     protected boolean perfomOperation() {
         prepareFileChooser();
-        if (fileChooser.showOpenDialog(GrasppeKit.commonFrame)
-                == JFileChooser.CANCEL_OPTION)
-            return false;
-        
-        if (!verifySelection(fileChooser.getSelectedFile()))
-        	return false;
+        boolean canProceed = false;
+        while(!canProceed){
+	        if (fileChooser.showOpenDialog(GrasppeKit.commonFrame)
+	                == JFileChooser.CANCEL_OPTION)
+	            return false;
+	        
+	        if (verifySelection(fileChooser.getSelectedFile()))
+	        	canProceed = true;
+	        else
+	            if (!confirmSelectionInvalid())
+	            	return false;
+        }
 
         // TODO: Inspect & Verify Scan Images / TDF are in selectedFile
         selectedFile = fileChooser.getSelectedFile();
         if (!selectedFile.isDirectory()) selectedFile = selectedFile.getParentFile();
 
         return true;
+    }
+    
+    protected boolean confirmSelectionInvalid() {
+    	return IJ.showMessageWithCancel(name,
+                "This is not a valid selection. Please make a valid selection.");
     }
     
     protected boolean verifySelection(File selectedFile) {
@@ -79,7 +99,7 @@ public abstract class FileChooserOperation extends CaseManagerOperation {
 
         // Setting initial chooser selection
         try {
-            File	defaultPath = new File(defaultChooserPath);
+            File	defaultPath = new File(getDefaultChooserPath());
 
             fileChooser.setSelectedFile(defaultPath);
         } catch (NullPointerException exception) {

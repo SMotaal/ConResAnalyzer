@@ -929,9 +929,9 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 //      Testing.imageName = imageNames[0];
 //        // testROIFinder();
 //
-        testImageWindow();
-        testImageJMouseListeners();
-        testMagnifier();
+//        testImageWindow();
+//        testImageJMouseListeners();
+//        testMagnifier();
 
     }
 

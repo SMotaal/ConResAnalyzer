@@ -26,10 +26,5 @@
 			<type>2</type>
 			<location>/Users/daflair/Documents/workspace/examples/gestures-wrapper/src/main/java</location>
 		</link>
-		<link>
-			<name>src/ConResAnalyzerPlugInA0.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/Downloads/ImageJ/ImageJ/plugins/Analyze/ConResAnalyzerPlugIn.java</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>

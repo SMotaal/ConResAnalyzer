@@ -1,5 +1,7 @@
 package com.grasppe.conres.framework.cases.operations;
 
+import ij.IJ;
+
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
@@ -49,9 +51,13 @@ import com.grasppe.lure.framework.GrasppeKit;
                 
                 GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
 
-                canProceed = selectCaseImagesFolder.quickSelect();
-                
                 // TODO: Show imageFolderChooser
+//                canProceed = false;
+//                while (!canProceed) 
+                if(!selectCaseImagesFolder.quickSelect()) return false; 
+
+                
+                canProceed = true;
                 // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
 
                 // TODO: Confirm and close current case before attempting to switching cases

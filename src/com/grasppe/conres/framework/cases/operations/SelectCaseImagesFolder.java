@@ -1,7 +1,13 @@
 package com.grasppe.conres.framework.cases.operations;
 
+import ij.IJ;
+
 import java.io.File;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
+import com.grasppe.conres.io.model.ImageFolder;
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
 /**
@@ -17,13 +23,15 @@ public class SelectCaseImagesFolder extends FileChooserOperation {
 	 */
 	@Override
 	protected boolean verifySelection(File selectedFile) {
-		return super.verifySelection(selectedFile);
+		if (!selectedFile.isDirectory()) selectedFile = selectedFile.getParentFile();
+		boolean isVerified = ImageFolder.validate(selectedFile);
+		return isVerified;  //super.verifySelection(selectedFile);
 	}
 
 	protected static final String	name = "SelectCaseFolder";
 
     protected static final String	defaultChooserPath =
-        "/Users/daflair/Documents/MATLAB/ConResAlpha/data/samples/Approval_Scans_ConRes26_FS";
+        "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
 
     protected boolean	executable = true;
 
@@ -31,11 +39,24 @@ public class SelectCaseImagesFolder extends FileChooserOperation {
         FileSelectionMode.DIRECTORIES_ONLY;
 
     /**
-     * Constructs ...
      */
     public SelectCaseImagesFolder() {
         super(name);
     }
     
+    @Override
+    protected boolean confirmSelectionInvalid() {
+    	return IJ.showMessageWithCancel(name,
+                "This is not a case images folder.\n\n" +
+                "Please select a folder and ensure that the scanned images \n" +
+                "filenames end with ##i.tif");
+    }
+    
+    /**
+	 * @return the defaultChooserPath
+	 */
+	public String getDefaultChooserPath() {
+		return defaultChooserPath;
+	}
     
 }

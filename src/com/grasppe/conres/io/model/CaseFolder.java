@@ -19,7 +19,6 @@ public class CaseFolder extends CaseFile {
 			return true;
 		}
     };	
-
 	/**
 	 * @param pathname
 	 */

@@ -180,7 +180,8 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
             if (!perfomCommand() ||!completed()) {
                 GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
-
+                executing = false;
+                executed  = false;
                 return false;
             }
 

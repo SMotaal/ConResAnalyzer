@@ -11,6 +11,7 @@
 
 package com.grasppe.conres.framework.units;
 
+import com.grasppe.conres.framework.targets.model.GridAxis;
 import com.grasppe.morie.units.AbstractValue;
 
 /**
@@ -23,11 +24,7 @@ import com.grasppe.morie.units.AbstractValue;
 public class ValueFactory {
 
     /**
-     * Method description
-     *
-     *
      * @param values
-     *
      * @return
      */
     public static ContrastValue[] CreateContrastValues(double values[]) {
@@ -40,11 +37,7 @@ public class ValueFactory {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param values
-     *
      * @return
      */
     public static ResolutionValue[] CreateResolutionValues(double values[]) {
@@ -57,11 +50,7 @@ public class ValueFactory {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param values
-     *
      * @return
      */
     public static ToneValue[] CreateToneValues(double values[]) {
@@ -74,12 +63,8 @@ public class ValueFactory {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param values
      * @param value
-     *
      * @return
      */
     public static AbstractValue[] CreateValues(double values[], AbstractValue value) {

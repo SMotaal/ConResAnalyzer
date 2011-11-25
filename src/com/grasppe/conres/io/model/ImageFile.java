@@ -16,6 +16,7 @@ package com.grasppe.conres.io.model;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.net.URI;
 import java.util.Arrays;
 
@@ -30,7 +31,13 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ImageFile extends CaseFile {
 
-    protected FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] { "*i.tif" }));
+    protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] { "*i.tif" }));
+    protected static FilenameFilter filenameFilter = new FilenameFilter() {
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith("i.tif");
+		}
+    };
+    protected float referenceToneValue;
 
     /**
      * @param pathname
@@ -68,15 +75,18 @@ public class ImageFile extends CaseFile {
      */
 
     /**
-     *
      * @return
      */
     @Override
     public boolean validate() {
-        validateScanImageFile(this);
-        validateScanImageSpecifications(this, getImageSpecifications());
+    	boolean validFile = validateScanImageFile(this);
+    	boolean validImage = validateScanImageSpecifications(this, getImageSpecifications());
 
-        return super.validate();
+    	boolean isValid = validFile && validImage;
+        
+        this.validated = true;
+        
+        return isValid;
     }
     
     private ImageSpecifications getImageSpecifications() {
@@ -86,7 +96,6 @@ public class ImageFile extends CaseFile {
     /**
      * Check specified image specifications
      * @param file
-     *
      * @return
      */
     private boolean validateScanImageSpecifications(File file, ImageSpecifications specifications) {
@@ -99,10 +108,7 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * Method description
-     *
      * @param file
-     *
      * @return
      */
     private boolean validateScanImageFile(File file) {
@@ -112,9 +118,8 @@ public class ImageFile extends CaseFile {
         String	extension = FilenameUtils.getExtension(name);
         String suffix = GrasppeKit.lastSplit(name,".").toLowerCase();
         int suffixCode = new Integer(suffix.split("_")[1]);
-        //String suffixText = suffix.
 
-        return false;
+        return true;
     }
 
     /*
@@ -123,8 +128,7 @@ public class ImageFile extends CaseFile {
      */
 
     /**
-     * Method description
-     *
+     * Inspect image characteristics to determine if the image is what is expected
      * @return
      */
     @Override
@@ -140,15 +144,10 @@ public class ImageFile extends CaseFile {
      */
 
     /**
-     * Method description
-     *
      * @return
      */
-    @Override
-    public FileFilter getFileFilter() {
-
-        // TODO Auto-generated method stub
-        return super.getFileFilter();
+    public static FileFilter getFileFilter() {
+        return fileFilter;
     }
 
     /*
@@ -157,14 +156,10 @@ public class ImageFile extends CaseFile {
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
     public boolean isValidated() {
-
-        // TODO Auto-generated method stub
         return super.isValidated();
     }
 
@@ -174,8 +169,6 @@ public class ImageFile extends CaseFile {
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -185,20 +178,24 @@ public class ImageFile extends CaseFile {
         return super.isVerified();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#setFileFilter(java.io.FileFilter)
-     */
-
     /**
-     * Method description
-     *
      * @param fileFilter
      */
-    @Override
-    public void setFileFilter(FileFilter fileFilter) {
-
-        // TODO Auto-generated method stub
-        super.setFileFilter(fileFilter);
+    public static void setFileFilter(FileFilter newFilter) {
+       fileFilter = newFilter;
     }
+    
+    /**
+	 * @return the filenameFilter
+	 */
+	public static FilenameFilter getFilenameFilter() {
+		return filenameFilter;
+	}
+
+	/**
+	 * @param filenameFilter the filenameFilter to set
+	 */
+	public static void setFilenameFilter(FilenameFilter filenameFilter) {
+		ImageFile.filenameFilter = filenameFilter;
+	}    
 }

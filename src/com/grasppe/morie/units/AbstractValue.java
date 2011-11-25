@@ -53,6 +53,14 @@ public abstract class AbstractValue {
         this();
         this.setStandardValue(inputValue.getStandardValue());
     }
+    
+//    public static AbstractValue createValue(double[] value) {
+//    	try {
+//    		return getClass().getConstructor(double.class).newInstance(value);
+//    	} catch (Exception exception) {
+//    		
+//    	}
+//    }
 
     /**
      * Constructs ...

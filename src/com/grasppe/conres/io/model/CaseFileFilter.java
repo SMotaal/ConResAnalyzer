@@ -14,6 +14,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class CaseFileFilter extends WildcardFileFilter {
 
+
 	/**
 	 * @param wildcards
 	 * @param caseSensitivity

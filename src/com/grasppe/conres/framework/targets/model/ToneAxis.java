@@ -3,19 +3,15 @@
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
- * This code is not licensed for use and is the properyty of it's owner.
+ * This code is not licensed for use and is the property of it's owner.
  *
  */
 
 
 
-/**
- *
- */
 package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.conres.framework.units.ToneValue;
-import com.grasppe.conres.framework.units.ValueFactory;
 
 /**
  * @author daflair
@@ -23,35 +19,51 @@ import com.grasppe.conres.framework.units.ValueFactory;
  */
 public final class ToneAxis extends GridAxis {
 
-    /** Field description */
     protected ToneValue[]	values;
+    protected ToneValue
+		minimumValue           = new ToneValue(0),
+		maximumValue           = new ToneValue(100);
+    protected String	label  = "Reference Tone Value",
+						symbol = "%";
 
     /**
-     * Constructs ...
-     *
-     *
      * @param steps
-     * @param label
-     * @param symbol
      */
-    protected ToneAxis(double[] steps, String label, String symbol) {
-        super(steps);		// , label, symbol);
+    protected ToneAxis(double[] steps) {
+        super(steps);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.conresalpha.targets.GridAxis#createValues(double[])
-     */
-
     /**
-     * Method description
-     *
-     *
+     * @param value
+     * @return
      */
     @Override
-    protected void generateValues() {
+    public ToneValue createValue(double value) {
+        return new ToneValue(value);
+    }
 
-        // TODO Auto-generated method stub
-        values = ValueFactory.CreateToneValues(steps);
+    /**
+     * @param length
+     * @return
+     */
+    @Override
+    public ToneValue[] createValueArray(int length) {
+        return new ToneValue[length];
+    }
+
+    /**
+     * @return the maximumValue
+     */
+    @Override
+    public ToneValue getMaximumValue() {
+        return maximumValue;
+    }
+
+    /**
+     * @return the minimumValue
+     */
+    @Override
+    public ToneValue getMinimumValue() {
+        return minimumValue;
     }
 }

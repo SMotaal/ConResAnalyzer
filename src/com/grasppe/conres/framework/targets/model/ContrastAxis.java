@@ -3,19 +3,15 @@
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
- * This code is not licensed for use and is the properyty of it's owner.
+ * This code is not licensed for use and is the property of it's owner.
  *
  */
 
 
 
-/**
- *
- */
 package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.conres.framework.units.ContrastValue;
-import com.grasppe.conres.framework.units.ValueFactory;
 
 /**
  * @author daflair
@@ -23,40 +19,51 @@ import com.grasppe.conres.framework.units.ValueFactory;
  */
 public final class ContrastAxis extends GridAxis {
 
-    /** Field description */
     protected ContrastValue[]	values;
-
-    /** Field description */
-    protected String	label, symbol;
+    protected ContrastValue
+		minimumValue           = new ContrastValue(0),
+		maximumValue           = new ContrastValue(100);
+    protected String	label  = "Contrast, Log step increments",
+						symbol = "%";
 
     /**
-     * Constructs ...
-     *
-     *
      * @param steps
-     * @param label
-     * @param symbol
      */
-    protected ContrastAxis(double[] steps, String label, String symbol) {
-
-        // super(steps, label, symbol);
+    protected ContrastAxis(double[] steps) {
         super(steps);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.conresalpha.targets.GridAxis#createValues(double[])
-     */
-
     /**
-     * Method description
-     *
-     *
+     * @param value
+     * @return
      */
     @Override
-    protected void generateValues() {
-
-        // TODO Auto-generated method stub
-        values = ValueFactory.CreateContrastValues(steps);
+    public ContrastValue createValue(double value) {
+        return new ContrastValue(value);
     }
+
+    /**
+     * @param length
+     * @return
+     */
+    @Override
+    public ContrastValue[] createValueArray(int length) {
+        return new ContrastValue[length];
+    }
+
+//    /**
+//     * @return the maximumValue
+//     */
+//    @Override
+//    public ContrastValue getMaximumValue() {
+//        return maximumValue;
+//    }
+//
+//    /**
+//     * @return the minimumValue
+//     */
+//    @Override
+//    public ContrastValue getMinimumValue() {
+//        return minimumValue;
+//    }
 }

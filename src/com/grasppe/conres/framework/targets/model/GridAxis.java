@@ -9,14 +9,9 @@
 
 
 
-/**
- *
- */
 package com.grasppe.conres.framework.targets.model;
 
-import com.grasppe.conres.framework.units.ValueFactory;
 import com.grasppe.morie.units.AbstractValue;
-import com.grasppe.morie.units.ConcreteValue;
 import com.grasppe.morie.units.UnitDefinition;
 
 /**
@@ -30,6 +25,8 @@ public class GridAxis {
 
     /** Field description */
     protected AbstractValue[]	values;
+    protected AbstractValue		minimumValue;
+    protected AbstractValue		maximumValue;
 
     /** Field description */
     protected String	label;
@@ -41,9 +38,6 @@ public class GridAxis {
     protected UnitDefinition	unitDefinition;
 
     /**
-     * Constructs ...
-     *
-     *
      * @param steps
      */
     protected GridAxis(double[] steps) {
@@ -53,13 +47,38 @@ public class GridAxis {
     }
 
     /**
-     * Method description
-     *
-     *
-     *
+     * @param value
+     * @return
+     */
+    public AbstractValue createValue(double value) {
+        return null;
+    }
+
+    /**
+     * @param length
+     * @return
+     */
+    public AbstractValue[] createValueArray(int length) {
+        return new AbstractValue[length];
+    }
+
+    /**
      */
     protected void generateValues() {
-        values = ValueFactory.CreateValues(steps, this.values[0]);
+        try {
+            int	nSteps = steps.length;
+
+            setMinimumValue(steps[0]);
+            setMaximumValue(steps[nSteps - 1]);
+
+            values = createValueArray(nSteps);
+
+            for (int i = 0; i < nSteps; i++)
+                values[i] = createValue(steps[i]);
+
+        } catch (Exception exception) {		// AbstractValues cannot be instantiated
+            exception.printStackTrace();
+        }
     }
 
     /**
@@ -67,6 +86,20 @@ public class GridAxis {
      */
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * @return the maximumValue
+     */
+    public AbstractValue getMaximumValue() {
+        return maximumValue;
+    }
+
+    /**
+     * @return the minimumValue
+     */
+    public AbstractValue getMinimumValue() {
+        return minimumValue;
     }
 
     /**
@@ -84,10 +117,17 @@ public class GridAxis {
     }
 
     /**
+     * @return the unitDefinition
+     */
+    public UnitDefinition getUnitDefinition() {
+        return unitDefinition;
+    }
+
+    /**
      * @return the values
      */
-    public ConcreteValue[] getValues() {
-        return (ConcreteValue[])values;
+    public AbstractValue[] getValues() {
+        return values;
     }
 
     /**
@@ -95,6 +135,34 @@ public class GridAxis {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    /**
+     * @param maximumValue the maximumValue to set
+     */
+    public void setMaximumValue(AbstractValue maximumValue) {
+        this.maximumValue = maximumValue;
+    }
+
+    /**
+     * @param maximumValue the maximumValue to set
+     */
+    public void setMaximumValue(double maximumValue) {
+        this.maximumValue = createValue(maximumValue);
+    }
+
+    /**
+     * @param minimumValue the minimumValue to set
+     */
+    public void setMinimumValue(AbstractValue minimumValue) {
+        this.minimumValue = minimumValue;
+    }
+
+    /**
+     * @param minimumValue
+     */
+    public void setMinimumValue(double minimumValue) {
+        this.minimumValue = createValue(minimumValue);
     }
 
     /**

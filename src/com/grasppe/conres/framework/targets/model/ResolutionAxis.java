@@ -3,19 +3,15 @@
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
- * This code is not licensed for use and is the properyty of it's owner.
+ * This code is not licensed for use and is the property of it's owner.
  *
  */
 
 
 
-/**
- *
- */
 package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.conres.framework.units.ResolutionValue;
-import com.grasppe.conres.framework.units.ValueFactory;
 
 /**
  * @author daflair
@@ -23,40 +19,51 @@ import com.grasppe.conres.framework.units.ValueFactory;
  */
 public final class ResolutionAxis extends GridAxis {
 
-    /** Field description */
     protected ResolutionValue[]	values;
-
-    /** Field description */
-    protected String	label, symbol;
+    protected ResolutionValue
+		minimumValue           = new ResolutionValue(0),
+		maximumValue           = new ResolutionValue(100);
+    protected String	label  = "Resolution, Line Pairs per Millimeter, Log steps",
+						symbol = "l2/mm";
 
     /**
-     * Constructs ...
-     *
-     *
      * @param steps
-     * @param label
-     * @param symbol
      */
-    protected ResolutionAxis(double[] steps, String label, String symbol) {
-
-        // super(steps, label, symbol);
+    protected ResolutionAxis(double[] steps) {
         super(steps);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.conresalpha.targets.GridAxis#createValues(double[])
-     */
-
     /**
-     * Method description
-     *
-     *
+     * @param value
+     * @return
      */
     @Override
-    protected void generateValues() {
+    public ResolutionValue createValue(double value) {
+        return new ResolutionValue(value);
+    }
 
-        // TODO Auto-generated method stub
-        values = ValueFactory.CreateResolutionValues(steps);
+    /**
+     * @param length
+     * @return
+     */
+    @Override
+    public ResolutionValue[] createValueArray(int length) {
+        return new ResolutionValue[length];
+    }
+
+    /**
+     * @return the maximumValue
+     */
+    @Override
+    public ResolutionValue getMaximumValue() {
+        return maximumValue;
+    }
+
+    /**
+     * @return the minimumValue
+     */
+    @Override
+    public ResolutionValue getMinimumValue() {
+        return minimumValue;
     }
 }

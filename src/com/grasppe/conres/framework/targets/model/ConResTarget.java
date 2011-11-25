@@ -14,6 +14,11 @@
  */
 package com.grasppe.conres.framework.targets.model;
 
+import com.grasppe.conres.framework.units.ContrastValue;
+import com.grasppe.conres.framework.units.ResolutionValue;
+import com.grasppe.conres.framework.units.ToneValue;
+import com.grasppe.morie.units.AbstractValue;
+
 /**
  * @author daflair
  *
@@ -21,16 +26,11 @@ package com.grasppe.conres.framework.targets.model;
 public class ConResTarget extends GridTarget {
 
     /** Field description */
-    protected ConResBlock[]	testBlockes;
-
-    /** Field description */
-    protected ToneAxis	bAxis;
-
-    /** Field description */
-    protected ResolutionAxis	rAxis;
-
-    /** Field description */
-    protected ContrastAxis	cAxis;
+    protected ConResBlock[]	targetBlocks;
+    protected static ToneAxis	zAxis;
+    protected static ResolutionAxis	yAxis;
+    protected static ContrastAxis	xAxis;
+    protected TargetDimensions dimensions;
 
     /**
      *
@@ -40,24 +40,24 @@ public class ConResTarget extends GridTarget {
      */
     protected ConResTarget(double[] blockSteps, double[] rowSteps, double[] columnSteps) {
         super();
-
+        
+        int nBlocks = blockSteps.length;
+        
         // Setup block axis
-        bAxis = new ToneAxis(blockSteps, "Ref Tone.", "%");
-        bAxis.setSteps(blockSteps);
-        bAxis.generateValues();
-
+        zAxis = new ToneAxis(blockSteps);
+        
+        targetBlocks = new ConResBlock[nBlocks];
+        
+        for (int i = 0; i < nBlocks; i++) { //(AbstractValue value : zAxis.getValues())
+        	targetBlocks[i] = new ConResBlock(blockSteps[i], columnSteps, rowSteps);
+        }
+        
         // Setup row axis
-        rAxis = new ResolutionAxis(rowSteps, "Resolution, Line Pairs per Millimeter, Log steps",
-                                     "l2/mm");
-        rAxis.setSteps(rowSteps);
-        rAxis.generateValues();
+        yAxis = new ResolutionAxis(rowSteps);
 
         // Setup column axis
-        cAxis = new ContrastAxis(columnSteps, "Contrast, Log step increments", "%");
-        cAxis.setSteps(columnSteps);
-        cAxis.generateValues();
-
-        // Create values for all axes steps
-        // createAxesValues();
+        xAxis = new ContrastAxis(columnSteps);
+        
     }
+    
 }
