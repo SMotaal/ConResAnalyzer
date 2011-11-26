@@ -102,8 +102,8 @@ public abstract class FileChooserOperation extends CaseManagerOperation {
             File	defaultPath = new File(getDefaultChooserPath());
 
             fileChooser.setSelectedFile(defaultPath);
-        } catch (NullPointerException exception) {
-
+        } catch (NullPointerException e) {
+        	e.printStackTrace();
             // Not setting initial chooser selection
         }
     }
@@ -123,6 +123,7 @@ public abstract class FileChooserOperation extends CaseManagerOperation {
             GrasppeKit.debugText(finalName + " Failed",
                                  finalName + " threw a " + e.getClass().getSimpleName()
                                  + "\n\n" + e.toString(), 2);
+            e.printStackTrace();
         }
 
         return canProceed;

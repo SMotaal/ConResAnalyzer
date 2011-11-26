@@ -6,7 +6,6 @@ import com.grasppe.lure.components.AbstractModel;
 public class ImageSpecifications extends AbstractModel {
 	
 	protected float minimumDPI = 600F;
-	//protected 
 
 	public ImageSpecifications() {
 		// TODO Auto-generated constructor stub

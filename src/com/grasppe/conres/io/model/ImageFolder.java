@@ -112,13 +112,17 @@ public class ImageFolder extends CaseFile {
 
         if (!isDirectory) return false;
 
-        int		imageCount = file.list(ImageFile.getFilenameFilter()).length;
+        File[] imageFileList = file.listFiles(ImageFile.getFilenameFilter());
+        int		imageCount = imageFileList.length;
         boolean	hasImages  = imageCount > 0;
+        boolean validImages = true;
+        for (File imageFile : imageFileList)
+        	validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
 
         int		tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
         boolean	hasTDF   = tdfCount == 1;
 
-        boolean	isValid  = isDirectory && hasImages && hasTDF;
+        boolean	isValid  = isDirectory && hasImages && validImages && hasTDF;
 
         return isValid;
 

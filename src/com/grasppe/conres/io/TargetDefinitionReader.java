@@ -89,16 +89,11 @@ public class TargetDefinitionReader extends BufferedReader {
      * @throws FileNotFoundException
      */
     public static void main(String[] args) throws FileNotFoundException, Exception {
-        String	testFile =
+        String	path =
             "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U.log";
-        
-        TargetDefinitionFile tdfFile = new TargetDefinitionFile(testFile);
-        
-
-        new TargetDefinitionReader(tdfFile); //.parseFile();
-        
-        System.out.println(tdfFile);
-
+        TargetDefinitionFile file = new TargetDefinitionFile(path);
+        TargetDefinitionReader reader =  new TargetDefinitionReader(file);
+        System.out.println(file);
     }
 
     /**

@@ -288,26 +288,15 @@ public abstract class AbstractRate extends AbstractValue {
 
         switch (relation) {
 
+        case IDENTICAL :	// Example: spi ==> spi
+        	setValue(inputRate.getValue());
+        	break;
         case INVERSE :		// Example: spi ==> mm/sp
         case MIRRORED :		// Example: sp/mm ==> mm/sp
-
-            /*
-             * flip inputRate components (before direct conversion)
-             */
-            components[1] = new AbstractValue[] { components[1][1], components[1][0] };
+        	// flip inputRate components (before direct conversion)
+            components[1] = new AbstractValue[] { components[1][1], components[1][0] }; 
             newValue      = 1.0 / inputRate.getValue();
-        case IDENTICAL :	// Example: spi ==> spi
         case DIRECT :		// Example: spi ==> sp/mm
-
-            /*
-             * nRatio = components[1][0].getStandardValue()/components[0][0].getStandardValue();
-             * dRatio = components[1][1].getStandardValue()/components[0][1].getStandardValue();
-             * value = nRatio * dRatio;
-             *
-             * nRatio = 2 spot / 1 spot;
-             * dRatio = 0.0254 m / 0.001 m;
-             * value = 2 * 25.4;
-             */
             newValue = newValue * components[1][0].getStandardValue()
                        / components[0][0].getStandardValue() * components[0][1].getStandardValue()
                        / components[1][1].getStandardValue();
@@ -319,16 +308,6 @@ public abstract class AbstractRate extends AbstractValue {
                                + components[1][1].toString());
             System.out.println(pfx + "\tTo:\t" + components[0][0].toString() + " / "
                                + components[0][1].toString());
-
-            /*
-             * If nothing matches, throw InvalidClassException with details
-             */
-
-//          case NONE :
-//          case NUMERATORS :           // BAD EXAMPLE: 1750 µm/dot and 10 µm/spot
-//          case DENOMINATORS :         // BAD EXAMPLE: 175 lpi and 2540 dpi
-//          case CROSSNUMERATOR :       // BAD EXAMPLE: µm/spot ==> line-pairs/mm
-//          case CROSSDENOMINATOR :     // BAD EXAMPLE: line-pairs/mm ==> µm/spot
             throw new InvalidClassException(
                 "Cannot conver between incompatible rates with non-equivalent components." + "\n\t"
                 + inputRate.toString() + " is not compatible with " + this.toString() + " (found "

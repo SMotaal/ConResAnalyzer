@@ -76,6 +76,7 @@ import com.grasppe.lure.framework.GrasppeKit;
                 } catch (Exception e) {
                     GrasppeKit.debugText("New Case Failure",
                                          "Failed to create new case" + "\n\n" + e.toString(), 2);
+                    e.printStackTrace();
                     canProceed = false;
                 }
 
@@ -91,6 +92,7 @@ import com.grasppe.lure.framework.GrasppeKit;
                     GrasppeKit.debugText("New Case Failure",
                                          "Failed to reorganize cases in the case manager model."
                                          + "\n\n" + e.toString(), 2);
+                    e.printStackTrace();
                     canProceed = false;
                 }
 

@@ -12,6 +12,7 @@
 package com.grasppe.lure.framework;
 
 import ij.IJ;
+import ij.io.FileInfo;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,6 +64,45 @@ public class GrasppeKit {
     private GrasppeKit() {
         super();
         setDebugTimeStamp(timestampLevel);
+    }
+    
+    /**
+     * Enumeration of java.awt.event.KeyEvent event id constants
+     */
+    public enum IJCompression { // fileInfo.compression 
+    	NONE(FileInfo.COMPRESSION_NONE),
+    	UNKNOWN(FileInfo.COMPRESSION_UNKNOWN);
+    	
+        private static final Map<Integer, IJCompression>	lookup = new HashMap<Integer, IJCompression>();
+
+        static {
+            for (IJCompression s : EnumSet.allOf(IJCompression.class))
+                lookup.put(s.value(), s);
+        }
+
+        private int	code;
+
+        /**
+         * @param code   integer or constant variable for the specific enumeration
+         */
+        private IJCompression(int code) {
+            this.code = code;
+        }
+
+        /**
+         * @return the integer value for a specific enumeration
+         */
+        public int value() {
+            return code;
+        }
+
+        /**
+         * @param code   integer or constant variable for the specific enumeration
+         * @return enumeration object
+         */
+        public static IJCompression get(int code) {
+            return lookup.get(code);
+        }
     }
 
     /**
@@ -1135,4 +1175,39 @@ public class GrasppeKit {
             return new UniversalDateFormat().format(Calendar.getInstance().getTime());		// date.getTime()) + "]";
         }
     }
+
+
+	/**
+	 * Method description
+	 *
+	 * @param value
+	 * @param enumClass
+	 * @param <E>
+	 *
+	 * @return
+	 */
+	public static <E extends Enum<E>> IIntegerValue lookupByEnumValue(int value, Class<E> enumClass) {
+	    Map<Integer, IIntegerValue>	lookup = new HashMap<Integer, IIntegerValue>();
+	
+	    for (E s : EnumSet.allOf(enumClass))
+	        lookup.put(((IIntegerValue)s).value(), (IIntegerValue)s);
+	
+	    return lookup.get(value);
+	}
+	/**
+	 * Interface description
+	 *
+	 * @version        $Revision: 1.0, 11/11/25
+	 * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+	 */
+	public interface IIntegerValue {
+		
+		/**
+		 * Method description
+		 *
+		 * @return
+		 */
+		public int value();
+	}
 }
+

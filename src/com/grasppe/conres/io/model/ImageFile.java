@@ -14,16 +14,23 @@
  */
 package com.grasppe.conres.io.model;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.net.URI;
-import java.util.Arrays;
+import com.grasppe.conres.image.management.model.ImageSpecifications;
+import com.grasppe.conres.io.ImageFileReader;
+import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.morie.units.spatial.SpatialFrequency;
+import com.grasppe.morie.units.spatial.resolution.PixelsPerInch;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.grasppe.conres.image.management.model.ImageSpecifications;
-import com.grasppe.lure.framework.GrasppeKit;
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+
+import java.net.URI;
+
+import java.util.Arrays;
 
 /**
  * @author daflair
@@ -31,25 +38,33 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ImageFile extends CaseFile {
 
-    protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] { "*i.tif" }));
-    protected static FilenameFilter filenameFilter = new FilenameFilter() {
-		public boolean accept(File dir, String name) {
-			return name.toLowerCase().endsWith("i.tif");
-		}
+    protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
+                                                 "*i.tif" }));
+    protected static FilenameFilter	filenameFilter = new FilenameFilter() {
+
+        public boolean accept(File dir, String name) {
+            return name.toLowerCase().endsWith("i.tif");
+        }
     };
-    protected float referenceToneValue;
+    protected int				channels = 0,
+								bitDepth = 0,
+								width    = 0,
+								height   = 0;
+    protected SpatialFrequency	resolution;
+    protected double			pixelWidth  = 0,
+								pixelHeight = 0;
 
     /**
      * @param pathname
      */
-    protected ImageFile(String pathname) {
+    public ImageFile(String pathname) {
         super(pathname);
     }
 
     /**
      * @param uri
      */
-    protected ImageFile(URI uri) {
+    public ImageFile(URI uri) {
         super(uri);
     }
 
@@ -57,7 +72,7 @@ public class ImageFile extends CaseFile {
      * @param parent
      * @param child
      */
-    protected ImageFile(File parent, String child) {
+    public ImageFile(File parent, String child) {
         super(parent, child);
     }
 
@@ -65,8 +80,17 @@ public class ImageFile extends CaseFile {
      * @param parent
      * @param child
      */
-    protected ImageFile(String parent, String child) {
+    public ImageFile(String parent, String child) {
         super(parent, child);
+    }
+
+    /**
+     * 	@return
+     */
+    public String toString() {
+        return super.toString() + "\t" + getChannels() + " x " + getBitDepth() + "-bit x "
+               + getWidth() + " x " + getHeight() + " / " + getResolution().value + " "
+               + getResolution().getSymbol();
     }
 
     /*
@@ -79,32 +103,21 @@ public class ImageFile extends CaseFile {
      */
     @Override
     public boolean validate() {
-    	boolean validFile = validateScanImageFile(this);
-    	boolean validImage = validateScanImageSpecifications(this, getImageSpecifications());
+        boolean	validFile = validateScanImageFile(this);
+        boolean	validImage;
 
-    	boolean isValid = validFile && validImage;
-        
+        try {
+            validImage = validateScanImageSpecifications(this, getImageSpecifications());
+        } catch (Exception e) {
+            validImage = false;
+            e.printStackTrace();
+        }
+
+        boolean	isValid = validFile && validImage;
+
         this.validated = true;
-        
+
         return isValid;
-    }
-    
-    private ImageSpecifications getImageSpecifications() {
-    	return new ImageSpecifications();
-    }
-
-    /**
-     * Check specified image specifications
-     * @param file
-     * @return
-     */
-    private boolean validateScanImageSpecifications(File file, ImageSpecifications specifications) {
-
-        // TODO: Check color mode: 8-bit gray
-        // TODO: Check resolution: 600 dpi minimum
-        // TODO: Check against TDF Model target size ±10%
-        // TODO: Check against TDF Model dpi > spi * 1.5
-        return true;
     }
 
     /**
@@ -112,13 +125,38 @@ public class ImageFile extends CaseFile {
      * @return
      */
     private boolean validateScanImageFile(File file) {
-        File	dir       = this.getParentFile();
-        String	name      = this.getName();
-        String	baseName  = FilenameUtils.getBaseName(name);
-        String	extension = FilenameUtils.getExtension(name);
-        String suffix = GrasppeKit.lastSplit(name,".").toLowerCase();
-        int suffixCode = new Integer(suffix.split("_")[1]);
+        File	dir        = this.getParentFile();
+        String	name       = this.getName();
+        String	baseName   = FilenameUtils.getBaseName(name);
+        String	extension  = FilenameUtils.getExtension(name);
+        String	suffix     = GrasppeKit.lastSplit(name, ".").toLowerCase();
+        //String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
+        int		suffixCode = new Integer(suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1)).intValue();//new Integer(suffix.split("_")[1]);
+        
+        return name.toLowerCase().replace("ff","f").endsWith("i.tif");//true;
+    }
 
+    /**
+     * Check specified image specifications
+     * @param file
+     * @param specifications
+     * @return
+     * @throws Exception
+     */
+    private boolean validateScanImageSpecifications(File file, ImageSpecifications specifications)
+            throws Exception {
+
+        if (getResolution() == null) new ImageFileReader(this);
+
+        // TODO: Check color mode: 8-bit gray
+        boolean	validChannels = getChannels() == 2;
+        boolean	validBitDepth = getBitDepth() >= 8;
+
+        // TODO: Check resolution: 600 dpi minimum
+        boolean	validResolution = new PixelsPerInch(getResolution()).getValue() >= 600;
+
+        // TODO: Check against TDF Model target size ±10%
+        // TODO: Check against TDF Model dpi > spi * 1.5
         return true;
     }
 
@@ -133,9 +171,21 @@ public class ImageFile extends CaseFile {
      */
     @Override
     public boolean verify() {
-
-        // TODO Auto-generated method stub
         return super.verify();
+    }
+
+    /**
+     * 	@return
+     */
+    public int getBitDepth() {
+        return bitDepth;
+    }
+
+    /**
+     * 	@return
+     */
+    public int getChannels() {
+        return channels;
     }
 
     /*
@@ -148,6 +198,57 @@ public class ImageFile extends CaseFile {
      */
     public static FileFilter getFileFilter() {
         return fileFilter;
+    }
+
+    /**
+     * @return the filenameFilter
+     */
+    public static FilenameFilter getFilenameFilter() {
+        return filenameFilter;
+    }
+
+    /**
+     * 	@return
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * Method description
+     *
+     * @return
+     */
+    private ImageSpecifications getImageSpecifications() {
+        return new ImageSpecifications();
+    }
+
+    /**
+     * 	@return
+     */
+    public double getPixelHeight() {
+        return pixelHeight;
+    }
+
+    /**
+     * 	@return
+     */
+    public double getPixelWidth() {
+        return pixelWidth;
+    }
+
+    /**
+     * 	@return
+     */
+    public SpatialFrequency getResolution() {
+        return resolution;
+    }
+
+    /**
+     * 	@return
+     */
+    public int getWidth() {
+        return width;
     }
 
     /*
@@ -179,23 +280,65 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * @param fileFilter
+     * 	@param bitDepth
+     */
+    public void setBitDepth(int bitDepth) {
+        this.bitDepth = bitDepth;
+    }
+
+    /**
+     * 	@param channels
+     */
+    public void setChannels(int channels) {
+        this.channels = channels;
+    }
+
+    /**
+     * @param newFilter
      */
     public static void setFileFilter(FileFilter newFilter) {
-       fileFilter = newFilter;
+        fileFilter = newFilter;
     }
-    
-    /**
-	 * @return the filenameFilter
-	 */
-	public static FilenameFilter getFilenameFilter() {
-		return filenameFilter;
-	}
 
-	/**
-	 * @param filenameFilter the filenameFilter to set
-	 */
-	public static void setFilenameFilter(FilenameFilter filenameFilter) {
-		ImageFile.filenameFilter = filenameFilter;
-	}    
+    /**
+     * @param filenameFilter the filenameFilter to set
+     */
+    public static void setFilenameFilter(FilenameFilter filenameFilter) {
+        ImageFile.filenameFilter = filenameFilter;
+    }
+
+    /**
+     * 	@param height
+     */
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    /**
+     * 	@param pixelHeight
+     */
+    public void setPixelHeight(double pixelHeight) {
+        this.pixelHeight = pixelHeight;
+    }
+
+    /**
+     * 	@param pixelWidth
+     */
+    public void setPixelWidth(double pixelWidth) {
+        this.pixelWidth = pixelWidth;
+    }
+
+    /**
+     * 	@param resolution
+     */
+    public void setResolution(SpatialFrequency resolution) {
+        this.resolution = resolution;
+    }
+
+    /**
+     * 	@param width
+     */
+    public void setWidth(int width) {
+        this.width = width;
+    }
 }

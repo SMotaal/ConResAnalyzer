@@ -18,7 +18,17 @@
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
+  	<dependency>
+  		<groupId>org.apache.sanselan</groupId>
+  		<artifactId>sanselan</artifactId>
+  		<version>0.97-incubator</version>
+  		<type>bundle</type>
+  	</dependency>
   </dependencies>
+  <dependencyManagement>
+  	<dependencies>
+  	</dependencies>
+  </dependencyManagement>
   <modules>
   </modules>
 </project>
