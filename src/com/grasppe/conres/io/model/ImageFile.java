@@ -15,6 +15,7 @@
 package com.grasppe.conres.io.model;
 
 import com.grasppe.conres.image.management.model.ImageSpecifications;
+import com.grasppe.conres.io.IGrasppeFileReader;
 import com.grasppe.conres.io.ImageFileReader;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.morie.units.spatial.SpatialFrequency;
@@ -38,7 +39,33 @@ import java.util.Arrays;
  */
 public class ImageFile extends CaseFile {
 
-    protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
+    /**
+	 * @return the imageID
+	 */
+	public int getImageID() {
+        File	dir       = this.getParentFile();
+        String	name      = this.getName();
+        String	baseName  = FilenameUtils.getBaseName(name);
+        String	extension = FilenameUtils.getExtension(name);
+        String	suffix    = GrasppeKit.lastSplit(name, ".").toLowerCase();
+
+        // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
+        int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
+                             suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
+        
+        setImageID(suffixCode);
+        
+		return imageID;
+	}
+
+	/**
+	 * @param imageID the imageID to set
+	 */
+	public void setImageID(int imageID) {
+		this.imageID = imageID;
+	}
+
+	protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
                                                  "*i.tif" }));
     protected static FilenameFilter	filenameFilter = new FilenameFilter() {
 
@@ -85,7 +112,7 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public String toString() {
         return super.toString() + "\t" + getChannels() + " x " + getBitDepth() + "-bit x "
@@ -125,16 +152,24 @@ public class ImageFile extends CaseFile {
      * @return
      */
     private boolean validateScanImageFile(File file) {
-        File	dir        = this.getParentFile();
-        String	name       = this.getName();
-        String	baseName   = FilenameUtils.getBaseName(name);
-        String	extension  = FilenameUtils.getExtension(name);
-        String	suffix     = GrasppeKit.lastSplit(name, ".").toLowerCase();
-        //String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
-        int		suffixCode = new Integer(suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1)).intValue();//new Integer(suffix.split("_")[1]);
+        File	dir       = this.getParentFile();
+        String	name      = this.getName();
+        String	baseName  = FilenameUtils.getBaseName(name);
+        String	extension = FilenameUtils.getExtension(name);
+        String	suffix    = GrasppeKit.lastSplit(name, ".").toLowerCase();
+
+        // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
+        int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
+                             suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
         
-        return name.toLowerCase().replace("ff","f").endsWith("i.tif");//true;
+        setImageID(suffixCode);
+
+        return name.toLowerCase().replace("ff", "f").endsWith("i.tif");		// true;
     }
+    
+    protected int imageID;
+//    protected String baseNmae;
+//    protected String extension;
 
     /**
      * Check specified image specifications
@@ -175,14 +210,14 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public int getBitDepth() {
         return bitDepth;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public int getChannels() {
         return channels;
@@ -208,7 +243,7 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public int getHeight() {
         return height;
@@ -224,14 +259,14 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public double getPixelHeight() {
         return pixelHeight;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public double getPixelWidth() {
         return pixelWidth;
@@ -240,12 +275,26 @@ public class ImageFile extends CaseFile {
     /**
      * 	@return
      */
+    @Override
+    public IGrasppeFileReader getReader() {
+        try {
+            return new ImageFileReader(this);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            return null;
+        }
+    }
+
+    /**
+     *  @return
+     */
     public SpatialFrequency getResolution() {
         return resolution;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public int getWidth() {
         return width;
@@ -280,14 +329,14 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@param bitDepth
+     *  @param bitDepth
      */
     public void setBitDepth(int bitDepth) {
         this.bitDepth = bitDepth;
     }
 
     /**
-     * 	@param channels
+     *  @param channels
      */
     public void setChannels(int channels) {
         this.channels = channels;
@@ -308,35 +357,35 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@param height
+     *  @param height
      */
     public void setHeight(int height) {
         this.height = height;
     }
 
     /**
-     * 	@param pixelHeight
+     *  @param pixelHeight
      */
     public void setPixelHeight(double pixelHeight) {
         this.pixelHeight = pixelHeight;
     }
 
     /**
-     * 	@param pixelWidth
+     *  @param pixelWidth
      */
     public void setPixelWidth(double pixelWidth) {
         this.pixelWidth = pixelWidth;
     }
 
     /**
-     * 	@param resolution
+     *  @param resolution
      */
     public void setResolution(SpatialFrequency resolution) {
         this.resolution = resolution;
     }
 
     /**
-     * 	@param width
+     *  @param width
      */
     public void setWidth(int width) {
         this.width = width;

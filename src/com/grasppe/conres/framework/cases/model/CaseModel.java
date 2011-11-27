@@ -1,5 +1,9 @@
 package com.grasppe.conres.framework.cases.model;
 
+import com.grasppe.conres.io.model.CaseFolder;
+import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.io.model.TargetDefinitionFile;
+
 /**
  * Class description
  *
@@ -13,4 +17,10 @@ public class CaseModel {
 
     /** Field description */
     public String	title;
+    
+    public CaseFolder caseFolder;
+    
+    public TargetDefinitionFile targetDefinitionFile;
+    
+    public ImageFile[] imageFiles;
 }

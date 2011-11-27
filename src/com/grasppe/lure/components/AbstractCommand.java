@@ -175,19 +175,23 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             if (!canExecute())
                 throw new IllegalStateException(getName()
                     + " could not execute in its current state.");
-            GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()), 3);
-            executing = true;
-
-            if (!perfomCommand() ||!completed()) {
-                GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
-                executing = false;
-                executed  = false;
-                return false;
+            GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()));
+            try {
+	            executing = true;
+	
+	            if (!perfomCommand() ||!completed()) 
+	            	throw new InternalError(this.getName() + " failed to complete successfully due to an internal error.");
+	            
+	            executing = false;
+	            executed  = true;
+	            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()));
+            
+            } catch (Exception exception) {
+            	GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
+            	executing = false;
+            	executed  = false;
+            	return false;            	
             }
-
-            executing = false;
-            executed  = true;
-            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()), 3);
 
             return executed;
         }

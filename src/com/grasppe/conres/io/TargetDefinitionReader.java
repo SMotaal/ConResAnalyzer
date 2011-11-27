@@ -15,6 +15,7 @@
 package com.grasppe.conres.io;
 
 import com.grasppe.conres.framework.targets.model.TargetMeasurements;
+import com.grasppe.conres.io.model.IConResTargetDefinition;
 import com.grasppe.conres.io.model.TargetDefinitionFile;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -37,7 +38,7 @@ import java.util.List;
  * @author daflair
  *
  */
-public class TargetDefinitionReader extends BufferedReader {
+public class TargetDefinitionReader extends BufferedReader implements IGrasppeFileReader  {
 
     protected String[]	sectionHeads = new String[] { "target", "fiducials", "measurements",
             "options" };
@@ -45,7 +46,7 @@ public class TargetDefinitionReader extends BufferedReader {
     protected HashSet<String>	sections       = new HashSet<String>(Arrays.asList(sectionHeads));
     protected String			currentSection = "";
     protected ArrayList<String>	sectionLines   = new ArrayList<String>();
-    protected TargetDefinitionFile file;
+    protected IConResTargetDefinition file;
     protected Reader			reader;
 
     /**
@@ -54,7 +55,7 @@ public class TargetDefinitionReader extends BufferedReader {
      */
     public TargetDefinitionReader(File file) throws Exception {
         this(new FileReader(file));
-        this.file = (TargetDefinitionFile) file;
+        this.file = (IConResTargetDefinition) file;
         parseFile();
     }
 
@@ -100,17 +101,17 @@ public class TargetDefinitionReader extends BufferedReader {
      * @param lines
      */
     protected void parseOptionsSection(ArrayList<String> lines) {    	
-    	float[] nLevels = new float[]{};
-    	int nStart = 2;
+    	int[] nLevels = new int[]{};
+    	int nStart = 3;
     	try {
     		if (!lines.get(0).startsWith("Options")) return;
     		String	fields[] = lines.get(1).split("\t");
     		int nFields = fields.length;
     		
-    		nLevels = new float[nFields-nStart];
+    		nLevels = new int[nFields-nStart];
     		
     		for (int i=nStart; i < nFields; i++)
-    			nLevels[i-nStart] = new Float(fields[i]).floatValue();
+    			nLevels[i-nStart] = new Float(fields[i]).intValue();
         	file.setBlockToneValues(nLevels);
         } catch (NumberFormatException exception) {
     	} catch (Exception exception) {

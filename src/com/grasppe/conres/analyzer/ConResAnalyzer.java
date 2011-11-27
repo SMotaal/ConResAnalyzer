@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import com.grasppe.conres.alpha.ConResBootCamp;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.framework.cases.CaseManager;
+import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -33,7 +34,37 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-    protected CaseManager	caseManager;
+    /**
+	 * @return the caseManager
+	 */
+	public CaseManager getCaseManager() {
+		return caseManager;
+	}
+
+	/**
+	 * @param caseManager the caseManager to set
+	 */
+	public void setCaseManager(CaseManager caseManager) {
+		this.caseManager = caseManager;
+	}
+
+	/**
+	 * @return the targetManager
+	 */
+	public TargetManager getTargetManager() {
+		return targetManager;
+	}
+
+	/**
+	 * @param targetManager the targetManager to set
+	 */
+	public void setTargetManager(TargetManager targetManager) {
+		this.targetManager = targetManager;
+	}
+
+
+	protected CaseManager	caseManager;
+    protected TargetManager targetManager;
 
     // protected LinkedHashMap<String, AbstractCommand>  commands;
 
@@ -43,7 +74,8 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     public ConResAnalyzer() {
         this(new ConResAnalyzerModel());
         updateCommands();
-        caseManager = new CaseManager(this);
+        setCaseManager( new CaseManager(this));
+        setTargetManager (new TargetManager(this));
     }
 
     /**

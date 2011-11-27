@@ -12,13 +12,20 @@
 package com.grasppe.lure.framework;
 
 import ij.IJ;
+
 import ij.io.FileInfo;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+
 import java.text.SimpleDateFormat;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.EnumSet;
@@ -35,8 +42,6 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.Timer;
-
-import com.sun.xml.internal.ws.util.StringUtils;
 
 /**
  * Abstract super-classes with common design patterns.
@@ -65,43 +70,50 @@ public class GrasppeKit {
         super();
         setDebugTimeStamp(timestampLevel);
     }
-    
+
     /**
-     * Enumeration of java.awt.event.KeyEvent event id constants
      */
-    public enum IJCompression { // fileInfo.compression 
-    	NONE(FileInfo.COMPRESSION_NONE),
-    	UNKNOWN(FileInfo.COMPRESSION_UNKNOWN);
-    	
-        private static final Map<Integer, IJCompression>	lookup = new HashMap<Integer, IJCompression>();
+    public enum ExitCodes implements IIntegerValue {
+        PENDING(-1, "Operation still running"),				// Asking about exit code when still not finished!
+        SUCCESS(0, "Done"),									// Normal completion of operation
+        FAILED(1, "Failed"),								// Interrupted execution with unrecoverable internal error
+        INACCESSIBLERESOURCE(2, "Failed Resource Busy"),	// Interrupted operation with unrecoverable due to an inaccessible resource
+        UNEXPECTED(3, "Invalid or unverfied selection"),	// User selection was not be validated / verified
+        CANCELED(10, "Cancled"),		// User canceled the operation
+        FORCED(20, "Interrupted");		// Interrupted execution initiated externally
 
-        static {
-            for (IJCompression s : EnumSet.allOf(IJCompression.class))
-                lookup.put(s.value(), s);
-        }
-
-        private int	code;
+        private int		value;
+        private String	description;
 
         /**
-         * @param code   integer or constant variable for the specific enumeration
+         *  @param value
+         *  @param description
          */
-        private IJCompression(int code) {
-            this.code = code;
+        private ExitCodes(int value, String description) {
+            this.value       = value;
+            this.description = description;
         }
 
         /**
-         * @return the integer value for a specific enumeration
+         *  @return
+         */
+        public String description() {
+            return description;
+        }
+
+        /**
+         *  @return
          */
         public int value() {
-            return code;
+            return value;
         }
 
         /**
-         * @param code   integer or constant variable for the specific enumeration
-         * @return enumeration object
+         *  @param value
+         *  @return
          */
-        public static IJCompression get(int code) {
-            return lookup.get(code);
+        public static IIntegerValue get(int value) {
+            return GrasppeKit.lookupByEnumValue(value, ExitCodes.class);
         }
     }
 
@@ -136,6 +148,45 @@ public class GrasppeKit {
          */
         public static FileSelectionMode get(int code) {
             return values()[code];
+        }
+    }
+
+    /**
+     * Enumeration of java.awt.event.KeyEvent event id constants
+     */
+    public enum IJCompression {		// fileInfo.compression
+        NONE(FileInfo.COMPRESSION_NONE), UNKNOWN(FileInfo.COMPRESSION_UNKNOWN);
+
+        private static final Map<Integer, IJCompression>	lookup = new HashMap<Integer,
+                                                                      IJCompression>();
+
+        static {
+            for (IJCompression s : EnumSet.allOf(IJCompression.class))
+                lookup.put(s.value(), s);
+        }
+
+        private int	code;
+
+        /**
+         * @param code   integer or constant variable for the specific enumeration
+         */
+        private IJCompression(int code) {
+            this.code = code;
+        }
+
+        /**
+         * @return the integer value for a specific enumeration
+         */
+        public int value() {
+            return code;
+        }
+
+        /**
+         * @param code   integer or constant variable for the specific enumeration
+         * @return enumeration object
+         */
+        public static IJCompression get(int code) {
+            return lookup.get(code);
         }
     }
 
@@ -543,26 +594,6 @@ public class GrasppeKit {
     public static String cat(String[] words, String delimiter) {
         return cat(new LinkedHashSet<String>(Arrays.asList(words)), delimiter);
     }
-    
-    public static String cat(String[] words, String delimiter, String lastDelimiter) {
-    	LinkedList<String> wordsList = new LinkedList<String>(Arrays.asList(words));
-//    	while (wordsList.contains(""))
-//    		wordsList.remove("");
-//    	while (wordsList.contains(" "))
-//    		wordsList.remove(" ");
-//    	while (wordsList.contains("  "))
-//    		wordsList.remove("  ");
-    	String lastWord = "";
-    	while (lastWord.trim()=="")
-    			lastWord = wordsList.removeLast();
-    	String text = cat(new LinkedHashSet<String>(wordsList), delimiter) + lastDelimiter + lastWord;//new LinkedHashSet<String>(Arrays.asList(words)), delimiter);
-//    	text = text.substring(0, text.lastIndexOf(delimiter)-1) & lastIndexOf &;
-        return text;
-    }
-    
-    public static String catWords(String[] words) {
-    	return cat(words, ", ", " and ");
-    }
 
     /**
      * Method description
@@ -577,10 +608,69 @@ public class GrasppeKit {
         String	text = word1.trim();
 
         if (text.isEmpty()) return word2.trim();
-        
+
         if (!word2.trim().isEmpty()) text += delimiter + word2.trim();
 
         return text;
+    }
+
+    /**
+     * 	@param words
+     * 	@param delimiter
+     * 	@param lastDelimiter
+     * 	@return
+     */
+    public static String cat(String[] words, String delimiter, String lastDelimiter) {
+        LinkedList<String>	wordsList = new LinkedList<String>(Arrays.asList(words));
+
+//      while (wordsList.contains(""))
+//          wordsList.remove("");
+//      while (wordsList.contains(" "))
+//          wordsList.remove(" ");
+//      while (wordsList.contains("  "))
+//          wordsList.remove("  ");
+        String	lastWord = "";
+
+        while (lastWord.trim() == "")
+            lastWord = wordsList.removeLast();
+
+        String	text = cat(new LinkedHashSet<String>(wordsList), delimiter) + lastDelimiter
+                      + lastWord;		// new LinkedHashSet<String>(Arrays.asList(words)), delimiter);
+
+//      text = text.substring(0, text.lastIndexOf(delimiter)-1) & lastIndexOf &;
+        return text;
+    }
+
+    /**
+     * 	@param words
+     * 	@return
+     */
+    public static String catWords(String[] words) {
+        return cat(words, ", ", " and ");
+    }
+
+    /**
+     * 	@return
+     */
+    private static boolean debugDefaultChecks() {
+        return debugLevelChecks(4);
+    }
+
+    /**
+     * 	@param level
+     * 	@return
+     */
+    private static boolean debugLevelChecks(int level) {
+        return (level > debugLevel);
+    }
+
+    /**
+     * 	@param headline
+     * 	@param text
+     * 	@return
+     */
+    private static String debugString(String headline, String text) {
+        return (headline + ": " + text);
     }
 
     /**
@@ -602,26 +692,6 @@ public class GrasppeKit {
         if (debugLevelChecks(level)) return;
         debugTextOut(text);
     }
-    
-    private static void debugTextOut(String text) {
-        Caller	caller = getCaller(5);
-        String	output = (text + "\t\t[" + getCallerString(caller) + "]");
-        
-        if (debugNatively) System.out.println(output);
-        else IJ.showMessage(output);    	
-    }
-    
-    private static boolean debugLevelChecks(int level) {
-    	return (level > debugLevel);
-    }
-    
-    private static boolean debugDefaultChecks() {
-    	return debugLevelChecks(4);
-    }
-    
-    private static String debugString(String headline, String text) {
-    	return (headline + ": " + text);
-    }
 
     /**
      * Output debug text with extended StackTraceElement details.
@@ -629,8 +699,8 @@ public class GrasppeKit {
      * @param text
      */
     public static void debugText(String headline, String text) {
-    	if (debugDefaultChecks()) return;
-    	debugTextOut(debugString(headline, text));
+        if (debugDefaultChecks()) return;
+        debugTextOut(debugString(headline, text));
     }
 
     /**
@@ -641,7 +711,18 @@ public class GrasppeKit {
      */
     public static void debugText(String headline, String text, int level) {
         if (debugLevelChecks(level)) return;
-    	debugTextOut(debugString(headline, text));
+        debugTextOut(debugString(headline, text));
+    }
+
+    /**
+     * 	@param text
+     */
+    private static void debugTextOut(String text) {
+        Caller	caller = getCaller(5);
+        String	output = (text + "\t\t[" + getCallerString(caller) + "]");
+
+        if (debugNatively) System.out.println(output);
+        else IJ.showMessage(output);
     }
 
     /**
@@ -856,9 +937,13 @@ public class GrasppeKit {
 
         return cat(new String[] { strShift, strControl, strAlt, strMeta }, "+");
     }
-    
+
+    /**
+     * 	@param object
+     * 	@return
+     */
     public static String lastSplit(Object object) {
-    	return lastSplit(object.toString());
+        return lastSplit(object.toString());
     }
 
     /**
@@ -870,10 +955,6 @@ public class GrasppeKit {
      */
     public static String lastSplit(String text) {
         return lastSplit(text, "\\.");
-    }
-    
-    public static String simpleName(Object object){
-    	return object.getClass().getSimpleName();
     }
 
     /**
@@ -890,6 +971,25 @@ public class GrasppeKit {
         if (splitText.length == 0) return text;
 
         return splitText[splitText.length - 1];
+    }
+
+    /**
+     * Method description
+     *
+     * @param value
+     * @param enumClass
+     * @param <E>
+     *
+     * @return
+     */
+    public static <E extends Enum<E>> IIntegerValue lookupByEnumValue(int value,
+            Class<E> enumClass) {
+        Map<Integer, IIntegerValue>	lookup = new HashMap<Integer, IIntegerValue>();
+
+        for (E s : EnumSet.allOf(enumClass))
+            lookup.put(((IIntegerValue)s).value(), (IIntegerValue)s);
+
+        return lookup.get(value);
     }
 
 //  /**
@@ -935,6 +1035,14 @@ public class GrasppeKit {
         }
 
         debugText("Call Stack", str, 3);
+    }
+
+    /**
+     * 	@param object
+     * 	@return
+     */
+    public static String simpleName(Object object) {
+        return object.getClass().getSimpleName();
     }
 
     /**
@@ -1078,7 +1186,7 @@ public class GrasppeKit {
 
         ActionListener	taskPerformer = new ActionListener() {
 
-			public void actionPerformed(ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 GrasppeKit.debugText(
                     "\n" + getTimeString()
                     + "\t\t--------------------------------------------------", level);
@@ -1087,6 +1195,23 @@ public class GrasppeKit {
 
         new Timer(delay, taskPerformer).start();
     }
+
+    /**
+     * Interface description
+     *
+     * @version        $Revision: 1.0, 11/11/25
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public interface IIntegerValue {
+
+        /**
+         * Method description
+         *
+         * @return
+         */
+        public int value();
+    }
+
 
     /**
      * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -1175,39 +1300,4 @@ public class GrasppeKit {
             return new UniversalDateFormat().format(Calendar.getInstance().getTime());		// date.getTime()) + "]";
         }
     }
-
-
-	/**
-	 * Method description
-	 *
-	 * @param value
-	 * @param enumClass
-	 * @param <E>
-	 *
-	 * @return
-	 */
-	public static <E extends Enum<E>> IIntegerValue lookupByEnumValue(int value, Class<E> enumClass) {
-	    Map<Integer, IIntegerValue>	lookup = new HashMap<Integer, IIntegerValue>();
-	
-	    for (E s : EnumSet.allOf(enumClass))
-	        lookup.put(((IIntegerValue)s).value(), (IIntegerValue)s);
-	
-	    return lookup.get(value);
-	}
-	/**
-	 * Interface description
-	 *
-	 * @version        $Revision: 1.0, 11/11/25
-	 * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
-	 */
-	public interface IIntegerValue {
-		
-		/**
-		 * Method description
-		 *
-		 * @return
-		 */
-		public int value();
-	}
 }
-

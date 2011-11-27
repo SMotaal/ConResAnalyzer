@@ -38,7 +38,7 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     ImagePlus				imagePlus = opener.openImage(imagePath);
     ImageWindow				imageWindow;	// = .getImageWindow();
 
-    // WindowListener    windowListener ;//= TestingListeners.WindowEventListener;
+    // WindowListener    windowListener ;//= CornerSelectorListeners.WindowEventListener;
 
     ImageWindowMagnifier	imageMagnifier;
 

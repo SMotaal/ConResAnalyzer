@@ -30,8 +30,8 @@ public class SelectCaseImagesFolder extends FileChooserOperation {
 
 	protected static final String	name = "SelectCaseFolder";
 
-    protected static final String	defaultChooserPath =
-        "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
+//    protected static final String	defaultChooserPath =
+//        "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
 
     protected boolean	executable = true;
 
@@ -49,14 +49,14 @@ public class SelectCaseImagesFolder extends FileChooserOperation {
     	return IJ.showMessageWithCancel(name,
                 "This is not a case images folder.\n\n" +
                 "Please select a folder and ensure that the scanned images \n" +
-                "filenames end with ##i.tif");
+                "filenames end with *i.tif.");
     }
     
-    /**
-	 * @return the defaultChooserPath
-	 */
-	public String getDefaultChooserPath() {
-		return defaultChooserPath;
-	}
+//    /**
+//	 * @return the defaultChooserPath
+//	 */
+//	public String getDefaultChooserPath() {
+//		return defaultChooserPath;
+//	}
     
 }

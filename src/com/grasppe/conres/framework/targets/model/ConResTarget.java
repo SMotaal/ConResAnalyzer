@@ -14,6 +14,8 @@
  */
 package com.grasppe.conres.framework.targets.model;
 
+import java.lang.reflect.Array;
+
 import com.grasppe.conres.framework.units.ContrastValue;
 import com.grasppe.conres.framework.units.ResolutionValue;
 import com.grasppe.conres.framework.units.ToneValue;
@@ -59,5 +61,23 @@ public class ConResTarget extends GridTarget {
         xAxis = new ContrastAxis(columnSteps);
         
     }
+
+	public ConResTarget(int[] blockToneValues, float[] yValues,
+			float[] xValues) {
+		this(asDouble(blockToneValues), asDouble(yValues), asDouble(xValues));
+	}
+
+	public static double[] asDouble(int[] array){
+		double[] newArray = new double[array.length];
+		for (int i=0; i<array.length; i++)//float value : blockToneValues)
+			newArray[i] = (double)array[i];		
+		return newArray;
+	}
+	public static double[] asDouble(float[] array){
+		double[] newArray = new double[array.length];
+		for (int i=0; i<array.length; i++)//float value : blockToneValues)
+			newArray[i] = (double)array[i];		
+		return newArray;
+	}
     
 }

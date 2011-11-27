@@ -22,7 +22,7 @@ public class CaseManagerModel extends AbstractModel {
     public CaseModel	newCase = null;
     
     public static String	defaultChooserPath =
-            "/Users/daflair/Documents/data/conreso/Approval_Scans_ConRes26_FS";
+            "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
 
     /**
      * Constructs a new model object with no predefined controller.

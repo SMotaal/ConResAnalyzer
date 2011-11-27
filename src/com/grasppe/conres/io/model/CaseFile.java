@@ -20,17 +20,19 @@ import java.io.FilenameFilter;
 
 import java.net.URI;
 
+import com.grasppe.conres.io.IGrasppeFileReader;
+
 /**
- * Verification is a quality control process that is used to evaluate whether a product, 
- * service, or system complies with regulations, specifications, or conditions imposed at 
- * the start of a development phase. Verification can be in development, scale-up, or 
+ * Verification is a quality control process that is used to evaluate whether a product,
+ * service, or system complies with regulations, specifications, or conditions imposed at
+ * the start of a development phase. Verification can be in development, scale-up, or
  * production. This is often an internal process.
- * 
- * Validation is a quality assurance process of establishing evidence that provides a high 
- * degree of assurance that a product, service, or system accomplishes its intended 
- * requirements. This often involves acceptance of fitness for purpose with end users and 
+ *
+ * Validation is a quality assurance process of establishing evidence that provides a high
+ * degree of assurance that a product, service, or system accomplishes its intended
+ * requirements. This often involves acceptance of fitness for purpose with end users and
  * other product stakeholders. This is often an external process.
- * 
+ *
  * {@link http://en.wikipedia.org/wiki/Verification_and_validation}
  *
  * @author daflair
@@ -38,34 +40,19 @@ import java.net.URI;
  */
 public abstract class CaseFile extends File {
 
-    /**
-	 * @return the filenameFilter
-	 */
-	public static FilenameFilter getFilenameFilter() {
-		return filenameFilter;
-	}
-
-	/**
-	 * @param filenameFilter the filenameFilter to set
-	 */
-	public static void setFilenameFilter(FilenameFilter filenameFilter) {
-		CaseFile.filenameFilter = filenameFilter;
-	}
-
-	protected boolean		verified, validated;
     protected static FileFilter	fileFilter = new FileFilter() {
 
         public boolean accept(File pathname) {
             return false;
         }
     };
-    
-    protected static FilenameFilter filenameFilter = new FilenameFilter() {
+    protected static FilenameFilter	filenameFilter = new FilenameFilter() {
 
-		public boolean accept(File dir, String name) {
-			return false;
-		}
+        public boolean accept(File dir, String name) {
+            return false;
+        }
     };
+    protected boolean	verified, validated;
 
     /**
      * @param pathname
@@ -131,6 +118,19 @@ public abstract class CaseFile extends File {
     }
 
     /**
+     * @return the filenameFilter
+     */
+    public static FilenameFilter getFilenameFilter() {
+        return filenameFilter;
+    }
+
+    /**
+     */
+    public IGrasppeFileReader getReader() {
+        return null;
+    }
+
+    /**
      * @return the validated
      */
     public boolean isValidated() {
@@ -145,9 +145,16 @@ public abstract class CaseFile extends File {
     }
 
     /**
-     * @param fileFilter the fileFilter to set
+     * 	@param newFilter
      */
     public static void setFileFilter(FileFilter newFilter) {
         fileFilter = newFilter;
-     }
+    }
+
+    /**
+     * @param filenameFilter the filenameFilter to set
+     */
+    public static void setFilenameFilter(FilenameFilter filenameFilter) {
+        CaseFile.filenameFilter = filenameFilter;
+    }
 }

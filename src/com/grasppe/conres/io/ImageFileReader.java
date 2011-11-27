@@ -12,10 +12,9 @@
 package com.grasppe.conres.io;
 
 import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.morie.units.spatial.SpatialFrequency;
 import com.grasppe.morie.units.spatial.resolution.PixelsPerInch;
-
-import ij.measure.Calibration;
 
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
@@ -25,7 +24,6 @@ import org.apache.sanselan.Sanselan;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidClassException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +34,7 @@ import java.util.TreeMap;
  *  @version        $Revision: 1.0, 11/11/25
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ImageFileReader {
+public class ImageFileReader implements IGrasppeFileReader {
 
     TreeMap<Integer, SanselanImageTag>	tagMap = new TreeMap<Integer, SanselanImageTag>();
     protected ImageFile					file;
@@ -57,8 +55,9 @@ public class ImageFileReader {
     public static void main(String[] args) throws Exception {
         String	path =
             "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U_10i.tif";
+
 //      "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U_10t.png";
-        
+
         ImageFile		file   = new ImageFile(path);
         ImageFileReader	reader = new ImageFileReader(file);
 
@@ -72,8 +71,8 @@ public class ImageFileReader {
     public void readInformation() throws IOException, ImageReadException {
 
         // Ref: http://commons.apache.org/sanselan/xref-test/org/apache/sanselan/sampleUsage/MetadataExample.html
-    	
-    	// TODO: Finalize tiff tags and add support for PNG
+
+        // TODO: Finalize tiff tags and add support for PNG
 
         ImageInfo	imageInfo   = Sanselan.getImageInfo(file);
 
@@ -93,8 +92,6 @@ public class ImageFileReader {
 
             tagMap.put(tagID, new SanselanImageTag(tagID, tagName, tagValue, tagType, tagLength));
 
-            //System.out.println(tagMap.get(tagID));
-
         }
 
         file.setChannels(tagMap.get(277).getIntegerValue().intValue());
@@ -108,7 +105,7 @@ public class ImageFileReader {
         SpatialFrequency	resolution = getResolutionValue(unit, xValue, yValue);
 
         file.setResolution(resolution);
-
+        GrasppeKit.debugText("Read Image", "Saneslan Metadata: \t" + file);
     }
 
     /**

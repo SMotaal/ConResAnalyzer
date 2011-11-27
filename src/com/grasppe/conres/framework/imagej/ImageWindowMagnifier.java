@@ -595,9 +595,9 @@ public class ImageWindowMagnifier extends ImageCanvas
 
 //      MagnifierCanvas   zoomCanvas = new MagnifierCanvas(Testing.getImageWindow().getImagePlus());
 
-//      zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
-//      zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
-//      zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
+//      zoomCanvas.addMouseListener(CornerSelectorListeners.IJMouseListener);
+//      zoomCanvas.addMouseMotionListener(CornerSelectorListeners.IJMotionListener);
+//      zoomCanvas.addMouseWheelListener(CornerSelectorListeners.IJWheelListener);
 //      zoomCanvas.setBackground(Color.black);
 //
 //      Container contentPane = magnifierFrame.getContentPane();

@@ -15,6 +15,8 @@
 package com.grasppe.conres.io.model;
 
 import com.grasppe.conres.framework.targets.model.TargetMeasurements;
+import com.grasppe.conres.io.IGrasppeFileReader;
+import com.grasppe.conres.io.TargetDefinitionReader;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -30,7 +32,7 @@ import java.util.Arrays;
  * @author daflair
  *
  */
-public class TargetDefinitionFile extends CaseFile {
+public class TargetDefinitionFile extends CaseFile implements IConResTargetDefinition {
 
     protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
                                                  "*.log" }));
@@ -43,7 +45,7 @@ public class TargetDefinitionFile extends CaseFile {
     protected float[][]				fiducials       = new float[4][2];
     protected String[]				fiducialIDs     = new String[] { "ULC", "URC", "LRC", "LLC" };
     protected TargetMeasurements	measurements    = new TargetMeasurements();
-    protected float[]				blockToneValues = new float[0];
+    protected int[]				blockToneValues = new int[0];
     protected String				name            = "";
 
     /**
@@ -107,22 +109,37 @@ public class TargetDefinitionFile extends CaseFile {
         return super.verify();
     }
 
-    /**
-     * @return the blockToneValues
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#getBlockToneValues()
      */
-    public float[] getBlockToneValues() {
+
+    /**
+     * 	@return
+     */
+    public int[] getBlockToneValues() {
         return blockToneValues;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#getFiducialIDs()
+     */
+
     /**
-     * @return the fiducialIDs
+     * 	@return
      */
     public String[] getFiducialIDs() {
         return fiducialIDs;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#getFiducials()
+     */
+
     /**
-     * @return the fiducials
+     * 	@return
      */
     public float[][] getFiducials() {
         return fiducials;
@@ -149,18 +166,42 @@ public class TargetDefinitionFile extends CaseFile {
         return filenameFilter;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#getMeasurements()
+     */
+
     /**
-     * @return the measurements
+     * 	@return
      */
     public TargetMeasurements getMeasurements() {
         return measurements;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#getName()
+     */
+
     /**
-     * @return the name
+     * 	@return
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * 	@return
+     */
+    @Override
+    public IGrasppeFileReader getReader() {
+        try {
+            return new TargetDefinitionReader(this);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            return null;
+        }
     }
 
     /*
@@ -197,22 +238,37 @@ public class TargetDefinitionFile extends CaseFile {
         return super.isVerified();
     }
 
-    /**
-     * @param blockToneValues the blockToneValues to set
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#setBlockToneValues(float[])
      */
-    public void setBlockToneValues(float[] blockToneValues) {
+
+    /**
+     * 	@param blockToneValues
+     */
+    public void setBlockToneValues(int[] blockToneValues) {
         this.blockToneValues = blockToneValues;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#setFiducialIDs(java.lang.String[])
+     */
+
     /**
-     * @param fiducialIDs the fiducialIDs to set
+     * 	@param fiducialIDs
      */
     public void setFiducialIDs(String[] fiducialIDs) {
         this.fiducialIDs = fiducialIDs;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#setFiducials(float[][])
+     */
+
     /**
-     * @param fiducials the fiducials to set
+     * 	@param fiducials
      */
     public void setFiducials(float[][] fiducials) {
         this.fiducials = fiducials;
@@ -240,15 +296,25 @@ public class TargetDefinitionFile extends CaseFile {
         ImageFile.filenameFilter = filenameFilter;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#setMeasurements(com.grasppe.conres.framework.targets.model.TargetMeasurements)
+     */
+
     /**
-     * @param measurements the measurements to set
+     * 	@param measurements
      */
     public void setMeasurements(TargetMeasurements measurements) {
         this.measurements = measurements;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.io.model.IConResTargetDefinition#setName(java.lang.String)
+     */
+
     /**
-     * @param name the name to set
+     * 	@param name
      */
     public void setName(String name) {
         this.name = name;
