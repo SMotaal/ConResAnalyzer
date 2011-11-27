@@ -24,6 +24,7 @@ public class SelectCornersOperation extends TargetManagerOperation implements Ob
 	protected static final String	name = "SelectCorners";
 	AbstractModel model;
 	CornerSelectorView view;// = new CornerSelectorView();
+	CornerSelector controller;
 	boolean openWindow = false;
 	
 	public SelectCornersOperation() {
@@ -35,6 +36,7 @@ public class SelectCornersOperation extends TargetManagerOperation implements Ob
      */
     public SelectCornersOperation(CornerSelector controller) {
         this();
+        this.controller = controller;
         setModel(controller.getModel());
         setView(controller.getSelectorView());
     }
@@ -75,23 +77,27 @@ public class SelectCornersOperation extends TargetManagerOperation implements Ob
     	GrasppeKit.debugText("OBSERVED",2);
     	//boolean cornersValid = view.blockROI!=null && view.blockROI.getNCoordinates()==4;
     	//boolean centresVaiid = view.patchSetROI!=null && view.patchSetROI.getNCoordinates() >10;
-    	if (getModel().isValidSelection()) windowClosed();
+//    	if (getModel().isValidSelection()) windowClosed();
     }
     
     public void prepareView() {
-    	//view = new CornerSelectorView(null);
-    	view.attachObserver(this);
+    	view = new CornerSelectorView(null);
+    	//view.attachObserver(this);
     }
     
     public void setCornerSelectorVisibile(boolean visible){
     	   if (visible)
     	    	view.run(null);
-		else
-			try {
-				view.terminate();
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
+//		else
+//			try {
+//				view.terminate();
+//			} catch (Throwable e) {
+//				e.printStackTrace();
+//			}
+    }
+    
+    public void showCornerSelector() {
+
     }
     
     /**
@@ -102,29 +108,43 @@ public class SelectCornersOperation extends TargetManagerOperation implements Ob
     @Override
     protected boolean perfomOperation() {
 
-    	prepareView();
-    	setCornerSelectorVisibile(true);
-    	openWindow = true;
-    	
-    	while(openWindow) {
-    		try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-    	}
+    	//prepareView();
+    	new CornerSelectorView(controller).run(null);
+//    	setCornerSelectorVisibile(true);
+//    	
+//        new Thread() {
+//        	public void run() {
+//        	}
+//        }.start();
+//        
+//        try {
+//            synchronized (threadLock) {
+//                threadLock.wait();
+//            }
+//        } catch (InterruptedException e) {
+//
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//    	while(openWindow) {
+//    		try {
+//				wait();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//    	}
     	return true;
     }
     
     public void windowClosed() {
 		openWindow = false;
     }
-    
-    public static void main(String[] args) {
-
-        (new SelectCornersOperation()).perfomOperation();
-        return;
-    }
-    
+//    
+//    public static void main(String[] args) {
+//
+//        (new SelectCornersOperation()).perfomOperation();
+//        return;
+//    }
+//    
     
 }

@@ -28,6 +28,7 @@ import com.grasppe.lure.components.AbstractModel;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 import java.util.LinkedHashMap;
 
@@ -85,7 +86,6 @@ public class CaseManager extends AbstractController implements ActionListener {
     @Override
     public void createCommands() {
         commands = new LinkedHashMap<String, AbstractCommand>();
-        putCommand(new NewCase(this, this));
         putCommand(new OpenCase(this, this));
         putCommand(new CloseCase(this));
     }
@@ -147,17 +147,25 @@ public class CaseManager extends AbstractController implements ActionListener {
         super.setModel(newModel);
     }
     
-    public void loadCase() {
+    public void loadCase(CaseModel newCase) throws FileNotFoundException {
     	try {
-    		CaseModel currentCase = getModel().currentCase;
-    		CaseFolder caseFolder = currentCase.caseFolder;
+
+	        newCase.caseFolder = new CaseFolder(newCase.path);
+	        
+    		CaseFolder caseFolder = newCase.caseFolder;
     		
-    		currentCase.targetDefinitionFile = caseFolder.getTargetDefinitionFile();
-			getTargetManager().loadTargetDefinitionFile(currentCase.targetDefinitionFile);
+	        newCase.title      = caseFolder.getName();
+    		
+    		newCase.targetDefinitionFile = caseFolder.getTargetDefinitionFile();
+			getTargetManager().loadTargetDefinitionFile(newCase.targetDefinitionFile);
 			
 			ImageFile[] imageFiles = caseFolder.getImageFiles();
-			return;
 			
+	    	newCase.filesLoaded = true;
+	        
+			return;
+    	} catch (FileNotFoundException e) {
+    		throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

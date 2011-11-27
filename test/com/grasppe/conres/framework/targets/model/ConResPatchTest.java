@@ -16,6 +16,7 @@ package com.grasppe.conres.framework.targets.model;
 
 import junit.framework.Assert;
 
+import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.conres.framework.units.ContrastValue;
 import com.grasppe.conres.framework.units.ResolutionValue;
 import com.grasppe.morie.units.AbstractValue;
@@ -59,7 +60,7 @@ public class ConResPatchTest {
     }
 
     /**
-     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#getPatchColumn()}.
+     * Test method for {@link com.grasppe.conres.framework.targets.model.grid.GridPatch#getPatchColumn()}.
      */
     @Test
     public final void testGetPatchColumn() {
@@ -67,7 +68,7 @@ public class ConResPatchTest {
     }
 
     /**
-     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#getPatchRow()}.
+     * Test method for {@link com.grasppe.conres.framework.targets.model.grid.GridPatch#getPatchRow()}.
      */
     @Test
     public final void testGetPatchRow() {
@@ -75,7 +76,7 @@ public class ConResPatchTest {
     }
 
     /**
-     * Test method for {@link com.grasppe.conres.framework.targets.model.ConResPatch#getXValue()}.
+     * Test method for {@link com.grasppe.conres.framework.targets.model.grid.ConResPatch#getXValue()}.
      */
     @Test
     public final void testGetXValue() {
@@ -85,7 +86,7 @@ public class ConResPatchTest {
     }
 
     /**
-     * Test method for {@link com.grasppe.conres.framework.targets.model.ConResPatch#getYValue()}.
+     * Test method for {@link com.grasppe.conres.framework.targets.model.grid.ConResPatch#getYValue()}.
      */
     @Test
     public final void testGetYValue() {

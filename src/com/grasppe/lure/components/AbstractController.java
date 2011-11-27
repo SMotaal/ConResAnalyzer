@@ -94,7 +94,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         public void actionPerformed(ActionEvent e) {
             try {
                 getCommand(e.getActionCommand()).execute();
-                GrasppeKit.debugText("Command Event Handled", e.getActionCommand(), 3);
+                GrasppeKit.debugText("Command Event Handled", e.getActionCommand());
             } catch (Exception exception) {
                 GrasppeKit.debugText("Command Event Ignored", e.getActionCommand(), 2);
             }

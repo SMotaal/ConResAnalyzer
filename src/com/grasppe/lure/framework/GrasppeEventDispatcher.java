@@ -1,6 +1,6 @@
 /*
  * @(#)GrasppeEventDispatcher.java   11/11/14
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -11,22 +11,29 @@
 
 package com.grasppe.lure.framework;
 
-
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-
 import com.grasppe.lure.components.Observers;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 import com.grasppe.lure.framework.GrasppeKit.KeyEventID;
 import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 /**
  * Class description
@@ -43,16 +50,59 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     public static boolean	newCombination = true;
 
     /** Field description */
-    public static boolean			consumedCombination = false;
-    public KeyboardFocusManager	manager             = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-    protected Observers				observers           = new Observers(this);
+    public static boolean	consumedCombination = false;
+
+    /** Field description */
+    public KeyboardFocusManager	manager   = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    protected Observers			observers = new Observers(this);
+    
+    Action closeWindow = new AbstractAction("Close Window") {
+ 	   public void actionPerformed(ActionEvent e) {
+ 	     // window closing code here
+            Frame[]	frames = Frame.getFrames();
+
+            for (Frame frame : frames)
+                if (frame.isActive()) {
+             	   frame.setVisible(false);
+             	   frame.dispose();
+                }
+ 	   }
+ 	 };      
+ 	 
+     KeyStroke closeKey = KeyStroke.getKeyStroke(
+    	      KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    
 
     /**
      * Constructs ...
      */
     private GrasppeEventDispatcher() {
         super();
-        manager.addKeyEventDispatcher(this);
+        manager.addKeyEventDispatcher(this);  
+    }
+    
+    public void makeClosable(JFrame frame) {
+    	// ref: http://stackoverflow.com/questions/4209975/how-to-have-command-w-close-a-window-on-mac-os-in-java-or-clojure
+    	
+    	// TODO: Figure out how to implement closeWindow!    		
+    	// TODO: Attach closeWindow to frame!
+    	return;
+    }
+
+    /**
+     *  @param keyCode
+     *  @return
+     */
+    public static HashSet<KeyCode> asSet(KeyCode keyCode) {
+        return new HashSet<KeyCode>(Arrays.asList(new KeyCode[] { keyCode }));
+    }
+
+    /**
+     *  @param keyCodes
+     *  @return
+     */
+    public static HashSet<KeyCode> asSet(KeyCode[] keyCodes) {
+        return new HashSet<KeyCode>(Arrays.asList(keyCodes));
     }
 
     /**
@@ -75,6 +125,12 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
+     */
+    public static void consumeCombination() {
+        consumedCombination = true;
+    }
+
+    /**
      * Method description
      *
      * @param observer
@@ -91,38 +147,41 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
      * @return
      */
     public boolean dispatchKeyEvent(KeyEvent e) {
-
-        // TODO: consume key combinations;
-        // if (pressedKeys.isEmpty()) consumedCombination = false;
         processKey(e);
 
-        // if (!consumedCombination && pressedKeys.isEmpty()) {
         if (!pressedKeys.isEmpty()) {
-        	consumedCombination = false;
-            Iterator<Observer>	observerIterator = observers.getIterator();
-            boolean				eventHandled     = false;
+            consumedCombination = false;
 
-            while (observerIterator.hasNext()) {
-                Observer	observer = observerIterator.next();
+            boolean	eventHandled = false;
 
-                if (observer instanceof GrasppeEventHandler) {
-                    eventHandled |= ((GrasppeEventHandler)observer).dispatchedKeyEvent(e);
-                    if (eventHandled) consumedCombination = true;
+            Object[]	allObservers = observers.getObserverSet().toArray();
+
+            for (Object observerObject : allObservers) {
+            	Observer observer = (Observer) observerObject;
+                try {
+                    if (!(observer instanceof GrasppeEventHandler)) continue;
+                } catch (NullPointerException exception) {
+                    observers.detachObserver(observer);
+                    continue;
                 }
+                eventHandled |= ((GrasppeEventHandler)observer).dispatchedKeyEvent(e);
+                if (eventHandled) consumedCombination = true;
             }
 
             if (eventHandled)
-                GrasppeKit.debugText("Key Event Handled",
-                                     GrasppeKit.keyEventString(e) + " (PressedKeys "
-                                     + pressedKeyString() + ")", 4);
+            	debugPressedKey("Key Event Handled", e, 4);
             else
-                GrasppeKit.debugText("Key Event Ignored",
-                                     GrasppeKit.keyEventString(e) + " (PressedKeys "
-                                     + pressedKeyString() + ")", 5);
+            	debugPressedKey("Key Event Ignored", e, 5);
 
         }
 
         return false;
+    }
+    
+    public void debugPressedKey(String heading, KeyEvent keyEvent, int level) {
+        GrasppeKit.debugText(heading,
+        		GrasppeKit.keyEventString(keyEvent) + " (PressedKeys "
+                + pressedKeyString() + ")", level);    	
     }
 
     /**
@@ -195,6 +254,13 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
+     *  @return
+     */
+    public static boolean isConsumed() {
+        return consumedCombination;
+    }
+
+    /**
      * Method description
      *
      * @param keyCode
@@ -211,18 +277,8 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
      * @return
      */
     public static boolean isPressed(KeyCode keyCode) {
-    	return isPressed(asSet(keyCode), false);
+        return isPressed(asSet(keyCode), false);
     }
-    
-    /**
-     * Method description
-     * @param keyCode
-     * @return
-     */
-    public static boolean isPressedExclusive(KeyCode keyCode) {
-    	return isPressed(asSet(keyCode), true);
-    }
-
 
     /**
      * Method description
@@ -230,50 +286,56 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
      * @return
      */
     public static boolean isPressed(KeyCode[] keyCodes) {
-    	return isPressed(asSet(keyCodes), false);
-    }    
-    
-    public static boolean isPressedExclusive(KeyCode[] keyCodes) {
-    	return isPressed(asSet(keyCodes), true);
-    }
-    
-    public static boolean isPressed(HashSet<KeyCode> keyCodes, boolean exclusive) {
-    	boolean allNeededPressed = pressedKeys.containsAll(keyCodes);
-    	if (exclusive) {
-    		boolean allPressedNeeded = pressedKeys.containsAll(keyCodes);
-    		return allPressedNeeded && allNeededPressed;
-    	}
-    	return allNeededPressed;
-    }
-    
-    public static HashSet<KeyCode> asSet (KeyCode[] keyCodes){
-    	return new HashSet<KeyCode>(Arrays.asList(keyCodes));
-    }
-    
-    public static HashSet<KeyCode> asSet (KeyCode keyCode) {
-    	return new HashSet<KeyCode>(Arrays.asList(new KeyCode[]{keyCode}));
-    }
-    
-    public static void consumeCombination() {
-    	consumedCombination = true;
-    }
-    
-    public static boolean isConsumed() {
-    	return consumedCombination;
+        return isPressed(asSet(keyCodes), false);
     }
 
-//    public static boolean isPressed(KeyCode[] keyCodes) {
-//        if (pressedKeys.isEmpty()) return false;
+    /**
+     *  @param keyCodes
+     *  @param exclusive
+     *  @return
+     */
+    public static boolean isPressed(HashSet<KeyCode> keyCodes, boolean exclusive) {
+        boolean	allNeededPressed = pressedKeys.containsAll(keyCodes);
+
+        if (exclusive) {
+            boolean	allPressedNeeded = pressedKeys.containsAll(keyCodes);
+
+            return allPressedNeeded && allNeededPressed;
+        }
+
+        return allNeededPressed;
+    }
+
+    /**
+     * Method description
+     * @param keyCode
+     * @return
+     */
+    public static boolean isPressedExclusive(KeyCode keyCode) {
+        return isPressed(asSet(keyCode), true);
+    }
+
+    /**
+     *  @param keyCodes
+     *  @return
+     */
+    public static boolean isPressedExclusive(KeyCode[] keyCodes) {
+        return isPressed(asSet(keyCodes), true);
+    }
+
+//  public static boolean isPressed(KeyCode[] keyCodes) {
+//      if (pressedKeys.isEmpty()) return false;
 //
-//        if (Arrays.asList(keyCodes).containsAll(pressedKeys) && pressedKeys.containsAll(Arrays.asList(keyCodes))) {
-//            GrasppeKit.debugText("Key Combination Pressed", pressedKeyString(), 3);
+//      if (Arrays.asList(keyCodes).containsAll(pressedKeys) && pressedKeys.containsAll(Arrays.asList(keyCodes))) {
+//          GrasppeKit.debugText("Key Combination Pressed", pressedKeyString());
 //
-//            // consumedCombination = true;
-//            return true;
-//        }
+//          // consumedCombination = true;
+//          return true;
+//      }
 //
-//        return false;
-//    }
+//      return false;
+//  }
+
     /**
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before. Bill Pugh's implementation of Singleton in Java.

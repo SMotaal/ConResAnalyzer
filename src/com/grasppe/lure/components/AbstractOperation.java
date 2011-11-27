@@ -78,11 +78,11 @@ public class AbstractOperation extends AbstractAction {		// implements Observer,
         if (isExecuted()) return false;		// TODO: Implement duplicity resolution
         if (!isExecutable())
             throw new IllegalStateException(getName() + " is not currently executable.");
-        GrasppeKit.debugText("Operation Execution Started", GrasppeKit.lastSplit(toString()), 3);
+        GrasppeKit.debugText("Operation Execution Started", GrasppeKit.lastSplit(toString()));
         executing = true;
         setExecuted(perfomOperation());
         executing = false;
-        if (isExecuted()) setExitCode(ExitCodes.SUCCESS);		// GrasppeKit.debugText("Operation Execution Ends", GrasppeKit.lastSplit(toString()), 3);
+        if (isExecuted()) setExitCode(ExitCodes.SUCCESS);		// GrasppeKit.debugText("Operation Execution Ends", GrasppeKit.lastSplit(toString()));
         else setExitCode(ExitCodes.FAILED);		// GrasppeKit.debugText("Operation Execution Failed", GrasppeKit.lastSplit(toString()), 2);
 
         return isExecuted();
@@ -96,7 +96,7 @@ public class AbstractOperation extends AbstractAction {		// implements Observer,
      * @return
      */
     public final boolean execute(boolean forcedAction) {
-        GrasppeKit.debugText("Operation Execution Forced", GrasppeKit.lastSplit(toString()), 3);
+        GrasppeKit.debugText("Operation Execution Forced", GrasppeKit.lastSplit(toString()));
 
         // if (forcedAction)
         setExecuted(false);

@@ -12,6 +12,8 @@
 package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.conres.framework.targets.TargetManager;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.lure.components.AbstractModel;
 
 /**
@@ -22,7 +24,23 @@ import com.grasppe.lure.components.AbstractModel;
  */
 public class TargetManagerModel extends AbstractModel {
 
-    ConResTarget	activeTarget;
+    /**
+	 * @return the activeBlock
+	 */
+	public ConResBlock getActiveBlock() {
+		return activeBlock;
+	}
+
+	/**
+	 * @param activeBlock the activeBlock to set
+	 */
+	public void setActiveBlock(ConResBlock activeBlock) {
+		this.activeBlock = activeBlock;
+		notifyObservers();
+	}
+
+	ConResTarget	activeTarget = null;
+    ConResBlock		activeBlock  = null;
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -52,5 +70,6 @@ public class TargetManagerModel extends AbstractModel {
      */
     public void setActiveTarget(ConResTarget activeTarget) {
         this.activeTarget = activeTarget;
+        notifyObservers();
     }
 }

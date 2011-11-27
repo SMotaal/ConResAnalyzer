@@ -12,9 +12,9 @@
 package com.grasppe.conres.framework.imagej;
 
 import com.grasppe.conres.framework.targets.CornerSelector;
-import com.grasppe.conres.framework.targets.model.BlockROI;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
-import com.grasppe.conres.framework.targets.model.PatchSetROI;
+import com.grasppe.conres.framework.targets.model.roi.BlockROI;
+import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
@@ -50,7 +50,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 
 import javax.media.jai.WarpPolynomial;
@@ -70,8 +71,9 @@ public class CornerSelectorView extends AbstractView
         implements PlugIn, GrasppeEventHandler, MouseListener, MouseWheelListener,
                    MouseMotionListener {
 
-    protected static String	name      = CornerSelectorView.class.getSimpleName();
-    protected static int	exitDelay = 3 * 1000;
+    protected static String	name       = CornerSelectorView.class.getSimpleName();
+    protected static int	exitDelay  = 3 * 1000;
+    private static Object	threadLock = new Object();
 
     /** Field description */
     public BlockROI	blockROI;
@@ -82,36 +84,23 @@ public class CornerSelectorView extends AbstractView
     /** Field description */
     public double	patchRadius;
 
-//  protected static ConResAnalyzer   analyzer;
-
     /**
      * @param controller
      */
     public CornerSelectorView(CornerSelector controller) {
         super(controller);
+        this.model = controller.getModel();
     }
 
     /**
      * Method description
      */
     public void attachMouseListeners() {
+        ImageWindow	imageWindow = CornerSelectorCommons.getImageWindow();
 
-        /* Static Variables */
-
-        /* Static Members */
-        MouseMotionListener	motionListener = this;		// CornerSelectorListeners.IJMotionListener;
-        MouseWheelListener	wheelListener  = this;		// CornerSelectorListeners.IJWheelListener;
-        MouseListener		mouseListener  = this;		// CornerSelectorListeners.IJMouseListener;
-        ImageWindow			imageWindow    = CornerSelectorCommons.getImageWindow();
-
-        /* Local Variables */
-
-        /* Test Statements */
-        imageWindow.getCanvas().addMouseListener(mouseListener);
-        imageWindow.getCanvas().addMouseMotionListener(motionListener);
-        imageWindow.getCanvas().addMouseWheelListener(wheelListener);
-
-        /* Static Updates */
+        imageWindow.getCanvas().addMouseListener(this);
+        imageWindow.getCanvas().addMouseMotionListener(this);
+        imageWindow.getCanvas().addMouseWheelListener(this);
 
     }
 
@@ -119,6 +108,7 @@ public class CornerSelectorView extends AbstractView
      * @param pointROI
      * @param nR
      * @param nC
+     *  @return
      */
     public static PatchSetROI calculateAffineGrid(PointRoi pointROI, int nR, int nC) {
 
@@ -378,7 +368,7 @@ public class CornerSelectorView extends AbstractView
         overlay.drawNames(true);
         overlay.drawLabels(true);
         CornerSelectorCommons.getImageWindow().getImagePlus().setOverlay(overlay);
-        
+
         return new PatchSetROI(cXs, cYs, nP, nP);
 
     }
@@ -519,7 +509,7 @@ public class CornerSelectorView extends AbstractView
 
             pI--;
 
-            pI                                      %= CornerSelectorCommons.pointROI.getNCoordinates();
+            pI                                      %= (CornerSelectorCommons.pointROI.getNCoordinates());
 
             CornerSelectorCommons.magnifyPatchIndex = pI;
 
@@ -543,10 +533,13 @@ public class CornerSelectorView extends AbstractView
             }
 
             int	pI = CornerSelectorCommons.magnifyPatchIndex;
+            int	nI = CornerSelectorCommons.pointROI.getNCoordinates();
 
             pI++;
 
-            pI                                      %= CornerSelectorCommons.pointROI.getNCoordinates();
+            pI %= nI;
+
+            //
 
             CornerSelectorCommons.magnifyPatchIndex = pI;
 
@@ -558,17 +551,17 @@ public class CornerSelectorView extends AbstractView
 
     }
 
+//  /**
+//   * @param args
+//   */
+//  public static void main(String[] args) {
+//
+//      new CornerSelectorView(null).run("");
+//
+//  }
+
     /**
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        new CornerSelectorView(null).run("");
-
-    }
-
-    /**
-     * 	@param e
+     *  @param e
      */
     public void mouseClicked(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMouseListener", e);
@@ -577,7 +570,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseDragged(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMotionListener", e);
@@ -585,7 +578,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseEntered(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMouseListener", e);
@@ -593,7 +586,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseExited(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMouseListener", e);
@@ -602,7 +595,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseMoved(MouseEvent e) {
         moveFrame(e.getXOnScreen(), e.getYOnScreen());
@@ -611,7 +604,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mousePressed(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMouseListener", e);
@@ -619,7 +612,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseReleased(MouseEvent e) {
         CornerSelectorListeners.debugEvent("IJMouseListener", e);
@@ -627,7 +620,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param e
+     *  @param e
      */
     public void mouseWheelMoved(MouseWheelEvent e) {
         CornerSelectorListeners.debugEvent("IJWheelListener", e);
@@ -694,7 +687,41 @@ public class CornerSelectorView extends AbstractView
 
         /* Static Members */
         ImageWindow		imageWindow    = CornerSelectorCommons.getImageWindow();
-        WindowListener	windowListener = CornerSelectorListeners.WindowEventListener;
+        WindowAdapter	windowListener = new WindowAdapter() {
+
+            public void windowClosed(WindowEvent e) {
+
+//              notify();
+//              Frame[] frames        = Frame.getFrames();
+//              int     visibleFrames = 0;
+//
+//              for (Frame frame : frames)
+//                  if (frame.isVisible()) visibleFrames++;
+//
+//              debugEvent("Window", e);
+//
+//              JFrame  zoomFrame = CornerSelectorView.CornerSelectorCommons.getZoomWindow();
+//
+//              if ((visibleFrames == 1) && zoomFrame.isVisible()) zoomFrame.setVisible(false);     // CornerSelectorView.delayedExit();
+//              if (visibleFrames == 0) System.exit(0);     // CornerSelectorView.delayedExit();
+                synchronized (threadLock) {		// frame.setVisible(false);
+                    threadLock.notify();
+                }
+            }
+
+//          public void windowClosing(WindowEvent e) {}
+//
+//          public void windowActivated(WindowEvent e) {}
+//
+//          public void windowDeactivated(WindowEvent e) {}
+//
+//          public void windowDeiconified(WindowEvent e) {}
+//
+//          public void windowIconified(WindowEvent e) {}
+//
+//          public void windowOpened(WindowEvent e) {}
+
+        };		// CornerSelectorListeners.WindowEventListener;
 
         /* Local Variables */
         Opener		opener;
@@ -712,7 +739,7 @@ public class CornerSelectorView extends AbstractView
 
         CornerSelectorCommons.getImageWindow().getCanvas().fitToWindow();
 
-        imageWindow.setVisible(true);
+        // imageWindow.setVisible(true);
 
         imageWindow.addWindowListener(windowListener);
 
@@ -919,7 +946,9 @@ public class CornerSelectorView extends AbstractView
     public void run(String arg) {
         IJ.showMessage(name, "Hello world!");
 
-        String[]	imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
+        final CornerSelectorView	thisView   = this;
+
+        String[]					imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
 
         CornerSelectorCommons.imageName = imageNames[0];
 
@@ -928,17 +957,23 @@ public class CornerSelectorView extends AbstractView
 
         GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
 
-        eventDispatcher.attachEventHandler(this);
+        eventDispatcher.attachEventHandler(thisView);
 
         prepareImageWindow();
+
+        final ImageWindow	imageWindow = CornerSelectorCommons.getImageWindow();
+
         attachMouseListeners();
+        imageWindow.setVisible(true);
 
 //      prepareMagnifier();
+
+        IJ.showMessage(name, "Goodbye world!");
 
     }
 
     /**
-     * 	@throws Throwable
+     *  @throws Throwable
      */
     public void terminate() throws Throwable {
         JFrame		zoomWindow  = CornerSelectorCommons.getZoomWindow();
@@ -1162,7 +1197,9 @@ public class CornerSelectorView extends AbstractView
         if ((clickCount == 1) && (CornerSelectorCommons.pointROI == null))
             CornerSelectorCommons.pointROI = new PointRoi(pointX, pointY,		// mousePosition.x, mousePosition.y,
                 CornerSelectorCommons.getImageWindow().getImagePlus());
-        else if ((clickCount == 1) && (CornerSelectorCommons.pointROI != null))
+        else if ((clickCount == 1)
+                 && ((CornerSelectorCommons.pointROI != null)
+                     && (CornerSelectorCommons.pointROI.getNCoordinates() < 3)))
                  CornerSelectorCommons.pointROI = CornerSelectorCommons.pointROI.addPoint(pointX,
                  pointY);
 
@@ -1174,7 +1211,7 @@ public class CornerSelectorView extends AbstractView
             return;
         }
 
-        String	debugStrings1 = debugPoints(CornerSelectorCommons.pointROI);
+//      String    debugStrings1 = debugPoints(CornerSelectorCommons.pointROI);
 
         // TODO: When 3 points are defined, calculate the fourth
         if (CornerSelectorCommons.pointROI.getNCoordinates() == 3) {
@@ -1188,8 +1225,8 @@ public class CornerSelectorView extends AbstractView
         // TODO: When 4 points are defined! We are done.
 
         // TODO: Finally, update overlay with defined points
-        String	debugStrings2 = debugPoints(CornerSelectorCommons.pointROI);
-        Overlay	overlay       = new Overlay(CornerSelectorCommons.pointROI);
+//      String    debugStrings2 = debugPoints(CornerSelectorCommons.pointROI);
+        Overlay	overlay = new Overlay(CornerSelectorCommons.pointROI);
 
         overlay.drawNames(true);
         overlay.drawLabels(true);
@@ -1199,13 +1236,15 @@ public class CornerSelectorView extends AbstractView
         // Testing.zoomCanvas.getImage().updateAndRepaintWindow();
         // Testing.imageWindow.getImagePlus().updateAndRepaintWindow();
 
-//      if (Testing.pointROI.getNCoordinates() == 4) {
+        if (CornerSelectorCommons.pointROI.getNCoordinates() == 4) {
+
 //          GrasppeKit.debugText("Vertex Selection",
 //                               "\n\t" + debugStrings1 + "\n\t" + "")"debugStrings2, 3);
-//          calculateAffineGrid(Testing.pointROI, 10, 10);
-//      }
-        setPatchSetROI(calculateAffineGrid(CornerSelectorCommons.pointROI, 10, 10));
-        notifyObservers();
+            setPatchSetROI(calculateAffineGrid(CornerSelectorCommons.pointROI, 10, 10));
+            notifyObservers();
+        }
+
+//      setPatchSetROI(calculateAffineGrid(CornerSelectorCommons.pointROI, 10, 10));
     }
 
     /**
@@ -1253,9 +1292,9 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param patchCenterROI
+     * 	@param patchSetROI
      */
-    protected void setPatchSetROI(PatchSetROI patchCenterROI) {
+    protected void setPatchSetROI(PatchSetROI patchSetROI) {
         getModel().setPatchSetROI(patchSetROI);
         this.patchSetROI = getModel().getPatchSetROI();
     }

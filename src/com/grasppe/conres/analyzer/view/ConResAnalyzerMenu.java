@@ -189,7 +189,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
         GrasppeKit.debugText("Menu Button Created",
                              GrasppeKit.lastSplit(thisButton.getActionCommand()) + " ("
-                             + (char)thisMnemonic + " : int " + thisMnemonic + ")", 3);
+                             + (char)thisMnemonic + " : int " + thisMnemonic + ")");
         if (thisMnemonic > 0) keyMap.put(thisMnemonic, thisButton);
 
         // buttonMap.put((command, thisButton);

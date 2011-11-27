@@ -117,7 +117,7 @@ import com.grasppe.lure.framework.GrasppeKit;
                 AbstractCommand	command = commandIterator.next();
 
                 GrasppeKit.debugText("Command Button Creation",
-                                     GrasppeKit.lastSplit(command.toString()), 3);
+                                     GrasppeKit.lastSplit(command.toString()));
 
 //              IJ.showMessage(this.getClass().getSimpleName(),
 //                             this.getClass().getSimpleName() + " Command Added: "

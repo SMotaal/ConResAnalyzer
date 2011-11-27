@@ -11,20 +11,18 @@
 
 package com.grasppe.conres.analyzer;
 
-import ij.IJ;
 
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import com.grasppe.conres.alpha.ConResBootCamp;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
+import com.grasppe.conres.analyzer.operations.Quit;
+import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
-import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * Class description
@@ -35,6 +33,20 @@ import com.grasppe.lure.framework.GrasppeKit;
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
     /**
+	 * @return the analysisManager
+	 */
+	public AnalysisManager getAnalysisManager() {
+		return analysisManager;
+	}
+
+	/**
+	 * @param analysisManager the analysisManager to set
+	 */
+	public void setAnalysisManager(AnalysisManager analysisManager) {
+		this.analysisManager = analysisManager;
+	}
+
+	/**
 	 * @return the caseManager
 	 */
 	public CaseManager getCaseManager() {
@@ -65,6 +77,8 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
 
 	protected CaseManager	caseManager;
     protected TargetManager targetManager;
+    protected AnalysisManager analysisManager;
+    protected AbstractController[] managers; // = new AbstractController[]{caseManager, targetManager,analysisManager};
 
     // protected LinkedHashMap<String, AbstractCommand>  commands;
 
@@ -76,6 +90,8 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
         updateCommands();
         setCaseManager( new CaseManager(this));
         setTargetManager (new TargetManager(this));
+        setAnalysisManager(new AnalysisManager(this));
+        managers = new AbstractController[]{caseManager, targetManager,analysisManager};
     }
 
     /**
@@ -85,8 +101,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     public ConResAnalyzer(ConResAnalyzerModel model) {
         super(model);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -94,11 +108,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     @Override
 	public void createCommands() {
-
-        // commands = new LinkedHashMap<String, GrasppeKit.AbstractCommand>();
         putCommand(new Quit(this));
-        putCommand(new LastPatch(this));
-        putCommand(new NextPatch(this));
     }
     
     public void forceCommandUpdates() {
@@ -115,7 +125,10 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     @Override
 	public LinkedHashMap<String, AbstractCommand> getCommands() {
-        return appendCommands(caseManager);
+    	LinkedHashMap<String,AbstractCommand> allCommands = new LinkedHashMap<String,AbstractCommand>();
+    	for(AbstractController manager : managers)
+    		if (manager!=null) allCommands.putAll(appendCommands(manager));
+        return allCommands;
     }
 
     /**
@@ -142,185 +155,4 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
         // TODO Auto-generated method stub
         super.setModel(newModel);
     }
-
-    /**
-     * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-     *
-     * @version        $Revision: 1.0, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public abstract class ConResAnalyzerCommand extends AbstractCommand {
-
-        /**
-         * Constructs a realization of AbstractCommand.
-         *
-         * @param listener
-         * @param name
-         */
-        public ConResAnalyzerCommand(ActionListener listener, String name) {
-            super(listener, name, false);
-            setModel(((ConResAnalyzer)listener).getModel());
-        }
-
-        /**
-         * Returns the correctly-cast model.
-         *
-         * @return
-         */
-        @Override
-		public ConResAnalyzerModel getModel() {
-            return (ConResAnalyzerModel)model;
-        }
-    }
-
-
-    /**
-     * Last Patch EAC pattern.
-     *
-     * @version        $Revision: 1.0, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class LastPatch extends ConResAnalyzerCommand {
-
-        protected static final String	name        = "Last Patch";
-        protected static final int		mnemonicKey = KeyEvent.VK_COMMA;
-
-        /**
-         * Constructs a realization of AbstractCommand.
-         *
-         * @param listener
-         */
-        public LastPatch(ActionListener listener) {
-            super(listener, name);
-            super.mnemonicKey = mnemonicKey;
-            executable        = true;
-            update();
-        }
-
-        /**
-         * Performs the command operations when called by execute().
-         *
-         * @return
-         */
-        @Override
-		public boolean perfomCommand() {
-
-            // TODO: Replace test code
-            ConResBootCamp.magnifyLastPatch();
-
-            return true;	// Action responded to in intended scenario
-        }
-
-        /**
-         * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-         */
-        @Override
-        public void update() {
-            super.update();
-            if (ConResBootCamp.canMagnifyPatch()) {
-            	GrasppeKit.debugText("ConResBootCamp.canMagnifyPatch()",3);
-            }
-            // TODO: Enable if open case, else disable
-            canExecute(ConResBootCamp.canMagnifyPatch());
-        }
-    }
-
-
-    /**
-     * Defines Case Manager's Close Case actions and command, using the EAC pattern.
-     *
-     * @version        $Revision: 1.0, 11/11/08
-     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class Quit extends ConResAnalyzerCommand {
-
-        protected static final String	name        = "Quit";
-        protected static final int		mnemonicKey = KeyEvent.VK_Q;
-
-        /**
-         * Constructs a realization of AbstractCommand.
-         *
-         * @param listener
-         */
-        public Quit(ActionListener listener) {
-            super(listener, name);
-            super.mnemonicKey = mnemonicKey;
-            executable        = true;
-            update();
-        }
-
-        /**
-         * Performs the command operations when called by execute().
-         *
-         * @return
-         */
-        @Override
-		public boolean perfomCommand() {
-            if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
-                System.exit(0);
-
-            return true;	// Action responded to in intended scenario
-        }
-
-        /**
-         * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-         */
-        @Override
-        public void update() {
-            super.update();
-
-            // TODO: Enable if open case, else disable
-            canExecute(true);
-        }
-    }
-
-
-	/**
-	 * Last Patch EAC pattern.
-	 *
-	 * @version        $Revision: 1.0, 11/11/08
-	 * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-	 */
-	public class NextPatch extends ConResAnalyzerCommand {
-	
-	    protected static final String	name        = "Next Patch";
-	    protected static final int		mnemonicKey = KeyEvent.VK_PERIOD;
-	
-	    /**
-	     * Constructs a realization of AbstractCommand.
-	     *
-	     * @param listener
-	     */
-	    public NextPatch(ActionListener listener) {
-	        super(listener, name);
-	        super.mnemonicKey = mnemonicKey;
-	        executable        = true;
-	        update();
-	    }
-	
-	    /**
-	     * Performs the command operations when called by execute().
-	     *
-	     * @return
-	     */
-	    @Override
-		public boolean perfomCommand() {
-	
-	        // TODO: Replace test code
-	        ConResBootCamp.magnifyNextPatch();
-	
-	        return true;	// Action responded to in intended scenario
-	    }
-	
-	    /**
-	     * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
-	     */
-	    @Override
-	    public void update() {
-	        super.update();
-	
-	        // TODO: Enable if open case, else disable
-	        canExecute(ConResBootCamp.canMagnifyPatch());
-	    }
-	}
 }

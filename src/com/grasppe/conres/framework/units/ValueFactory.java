@@ -11,7 +11,7 @@
 
 package com.grasppe.conres.framework.units;
 
-import com.grasppe.conres.framework.targets.model.GridAxis;
+import com.grasppe.conres.framework.targets.model.axis.GridAxis;
 import com.grasppe.morie.units.AbstractValue;
 
 /**

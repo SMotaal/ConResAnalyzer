@@ -27,35 +27,37 @@ public class CornerSelector extends AbstractController {
 
     /** Field description */
     public CornerSelectorView	selectorView = null;
-    SelectCornersOperation		operation;
+    public TargetManager targetManager = null;
+//    SelectCornersOperation		operation;
 
     /**
      * Constructs and attaches a new controller and a new model.
      */
-    public CornerSelector() {
-        this(new CornerSelectorModel());
+    public CornerSelector(TargetManager targetManager) {
+        this(targetManager, new CornerSelectorModel());
+        selectorView = new CornerSelectorView(this);
+        attachView(selectorView);        
     }
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
      * @param model
      */
-    public CornerSelector(CornerSelectorModel model) {
+    public CornerSelector(TargetManager targetManager, CornerSelectorModel model) {
         super(model);
+        this.targetManager = targetManager;
     }
 
-    /**
-     *  @return
-     * @throws Throwable 
-     */
-    public ExitCodes showSelectorWindow() throws Throwable {
-        selectorView = new CornerSelectorView(this);
-        attachView(selectorView);
-        operation = new SelectCornersOperation(this);
-        operation.execute();
-        selectorView.terminate();
-        return operation.getExitCode();
-    }
+//    /**
+//     *  @return
+//     * @throws Throwable 
+//     */
+//    public ExitCodes showSelectorWindow() throws Throwable {
+//        operation = new SelectCornersOperation(this);
+//        operation.execute();
+//        selectorView.terminate();
+//        return operation.getExitCode();
+//    }
 
     /**
      *  @param model

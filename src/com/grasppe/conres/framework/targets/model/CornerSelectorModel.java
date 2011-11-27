@@ -3,6 +3,8 @@ package com.grasppe.conres.framework.targets.model;
 import java.io.File;
 
 import com.grasppe.conres.framework.targets.CornerSelector;
+import com.grasppe.conres.framework.targets.model.roi.BlockROI;
+import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.io.model.IConResTargetDefinition;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractModel;

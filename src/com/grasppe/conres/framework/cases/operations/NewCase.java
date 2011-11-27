@@ -79,10 +79,10 @@ public class NewCase extends CaseManagerCommand {
 
         // TODO: Create new case in metadata entry state
         GrasppeKit.debugText("New Case Creation",
-                             "New case will be created and passed for metadata entry", 4);
+                             "New case will be created and passed for metadata entry", 3);
 
         try {
-            getModel().newCase = getModel().newCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
+            getModel().getNewCase();		// getModel().Case//new getModel()canProceed..CaseModel();
             getModel().notifyObservers();
             canProceed = true;
         } catch (Exception e) {
@@ -95,9 +95,10 @@ public class NewCase extends CaseManagerCommand {
         if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
 
         try {
-            getModel().currentCase    = getModel().newCase;		// Make current the new case
-            getModel().newCase        = null;					// Clear new case
-            getModel().backgroundCase = null;					// clear background case
+//            getModel().currentCase    = getModel().newCase;		// Make current the new case
+//            getModel().newCase        = null;					// Clear new case
+//            getModel().backgroundCase = null;					// clear background case
+        	getModel().promoteNewCase();
             canProceed                = true;
             getModel().notifyObservers();
         } catch (Exception e) {

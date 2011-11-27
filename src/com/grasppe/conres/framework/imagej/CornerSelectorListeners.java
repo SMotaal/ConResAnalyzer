@@ -100,6 +100,7 @@ public class CornerSelectorListeners {
         }
 
         public void windowClosed(WindowEvent e) {
+        	notify();
             Frame[]	frames        = Frame.getFrames();
             int		visibleFrames = 0;
 

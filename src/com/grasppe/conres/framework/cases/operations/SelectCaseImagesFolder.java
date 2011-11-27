@@ -28,7 +28,7 @@ public class SelectCaseImagesFolder extends FileChooserOperation {
 		return isVerified;  //super.verifySelection(selectedFile);
 	}
 
-	protected static final String	name = "SelectCaseFolder";
+	protected static final String	name = "SelectCaseImagesFolder";
 
 //    protected static final String	defaultChooserPath =
 //        "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";

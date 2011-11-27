@@ -136,7 +136,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         public boolean completed() {
             if (!executed) {
                 executed = true;
-                GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()), 3);
+                GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()));
 
                 return true;
             }
@@ -204,7 +204,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
          * @return
          */
         public final boolean execute(boolean forcedAction) {
-            GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()), 3);
+            GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()));
 
             // update();
             // if (forcedAction)
@@ -259,7 +259,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
                 model.detachObserver(this);
                 GrasppeKit.debugText("Command Finalize/Detatch Succeeded",
                           model.getClass().getSimpleName() + " is no longer attached to "
-                          + GrasppeKit.lastSplit(toString()), 3);
+                          + GrasppeKit.lastSplit(toString()));
             } catch (Exception e) {
 
                 // Command has no model and can finalize immediately
@@ -384,7 +384,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         public void setMnemonicKey(int mnemonicKey) {
             this.mnemonicKey = mnemonicKey;
             GrasppeKit.debugText("Setting Action Mnemonic",
-                      "The key '" + this.mnemonicKey + "' is assigned to " + getName(), 3);
+                      "The key '" + this.mnemonicKey + "' is assigned to " + getName());
 
             // super.putValue(Action.MNEMONIC_KEY, mnemonicKey);
         }

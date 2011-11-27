@@ -1,5 +1,7 @@
 package com.grasppe.conres.framework.cases.operations;
 
+import ij.IJ;
+
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
 /**
@@ -18,9 +20,16 @@ public class SelectCaseFolder extends FileChooserOperation {
         FileSelectionMode.DIRECTORIES_ONLY;
 
     /**
-     * Constructs ...
      */
     public SelectCaseFolder() {
         super(name);
     }
+    
+    @Override
+    protected boolean confirmSelectionInvalid() {
+    	return IJ.showMessageWithCancel(name,
+                "This is not a case images folder.\n\n" +
+                "Please select a folder and ensure that the scanned images \n" +
+                "filenames end with *i.tif.");
+    }    
 }

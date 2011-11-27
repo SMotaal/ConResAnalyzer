@@ -4,6 +4,7 @@ import ij.IJ;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.rmi.UnexpectedException;
 
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -36,20 +37,27 @@ public class CloseCase extends CaseManagerCommand {
      */
     @Override
 	public boolean perfomCommand() {
-        boolean	canProceed = !isCaseClosed();		// canExecute();
+        boolean	canProceed = !isCaseClosed(); // && !getModel().isBusy();		// canExecute();
 
-        GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 4);
+        GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 3);
         if (!canProceed) return true;		// Action responded to in alternative scenario
         if (!altPressed())
             canProceed = IJ.showMessageWithCancel(name,
                 "Do you want to close the current case?");
         if (!canProceed) return true;		// Action responded to in alternative scenario
         GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", 3);
-        getModel().backgroundCase = getModel().currentCase;
-        getModel().currentCase    = null;
+//        getModel().backgroundCase = getModel().currentCase;
+//        getModel().currentCase    = null;
+
+        try {
+        	getModel().backgroundCurrentCase();
+    	} catch (UnexpectedException e) {
+//    		IJ.showMessage(e.getMessage());
+    		e.printStackTrace();
+    	}        	
         GrasppeKit.debugText("Closed Case Success",
                              "Moved current case to background and cleared current case.",
-                             4);
+                             3);
         getModel().notifyObservers();
 
         // update();
@@ -89,6 +97,8 @@ public class CloseCase extends CaseManagerCommand {
     @Override
     public void update() {
         super.update();
+        
+        //if (getModel().isBusy()) return;
 
         // TODO: Enable if open case, else disable
         canExecute(!isCaseClosed());	//

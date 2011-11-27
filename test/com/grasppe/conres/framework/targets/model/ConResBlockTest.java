@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.units.ContrastValue;
 import com.grasppe.conres.framework.units.ResolutionValue;
 
@@ -54,7 +55,7 @@ public class ConResBlockTest {
 	}
 
 	/**
-	 * Test method for {@link com.grasppe.conres.framework.targets.model.ConResBlock#ConResBlock(com.grasppe.conres.framework.units.ContrastValue[], com.grasppe.conres.framework.units.ResolutionValue[])}.
+	 * Test method for {@link com.grasppe.conres.framework.targets.model.grid.ConResBlock#ConResBlock(com.grasppe.conres.framework.units.ContrastValue[], com.grasppe.conres.framework.units.ResolutionValue[])}.
 	 */
 	@Test
 	public final void testConResBlock() {
@@ -77,7 +78,7 @@ public class ConResBlockTest {
 	}
 
 	/**
-	 * Test method for {@link com.grasppe.conres.framework.targets.model.ConResBlock#buildBlock(double[], double[])}.
+	 * Test method for {@link com.grasppe.conres.framework.targets.model.grid.ConResBlock#buildBlock(double[], double[])}.
 	 */
 	@Test
 	public final void testBuildGridBlock() {
@@ -101,7 +102,7 @@ public class ConResBlockTest {
 	}
 
 	/**
-	 * Test method for {@link com.grasppe.conres.framework.targets.model.GridBlock#getPatch(int, int)}.
+	 * Test method for {@link com.grasppe.conres.framework.targets.model.grid.GridBlock#getPatch(int, int)}.
 	 */
 	@Test
 	public final void testGetPatch() {
@@ -109,7 +110,7 @@ public class ConResBlockTest {
 	}
 
 	/**
-	 * Test method for {@link com.grasppe.conres.framework.targets.model.GridBlock#getXValue(int)}.
+	 * Test method for {@link com.grasppe.conres.framework.targets.model.grid.GridBlock#getXValue(int)}.
 	 */
 	@Test
 	public final void testGetXValue() {
@@ -117,7 +118,7 @@ public class ConResBlockTest {
 	}
 
 	/**
-	 * Test method for {@link com.grasppe.conres.framework.targets.model.GridBlock#getYValue(int)}.
+	 * Test method for {@link com.grasppe.conres.framework.targets.model.grid.GridBlock#getYValue(int)}.
 	 */
 	@Test
 	public final void testGetYValue() {

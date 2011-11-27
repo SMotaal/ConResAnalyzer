@@ -14,6 +14,13 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
  */
 public class Observers implements Observable {
 	
+	/**
+	 * @param observerSet the observerSet to set
+	 */
+	public void setObserverSet(Set<Observer> observerSet) {
+		this.observerSet = observerSet;
+	}
+
 	public Observers() {
 		super();
 	}

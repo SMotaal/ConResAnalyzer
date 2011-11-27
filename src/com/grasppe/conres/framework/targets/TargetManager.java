@@ -14,18 +14,24 @@ package com.grasppe.conres.framework.targets;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
-import com.grasppe.conres.framework.targets.model.ConResTarget;
+import com.grasppe.conres.framework.cases.operations.CloseCase;
+import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
+import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
+import com.grasppe.conres.framework.targets.operations.MarkBlock;
+import com.grasppe.conres.framework.targets.operations.SelectBlock;
 import com.grasppe.conres.io.TargetDefinitionReader;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.io.model.IConResTargetDefinition;
 import com.grasppe.conres.io.model.TargetDefinitionFile;
+import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.event.ActionListener;
+import java.util.LinkedHashMap;
 
 /**
  * Class description
@@ -134,4 +140,14 @@ public class TargetManager extends AbstractController {
     public CaseManager getCaseManager(){
     	return getAnalyzer().getCaseManager();
     }
+    
+    /**
+     * Create and populate all commands from scratch.
+     */
+    @Override
+    public void createCommands() {
+        commands = new LinkedHashMap<String, AbstractCommand>();
+        putCommand(new SelectBlock(this, this));
+        putCommand(new MarkBlock(this, this));
+    }    
 }

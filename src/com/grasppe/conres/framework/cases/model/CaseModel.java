@@ -23,4 +23,7 @@ public class CaseModel {
     public TargetDefinitionFile targetDefinitionFile;
     
     public ImageFile[] imageFiles;
+    
+    public boolean filesLoaded = false;
+    
 }

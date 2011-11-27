@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.grasppe.conres.framework.targets.model.axis.ResolutionAxis;
 import com.grasppe.conres.framework.units.ResolutionValue;
 
 /**

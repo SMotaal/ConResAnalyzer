@@ -160,7 +160,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         PointRoi	sortedROI = new PointRoi(sortedXs, sortedYs, 4);
 
         GrasppeKit.debugText("ConvexHull",
-                             "\n\t" + debugPoints(newROI) + "\n\t" + debugPoints(sortedROI), 3);
+                             "\n\t" + debugPoints(newROI) + "\n\t" + debugPoints(sortedROI));
 
         int	xTL = sortedXs[0];
         int	xTR = sortedXs[1];
@@ -293,7 +293,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
                 GrasppeKit.debugText("Warp Points",
                                      "C" + cI + ": " + GrasppeKit.lastSplit(PC.toString())
-                                     + " ==> " + GrasppeKit.lastSplit(IC.toString()), 3);
+                                     + " ==> " + GrasppeKit.lastSplit(IC.toString()));
 
                 cXs[cI] = (int)IC.getX() + tlX;
                 cYs[cI] = (int)IC.getY() + tlY;
@@ -1070,13 +1070,13 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             Point[]		points2  = new Point[] { points[pA], points[pB], points[pC] };
             int[]		xs       = new int[] { points2[0].x, points2[1].x, points2[2].x };
             int[]		ys       = new int[] { points2[0].y, points2[1].y, points2[2].y };
-            PointRoi	pointROI = new PointRoi(xs, ys, 3);
+            PointRoi	pointROI = new PointRoi(xs, ys, xs.length);
 
-            GrasppeKit.debugText("Points Selection", debugPoints(pointROI), 3);
+            GrasppeKit.debugText("Points Selection", debugPoints(pointROI));
 
             PointRoi	newROI = calculateFourthVertex(pointROI);
 
-            GrasppeKit.debugText("Points Determined", debugPoints(newROI), 3);
+            GrasppeKit.debugText("Points Determined", debugPoints(newROI));
         }
     }
 
@@ -1348,7 +1348,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
          */
         public static void checkTimer(String description) {
             GrasppeKit.debugText("Elapsed Time",
-                                 description + " in " + timer.getElapsedTime() + " ms.", 3);
+                                 description + " in " + timer.getElapsedTime() + " ms.");
         }
 
         /**
@@ -1367,7 +1367,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             checkTimer(description);
 
             // GrasppeKit.debugText("Elapsed Time",
-            // description + " in " + timer.getElapsedTime() + " ms.", 3);
+            // description + " in " + timer.getElapsedTime() + " ms.");
             startTimer();
         }
 
