@@ -47,6 +47,11 @@ public class CaseFolder extends CaseFile {
 		return imageFiles;
 	}
 	
+	
+	public ImageFile getImageFile(int toneValue){
+		return imageFileMap.get(toneValue);
+	}
+	
 	public void enumerateImageFiles() throws FileNotFoundException {
         File[] fileList = listFiles(ImageFile.getFilenameFilter());
         int		fileCount = fileList.length;

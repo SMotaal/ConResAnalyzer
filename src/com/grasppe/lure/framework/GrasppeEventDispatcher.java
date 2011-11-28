@@ -78,7 +78,7 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
      */
     private GrasppeEventDispatcher() {
         super();
-        manager.addKeyEventDispatcher(this);  
+//        manager.addKeyEventDispatcher(this);  
     }
     
     public void makeClosable(JFrame frame) {

@@ -23,7 +23,21 @@ import com.grasppe.lure.components.ObservableObject;
  */
 public class GridTarget extends ObservableObject {
 
-    /** Field description */
+    /**
+	 * @return the activeBlock
+	 */
+	public GridBlock getActiveBlock() {
+		return activeBlock;
+	}
+
+	/**
+	 * @param activeBlock the activeBlock to set
+	 */
+	public void setActiveBlock(GridBlock activeBlock) {
+		this.activeBlock = activeBlock;
+	}
+
+	/** Field description */
     protected GridBlock[]	testBlockes;
 
     /** Field description */
@@ -31,6 +45,9 @@ public class GridTarget extends ObservableObject {
 
     /** Field description */
     protected GridAxis	blockAxis, rowAxis,	columnAxis;
+    
+    protected GridBlock activeBlock = null;
+    
 
     /**
      * Constructs ...

@@ -13,7 +13,9 @@ package com.grasppe.conres.framework.targets;
 
 import com.grasppe.conres.framework.imagej.CornerSelectorView;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
+import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.operations.SelectCornersOperation;
+import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit.ExitCodes;
 
@@ -25,7 +27,24 @@ import com.grasppe.lure.framework.GrasppeKit.ExitCodes;
  */
 public class CornerSelector extends AbstractController {
 
-    /** Field description */
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractController#update()
+	 */
+	@Override
+	public void update() {
+		getModel().setTargetImageFile(getBlockImage());
+		super.update();
+	}
+	
+	public ImageFile getBlockImage() {
+		return targetManager.getBlockImage();
+	}
+	
+	public TargetManagerModel getManagerModel() {
+		return targetManager.getModel();
+	}
+
+	/** Field description */
     public CornerSelectorView	selectorView = null;
     public TargetManager targetManager = null;
 //    SelectCornersOperation		operation;
@@ -36,6 +55,7 @@ public class CornerSelector extends AbstractController {
     public CornerSelector(TargetManager targetManager) {
         this(targetManager, new CornerSelectorModel());
         selectorView = new CornerSelectorView(this);
+        getManagerModel().attachObserver(targetManager);
         attachView(selectorView);        
     }
 
@@ -46,6 +66,7 @@ public class CornerSelector extends AbstractController {
     public CornerSelector(TargetManager targetManager, CornerSelectorModel model) {
         super(model);
         this.targetManager = targetManager;
+        getManagerModel().attachObserver(this);
     }
 
 //    /**

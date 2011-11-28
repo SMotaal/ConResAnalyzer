@@ -16,29 +16,23 @@ package com.grasppe.conres.framework.targets.model.grid;
 
 import com.grasppe.conres.framework.units.ContrastValue;
 import com.grasppe.conres.framework.units.ResolutionValue;
-import com.grasppe.morie.units.AbstractValue;
 
 /**
  * @author daflair
  *
  */
 public class ConResPatch extends GridPatch {
-	
-	/**
-	 * @param row
-	 * @param column
-	 * @param xValue
-	 * @param yValue
-	 */
-	public ConResPatch(int row, int column, ContrastValue xValue,
-			ResolutionValue yValue) {
-		super(row, column, xValue, yValue);
-		// TODO Auto-generated constructor stub
-	}
 
-	//protected ContrastValue	xValue;
-	//protected ResolutionValue yValue;
-	
+    /**
+     * @param row
+     * @param column
+     * @param xValue
+     * @param yValue
+     */
+    public ConResPatch(int row, int column, ContrastValue xValue, ResolutionValue yValue) {
+        super(row, column, xValue, yValue);
+    }
+
     /**
      * @return the xValue
      */
@@ -52,7 +46,7 @@ public class ConResPatch extends GridPatch {
     public ResolutionValue getYValue() {
         return (ResolutionValue)yValue;
     }
-	
+
     /**
      * @param xValue the xValue to set
      */
@@ -65,6 +59,5 @@ public class ConResPatch extends GridPatch {
      */
     public void setYValue(ResolutionValue yValue) {
         this.yValue = yValue;
-    }    
-	
+    }
 }

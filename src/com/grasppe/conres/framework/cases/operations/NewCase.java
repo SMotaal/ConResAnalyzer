@@ -121,10 +121,8 @@ public class NewCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
+    	canExecute(true);		// getModel().hasCurrentCase());
         super.update();
-
-        // TODO: Enable if open case, else disable
-        canExecute(true);		// getModel().hasCurrentCase());
     }
 
 //  /**

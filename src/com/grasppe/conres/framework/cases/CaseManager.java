@@ -15,19 +15,19 @@ import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.framework.cases.operations.CloseCase;
-import com.grasppe.conres.framework.cases.operations.NewCase;
 import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.io.model.ImageFile;
-import com.grasppe.conres.io.model.TargetDefinitionFile;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.event.ActionListener;
+
 import java.io.FileNotFoundException;
 
 import java.util.LinkedHashMap;
@@ -55,6 +55,7 @@ public class CaseManager extends AbstractController implements ActionListener {
      */
     public CaseManager(AbstractModel model) {
         super(model);
+//        model.attachController(this);
     }
 
     /**
@@ -65,7 +66,7 @@ public class CaseManager extends AbstractController implements ActionListener {
     }
 
     /**
-     * 	@param analyzer
+     *  @param analyzer
      */
     public CaseManager(ConResAnalyzer analyzer) {
         this((ActionListener)analyzer);
@@ -78,6 +79,13 @@ public class CaseManager extends AbstractController implements ActionListener {
      */
     public CaseManager(AbstractModel model, ActionListener listener) {
         super(model, listener);
+//        model.attachController(this);
+    }
+
+    /**
+     */
+    public void backgroundCurrentCase() {
+        getAnalyzer().backgroundCurrentCase();
     }
 
     /**
@@ -91,10 +99,63 @@ public class CaseManager extends AbstractController implements ActionListener {
     }
 
     /**
-     * 	@return
+     */
+    public void discardBackgroundCase() {
+        getAnalyzer().discardBackgroundCase();
+
+    }
+
+    /**
+     * 	@param newCase
+     * 	@throws FileNotFoundException
+     */
+    public void loadCase(CaseModel newCase) throws FileNotFoundException {
+        try {
+        	
+        	CaseFolder caseFolder = new CaseFolder(newCase.path);
+        	
+        	try {
+        	getTargetManager().loadTargetDefinitionFile(caseFolder.getTargetDefinitionFile());
+        	ImageFile[]	imageFiles = caseFolder.getImageFiles();
+        	
+        	} catch (Exception exception) {
+        		newCase = null;
+        		return;
+        	}
+        	
+            newCase.caseFolder = caseFolder;
+
+//            CaseFolder	caseFolder = newCase.caseFolder;
+
+            newCase.title                = caseFolder.getName();
+
+            newCase.targetDefinitionFile = caseFolder.getTargetDefinitionFile();
+//            getTargetManager().loadTargetDefinitionFile(newCase.targetDefinitionFile);
+            getTargetManager().setTargetDefinitionFile(newCase.targetDefinitionFile);
+
+//            ImageFile[]	imageFiles = caseFolder.getImageFiles();
+
+            newCase.filesLoaded = true;
+
+            return;
+//        } catch (FileNotFoundException e) {
+//            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  @return
      */
     public AbstractController parentController() {
         return null;
+    }
+
+    /**
+     */
+    public void restoreBackgroundCase() {
+        getAnalyzer().restoreBackgroundCase();
     }
 
     /**
@@ -124,9 +185,16 @@ public class CaseManager extends AbstractController implements ActionListener {
      *
      * @return
      */
-    @Override
-    protected CaseManagerModel getNewModel() {
-        return new CaseManagerModel();
+//    @Override
+//    protected CaseManagerModel getNewModel() {
+//        return new CaseManagerModel();
+//    }
+
+    /**
+     * 	@return
+     */
+    public TargetManager getTargetManager() {
+        return getAnalyzer().getTargetManager();
     }
 
     /**
@@ -147,33 +215,9 @@ public class CaseManager extends AbstractController implements ActionListener {
         super.setModel(newModel);
     }
     
-    public void loadCase(CaseModel newCase) throws FileNotFoundException {
-    	try {
-
-	        newCase.caseFolder = new CaseFolder(newCase.path);
-	        
-    		CaseFolder caseFolder = newCase.caseFolder;
-    		
-	        newCase.title      = caseFolder.getName();
-    		
-    		newCase.targetDefinitionFile = caseFolder.getTargetDefinitionFile();
-			getTargetManager().loadTargetDefinitionFile(newCase.targetDefinitionFile);
-			
-			ImageFile[] imageFiles = caseFolder.getImageFiles();
-			
-	    	newCase.filesLoaded = true;
-	        
-			return;
-    	} catch (FileNotFoundException e) {
-    		throw e;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
-    
-    public TargetManager getTargetManager(){
-    	return getAnalyzer().getTargetManager();
-    }
-    
-    
+    @Override
+    protected AbstractModel getNewModel() {
+    	GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", 2);
+		return new CaseManagerModel(this);
+    }    
 }

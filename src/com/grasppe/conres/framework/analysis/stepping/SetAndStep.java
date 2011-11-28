@@ -52,16 +52,16 @@ public class SetAndStep extends SteppingStrategy {
     public boolean execute() {
 
         // TODO Auto-generated method stub
-        int	column = this.finalState.getColumn();
-        int	row    = this.finalState.getRow();
+        int	column = this.getFinalState().getColumn();
+        int	row    = this.getFinalState().getRow();
         int	value  = this.value;
 
-        this.finalState.setValue(value, row, column);
+        this.getFinalState().setValue(value, row, column);
 
-        StepNext	stepNext = new StepNext(this.finalState);
+        StepNext	stepNext = new StepNext(this.getFinalState());
         boolean		executed = stepNext.execute();
 
-        this.finalState = stepNext.finalState;
+        this.setFinalState(stepNext.getFinalState());
 
         return executed;
     }

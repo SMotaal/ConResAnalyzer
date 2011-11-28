@@ -151,7 +151,8 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
             // TODO: update() on attachModel()
             // TODO: handle attach will fail if model is empty
-            this.model.attachObserver(this);
+        	this.model.attachController(this);
+//            this.model.attachObserver(this);
         }
         
         public void attachListener(ActionListener listener) {

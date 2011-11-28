@@ -14,7 +14,16 @@
  */
 package com.grasppe.conres.analyzer.view;
 
+import com.grasppe.conres.framework.cases.CaseManager;
+import com.grasppe.lure.components.AbstractCommand;
+import com.grasppe.lure.framework.GrasppeEventDispatcher;
+import com.grasppe.lure.framework.GrasppeEventHandler;
+import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observer;
+
 import ij.plugin.frame.PlugInFrame;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,21 +38,18 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
 import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-
-import com.grasppe.lure.components.AbstractCommand;
-import com.grasppe.lure.framework.GrasppeEventDispatcher;
-import com.grasppe.lure.framework.GrasppeEventHandler;
-import com.grasppe.lure.framework.GrasppeKit;
-import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 /**
  * @author daflair
@@ -63,12 +69,14 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     protected JToolBar								pluginBar = new JToolBar();
     protected String								name      = this.getClass().getSimpleName();	// "ConResAnalyzerMenu";
     protected Hashtable<Integer, PluginMenuItem>	keyMap    = new Hashtable<Integer, PluginMenuItem>();
+    protected CaseLabel								caseLabel = new CaseLabel("ConResAnalyzer");
 
     /**
      * Constructs ...
      */
     public ConResAnalyzerMenu() {
         super("ConResAnalyzerMenu");
+        pluginBar.add(caseLabel);
         setAlwaysOnTop(true);
         setUndecorated(true);
         setSize(450, 350);
@@ -76,7 +84,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         WindowListener	wndCloser = new WindowAdapter() {
 
             @Override
-			public void windowClosing(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
         };
@@ -86,7 +94,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
 
         eventDispatcher.attachEventHandler(this);
-        
+
         super.add(pluginBar, BorderLayout.NORTH);
         
         pack();
@@ -141,7 +149,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          * @return  the standardized format of the enum value
          */
         @Override
-		public String toString() {
+        public String toString() {
             return simpleForm(name().toString());
         }
     }
@@ -205,6 +213,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
      */
     public void createButtonsFromActions( /* Enum<T> actions */) {
         pluginBar = new JToolBar();
+        pluginBar.add(new CaseLabel("ConResAnalyzer"));
         actionMap = new Hashtable<Actions, PluginMenuAction>();
         buttonMap = new Hashtable<Actions, PluginMenuItem>();
 
@@ -245,7 +254,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     public boolean dispatchedKeyEvent(KeyEvent e) {
         int	keyCode = e.getKeyCode();
 
-        //if (!isActive()) return false;
+        // if (!isActive()) return false;
 
         String	keyString = GrasppeKit.keyEventString(e);
 
@@ -266,6 +275,100 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         // TODO Auto-generated method stub
 
     }
+
+    /**
+     * Class description
+     * 	@version        $Revision: 1.0, 11/11/28
+     * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+     */
+    public class CaseLabel extends JLabel implements Observer {
+
+        /** Field description */
+        public CaseManager	caseManager = null;
+
+        /** Field description */
+        public String	defaultText = null;
+
+        /**
+         *
+         */
+        protected CaseLabel() {
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @param image
+         */
+        protected CaseLabel(Icon image) {
+            super(image);
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @param text
+         */
+        protected CaseLabel(String text) {
+            super(text);
+            defaultText = text;
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @param image
+         * @param horizontalAlignment
+         */
+        protected CaseLabel(Icon image, int horizontalAlignment) {
+            super(image, horizontalAlignment);
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @param text
+         * @param horizontalAlignment
+         */
+        protected CaseLabel(String text, int horizontalAlignment) {
+            super(text, horizontalAlignment);
+            defaultText = text;
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @param text
+         * @param icon
+         * @param horizontalAlignment
+         */
+        protected CaseLabel(String text, Icon icon, int horizontalAlignment) {
+            super(text, icon, horizontalAlignment);
+            defaultText = text;
+
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         */
+        public void update() {
+
+            // TODO Auto-generated method stub
+            if (caseManager != null)
+            try {
+            	String text = caseManager.getModel().getCurrentCase().title;
+                setText(text);
+//                if (getPreferredSize().width>getWidth())
+//                	setText(text.substring(0, 3).concat("É").concat(text.substring(text.length() - 4, 2)));
+                setToolTipText(text);
+            } catch (Exception exception) {
+                setText(defaultText);
+                setToolTipText("Open a case!");
+            }
+            //setSize(getPreferredSize());
+        }
+    }
+
 
     /**
      * Class description
@@ -335,7 +438,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          *
          * @param e
          */
-		public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             actionListener.actionPerformed(e);
         }
     }
@@ -386,6 +489,13 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
             String	actionName,	actionDescription;
             int		actionMnemonic;
 
+            try {
+                ((AbstractCommand)action).attachObserver(this);
+            } catch (Exception exception) {
+                GrasppeKit.debugText("Command Menu Item",
+                                     "Cannot attach menu item to observe command.", 4);
+            }
+
             // Tooltip Text
             try {
                 actionDescription = (String)action.getValue(Action.SHORT_DESCRIPTION);
@@ -425,13 +535,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
             setMnemonic(actionMnemonic);
 
-            try {
-                ((AbstractCommand)action).attachObserver(this);
-            } catch (Exception exception) {
-                GrasppeKit.debugText("Command Menu Item",
-                                     "Cannot attach menu item to observe command.", 4);
-            }
-
             update();
         }
 
@@ -470,14 +573,14 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          *
          * @param e
          */
-		public void mouseClicked(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {}
 
         /**
          * Method description
          *
          * @param e
          */
-		public void mouseEntered(MouseEvent e) {
+        public void mouseEntered(MouseEvent e) {
             if (isEnabled()) setBorder(m_raised);
         }
 
@@ -486,7 +589,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          *
          * @param e
          */
-		public void mouseExited(MouseEvent e) {
+        public void mouseExited(MouseEvent e) {
             setBorder(m_inactive);
         }
 
@@ -495,7 +598,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          *
          * @param e
          */
-		public void mousePressed(MouseEvent e) {
+        public void mousePressed(MouseEvent e) {
             if (isEnabled()) setBorder(m_lowered);
         }
 
@@ -504,7 +607,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          *
          * @param e
          */
-		public void mouseReleased(MouseEvent e) {
+        public void mouseReleased(MouseEvent e) {
             setBorder(m_inactive);
         }
 
@@ -542,7 +645,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          * @return
          */
         @Override
-		public float getAlignmentY() {
+        public float getAlignmentY() {
             return 0.5f;
         }
     }

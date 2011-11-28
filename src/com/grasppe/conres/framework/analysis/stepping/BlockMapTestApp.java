@@ -148,7 +148,7 @@ public class BlockMapTestApp extends Canvas {
         thisStep.execute();
 
         // smartState = new SmartBlockState(thisStep.finalState);
-        this.blockState = thisStep.finalState;
+        this.blockState = thisStep.getFinalState();
 
         BlockMap	blockMap = new BlockMap(this.blockState);
 

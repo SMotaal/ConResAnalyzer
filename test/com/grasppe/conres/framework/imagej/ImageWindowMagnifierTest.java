@@ -48,8 +48,8 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     public ImageWindowMagnifierTest() {
 
         // Debug System
-        GrasppeKit.timestampLevel = 5;
-        GrasppeKit.debugLevel     = 3;
+//        GrasppeKit.timestampLevel = 5;
+//        GrasppeKit.debugLevel     = 3;
 
         // Event Dispatch
         GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();

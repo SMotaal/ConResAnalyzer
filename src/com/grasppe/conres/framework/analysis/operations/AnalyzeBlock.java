@@ -12,6 +12,8 @@
 package com.grasppe.conres.framework.analysis.operations;
 
 import com.grasppe.conres.framework.analysis.AnalysisManager;
+import com.grasppe.conres.framework.analysis.AnalysisStepper;
+import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.TargetManager;
@@ -61,6 +63,10 @@ public class AnalyzeBlock extends AnalysisCommand {
     @Override
     public boolean perfomCommand() {
         boolean	canProceed = canExecute();
+
+        AnalysisStepper analysisStepper = new AnalysisStepper(controller);
+       
+        analysisStepper.testRun();
         
 //        CornerSelector conrnerSelector = new CornerSelector(controller);
 //        canProceed = new SelectCornersOperation(conrnerSelector).execute(true);
@@ -73,17 +79,15 @@ public class AnalyzeBlock extends AnalysisCommand {
      */
     @Override
     public void update() {
+    	canExecute(true); //canMarkBlocks());		// getModel().hasCurrentCase());
         super.update();
-
-        // TODO: Enable if open case, else disable
-        canExecute(canMarkBlocks());		// getModel().hasCurrentCase());
     }
     
-    protected boolean canMarkBlocks() {
-    	ConResBlock block = getModel().getActiveBlock();
-//    	if (block==null) return false;
-    	return block!=null;
-    }    
+//    protected boolean canMarkBlocks() {
+//    	ConResBlock block = getModel().getActiveBlock();
+////    	if (block==null) return false;
+//    	return block!=null;
+//    }    
 
 //  /**
 //   * @return the mnemonicKey

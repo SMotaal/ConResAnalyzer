@@ -10,13 +10,11 @@
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
 /**
  * @author daflair
- *
  */
 public class BlockState implements ISteppingBlockState {
 
@@ -28,13 +26,10 @@ public class BlockState implements ISteppingBlockState {
 
     /**
      * Constructs ...
-     *
      */
     protected BlockState() {}
 
     /**
-     *
-     *
      * @param sourceState
      */
     protected BlockState(ISteppingBlockState sourceState) {
@@ -46,9 +41,20 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
-     * Constructs ...
-     *
-     *
+     * @param rows
+     * @param columns
+     * @param row
+     * @param column
+     */
+    public BlockState(int rows, int columns, int row, int column) {
+        this.rows     = rows;
+        this.columns  = columns;
+        this.row      = row;
+        this.column   = column;
+        this.blockMap = new int[rows][columns];
+    }
+
+    /**
      * @param rows
      * @param columns
      * @param row
@@ -63,84 +69,52 @@ public class BlockState implements ISteppingBlockState {
         this.blockMap = blockMap;
     }
 
-    /**
-     * @return the rows
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#copy()
      */
-    public int getRows() {
-        return rows;
-    }
 
     /**
-     * @return the columns
-     */
-    public int getColumns() {
-        return columns;
-    }
-
-    /**
-     * @return the blockMap
-     */
-    public int[][] getBlockMap() {
-        return blockMap;
-    }
-
-    /**
-     * @return the row
-     */
-    public int getRow() {
-        return row;
-    }
-
-    /**
-     * @param row the row to set
-     */
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    /**
-     * @return the column
-     */
-    public int getColumn() {
-        return column;
-    }
-
-    /**
-     * @param column the column to set
-     */
-    public void setColumn(int column) {
-        this.column = column;
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param row
-     * @param column
-     *
      * @return
      */
-    public int getValue(int row, int column) {
-        return this.blockMap[column][row];
+    public BlockState copy() {
+
+        // TODO Auto-generated method stub
+        BlockState	stateCopy = new BlockState(this);
+
+        return stateCopy;
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param value
-     * @param row
-     * @param column
+     * @param otherState
+     * @return
      */
-    public void setValue(int value, int row, int column) {
-        this.blockMap[column][row] = value;
+    public boolean equivalent(BlockState otherState) {
+        if (this.rows != otherState.rows) return false;
+        if (this.columns != otherState.columns) return false;
+        if (this.row != otherState.row) return false;
+        if (this.column != otherState.column) return false;
+        if (this.blockMap != otherState.blockMap) return false;
+
+        return true;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#equivalent(com.grasppe.conresalpha.steppingLogic.ISteppingBlockState)
+     */
+
+    /**
+     * @param otherState
+     * @return
+     */
+    public boolean equivalent(ISteppingBlockState otherState) {
+
+        // TODO Auto-generated method stub
+        return this.equivalent(otherState);
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public static int[][] fudgeMap0() {
@@ -181,9 +155,6 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public static int[][] fudgeMap1() {
@@ -224,31 +195,17 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param blockData
-     *
-     * @return
      */
-    public static int[][] transpose(int[][] blockData) {
-        int		s1      = blockData.length;
-        int		s2      = blockData[0].length;
-        int[][]	newData = new int[s1][s2];
+    public static void printBlock(int[] blockData) {
 
-        for (int m = 1; m < s1; m++)
-            if (s2 != blockData[m].length) return null;
-        for (int m = 0; m < s1; m++)
-            for (int n = 0; n < s2; n++)
-                newData[n][m] = blockData[m][n];
-
-        return newData;
+        // System.out.println();
+        for (int m = 0; m < blockData.length; m++)
+            System.out.print("\t" + blockData[m]);
+        System.out.print("\n");
     }
 
     /**
-     * Method description
-     *
-     *
      * @param blockData
      */
     public static void printBlock(int[][] blockData) {
@@ -267,72 +224,87 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param blockData
-     */
-    public static void printBlock(int[] blockData) {
-
-        // System.out.println();
-        for (int m = 0; m < blockData.length; m++)
-            System.out.print("\t" + blockData[m]);
-        System.out.print("\n");
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#copy()
-     */
-
-    /**
-     * Method description
-     *
-     *
      * @return
      */
-    public BlockState copy() {
+    public static int[][] transpose(int[][] blockData) {
+        int		s1      = blockData.length;
+        int		s2      = blockData[0].length;
+        int[][]	newData = new int[s1][s2];
 
-        // TODO Auto-generated method stub
-        BlockState	stateCopy = new BlockState(this);
+        for (int m = 1; m < s1; m++)
+            if (s2 != blockData[m].length) return null;
+        for (int m = 0; m < s1; m++)
+            for (int n = 0; n < s2; n++)
+                newData[n][m] = blockData[m][n];
 
-        return stateCopy;
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#equivalent(com.grasppe.conresalpha.steppingLogic.ISteppingBlockState)
-     */
-
-    /**
-     * Method description
-     *
-     *
-     * @param otherState
-     *
-     * @return
-     */
-    public boolean equivalent(ISteppingBlockState otherState) {
-
-        // TODO Auto-generated method stub
-        return this.equivalent(otherState);
+        return newData;
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param otherState
-     *
+     * @return the blockMap
+     */
+    public int[][] getBlockMap() {
+        return blockMap;
+    }
+
+    /**
+     * @return the column
+     */
+    public int getColumn() {
+        return column;
+    }
+
+    /**
+     * @return the columns
+     */
+    public int getColumns() {
+        return columns;
+    }
+
+    /**
+     * @return the row
+     */
+    public int getRow() {
+        return row;
+    }
+
+    /**
+     * @return the rows
+     */
+    public int getRows() {
+        return rows;
+    }
+
+    /**
+     * @param row
+     * @param column
      * @return
      */
-    public boolean equivalent(BlockState otherState) {
-        if (this.rows != otherState.rows) return false;
-        if (this.columns != otherState.columns) return false;
-        if (this.row != otherState.row) return false;
-        if (this.column != otherState.column) return false;
-        if (this.blockMap != otherState.blockMap) return false;
+    public int getValue(int row, int column) {
+        return this.blockMap[column][row];
+    }
 
-        return true;
+    /**
+     * @param column the column to set
+     */
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
+    /**
+     * @param row the row to set
+     */
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    /**
+     * @param value
+     * @param row
+     * @param column
+     */
+    public void setValue(int value, int row, int column) {
+        this.blockMap[column][row] = value;
     }
 }

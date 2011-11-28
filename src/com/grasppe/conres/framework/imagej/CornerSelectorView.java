@@ -15,6 +15,7 @@ import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.roi.BlockROI;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
+import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
@@ -39,6 +40,7 @@ import ij.plugin.PlugIn;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -683,66 +685,79 @@ public class CornerSelectorView extends AbstractView
      * Opens an ImagePlus image using Opener and creates and displays it in an
      * ImageWindow;
      */
-    public void prepareImageWindow() {
+    public void prepareImageWindow(ImageFile imageFile) {
 
         /* Static Members */
         ImageWindow		imageWindow    = CornerSelectorCommons.getImageWindow();
-        WindowAdapter	windowListener = new WindowAdapter() {
-
-            public void windowClosed(WindowEvent e) {
-
-//              notify();
-//              Frame[] frames        = Frame.getFrames();
-//              int     visibleFrames = 0;
+////        WindowAdapter	windowListener = new WindowAdapter() {
+////
+//////            public void windowClosed(WindowEvent e) {
+//////
+////////              notify();
+////////              Frame[] frames        = Frame.getFrames();
+////////              int     visibleFrames = 0;
+////////
+////////              for (Frame frame : frames)
+////////                  if (frame.isVisible()) visibleFrames++;
+////////
+////////              debugEvent("Window", e);
+////////
+////////              JFrame  zoomFrame = CornerSelectorView.CornerSelectorCommons.getZoomWindow();
+////////
+////////              if ((visibleFrames == 1) && zoomFrame.isVisible()) zoomFrame.setVisible(false);     // CornerSelectorView.delayedExit();
+////////              if (visibleFrames == 0) System.exit(0);     // CornerSelectorView.delayedExit();
+//////                synchronized (threadLock) {		// frame.setVisible(false);
+//////                    threadLock.notify();
+//////                }
+//////            }
 //
-//              for (Frame frame : frames)
-//                  if (frame.isVisible()) visibleFrames++;
+////          public void windowClosing(WindowEvent e) {}
+////
+////          public void windowActivated(WindowEvent e) {}
+////
+////          public void windowDeactivated(WindowEvent e) {}
+////
+////          public void windowDeiconified(WindowEvent e) {}
+////
+////          public void windowIconified(WindowEvent e) {}
+////
+////          public void windowOpened(WindowEvent e) {}
 //
-//              debugEvent("Window", e);
-//
-//              JFrame  zoomFrame = CornerSelectorView.CornerSelectorCommons.getZoomWindow();
-//
-//              if ((visibleFrames == 1) && zoomFrame.isVisible()) zoomFrame.setVisible(false);     // CornerSelectorView.delayedExit();
-//              if (visibleFrames == 0) System.exit(0);     // CornerSelectorView.delayedExit();
-                synchronized (threadLock) {		// frame.setVisible(false);
-                    threadLock.notify();
-                }
-            }
-
-//          public void windowClosing(WindowEvent e) {}
-//
-//          public void windowActivated(WindowEvent e) {}
-//
-//          public void windowDeactivated(WindowEvent e) {}
-//
-//          public void windowDeiconified(WindowEvent e) {}
-//
-//          public void windowIconified(WindowEvent e) {}
-//
-//          public void windowOpened(WindowEvent e) {}
-
-        };		// CornerSelectorListeners.WindowEventListener;
+//        };		// CornerSelectorListeners.WindowEventListener;
 
         /* Local Variables */
         Opener		opener;
         ImagePlus	imagePlus;
 
-        opener = new Opener();
+        opener = new Opener();        
 
-        String	imagePath = CornerSelectorCommons.getInputPath();
 
-        imagePlus = opener.openImage(imagePath);
+        String	imagePath = imageFile.getAbsolutePath();//CornerSelectorCommons.getInputPath();
 
-        CornerSelectorCommons.setImageWindow(new ImageWindow(imagePlus));		// Initialize static
+        try {
+        	imagePlus = opener.openImage(imagePath);
+        	CornerSelectorCommons.setImageWindow(new ImageWindow(imagePlus));		// Initialize static
+            CornerSelectorCommons.getImageWindow().getCanvas().fitToWindow();
+            CornerSelectorCommons.getImageWindow().setExtendedState(Frame.MAXIMIZED_BOTH);
+//        	return;
+        }catch (Exception exception) {
+        	exception.printStackTrace();
+        }
 
-        imageWindow = CornerSelectorCommons.getImageWindow();
 
-        CornerSelectorCommons.getImageWindow().getCanvas().fitToWindow();
+        //imageWindow = CornerSelectorCommons.getImageWindow();
+
+  
+
 
         // imageWindow.setVisible(true);
 
-        imageWindow.addWindowListener(windowListener);
+//        imageWindow.addWindowListener(windowListener);
 
+    }
+    
+    public CornerSelector getController() {
+    	return (CornerSelector) controller;
     }
 
     /**
@@ -944,31 +959,44 @@ public class CornerSelectorView extends AbstractView
      */
 
     public void run(String arg) {
-        IJ.showMessage(name, "Hello world!");
+//        IJ.showMessage(name, "Hello world!");
 
-        final CornerSelectorView	thisView   = this;
+        //final CornerSelectorView	thisView   = this;
 
-        String[]					imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
+//        String[]					imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
+//
+//        CornerSelectorCommons.imageName = imageNames[0];
 
-        CornerSelectorCommons.imageName = imageNames[0];
+//        GrasppeKit.timestampLevel       = 5;
+//        GrasppeKit.debugLevel           = 3;
+        
+        //CornerSelectorModel model  = getModel();
+        
+        if (getController().getBlockImage()==null)
+        	return;
+        
+        
+        ImageWindow	imageWindow = CornerSelectorCommons.getImageWindow();
+        if(imageWindow!=null && imageWindow.isVisible()) {
+        	imageWindow.setVisible(false);
+        	imageWindow.dispose();        	
+        } else {
+	        GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
+	        eventDispatcher.attachEventHandler(this);
+        }
 
-        GrasppeKit.timestampLevel       = 5;
-        GrasppeKit.debugLevel           = 3;
+        ImageFile blockImageFile = getController().getBlockImage();
+        prepareImageWindow(blockImageFile);
+        
+        imageWindow = CornerSelectorCommons.getImageWindow();
 
-        GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
-
-        eventDispatcher.attachEventHandler(thisView);
-
-        prepareImageWindow();
-
-        final ImageWindow	imageWindow = CornerSelectorCommons.getImageWindow();
 
         attachMouseListeners();
         imageWindow.setVisible(true);
 
 //      prepareMagnifier();
 
-        IJ.showMessage(name, "Goodbye world!");
+//        IJ.showMessage(name, "Goodbye world!");
 
     }
 

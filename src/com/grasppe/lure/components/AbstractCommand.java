@@ -44,6 +44,8 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
          */
         public AbstractCommand(ActionListener listener, String text) {
             super(text);	// , icon);
+            
+//            attachObserver(this);
 
 //          debugText("Abstract Command",
 //                    "mnemonicKey = char '" + mnemonicKey + "'; int '" + (int)mnemonicKey + "'",
@@ -75,20 +77,47 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public boolean altPressed() {
             if (getKeyEvent() != null) return getKeyEvent().isAltDown();
-
             return false;
-
-//          boolean   altDown     = getKeyEvent().isAltDown();
-//          boolean   controlDown = getKeyEvent().isControlDown();
-//          boolean   shiftDown   = getKeyEvent().isShiftDown();
-//          boolean   metaDown    = getKeyEvent().isMetaDown();
         }
+        
+        /**
+         * @return
+         */
+        public boolean metaPressed() {
+            if (getKeyEvent() != null) return getKeyEvent().isMetaDown();
+            return false;
+        }
+        
+        /**
+         * @return
+         */
+        public boolean shiftPressed() {
+            if (getKeyEvent() != null) return getKeyEvent().isShiftDown();
+            return false;
+        }
+        
+        /**
+         * @return
+         */
+        public boolean controlPressed() {
+            if (getKeyEvent() != null) return getKeyEvent().isControlDown();
+            return false;
+        }
+        
+        /**
+         * @return Control down for PC or Command down for Mac!
+         */
+        public boolean controlKeyPressed() {
+        	if (getKeyEvent() == null) return false;
+        	if(GrasppeKit.OperatingSystem.isMac())
+        		return getKeyEvent().isMetaDown();
+        	else
+        		return getKeyEvent().isControlDown();
+        }        
 
         /**
          * Attaches an observer through the observers object which will include the observer in future update() notify calls.
@@ -147,15 +176,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         }
 
         /**
-         * Method description
-         *
-         * @return
-         */
-        public boolean controlPressed() {
-            return getKeyEvent().isControlDown();
-        }
-
-        /**
          * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
          *
          * @param observer
@@ -179,8 +199,10 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             try {
 	            executing = true;
 	
-	            if (!perfomCommand() ||!completed()) 
+	            if (!perfomCommand() ||!completed()) {
+	            	update();
 	            	throw new InternalError(this.getName() + " failed to complete successfully due to an internal error.");
+	            }
 	            
 	            executing = false;
 	            executed  = true;
@@ -271,15 +293,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         }
 
         /**
-         * Method description
-         *
-         * @return
-         */
-        public boolean metaPressed() {
-            return getKeyEvent().isMetaDown();
-        }
-
-        /**
          * Notifies all observer through the observers object which calls update().
          *
          */
@@ -296,19 +309,12 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         }
 
         /**
-         * Method description
-         *
-         * @return
-         */
-        public boolean shiftPressed() {
-            return getKeyEvent().isShiftDown();
-        }
-
-        /**
          * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
          */
         public void update() {
-            canExecute(!useModel || (model != null));		// either not using model or model is not empty!
+        	notifyObservers();
+            //canExecute(!useModel || (model != null));		// either not using model or model is not empty!
+
 
             if (canExecute()) {
                 GrasppeKit.debugText("Abstract Command Update", getName() + " can execute.");
@@ -316,7 +322,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
                 GrasppeKit.debugText("Abstract Command Update", getName() + " cannot execute.");
             }
 
-            notifyObservers();
         }
 
         /**

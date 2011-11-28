@@ -7,6 +7,8 @@
  *
  */
 
+
+
 package com.grasppe.conres.framework.targets.model.grid;
 
 import com.grasppe.conres.framework.targets.model.axis.GridAxis;
@@ -17,35 +19,7 @@ import com.grasppe.morie.units.AbstractValue;
  */
 public class GridBlock {	// extends ObservableObject {
 
-    /**
-	 * @return the xAxis
-	 */
-	public GridAxis getXAxis() {
-		return xAxis;
-	}
-
-	/**
-	 * @param xAxis the xAxis to set
-	 */
-	public void setXAxis(GridAxis xAxis) {
-		this.xAxis = xAxis;
-	}
-
-	/**
-	 * @return the yAxis
-	 */
-	public GridAxis getYAxis() {
-		return yAxis;
-	}
-
-	/**
-	 * @param yAxis the yAxis to set
-	 */
-	public void setYAxis(GridAxis yAxis) {
-		this.yAxis = yAxis;
-	}
-
-	protected static String
+    protected static String
 		xLabel = "",
 		yLabel = "";
     protected static String
@@ -66,21 +40,33 @@ public class GridBlock {	// extends ObservableObject {
         columns = xValues.length;
         setValues(xValues, yValues);
     }
-    
+
+    /**
+     * 	@param xValues
+     * 	@param yValues
+     */
     public GridBlock(double[] xValues, double[] yValues) {
         super();
         rows    = yValues.length;
         columns = xValues.length;
-    	generateAxes(xValues, yValues);
-    	GridAxis axis =  getXAxis();
-    	this.toString();
-    	AbstractValue[] values = getXAxis().getValues();
-    	setValues(getXAxis().getValues(),getYAxis().getValues());
+        generateAxes(xValues, yValues);
+
+        GridAxis	axis = getXAxis();
+
+        this.toString();
+
+        AbstractValue[]	values = getXAxis().getValues();
+
+        setValues(getXAxis().getValues(), getYAxis().getValues());
     }
-    
+
+    /**
+     * 	@param xValues
+     * 	@param yValues
+     */
     public void generateAxes(double[] xValues, double[] yValues) {
-    	setXAxis(null);
-    	setYAxis(null);
+        setXAxis(null);
+        setYAxis(null);
     }
 
     /**
@@ -90,6 +76,13 @@ public class GridBlock {	// extends ObservableObject {
      */
     public GridPatch getPatch(int row, int column) {
         return new GridPatch(row, column, getXValue(column), getYValue(row));
+    }
+
+    /**
+     * @return the xAxis
+     */
+    public GridAxis getXAxis() {
+        return xAxis;
     }
 
     /**
@@ -113,6 +106,13 @@ public class GridBlock {	// extends ObservableObject {
      */
     public AbstractValue getXValue(int column) {
         return xValues[column];
+    }
+
+    /**
+     * @return the yAxis
+     */
+    public GridAxis getYAxis() {
+        return yAxis;
     }
 
     /**
@@ -145,5 +145,19 @@ public class GridBlock {	// extends ObservableObject {
     public void setValues(AbstractValue[] xValues, AbstractValue[] yValues) {
         this.xValues = xValues;
         this.yValues = yValues;
+    }
+
+    /**
+     * @param xAxis the xAxis to set
+     */
+    public void setXAxis(GridAxis xAxis) {
+        this.xAxis = xAxis;
+    }
+
+    /**
+     * @param yAxis the yAxis to set
+     */
+    public void setYAxis(GridAxis yAxis) {
+        this.yAxis = yAxis;
     }
 }

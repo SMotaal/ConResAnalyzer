@@ -44,7 +44,7 @@ import java.util.Set;
          *
          * @param controller
          */
-        protected void attachController(AbstractController controller) {
+        public void attachController(AbstractController controller) {
             this.controller = controller;
         }
 

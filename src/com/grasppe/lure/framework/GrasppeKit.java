@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
+import java.security.Permission;
+
 import java.text.SimpleDateFormat;
 
 import java.util.Arrays;
@@ -52,16 +54,18 @@ import javax.swing.Timer;
 public class GrasppeKit {
 
     /** Field description */
-    public static int	debugLevel = 3;		// default level is 3
+    private static int	debugLevel = 10;		// default level is 3
+    private static int	debugDefault = 4;		// default level is 3
 
     /** Field description */
-    public static int	timestampLevel = 4;		// default level is 3
+    private static int	timestampLevel = 4;		// default level is 3
 
     /** Field description */
     public static final JFrame	commonFrame = new JFrame();
 
     /** Field description */
     public static boolean	debugNatively = true;
+    private static boolean	isHooked      = false;
 
     /**
      * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.
@@ -69,6 +73,7 @@ public class GrasppeKit {
     private GrasppeKit() {
         super();
         setDebugTimeStamp(timestampLevel);
+
     }
 
     /**
@@ -489,6 +494,110 @@ public class GrasppeKit {
     }
 
     /**
+     */
+    public enum OperatingSystem implements IIntegerValue {
+        UNKNOWN(0, "Unknown"), LINUX(1, "Linux"), UNIX(2, "Unix"), MAC(3, "Mac currentOSString"),
+        WINDOWS(4, "Windows");
+
+        private static String			currentOSString = null;
+        private static OperatingSystem	currentOS       = null;
+        private int						value;
+        private String					description;
+
+        /**
+         *  @param value
+         *  @param description
+         */
+        private OperatingSystem(int value, String description) {
+            this.value       = value;
+            this.description = description;
+        }
+
+        /**
+         *  @return
+         */
+        public static OperatingSystem currentSystem() {
+            if (currentOS == null) {
+                if (isOther()) return OperatingSystem.UNKNOWN;
+                if (isUnix()) return OperatingSystem.LINUX;
+                if (isUnix()) return OperatingSystem.UNIX;
+                if (isMac()) return OperatingSystem.MAC;
+                if (isWindows()) return OperatingSystem.WINDOWS;
+            }
+
+            return currentOS;
+        }
+
+        /**
+         *  @return
+         */
+        public String description() {
+            return description;
+        }
+
+        /**
+         *  @return
+         */
+        public int value() {
+            return value;
+        }
+
+        /**
+         *  @param value
+         *  @return
+         */
+        public static IIntegerValue get(int value) {
+            return GrasppeKit.lookupByEnumValue(value, ExitCodes.class);
+        }
+
+        /**
+         *  @return
+         */
+        public static String getOsName() {
+            if (currentOSString == null) {
+                currentOSString = System.getProperty("os.name");
+            }
+
+            return currentOSString;
+        }
+
+        /**
+         *  @return
+         */
+        public static boolean isLinux() {
+            return getOsName().contains("Linux");
+        }
+
+        /**
+         *  @return
+         */
+        public static boolean isMac() {
+            return getOsName().startsWith("Mac");
+        }
+
+        /**
+         *  @return
+         */
+        public static boolean isOther() {
+            return !isWindows() &&!isMac() &&!isUnix() &&!isLinux();
+        }
+
+        /**
+         *  @return
+         */
+        public static boolean isUnix() {
+            return getOsName().startsWith("Unix");
+        }
+
+        /**
+         *  @return
+         */
+        public static boolean isWindows() {
+            return getOsName().startsWith("Windows");
+        }
+    }
+
+    /**
      * Enumeration of java.awt.event.WindowEvent constants
      */
     public enum WindowEventType {								// #(WindowEvent.#), //
@@ -615,10 +724,10 @@ public class GrasppeKit {
     }
 
     /**
-     * 	@param words
-     * 	@param delimiter
-     * 	@param lastDelimiter
-     * 	@return
+     *  @param words
+     *  @param delimiter
+     *  @param lastDelimiter
+     *  @return
      */
     public static String cat(String[] words, String delimiter, String lastDelimiter) {
         LinkedList<String>	wordsList = new LinkedList<String>(Arrays.asList(words));
@@ -642,32 +751,32 @@ public class GrasppeKit {
     }
 
     /**
-     * 	@param words
-     * 	@return
+     *  @param words
+     *  @return
      */
     public static String catWords(String[] words) {
         return cat(words, ", ", " and ");
     }
 
     /**
-     * 	@return
+     *  @return
      */
     private static boolean debugDefaultChecks() {
-        return debugLevelChecks(4);
+        return debugLevelChecks(debugDefault);
     }
 
     /**
-     * 	@param level
-     * 	@return
+     *  @param level
+     *  @return
      */
     private static boolean debugLevelChecks(int level) {
-        return (level > debugLevel);
+        return (level < debugLevel);
     }
 
     /**
-     * 	@param headline
-     * 	@param text
-     * 	@return
+     *  @param headline
+     *  @param text
+     *  @return
      */
     private static String debugString(String headline, String text) {
         return (headline + ": " + text);
@@ -679,8 +788,8 @@ public class GrasppeKit {
      * @param text  the body of the debug text
      */
     public static void debugText(String text) {
-        if (debugDefaultChecks()) return;
-        debugTextOut(text);
+        if (!debugDefaultChecks()) return;
+        debugTextOut(text, 0);
     }
 
     /**
@@ -689,8 +798,8 @@ public class GrasppeKit {
      * @param level
      */
     public static void debugText(String text, int level) {
-        if (debugLevelChecks(level)) return;
-        debugTextOut(text);
+        if (!debugLevelChecks(level)) return;
+        debugTextOut(text, level);
     }
 
     /**
@@ -699,8 +808,8 @@ public class GrasppeKit {
      * @param text
      */
     public static void debugText(String headline, String text) {
-        if (debugDefaultChecks()) return;
-        debugTextOut(debugString(headline, text));
+        if (!debugDefaultChecks()) return;
+        debugTextOut(debugString(headline, text),0);
     }
 
     /**
@@ -710,16 +819,17 @@ public class GrasppeKit {
      * @param level
      */
     public static void debugText(String headline, String text, int level) {
-        if (debugLevelChecks(level)) return;
-        debugTextOut(debugString(headline, text));
+        if (!debugLevelChecks(level)) return;
+        debugTextOut(debugString(headline, text), level);
     }
 
     /**
-     * 	@param text
+     *  @param text
      */
-    private static void debugTextOut(String text) {
+    private static void debugTextOut(String text, int level) {
         Caller	caller = getCaller(5);
-        String	output = (text + "\t\t[" + getCallerString(caller) + "]");
+        String lText = (level==0) ? "L-D" : ("L-" + level);
+        String	output = (lText + "\t" + text + "\t\t[" + getCallerString(caller) + "]");
 
         if (debugNatively) System.out.println(output);
         else IJ.showMessage(output);
@@ -939,8 +1049,8 @@ public class GrasppeKit {
     }
 
     /**
-     * 	@param object
-     * 	@return
+     *  @param object
+     *  @return
      */
     public static String lastSplit(Object object) {
         return lastSplit(object.toString());
@@ -992,6 +1102,56 @@ public class GrasppeKit {
         return lookup.get(value);
     }
 
+    /**
+     */
+    public static void setupHooks() {
+        if (isHooked) return;
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                super.run();
+                System.out.println("Shutdown hook called... thread is running!");
+            }
+
+        });
+
+        System.setSecurityManager(new SecurityManager() {
+
+            @Override
+            public void checkPermission(Permission perm) {
+
+                /* Allow everything else. */
+
+                // if (perm.getName().startsWith(exitVM))
+            	if (debugLevelChecks(5))
+                System.out.println("Check " + perm.getName() + ": "+ perm.getActions().trim()
+                                   + "\t" + perm.toString());
+
+                // perm.getName()
+            }
+
+            @Override
+            public void checkExit(int status) {
+
+                /* Don't allow exit with any status code. */
+//            	throw new GrasppeKit.RuntimeExitException();
+            }
+
+        });
+
+//      System.err.println("I'm dying!");
+//
+//      try {
+//          System.exit(0);
+//      } finally {
+//          System.err.println("I'm not dead yet!");
+//          System.exit(1);
+//      }
+
+        isHooked = true;
+    }
+
 //  /**
 //   * Traverse the call stack to determine and return where a method was called from.
 //   *
@@ -1038,8 +1198,8 @@ public class GrasppeKit {
     }
 
     /**
-     * 	@param object
-     * 	@return
+     *  @param object
+     *  @return
      */
     public static String simpleName(Object object) {
         return object.getClass().getSimpleName();
@@ -1086,6 +1246,7 @@ public class GrasppeKit {
      * @return
      */
     public static Caller getCaller(int traversals) {
+    	try {
         StackTraceElement[]	stackTraceElements = Thread.currentThread().getStackTrace();
         StackTraceElement	caller             = stackTraceElements[traversals];
         String				className          = caller.getClassName();
@@ -1093,6 +1254,9 @@ public class GrasppeKit {
         int					lineNumber         = caller.getLineNumber();
 
         return new Caller(stackTraceElements, caller, className, methodName, lineNumber);
+    	} catch (Exception exception) {
+    		return null;
+    	}
     }
 
     /**
@@ -1259,6 +1423,14 @@ public class GrasppeKit {
          */
         public void update();
     }
+
+
+    /**
+     * Class description
+     * 	@version        $Revision: 1.0, 11/11/28
+     * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+     */
+    public static class RuntimeExitException extends SecurityException {}
 
 
     /**

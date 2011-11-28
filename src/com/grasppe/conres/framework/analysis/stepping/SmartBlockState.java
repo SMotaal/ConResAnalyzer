@@ -25,7 +25,7 @@ public class SmartBlockState extends BlockState {
      *
      * @param sourceState
      */
-    protected SmartBlockState(ISteppingBlockState sourceState) {
+    public SmartBlockState(ISteppingBlockState sourceState) {
         super(sourceState);
 
 //      

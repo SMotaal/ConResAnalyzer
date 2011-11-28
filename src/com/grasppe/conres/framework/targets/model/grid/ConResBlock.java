@@ -9,9 +9,6 @@
 
 
 
-/**
- *
- */
 package com.grasppe.conres.framework.targets.model.grid;
 
 import com.grasppe.conres.framework.targets.model.axis.ContrastAxis;
@@ -26,21 +23,34 @@ import com.grasppe.conres.framework.units.ToneValue;
  */
 public class ConResBlock extends GridBlock {
 
-    protected static String
-		xLabel = "Contrast, Log step increments",
-		yLabel = "Resolution, Line Pairs per Millimeter, Log steps";
+    /**
+	 * @return the zValue
+	 */
+	public ToneValue getZValue() {
+		return zValue;
+	}
 
-    protected static String
-		xUnit = "%",
-		yUnit = "l2/mm";
+	/**
+	 * @param zValue the zValue to set
+	 */
+	public void setZValue(ToneValue zValue) {
+		this.zValue = zValue;
+	}
 
-    protected ToneValue			zValue;
-//    protected ContrastAxis		xAxis;
-//    protected ResolutionAxis	yAxis;
+	protected static String
+		xLabel                           = "Contrast, Log step increments",
+		yLabel                           = "Resolution, Line Pairs per Millimeter, Log steps";
+    protected static String
+		xUnit                            = "%",
+		yUnit                            = "l2/mm";
+    protected int			activeRow    = 0,
+							activeColumn = 0;
+    protected ToneValue		zValue;
+    protected ConResBlock	parentBlock = null;
+    
+    protected String blockImage = null;
 
     /**
-     * Constructs ...
-     *
      * @param toneValue
      * @param xValues
      * @param yValues
@@ -61,7 +71,6 @@ public class ConResBlock extends GridBlock {
     }
 
     /**
-     * Method description
      * @param toneValue
      * @param xValues
      * @param yValues
@@ -102,13 +111,6 @@ public class ConResBlock extends GridBlock {
     public ConResPatch getPatch(int row, int column) {
         return (ConResPatch)super.getPatch(row, column);
     }
-//
-//    /**
-//     * @return the xAxis
-//     */
-//    public ContrastAxis getXAxis() {
-//        return xAxis;
-//    }
 
     /**
      * @return the yLabel
@@ -131,13 +133,6 @@ public class ConResBlock extends GridBlock {
     public ContrastValue getXValue(int column) {
         return (ContrastValue)super.getXValue(column);
     }
-//
-//    /**
-//     * @return the yAxis
-//     */
-//    public ResolutionAxis getYAxis() {
-//        return yAxis;
-//    }
 
     /**
      * @return the yLabel
@@ -159,5 +154,14 @@ public class ConResBlock extends GridBlock {
      */
     public ResolutionValue getYValue(int row) {
         return (ResolutionValue)super.getYValue(row);
+    }
+
+    /**
+     *  @param row
+     *  @param column
+     */
+    public void setActivePatch(int row, int column) {
+
+        // TODO: Create central mechanism for active patch!
     }
 }

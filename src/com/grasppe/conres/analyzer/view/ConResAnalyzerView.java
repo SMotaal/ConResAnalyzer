@@ -108,6 +108,9 @@ import com.grasppe.lure.framework.GrasppeKit;
          */
         public void prepareMenu() {
             menu = new ConResAnalyzerMenu();
+            menu.caseLabel.caseManager = getController().getCaseManager();
+            getController().getCaseManager().getModel().attachObserver(menu.caseLabel);
+
 
             LinkedHashMap<String, AbstractCommand>	commands        = controller.getCommands();
             Collection<AbstractCommand>				commandSet      = commands.values();
@@ -169,5 +172,9 @@ import com.grasppe.lure.framework.GrasppeKit;
          */
         protected void setTitle(String title) {
             frame.setTitle(title);
+        }
+        
+        protected ConResAnalyzer getController(){
+        	return (ConResAnalyzer)controller;
         }
     }

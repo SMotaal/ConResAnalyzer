@@ -27,6 +27,7 @@ public class CloseCase extends CaseManagerCommand {
     public CloseCase(ActionListener listener) {
         super(listener, name);
         super.mnemonicKey = mnemonicKey;
+        getModel().attachObserver(this);
         update();
     }
 
@@ -40,7 +41,10 @@ public class CloseCase extends CaseManagerCommand {
         boolean	canProceed = !isCaseClosed(); // && !getModel().isBusy();		// canExecute();
 
         GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 3);
-        if (!canProceed) return true;		// Action responded to in alternative scenario
+        if (!canProceed) {
+        	notifyObservers();
+        	return true;		// Action responded to in alternative scenario
+        }
         if (!altPressed())
             canProceed = IJ.showMessageWithCancel(name,
                 "Do you want to close the current case?");
@@ -51,6 +55,7 @@ public class CloseCase extends CaseManagerCommand {
 
         try {
         	getModel().backgroundCurrentCase();
+        	
     	} catch (UnexpectedException e) {
 //    		IJ.showMessage(e.getMessage());
     		e.printStackTrace();
@@ -59,8 +64,8 @@ public class CloseCase extends CaseManagerCommand {
                              "Moved current case to background and cleared current case.",
                              3);
         getModel().notifyObservers();
+    	notifyObservers();
 
-        // update();
         return true;	// Action responded to in intended scenario
     }
 
@@ -96,14 +101,8 @@ public class CloseCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
+    	canExecute(!isCaseClosed());	//
         super.update();
-        
-        //if (getModel().isBusy()) return;
-
-        // TODO: Enable if open case, else disable
-        canExecute(!isCaseClosed());	//
-
-        // notifyObservers();
     }
 
     /**

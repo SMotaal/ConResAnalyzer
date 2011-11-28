@@ -21,7 +21,9 @@ package com.grasppe.conres.framework.analysis.stepping;
 public abstract class SteppingStrategy implements ISteppingStrategy {
 
     /** Field description */
-    protected BlockState	startState,	undoState, finalState, backState;
+    protected BlockState	startState,	undoState;
+	private BlockState finalState;
+	protected BlockState backState;
 
     /**
      *
@@ -33,7 +35,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         // TODO Auto-generated constructor stub
         this.startState = blockState;
         this.backState  = blockState.copy();
-        this.finalState = this.startState.copy();
+        this.setFinalState(this.startState.copy());
     }
 
     /*
@@ -50,7 +52,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
     public boolean execute() {
 
         // TODO Auto-generated method stub
-        this.startState = this.finalState;
+        this.startState = this.getFinalState();
 
         return false;
     }
@@ -65,7 +67,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     protected boolean moveBy(int row, int column) {
-        return this.moveTo(this.finalState.getRow() + row, this.finalState.getColumn() + column);
+        return this.moveTo(this.getFinalState().getRow() + row, this.getFinalState().getColumn() + column);
     }
 
     /**
@@ -78,10 +80,10 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     protected boolean moveTo(int row, int column) {
-        this.undoState         = this.finalState;
-        this.finalState        = this.finalState.copy();
-        this.finalState.row    = row;
-        this.finalState.column = column;
+        this.undoState         = this.getFinalState();
+        this.setFinalState(this.getFinalState().copy());
+        this.getFinalState().row    = row;
+        this.getFinalState().column = column;
         System.out.println("Move to Row " + row + "/" + this.startState.getRows() + " Column " + column + "/"
                            + this.startState.getColumns());
 
@@ -114,7 +116,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     private boolean notEquivalent() {
-        return !this.finalState.equivalent(startState);
+        return !this.getFinalState().equivalent(startState);
     }
 
     /**
@@ -124,8 +126,8 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     private boolean isValidPosition() {
-        int	finalRow     = this.finalState.getRow();
-        int	finalColumn  = this.finalState.getColumn();
+        int	finalRow     = this.getFinalState().getRow();
+        int	finalColumn  = this.getFinalState().getColumn();
         int	blockRows    = this.startState.getRows();
         int	blockColumns = this.startState.getColumns();
 
@@ -158,7 +160,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         // TODO Auto-generated method stub
         // this.finalState = this.startState.copy();
         System.out.println("Undo step!");
-        this.finalState = this.undoState;
+        this.setFinalState(this.undoState);
 
         return true;
     }
@@ -176,4 +178,12 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
 
         return valid;
     }
+
+	public BlockState getFinalState() {
+		return finalState;
+	}
+
+	public void setFinalState(BlockState finalState) {
+		this.finalState = finalState;
+	}
 }

@@ -61,7 +61,9 @@ public class MarkBlock extends TargetManagerCommand {
     public boolean perfomCommand() {
         boolean	canProceed = canExecute();
         
-        CornerSelector conrnerSelector = new CornerSelector(controller);
+        
+        
+        CornerSelector conrnerSelector = controller.getCornerSelector(); //new CornerSelector(controller);
         canProceed = new SelectCornersOperation(conrnerSelector).execute(true);
         
         return true;
@@ -72,16 +74,18 @@ public class MarkBlock extends TargetManagerCommand {
      */
     @Override
     public void update() {
+    	canExecute(canMarkBlocks());		// getModel().hasCurrentCase());
         super.update();
-
-        // TODO: Enable if open case, else disable
-        canExecute(canMarkBlocks());		// getModel().hasCurrentCase());
     }
     
     protected boolean canMarkBlocks() {
+    	try {
     	ConResBlock block = getModel().getActiveBlock();
-//    	if (block==null) return false;
     	return block!=null;
+    	} catch (Exception exception) {
+    		return false;
+    	}
+
     }    
 
 //  /**

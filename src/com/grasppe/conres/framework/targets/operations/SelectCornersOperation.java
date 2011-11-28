@@ -109,7 +109,9 @@ public class SelectCornersOperation extends TargetManagerOperation implements Ob
     protected boolean perfomOperation() {
 
     	//prepareView();
-    	new CornerSelectorView(controller).run(null);
+//    	new CornerSelectorView(controller).run(null);
+    	
+    	view.run(null);
 //    	setCornerSelectorVisibile(true);
 //    	
 //        new Thread() {

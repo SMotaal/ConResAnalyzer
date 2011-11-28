@@ -13,7 +13,6 @@ package com.grasppe.conres.framework.cases.model;
 
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.lure.components.AbstractModel;
-import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -27,22 +26,7 @@ import java.rmi.UnexpectedException;
  */
 public class CaseManagerModel extends AbstractModel {
 
-    /**
-	 * @return the locked
-	 */
-	public boolean isLocked() {
-		return locked;
-	}
-	
-	protected boolean lock() {
-		return locked  = true;
-	}
-	
-	protected boolean unlock() {
-		return locked  = false;
-	}
-
-	/** Field description */
+    /** Field description */
     public static String	defaultChooserPath =
         "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
 
@@ -54,15 +38,16 @@ public class CaseManagerModel extends AbstractModel {
 
     /** Field description */
     protected CaseModel	newCase = null;
-    
-    protected boolean locked = false;
+    protected boolean	locked  = false;
 
     /**
      * Constructs a new model object with no predefined controller.
+     * 	@param controller
      */
-    public CaseManagerModel() {
-        super();
-    }
+
+//  public CaseManagerModel() {
+//      super();
+//  }
 
     /**
      * Constructs a new model with a predefined controller.
@@ -74,32 +59,54 @@ public class CaseManagerModel extends AbstractModel {
     }
 
     /**
-     * @throws UnexpectedException 
+     * @throws UnexpectedException
      */
     public void backgroundCurrentCase() throws UnexpectedException {
+
 //      if (newCase==null)
 //          currentCase = null;
-        if ((backgroundCase == null) && (currentCase != null)) backgroundCase = currentCase;
-        else  throw new UnexpectedException(
-                "Case manager could not background the current case case since it does not exist.");
+        try {
+            if ((backgroundCase == null) && (currentCase != null)) backgroundCase = currentCase;
+        } catch (Exception exception) {}
+
+//      else
+//          throw new UnexpectedException(
+//              "Case manager could not background the current case case since it does not exist.");
 
         currentCase = null;
         notifyObservers();
+        getController().backgroundCurrentCase();
 
+    }
+
+    /**
+     *  @return
+     */
+    public boolean canGetNewCase() {
+        return ((backgroundCase == null) || (currentCase == null));
     }
 
     /**
      *  @throws UnexpectedException
      */
-    public void discardNewCase() throws UnexpectedException {
-        if (newCase == null)	// return;
-            throw new UnexpectedException(
-                "Case manager could not discard a new case since it does not exist.");
+    public void discardBackgroundCase() throws UnexpectedException {
+
+//      if (newCase == null)  // return;
+//          throw new UnexpectedException(
+//              "Case manager could not discard a new case since it does not exist.");
         if (backgroundCase != null) currentCase = backgroundCase;
 
-        newCase        = null;
+//      newCase        = null;
         backgroundCase = null;
+        getController().discardBackgroundCase();
         notifyObservers();
+    }
+
+    /**
+     *  @return
+     */
+    protected boolean lock() {
+        return locked = true;
     }
 
     /**
@@ -117,24 +124,37 @@ public class CaseManagerModel extends AbstractModel {
             throw new UnexpectedException(
                 "Case manager is mulfunctioning and cannot promote a newcase when has both a background case and a current case.");
         currentCase    = newCase;
+        newCase        = null;
         backgroundCase = null;		// if (backgroundCase!=null)
+        getController().discardBackgroundCase();
         notifyObservers();
     }
 
     /**
-     * 	@throws UnexpectedException
+     *  @throws UnexpectedException
      */
-    public void rollBackCurrentCase() throws UnexpectedException {
-        if (backgroundCase == null) return;
+    public void restoreBackgroundCase() throws UnexpectedException {
+        if (backgroundCase != null) {
 
-        // TODO: How should we recover from this?
-        if (backgroundCase != null && currentCase != null)
-            throw new UnexpectedException(
-                "Case manager is mulfunctioning and cannot rollback the current case since it has both a background case and a current case.");
+            // TODO: How should we recover from this?
+            if ((backgroundCase != null) && (currentCase != null))
+                throw new UnexpectedException(
+                    "Case manager is mulfunctioning and cannot rollback the current case since it has both a background case and a current case.");
 
-        currentCase    = backgroundCase;
-        backgroundCase = null;
+            currentCase    = backgroundCase;
+            newCase        = null;
+            backgroundCase = null;
+        }
+
+        getController().restoreBackgroundCase();
         notifyObservers();
+    }
+
+    /**
+     *  @return
+     */
+    protected boolean unlock() {
+        return locked = false;
     }
 
     /**
@@ -145,6 +165,13 @@ public class CaseManagerModel extends AbstractModel {
     }
 
     /**
+     *  @return
+     */
+    private CaseManager getController() {
+        return (CaseManager)controller;
+    }
+
+    /**
      * @return the currentCase
      */
     public CaseModel getCurrentCase() {
@@ -152,18 +179,17 @@ public class CaseManagerModel extends AbstractModel {
     }
 
     /**
-     * Method description
-     *
      * @return
      * @throws UnexpectedException
      */
     public CaseModel getNewCase() throws UnexpectedException {
-    	if ((backgroundCase != null) && (currentCase != null))
-    		throw new UnexpectedException(
-    				"Case manager could not create a new case since it already has both a background case and a current case.");
+        if (!canGetNewCase())		// (backgroundCase != null) && (currentCase != null))
+            throw new UnexpectedException(
+                "Case manager could not create a new case since it already has both a background case and a current case.");
 
-    	newCase = new CaseModel();
+        newCase = new CaseModel();
         notifyObservers();
+
         return newCase;
     }
 
@@ -173,18 +199,29 @@ public class CaseManagerModel extends AbstractModel {
      * @return
      */
     public boolean hasCurrentCase() {
-        if (currentCase != null) GrasppeKit.debugText("Current Case", currentCase.toString());
-        if (backgroundCase != null) GrasppeKit.debugText("Current Case", backgroundCase.toString());
-        else GrasppeKit.debugText("Current Case", "null!");
 
-        return ((currentCase != null) | (currentCase != null && backgroundCase != null));
+        // if (currentCase != null) GrasppeKit.debugText("Current Case", currentCase.toString());
+        return (currentCase != null);
+
+//      if (backgroundCase != null) GrasppeKit.debugText("Current Case", backgroundCase.toString());
+//      else GrasppeKit.debugText("Current Case", "null!");
+//
+//      return ((currentCase != null) | ((currentCase != null) && (backgroundCase != null)));
     }
 
     /**
      *  @return
      */
     public boolean isBusy() {
-    	return false;
-//        return ((newCase != null) && (backgroundCase != null));
+        return false;
+
+//      return ((newCase != null) && (backgroundCase != null));
+    }
+
+    /**
+     * @return the locked
+     */
+    public boolean isLocked() {
+        return locked;
     }
 }

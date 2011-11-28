@@ -18,6 +18,7 @@ import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -137,7 +138,9 @@ public class AnalysisManager extends AbstractController {
      */
     @Override
     protected AnalysisManagerModel getNewModel() {
+    	GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", 2);    	
         return new AnalysisManagerModel();
+        
     }
 
     /**

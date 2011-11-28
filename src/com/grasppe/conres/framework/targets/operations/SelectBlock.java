@@ -48,6 +48,7 @@ public class SelectBlock extends TargetManagerCommand {
         super(listener, name);
         this.controller  = controller;
         super.mnemonicKey = mnemonicKey;
+        controller.getModel().attachObserver(this);
         update();
     }
 
@@ -68,10 +69,9 @@ public class SelectBlock extends TargetManagerCommand {
      */
     @Override
     public void update() {
+    	boolean newState  = canSelectBlocks();
+    	canExecute(newState);		// getModel().hasCurrentCase());
         super.update();
-
-        // TODO: Enable if open case, else disable
-        canExecute(canSelectBlocks());		// getModel().hasCurrentCase());
     }
     
     protected boolean canSelectBlocks() {

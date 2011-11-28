@@ -635,9 +635,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
      * @param args
      */
     public static void main(String[] args) {
-
-        new ConResBootCamp().run("");
-
+        	GrasppeKit.setupHooks();
+    		new ConResBootCamp().run("");
     }
 
     /**
@@ -914,8 +913,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         Testing.imageName         = imageNames[1];
 
-        GrasppeKit.timestampLevel = 5;
-        GrasppeKit.debugLevel     = 3;
+//        GrasppeKit.timestampLevel = 5;
+//        GrasppeKit.debugLevel     = 3;
 
         GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
 

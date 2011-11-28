@@ -14,6 +14,7 @@ package com.grasppe.conres.framework.targets.model;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
+import com.grasppe.conres.framework.targets.model.grid.GridBlock;
 import com.grasppe.lure.components.AbstractModel;
 
 /**
@@ -24,23 +25,8 @@ import com.grasppe.lure.components.AbstractModel;
  */
 public class TargetManagerModel extends AbstractModel {
 
-    /**
-	 * @return the activeBlock
-	 */
-	public ConResBlock getActiveBlock() {
-		return activeBlock;
-	}
-
-	/**
-	 * @param activeBlock the activeBlock to set
-	 */
-	public void setActiveBlock(ConResBlock activeBlock) {
-		this.activeBlock = activeBlock;
-		notifyObservers();
-	}
-
-	ConResTarget	activeTarget = null;
-    ConResBlock		activeBlock  = null;
+    ConResTarget	activeTarget     = null;
+    ConResTarget	backgroundTarget = null;
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -59,6 +45,36 @@ public class TargetManagerModel extends AbstractModel {
     }
 
     /**
+     */
+    public void backgroundCurrentTarget() {
+        if (getActiveTarget() == null) return;
+        setBackgroundTarget(getActiveTarget());
+        setActiveTarget(null);
+    }
+
+    /**
+     */
+    public void discardBackgroundTarget() {
+        if (getBackgroundTarget() == null) return;
+        setBackgroundTarget(null);
+    }
+
+    /**
+     */
+    public void restoreBackgroundTarget() {
+        if (getBackgroundTarget() == null) return;
+        setActiveTarget(getBackgroundTarget());
+        setBackgroundTarget(null);
+    }
+
+    /**
+     * @return the activeBlock
+     */
+    public ConResBlock getActiveBlock() {
+        return (ConResBlock)getActiveTarget().getActiveBlock();
+    }
+
+    /**
      * @return the activeTarget
      */
     public ConResTarget getActiveTarget() {
@@ -66,10 +82,44 @@ public class TargetManagerModel extends AbstractModel {
     }
 
     /**
+     * @return the backgroundTarget
+     */
+    public ConResTarget getBackgroundTarget() {
+        return backgroundTarget;
+    }
+
+    /**
+     * @param activeBlock the activeBlock to set
+     */
+    public void setActiveBlock(GridBlock activeBlock) {
+        getActiveTarget().setActiveBlock(activeBlock);
+        notifyObservers();
+    }
+
+    /**
      * @param activeTarget the activeTarget to set
      */
     public void setActiveTarget(ConResTarget activeTarget) {
-        this.activeTarget = activeTarget;
+        try {
+            if (activeTarget == null) if (this.activeTarget != null) {
+                this.backgroundTarget = this.activeTarget;
+                this.activeTarget     = null;
+            } else {
+                if (this.backgroundTarget != null) this.activeTarget = this.backgroundTarget;
+            }
+            if (this.activeTarget == activeTarget) return;
+            this.activeTarget = activeTarget;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
         notifyObservers();
+    }
+
+    /**
+     * @param backgroundTarget the backgroundTarget to set
+     */
+    public void setBackgroundTarget(ConResTarget backgroundTarget) {
+        this.backgroundTarget = backgroundTarget;
     }
 }
