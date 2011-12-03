@@ -1,5 +1,4 @@
 /**
- * 
  */
 package com.grasppe.conres.framework.targets.model;
 
@@ -18,7 +17,6 @@ import com.grasppe.conres.framework.units.ResolutionValue;
 
 /**
  * @author daflair
- *
  */
 public class ConResBlockTest {
 	

@@ -1,16 +1,12 @@
 /*
  * @(#)GrasppeIJ.java   11/11/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.lure.framework;
 
@@ -20,7 +16,6 @@ import ij.io.FileInfo;
 
 /**
  * @author daflair
- *
  */
 public class GrasppeIJ {
 
@@ -35,8 +30,8 @@ public class GrasppeIJ {
         private String	description;
 
         /**
-         * 	@param value
-         * 	@param description
+         *  @param value
+         *  @param description
          */
         private CompressionModes(int value, String description) {
             this.value       = value;
@@ -44,22 +39,22 @@ public class GrasppeIJ {
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public String description() {
             return description;
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public int value() {
             return value;
         }
 
         /**
-         * 	@param value
-         * 	@return
+         *  @param value
+         *  @return
          */
         public static IIntegerValue get(int value) {
             return GrasppeKit.lookupByEnumValue(value, CompressionModes.class);
@@ -78,8 +73,8 @@ public class GrasppeIJ {
         private String	description;
 
         /**
-         * 	@param value
-         * 	@param description
+         *  @param value
+         *  @param description
          */
         private FileFormats(int value, String description) {
             this.value       = value;
@@ -87,22 +82,22 @@ public class GrasppeIJ {
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public String description() {
             return description;
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public int value() {
             return value;
         }
 
         /**
-         * 	@param value
-         * 	@return
+         *  @param value
+         *  @return
          */
         public static IIntegerValue get(int value) {
             return GrasppeKit.lookupByEnumValue(value, FileFormats.class);
@@ -152,8 +147,8 @@ public class GrasppeIJ {
         private String	description;
 
         /**
-         * 	@param value
-         * 	@param description
+         *  @param value
+         *  @param description
          */
         private ImageTypes(int value, String description) {
             this.value       = value;
@@ -161,22 +156,22 @@ public class GrasppeIJ {
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public String description() {
             return description;
         }
 
         /**
-         * 	@return
+         *  @return
          */
         public int value() {
             return value;
         }
 
         /**
-         * 	@param value
-         * 	@return
+         *  @param value
+         *  @return
          */
         public static IIntegerValue get(int value) {
             return GrasppeKit.lookupByEnumValue(value, ImageTypes.class);

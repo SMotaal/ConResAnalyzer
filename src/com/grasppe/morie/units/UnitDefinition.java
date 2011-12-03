@@ -1,22 +1,17 @@
 /*
  * @(#)UnitDefinition.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units;
 
 /**
  * @author daflair
- *
  */
 public class UnitDefinition {
 
@@ -55,10 +50,6 @@ public class UnitDefinition {
 						hasMinimum = !Double.isNaN(minimum);
 
     /**
-     * Constructs ...
-     *
-     *
-     *
      * @param abstractType
      */
     public UnitDefinition(String abstractType) {
@@ -66,9 +57,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param valueType
      */
     public UnitDefinition(ValueTypes valueType) {
@@ -76,9 +64,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param symbol
      * @param valueType
@@ -88,9 +73,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param abstractType
      * @param symbol
      * @param valueType
@@ -100,9 +82,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param symbol
      * @param abstractType
@@ -113,9 +92,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param suffix
      * @param symbol
@@ -126,9 +102,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param suffix
      * @param symbol
@@ -139,9 +112,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param symbol
      * @param valueType
@@ -152,9 +122,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param suffix
      * @param symbol
@@ -167,9 +134,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param prefix
      * @param singular
      * @param suffix
@@ -182,9 +146,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param singular
      * @param suffix
      * @param symbol
@@ -197,9 +158,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param prefix
      * @param singular
      * @param suffix
@@ -213,9 +171,6 @@ public class UnitDefinition {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param prefix
      * @param singular
      * @param suffix

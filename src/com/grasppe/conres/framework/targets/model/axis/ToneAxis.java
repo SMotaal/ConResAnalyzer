@@ -1,10 +1,7 @@
 /*
  * @(#)ContrastAxis.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -15,16 +12,14 @@ import com.grasppe.conres.framework.units.ToneValue;
 
 /**
  * @author daflair
- *
  */
 public final class ToneAxis extends GridAxis {
 
     protected ToneValue[]	values;
-    protected ToneValue
-		minimumValue           = new ToneValue(0),
-		maximumValue           = new ToneValue(100);
-    protected String	label  = "Reference Tone Value",
-						symbol = "%";
+    protected ToneValue		minimumValue = new ToneValue(0),
+							maximumValue = new ToneValue(100);
+    protected String		label        = "Reference Tone Value",
+							symbol       = "%";
 
     /**
      * @param steps

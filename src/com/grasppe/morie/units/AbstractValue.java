@@ -1,10 +1,7 @@
 /*
  * @(#)abstractValue.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
@@ -12,12 +9,11 @@
 package com.grasppe.morie.units;
 
 import java.io.InvalidClassException;
+
 import java.text.DecimalFormat;
 
 /**
  * Class description
- *
- *
  * @version        Enter version here..., 11/10/24
  * @author         Enter your name here...
  */
@@ -36,36 +32,20 @@ public abstract class AbstractValue {
     public double	value;
 
     /**
-     * Constructs ...
-     *
      */
     protected AbstractValue() {
         this(defaultValue);
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param inputValue
      */
     protected AbstractValue(AbstractValue inputValue) {
         this();
         this.setStandardValue(inputValue.getStandardValue());
     }
-    
-//    public static AbstractValue createValue(double[] value) {
-//    	try {
-//    		return getClass().getConstructor(double.class).newInstance(value);
-//    	} catch (Exception exception) {
-//    		
-//    	}
-//    }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param value
      */
     protected AbstractValue(double value) {
@@ -73,14 +53,10 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
-     *
      */
     @Override
-	public AbstractValue clone() {
+    public AbstractValue clone() {
         AbstractValue	newValue = null;
 
         try {
@@ -101,9 +77,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param value
      * @param name
      */
@@ -119,9 +92,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      * @throws InvalidClassException
      */
@@ -130,13 +100,10 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
-	public String toString() {
+    public String toString() {
         String	returnString;
         String	standardSymbol;
         String	standardValue;
@@ -170,9 +137,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     protected UnitDefinition getDefinition() {
@@ -180,9 +144,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public double getFactor() {
@@ -197,9 +158,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public double getStandardValue() {
@@ -214,7 +172,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     *
      * @param value
      * @return the suffix
      */
@@ -228,9 +185,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public String getSymbol() {
@@ -238,9 +192,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public ValueTypes getType() {
@@ -248,9 +199,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     public double getValue() {
@@ -258,11 +206,7 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param value
-     *
      * @return
      */
     protected static boolean isNotRate(AbstractValue value) {
@@ -270,12 +214,8 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param value1
      * @param value2
-     *
      * @return
      */
     protected static boolean isSameType(AbstractValue value1, AbstractValue value2) {
@@ -292,10 +232,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
-     *
      * @param inputValue
      */
     public void setStandardValue(double inputValue) {
@@ -303,8 +239,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     *
-     *
      * @param inputValue
      */
     public void setValue(AbstractValue inputValue) {
@@ -312,9 +246,6 @@ public abstract class AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param value
      */
     public void setValue(double value) {

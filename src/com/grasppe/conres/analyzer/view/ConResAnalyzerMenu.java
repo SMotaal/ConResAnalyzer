@@ -1,16 +1,12 @@
 /*
  * @(#)ConResPluginMenu.java   11/11/08
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.analyzer.view;
 
@@ -53,7 +49,6 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author daflair
- *
  */
 public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, GrasppeEventHandler {
 
@@ -72,7 +67,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     protected CaseLabel								caseLabel = new CaseLabel("ConResAnalyzer");
 
     /**
-     * Constructs ...
      */
     public ConResAnalyzerMenu() {
         super("ConResAnalyzerMenu");
@@ -96,24 +90,20 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         eventDispatcher.attachEventHandler(this);
 
         super.add(pluginBar, BorderLayout.NORTH);
-        
+
         pack();
         setVisible(true);
     }
 
     /**
      * Enum description
-     *
      */
     enum Actions {
         NEW_CASE, OPEN_CASE, CLOSE_CASE, BLOCK_MAPPER, BLOCK_ANALYZER, CASE_PLOTTER, NEXT_BLOCK,
         LAST_BLOCK, QUIT;
 
         /**
-         * Method description
-         *
          * @param e an ActionEvent (i.e. ones passed to Action Listeners.actionPerformed)
-         *
          * @return  a boolean indicating the simpleForm string match of the getActionCommand and this Action value
          */
         public boolean equals(ActionEvent e) {
@@ -124,9 +114,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
         /**
          * Standardizes string formats to help match value.toString() with human-readable action names
-         *
          * @param name  the name of an enum value
-         *
          * @return  the standardized format of the value name specified
          */
         public static String simpleForm(String name) {
@@ -144,8 +132,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @return  the standardized format of the enum value
          */
         @Override
@@ -155,8 +141,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     public void actionPerformed(ActionEvent e) {
@@ -178,8 +162,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     }
 
     /**
-     * Method description
-     *
      * @param command
      */
     public void createButton(AbstractCommand command) {
@@ -188,7 +170,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
         /*
          * PluginMenuAction    thisAction = new PluginMenuAction(this, command.toString());
-         *
          * actionMap.put(action, thisAction);
          * IJ.showMessage("ConResAnalyzerPlugInA0Menu Action Created: " + thisAction.toString());
          */
@@ -209,7 +190,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     }
 
     /**
-     * Method description
      */
     public void createButtonsFromActions( /* Enum<T> actions */) {
         pluginBar = new JToolBar();
@@ -245,10 +225,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     }
 
     /**
-     * Method description
-     *
      * @param e
-     *
      * @return
      */
     public boolean dispatchedKeyEvent(KeyEvent e) {
@@ -268,7 +245,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     }
 
     /**
-     * Method description
      */
     public void update() {
 
@@ -278,8 +254,8 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
     /**
      * Class description
-     * 	@version        $Revision: 1.0, 11/11/28
-     * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+     *  @version        $Revision: 1.0, 11/11/28
+     *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
     public class CaseLabel extends JLabel implements Observer {
 
@@ -290,7 +266,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         public String	defaultText = null;
 
         /**
-         *
          */
         protected CaseLabel() {
 
@@ -356,23 +331,25 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
             // TODO Auto-generated method stub
             if (caseManager != null)
             try {
-            	String text = caseManager.getModel().getCurrentCase().title;
+                String	text = caseManager.getModel().getCurrentCase().title;
+
                 setText(text);
-//                if (getPreferredSize().width>getWidth())
-//                	setText(text.substring(0, 3).concat("É").concat(text.substring(text.length() - 4, 2)));
+
+//              if (getPreferredSize().width>getWidth())
+//                setText(text.substring(0, 3).concat("É").concat(text.substring(text.length() - 4, 2)));
                 setToolTipText(text);
             } catch (Exception exception) {
                 setText(defaultText);
                 setToolTipText("Open a case!");
             }
-            //setSize(getPreferredSize());
+
+            // setSize(getPreferredSize());
         }
     }
 
 
     /**
      * Class description
-     *
      * @version        $Revision: 1.0, 11/11/09
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
@@ -385,10 +362,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         public int	lastModifier;
 
         /**
-         * Method description
-         *
          * @param e
-         *
          * @return
          */
         public boolean dispatchKeyEvent(KeyEvent e) {
@@ -409,7 +383,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
     /**
      * Class description
-     *
      * @version        $Revision: 1.0, 11/11/08
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
@@ -418,8 +391,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         private ActionListener	actionListener;
 
         /**
-         * Constructs ...
-         *
          * @param listener
          * @param text
          */
@@ -434,8 +405,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void actionPerformed(ActionEvent e) {
@@ -447,8 +416,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     /**
      * PluginMenuItem is a modified implementation of SmallButton (http://www.java2s.com/Code/Java/Swing-JFC/Simpletoolbar.htm)
      * designed to simplify the process of creating plugin menu buttons.
-     *
-     *
      * @version        Enter version here..., 11/11/06
      * @author         Enter your name here...
      */
@@ -466,8 +433,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         protected Dimension	m_minimumSize = new Dimension(100, 20);
 
         /**
-         * Constructs ...
-         *
          * @param action
          */
         public PluginMenuItem(AbstractAction action) {
@@ -539,8 +504,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Constructs ...
-         *
          * @param action
          * @param tooltip
          */
@@ -550,8 +513,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void keyPressed(KeyEvent e) {
@@ -569,15 +530,11 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void mouseClicked(MouseEvent e) {}
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void mouseEntered(MouseEvent e) {
@@ -585,8 +542,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void mouseExited(MouseEvent e) {
@@ -594,8 +549,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void mousePressed(MouseEvent e) {
@@ -603,8 +556,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @param e
          */
         public void mouseReleased(MouseEvent e) {
@@ -617,7 +568,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          */
 
         /**
-         * Method description
          */
         public void update() {
 
@@ -640,8 +590,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         @Override

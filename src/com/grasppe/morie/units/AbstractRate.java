@@ -1,16 +1,12 @@
 /*
  * @(#)AbstractRate.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units;
 
@@ -18,7 +14,6 @@ import java.io.InvalidClassException;
 
 /**
  * @author daflair
- *
  */
 public abstract class AbstractRate extends AbstractValue {
 
@@ -33,7 +28,6 @@ public abstract class AbstractRate extends AbstractValue {
 
     /**
      * Enum description
-     *
      */
     public enum RateRelations {
         IDENTICAL, MIRRORED, DIRECT, INVERSE, NUMERATORS, DENOMINATORS, CROSSNUMERATOR,
@@ -41,8 +35,6 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Constructs ...
-     *
      */
     protected AbstractRate() {
         super();
@@ -65,12 +57,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param rate1
      * @param rate2
-     *
      * @return
      */
     protected static boolean areCompatible(AbstractRate rate1, AbstractRate rate2) {
@@ -80,12 +68,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param rate1
      * @param rate2
-     *
      * @return
      */
     protected static boolean areInversed(AbstractRate rate1, AbstractRate rate2) {
@@ -97,14 +81,10 @@ public abstract class AbstractRate extends AbstractValue {
     // protected static RelationTypes checkRelation (boolean  eqvNumerator, boolean eqvDenominator, boolean revNumerator, boolean revDenominator, boolean idtNumeratorType){
 
     /**
-     * Method description
-     *
-     *
      * @param eqvNumerator
      * @param eqvDenominator
      * @param revNumerator
      * @param revDenominator
-     *
      * @return
      */
     protected static RateRelations checkContigency(boolean eqvNumerator, boolean eqvDenominator,
@@ -117,12 +97,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param rate1
      * @param rate2
-     *
      * @return
      */
     protected static RateRelations checkRelation(AbstractRate rate1, AbstractRate rate2) {
@@ -185,7 +161,7 @@ public abstract class AbstractRate extends AbstractValue {
 
         if (cntType) {
             RateRelations	relation = checkContigency(eqvNumeratorType, eqvDenominatorType,
-                                           revNumeratorType, revDenominatorType);
+                                         revNumeratorType, revDenominatorType);
 
             System.out.println(pfx + "Contingency relation: " + relation);
 
@@ -201,11 +177,7 @@ public abstract class AbstractRate extends AbstractValue {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
-     *
      */
     @Override
     public AbstractRate clone() {
@@ -223,12 +195,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param numeratorValue
      * @param denominatorValue
-     *
      * @return
      */
     protected static String combineSingular(AbstractValue numeratorValue,
@@ -238,12 +206,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param numeratorValue
      * @param denominatorValue
-     *
      * @return
      */
     protected static String combineSuffix(AbstractValue numeratorValue,
@@ -253,12 +217,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param numeratorValue
      * @param denominatorValue
-     *
      * @return
      */
     protected static String combineSymbol(AbstractValue numeratorValue,
@@ -268,12 +228,8 @@ public abstract class AbstractRate extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param inputRate
      * @throws InvalidClassException
-     *
      */
     public void convertFromRate(AbstractRate inputRate) throws InvalidClassException {
         AbstractValue[][]	components = new AbstractValue[2][2];
@@ -289,12 +245,14 @@ public abstract class AbstractRate extends AbstractValue {
         switch (relation) {
 
         case IDENTICAL :	// Example: spi ==> spi
-        	setValue(inputRate.getValue());
-        	break;
+            setValue(inputRate.getValue());
+            break;
+
         case INVERSE :		// Example: spi ==> mm/sp
         case MIRRORED :		// Example: sp/mm ==> mm/sp
-        	// flip inputRate components (before direct conversion)
-            components[1] = new AbstractValue[] { components[1][1], components[1][0] }; 
+
+            // flip inputRate components (before direct conversion)
+            components[1] = new AbstractValue[] { components[1][1], components[1][0] };
             newValue      = 1.0 / inputRate.getValue();
         case DIRECT :		// Example: spi ==> sp/mm
             newValue = newValue * components[1][0].getStandardValue()
@@ -358,9 +316,6 @@ public abstract class AbstractRate extends AbstractValue {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
@@ -394,11 +349,7 @@ public abstract class AbstractRate extends AbstractValue {
      */
 
     /**
-     * Method description
-     *
-     *
      * @param value
-     *
      * @return
      */
     @Override
@@ -428,9 +379,6 @@ public abstract class AbstractRate extends AbstractValue {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
@@ -496,11 +444,7 @@ public abstract class AbstractRate extends AbstractValue {
 //  }
 
     /**
-     * Method description
-     *
-     *
      * @param inputRate
-     *
      * @return
      */
     public boolean isCompatible(AbstractRate inputRate) {
@@ -541,9 +485,6 @@ public abstract class AbstractRate extends AbstractValue {
      */
 
     /**
-     * Method description
-     *
-     *
      * @param inputValue
      */
     @Override

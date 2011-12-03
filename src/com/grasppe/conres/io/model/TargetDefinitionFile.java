@@ -1,16 +1,12 @@
 /*
  * @(#)ImageFile.java   11/11/15
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
 
@@ -30,7 +26,6 @@ import java.util.Arrays;
 
 /**
  * @author daflair
- *
  */
 public class TargetDefinitionFile extends CaseFile implements IConResTargetDefinition {
 
@@ -45,7 +40,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
     protected float[][]				fiducials       = new float[4][2];
     protected String[]				fiducialIDs     = new String[] { "ULC", "URC", "LRC", "LLC" };
     protected TargetMeasurements	measurements    = new TargetMeasurements();
-    protected int[]				blockToneValues = new int[0];
+    protected int[]					blockToneValues = new int[0];
     protected String				name            = "";
 
     /**
@@ -84,7 +79,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     *
      * @return
      */
     @Override
@@ -98,8 +92,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -115,7 +107,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@return
+     *  @return
      */
     public int[] getBlockToneValues() {
         return blockToneValues;
@@ -127,7 +119,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@return
+     *  @return
      */
     public String[] getFiducialIDs() {
         return fiducialIDs;
@@ -139,7 +131,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@return
+     *  @return
      */
     public float[][] getFiducials() {
         return fiducials;
@@ -151,8 +143,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     public static FileFilter getFileFilter() {
@@ -172,7 +162,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@return
+     *  @return
      */
     public TargetMeasurements getMeasurements() {
         return measurements;
@@ -184,14 +174,14 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@return
+     *  @return
      */
     public String getName() {
         return name;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     @Override
     public IGrasppeFileReader getReader() {
@@ -210,8 +200,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -227,8 +215,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -244,7 +230,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@param blockToneValues
+     *  @param blockToneValues
      */
     public void setBlockToneValues(int[] blockToneValues) {
         this.blockToneValues = blockToneValues;
@@ -256,7 +242,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@param fiducialIDs
+     *  @param fiducialIDs
      */
     public void setFiducialIDs(String[] fiducialIDs) {
         this.fiducialIDs = fiducialIDs;
@@ -268,7 +254,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@param fiducials
+     *  @param fiducials
      */
     public void setFiducials(float[][] fiducials) {
         this.fiducials = fiducials;
@@ -280,9 +266,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * Method description
-     *
-     *
      * @param newFilter
      */
     public static void setFileFilter(FileFilter newFilter) {
@@ -302,7 +285,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@param measurements
+     *  @param measurements
      */
     public void setMeasurements(TargetMeasurements measurements) {
         this.measurements = measurements;
@@ -314,7 +297,7 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
 
     /**
-     * 	@param name
+     *  @param name
      */
     public void setName(String name) {
         this.name = name;

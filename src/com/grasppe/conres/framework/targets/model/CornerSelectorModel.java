@@ -1,6 +1,12 @@
-package com.grasppe.conres.framework.targets.model;
+/*
+ * @(#)CornerSelectorModel.java   11/12/03
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ * This code is not licensed for use and is the property of it's owner.
+ */
 
-import java.io.File;
+
+
+package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.model.roi.BlockROI;
@@ -11,102 +17,27 @@ import com.grasppe.lure.components.AbstractModel;
 
 /**
  * Class description
- *
  * @version $Revision: 0.1, 11/11/08
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class CornerSelectorModel extends AbstractModel {
-	
-	public boolean isVisibleView() {
-		return visibleView;
-	}
 
-	public void setVisibleView(boolean visibleView) {
-		this.visibleView = visibleView;
-	}
+    /* Sample target image */
+    protected ImageFile	targetImageFile;
 
-	public boolean isValidSelection() {
-		return validSelection;
-	}
+    /* Target Definition File */
+    protected IConResTargetDefinition	targetDefinitionFile;
 
-	public void setValidSelection(boolean validSelection) {
-		this.validSelection = validSelection;
-	}
+    /* Physical dimensions per target definition file */
+    protected TargetDimensions	targetDimensions;
 
-	public boolean isFinalizedView() {
-		return finalizedView;
-	}
-
-	public void setFinalizedView(boolean finalizedView) {
-		this.finalizedView = finalizedView;
-	}
-
-	public ImageFile getTargetImageFile() {
-		return targetImageFile;
-	}
-
-	public void setTargetImageFile(ImageFile targetImageFile) {
-		this.targetImageFile = targetImageFile;
-	}
-
-	public IConResTargetDefinition getTargetDefinitionFile() {
-		return targetDefinitionFile;
-	}
-
-	public void setTargetDefinitionFile(IConResTargetDefinition targetDefinitionFile) {
-		this.targetDefinitionFile = targetDefinitionFile;
-	}
-
-	public TargetDimensions getTargetDimensions() {
-		return targetDimensions;
-	}
-
-	public void setTargetDimensions(TargetDimensions targetDimensions) {
-		this.targetDimensions = targetDimensions;
-	}
-
-	public TargetDimensions getImageDimensions() {
-		return imageDimensions;
-	}
-
-	public void setImageDimensions(TargetDimensions imageDimensions) {
-		this.imageDimensions = imageDimensions;
-	}
-
-	public BlockROI getBlockROI() {
-		return blockROI;
-	}
-
-	public void setBlockROI(BlockROI blockROI) {
-		this.blockROI = blockROI;
-	}
-
-	public PatchSetROI getPatchSetROI() {
-		return patchSetROI;
-	}
-
-	public void setPatchSetROI(PatchSetROI patchSetROI) {
-		this.patchSetROI = patchSetROI;
-	}
-
-	/* Sample target image */
-	protected ImageFile targetImageFile;
-	
-	/* Target Definition File */
-	protected IConResTargetDefinition targetDefinitionFile;
-	
-	/* Physical dimensions per target definition file*/
-	protected TargetDimensions targetDimensions;
-	
-	/* Pixel dimensions per Sample target image */
-	protected TargetDimensions imageDimensions;
-	
-	protected BlockROI blockROI;
-	protected PatchSetROI patchSetROI;
-	
-	protected boolean visibleView = false;
-	protected boolean validSelection = false;	// set by controller.validateSelection()
-	protected boolean finalizedView = false;	// after window close
+    /* Pixel dimensions per Sample target image */
+    protected TargetDimensions	imageDimensions;
+    protected BlockROI			blockROI;
+    protected PatchSetROI		patchSetROI;
+    protected boolean			visibleView    = false;
+    protected boolean			validSelection = false;		// set by controller.validateSelection()
+    protected boolean			finalizedView  = false;		// after window close
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -121,5 +52,131 @@ public class CornerSelectorModel extends AbstractModel {
      */
     public CornerSelectorModel(CornerSelector controller) {
         super(controller);
+    }
+
+    /**
+     *  @return
+     */
+    public BlockROI getBlockROI() {
+        return blockROI;
+    }
+
+    /**
+     *  @return
+     */
+    public TargetDimensions getImageDimensions() {
+        return imageDimensions;
+    }
+
+    /**
+     *  @return
+     */
+    public PatchSetROI getPatchSetROI() {
+        return patchSetROI;
+    }
+
+    /**
+     *  @return
+     */
+    public IConResTargetDefinition getTargetDefinitionFile() {
+        return targetDefinitionFile;
+    }
+
+    /**
+     *  @return
+     */
+    public TargetDimensions getTargetDimensions() {
+        return targetDimensions;
+    }
+
+    /**
+     *  @return
+     */
+    public ImageFile getTargetImageFile() {
+        return targetImageFile;
+    }
+
+    /**
+     *  @return
+     */
+    public boolean isFinalizedView() {
+        return finalizedView;
+    }
+
+    /**
+     *  @return
+     */
+    public boolean isValidSelection() {
+        return validSelection;
+    }
+
+    /**
+     *  @return
+     */
+    public boolean isVisibleView() {
+        return visibleView;
+    }
+
+    /**
+     *  @param blockROI
+     */
+    public void setBlockROI(BlockROI blockROI) {
+        this.blockROI = blockROI;
+    }
+
+    /**
+     *  @param finalizedView
+     */
+    public void setFinalizedView(boolean finalizedView) {
+        this.finalizedView = finalizedView;
+    }
+
+    /**
+     *  @param imageDimensions
+     */
+    public void setImageDimensions(TargetDimensions imageDimensions) {
+        this.imageDimensions = imageDimensions;
+    }
+
+    /**
+     *  @param patchSetROI
+     */
+    public void setPatchSetROI(PatchSetROI patchSetROI) {
+        this.patchSetROI = patchSetROI;
+    }
+
+    /**
+     *  @param targetDefinitionFile
+     */
+    public void setTargetDefinitionFile(IConResTargetDefinition targetDefinitionFile) {
+        this.targetDefinitionFile = targetDefinitionFile;
+    }
+
+    /**
+     *  @param targetDimensions
+     */
+    public void setTargetDimensions(TargetDimensions targetDimensions) {
+        this.targetDimensions = targetDimensions;
+    }
+
+    /**
+     *  @param targetImageFile
+     */
+    public void setTargetImageFile(ImageFile targetImageFile) {
+        this.targetImageFile = targetImageFile;
+    }
+
+    /**
+     *  @param validSelection
+     */
+    public void setValidSelection(boolean validSelection) {
+        this.validSelection = validSelection;
+    }
+
+    /**
+     *  @param visibleView
+     */
+    public void setVisibleView(boolean visibleView) {
+        this.visibleView = visibleView;
     }
 }

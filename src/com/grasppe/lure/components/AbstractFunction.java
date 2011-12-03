@@ -1,10 +1,7 @@
 /*
  * @(#)AbstractFunction.java   11/11/26
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -23,7 +20,6 @@ import javax.swing.Icon;
 
 /**
  *     Class description
- *    
  *     @version        $Revision: 1.0, 11/11/09
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -39,7 +35,6 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     public String	name = getClass().getSimpleName();
 
     /**
-     * Constructs ...
      */
     public AbstractFunction() {
         super();
@@ -61,8 +56,6 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     }
 
     /**
-     * Method description
-     *
      * @param arg0
      */
     public void actionPerformed(ActionEvent arg0) {
@@ -89,10 +82,7 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     }
 
     /**
-     * Method description
-     *
      * @param forcedAction
-     *
      * @return
      */
     public final boolean execute(boolean forcedAction) {
@@ -114,7 +104,7 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public ExitCodes getExitCode() {
         return exitCode;
@@ -122,7 +112,6 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
 
     /**
      * Returns the name of the command.
-     *
      * @return
      */
     public String getName() {
@@ -151,7 +140,7 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean isExecuting() {
         return executing;
@@ -172,14 +161,14 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     }
 
     /**
-     * 	@param executing
+     *  @param executing
      */
     public void setExecuting(boolean executing) {
         this.executing = executing;
     }
 
     /**
-     * 	@param exitCode
+     *  @param exitCode
      */
     public void setExitCode(ExitCodes exitCode) {
         this.exitCode = exitCode;

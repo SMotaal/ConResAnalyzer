@@ -1,16 +1,12 @@
 /*
  * @(#)AbstractSpatialFrequency.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units;
 
@@ -18,7 +14,6 @@ import java.io.InvalidClassException;
 
 /**
  * @author daflair
- *
  */
 public abstract class AbstractFrequency extends AbstractRate {
 
@@ -29,8 +24,6 @@ public abstract class AbstractFrequency extends AbstractRate {
     public FrequencyTypes	frequencyType;
 
     /**
-     * Constructs ...
-     *
      */
     protected AbstractFrequency() {
         super();

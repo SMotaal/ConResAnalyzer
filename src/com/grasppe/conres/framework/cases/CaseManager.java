@@ -1,10 +1,7 @@
 /*
  * @(#)CaseManager.java   11/11/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -29,14 +26,12 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 import java.awt.event.ActionListener;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.LinkedHashMap;
 
 /**
  *     Class description
- *
  *     @version        $Revision: 0.1, 11/11/08
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -45,26 +40,10 @@ public class CaseManager extends AbstractController implements ActionListener {
     /** Field description */
     public ConResAnalyzer	analyzer;
 
-//    /**
-//     * Constructs a new CaseManager
-//     */
-//    public CaseManager() {
-//        super();
-//    }
-//
-//    /**
-//     * @param model
-//     */
-//    public CaseManager(AbstractModel model) {
-//        super(model);
-//
-////      model.attachController(this);
-//    }
-
     /**
      * @param listener
      */
-    protected CaseManager(ActionListener listener) {
+    private CaseManager(ActionListener listener) {
         super(listener);
     }
 
@@ -112,7 +91,7 @@ public class CaseManager extends AbstractController implements ActionListener {
 
     /**
      *  @param newCase
-     *  @throws FileNotFoundException
+     *  @throws IOException
      */
     public void loadCase(CaseModel newCase) throws IOException {
 
@@ -125,16 +104,16 @@ public class CaseManager extends AbstractController implements ActionListener {
         } catch (IOException exception) {
             newCase = null;
             throw exception;
-		}
+        }
 
         try {
-            newCase.caseFolder = caseFolder;
+            newCase.caseFolder           = caseFolder;
 
             newCase.title                = caseFolder.getName();
 
             newCase.targetDefinitionFile = caseFolder.getTargetDefinitionFile();
-            
-            newCase.imageFiles = caseFolder.getImageFiles();
+
+            newCase.imageFiles           = caseFolder.getImageFiles();
 
             getTargetManager().setTargetDefinitionFile(newCase.targetDefinitionFile);
 
@@ -169,7 +148,6 @@ public class CaseManager extends AbstractController implements ActionListener {
 
     /**
      * Return the controller's correctly-cast model
-     *
      * @return
      */
     @Override
@@ -178,7 +156,7 @@ public class CaseManager extends AbstractController implements ActionListener {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     @Override
     protected AbstractModel getNewModel() {
@@ -193,8 +171,6 @@ public class CaseManager extends AbstractController implements ActionListener {
      */
 
     /**
-     * Method description
-     *
      * @return
      */
 
@@ -219,9 +195,7 @@ public class CaseManager extends AbstractController implements ActionListener {
 
     /**
      * Sets controller's model to a CaseManagerModel and not any AbstractModel.
-     *
      * @param newModel
-     *
      * @throws IllegalAccessException
      */
     public void setModel(CaseManagerModel newModel) throws IllegalAccessException {

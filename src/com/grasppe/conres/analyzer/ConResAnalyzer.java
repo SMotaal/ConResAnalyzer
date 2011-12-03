@@ -1,10 +1,7 @@
 /*
  * @(#)ConResAnalyzer.java   11/11/15
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -29,7 +26,6 @@ import java.util.LinkedHashMap;
 
 /**
  * Class description
- *
  * @version        $Revision: 0.1, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -56,7 +52,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
-     *
      * @param model
      */
     public ConResAnalyzer(ConResAnalyzerModel model) {
@@ -67,15 +62,15 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     public void backgroundCurrentCase() {
         try {
-        for (AbstractController manager : managers) {
-            if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                try {
-                    ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+            for (AbstractController manager : managers) {
+                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+                    try {
+                        ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
-        }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -92,16 +87,16 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     /**
      */
     public void discardBackgroundCase() {
-    	try {
-        for (AbstractController manager : managers) {
-            if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                try {
-                    ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+        try {
+            for (AbstractController manager : managers) {
+                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+                    try {
+                        ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
-        }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -117,22 +112,21 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     }
 
     /**
-     * 	@throws IllegalAccessException
      */
     public void restoreBackgroundCase() {
-    	try{
-        for (AbstractController manager : managers) {
-            if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                try {
-                    ((IAuxiliaryCaseManager)manager).restoreBackgroundCase();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+        try {
+            for (AbstractController manager : managers) {
+                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+                    try {
+                        ((IAuxiliaryCaseManager)manager).restoreBackgroundCase();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-    } catch (Exception exception) {
-        exception.printStackTrace();
-    }
     }
 
     /**
@@ -150,8 +144,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -166,8 +158,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
@@ -199,10 +189,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     }
 
     /**
-     * Method description
-     *
      * @param newModel
-     *
      * @throws IllegalAccessException
      */
     public void setModel(ConResAnalyzerModel newModel) throws IllegalAccessException {

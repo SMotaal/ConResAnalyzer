@@ -1,16 +1,12 @@
 /*
  * @(#)ImageFile.java   11/11/15
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
 
@@ -35,37 +31,10 @@ import java.util.Arrays;
 
 /**
  * @author daflair
- *
  */
 public class ImageFile extends CaseFile {
 
-    /**
-	 * @return the imageID
-	 */
-	public int getImageID() {
-        File	dir       = this.getParentFile();
-        String	name      = this.getName();
-        String	baseName  = FilenameUtils.getBaseName(name);
-        String	extension = FilenameUtils.getExtension(name);
-        String	suffix    = GrasppeKit.lastSplit(name, ".").toLowerCase();
-
-        // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
-        int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
-                             suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
-        
-        setImageID(suffixCode);
-        
-		return imageID;
-	}
-
-	/**
-	 * @param imageID the imageID to set
-	 */
-	public void setImageID(int imageID) {
-		this.imageID = imageID;
-	}
-
-	protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
+    protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
                                                  "*i.tif" }));
     protected static FilenameFilter	filenameFilter = new FilenameFilter() {
 
@@ -80,6 +49,10 @@ public class ImageFile extends CaseFile {
     protected SpatialFrequency	resolution;
     protected double			pixelWidth  = 0,
 								pixelHeight = 0;
+    protected int				imageID;
+
+//  protected String baseNmae;
+//  protected String extension;
 
     /**
      * @param pathname
@@ -161,15 +134,11 @@ public class ImageFile extends CaseFile {
         // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
         int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
                              suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
-        
+
         setImageID(suffixCode);
 
         return name.toLowerCase().replace("ff", "f").endsWith("i.tif");		// true;
     }
-    
-    protected int imageID;
-//    protected String baseNmae;
-//    protected String extension;
 
     /**
      * Check specified image specifications
@@ -250,8 +219,25 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * Method description
-     *
+     * @return the imageID
+     */
+    public int getImageID() {
+        File	dir       = this.getParentFile();
+        String	name      = this.getName();
+        String	baseName  = FilenameUtils.getBaseName(name);
+        String	extension = FilenameUtils.getExtension(name);
+        String	suffix    = GrasppeKit.lastSplit(name, ".").toLowerCase();
+
+        // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
+        int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
+                             suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
+
+        setImageID(suffixCode);
+
+        return imageID;
+    }
+
+    /**
      * @return
      */
     private ImageSpecifications getImageSpecifications() {
@@ -273,7 +259,7 @@ public class ImageFile extends CaseFile {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     @Override
     public IGrasppeFileReader getReader() {
@@ -361,6 +347,13 @@ public class ImageFile extends CaseFile {
      */
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    /**
+     * @param imageID the imageID to set
+     */
+    public void setImageID(int imageID) {
+        this.imageID = imageID;
     }
 
     /**

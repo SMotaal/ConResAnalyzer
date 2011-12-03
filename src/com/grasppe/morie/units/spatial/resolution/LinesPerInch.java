@@ -1,24 +1,14 @@
 /*
  * @(#)CyclesPerMetre.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units.spatial.resolution;
-
-
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.InvalidClassException;
 
 import com.grasppe.morie.units.AbstractValue;
 import com.grasppe.morie.units.UnitDefinition;
@@ -26,9 +16,12 @@ import com.grasppe.morie.units.ValueTypes;
 import com.grasppe.morie.units.spatial.SpatialFrequency;
 import com.grasppe.morie.units.spatial.length.Inches;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.InvalidClassException;
+
 /**
  * @author daflair
- *
  */
 public class LinesPerInch extends SpatialFrequency {
 
@@ -40,11 +33,9 @@ public class LinesPerInch extends SpatialFrequency {
 
     /** Field description */
     public static UnitDefinition	unitDefinition = new UnitDefinition(ValueTypes.FREQUENCY,
-                                                         "image resolution", "lpi");
+                                                      "image resolution", "lpi");
 
     /**
-     * Constructs ...
-     *
      */
     public LinesPerInch() {
         super();
@@ -66,13 +57,10 @@ public class LinesPerInch extends SpatialFrequency {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
-	protected UnitDefinition getDefinition() {
+    protected UnitDefinition getDefinition() {
         return unitDefinition;
     }
 
@@ -80,7 +68,7 @@ public class LinesPerInch extends SpatialFrequency {
      * @return the denominatorValue
      */
     @Override
-	protected AbstractValue getDenominatorValue() {
+    protected AbstractValue getDenominatorValue() {
         return denominatorValue;
     }
 
@@ -88,7 +76,7 @@ public class LinesPerInch extends SpatialFrequency {
      * @return the numeratorValue
      */
     @Override
-	protected AbstractValue getNumeratorValue() {
+    protected AbstractValue getNumeratorValue() {
         return numeratorValue;
     }
 }

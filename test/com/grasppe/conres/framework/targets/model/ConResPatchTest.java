@@ -1,16 +1,12 @@
 /*
  * @(#)ConResPatchTest.java   11/11/23
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.targets.model;
 
@@ -31,7 +27,6 @@ import static org.junit.Assert.fail;
 
 /**
  * @author daflair
- *
  */
 public class ConResPatchTest {
 
@@ -42,7 +37,6 @@ public class ConResPatchTest {
     ResolutionValue			yValue = new ResolutionValue(0);
 
     /**
-     *
      * @throws Exception
      */
     @Before
@@ -51,7 +45,6 @@ public class ConResPatchTest {
     }
     
     /**
-     *
      * @throws Exception
      */
     @BeforeClass
@@ -128,14 +121,12 @@ public class ConResPatchTest {
 //    }
 
     /**
-     *
      * @throws Exception
      */
     @After
     public void tearDown() throws Exception {}
     
     /**
-     *
      * @throws Exception
      */
     @AfterClass

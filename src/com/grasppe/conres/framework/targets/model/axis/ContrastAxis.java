@@ -1,10 +1,7 @@
 /*
  * @(#)ContrastAxis.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -15,7 +12,6 @@ import com.grasppe.conres.framework.units.ContrastValue;
 
 /**
  * @author daflair
- *
  */
 public final class ContrastAxis extends GridAxis {
 
@@ -51,19 +47,19 @@ public final class ContrastAxis extends GridAxis {
         return new ContrastValue[length];
     }
 
-//    /**
-//     * @return the maximumValue
-//     */
-//    @Override
-//    public ContrastValue getMaximumValue() {
-//        return maximumValue;
-//    }
+//  /**
+//   * @return the maximumValue
+//   */
+//  @Override
+//  public ContrastValue getMaximumValue() {
+//      return maximumValue;
+//  }
 //
-//    /**
-//     * @return the minimumValue
-//     */
-//    @Override
-//    public ContrastValue getMinimumValue() {
-//        return minimumValue;
-//    }
+//  /**
+//   * @return the minimumValue
+//   */
+//  @Override
+//  public ContrastValue getMinimumValue() {
+//      return minimumValue;
+//  }
 }

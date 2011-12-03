@@ -1,10 +1,7 @@
 /*
  * @(#)lengthValue.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -16,8 +13,6 @@ import com.grasppe.morie.units.ValueTypes;
 
 /**
  * Class description
- *
- *
  * @version        Enter version here..., 11/10/24
  * @author         Enter your name here...
  */
@@ -30,7 +25,6 @@ public abstract class Length extends AbstractValue {
     // public static UnitDefinition  unitDefinition = new UnitDefinition("", "", ValueTypes.LENGTH);
 
     /**
-     *
      */
     protected Length() {
         super();
@@ -44,9 +38,6 @@ public abstract class Length extends AbstractValue {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param inputValue
      */
     protected Length(Length inputValue) {
@@ -54,22 +45,15 @@ public abstract class Length extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
-	public final Metres standardValue() {
+    public final Metres standardValue() {
         return new Metres();
     }
 
     /**
-     * Method description
-     *
-     *
      * @param inputValue
-     *
      * @return
      */
     public final Metres standardValue(double inputValue) {
@@ -77,11 +61,7 @@ public abstract class Length extends AbstractValue {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param inputValue
-     *
      * @return
      */
     public final Metres standardValue(Length inputValue) {

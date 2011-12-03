@@ -1,10 +1,7 @@
 /*
  * @(#)Observers.java   11/11/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -20,22 +17,23 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
- *
  */
 public class Observers implements Observable {
 
     protected Observable	observable;
+    protected boolean		updating = false;
 
     /** Field description */
     protected Set<Observer>	observerSet = new HashSet<Observer>();
 
     /**
      */
-    public Observers() {
+    private Observers() {
         super();
     }
 
@@ -47,26 +45,26 @@ public class Observers implements Observable {
     }
 
     /**
-     * Method description
-     *
      * @param observer
      */
     public void attachObserver(Observer observer) {
+        if (observable == observer) return;
+
         GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()));
         observerSet.add(observer);
         notifyObservers();
+
         // TODO Implement throwing exceptions for attach of existing element
     }
 
     /**
-     * Method description
-     *
      * @param observer
      */
     public void detachObserver(Observer observer) {
         GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()));
         observerSet.remove(observer);
         notifyObservers();
+
         // TODO Implement throwing exceptions for detach of missing element
     }
 
@@ -78,29 +76,32 @@ public class Observers implements Observable {
     }
 
     /**
-     * Method description
-     *
      */
     public void notifyObservers() {
 
+        if (updating) return;
+
+        updating = true;
+
         observerSet.toArray();
-        
-        try{
 
-        for (Object object : observerSet) {
-            Observer	observer = (Observer)object;
+        try {
 
-            try {
-                if (observable == null) notifyObserver(observer);
-                else observable.notifyObserver(observer);
-            } catch (Exception exception) {
-                observerSet.remove(observer);
-//                exception.printStackTrace();
+            for (Object object : observerSet) {
+                Observer	observer = (Observer)object;
+
+                try {
+                    if (observable == null) notifyObserver(observer);
+                    else observable.notifyObserver(observer);
+                } catch (Exception exception) {
+                    observerSet.remove(observer);
+
+                    exception.printStackTrace();
+                }
             }
-        }
-        } catch (ConcurrentModificationException exception) {
-        	
-        }
+        } catch (ConcurrentModificationException exception) {}
+
+        updating = false;
 
 //      Iterator<Observer>    observerIterator = observerSet.iterator();
 //
@@ -125,19 +126,22 @@ public class Observers implements Observable {
      */
     public String toString() {
 
-//      observerSet.toArray();
-//
-//      for (Object object : observerSet) {
-//          Observer  observer = (Observer)object;
-//
-//          try {}
-//          catch (Exception exception) {
-//              observerSet.remove(observer);
-//              exception.printStackTrace();
-//          }
-//      }
-        return "" + observerSet.size() + ((observerSet.size() > 1) ? " observers"
+        LinkedHashSet<String>	obsererStrings = new LinkedHashSet<String>();
+
+        try {
+            observerSet.toArray();
+            for (Object object : observerSet)
+                obsererStrings.add(((Observer)object).getClass().getSimpleName());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        String	observersText = "" + observerSet.size() + ((observerSet.size() > 1) ? " observers"
                 : " observer");
+
+        if (obsererStrings.size() > 0) observersText += ": " + GrasppeKit.cat(obsererStrings, ", ");
+
+        return observersText;
     }
 
     /**

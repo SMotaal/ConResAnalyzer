@@ -1,23 +1,17 @@
 /*
  * @(#)ValueFactory.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 package com.grasppe.conres.framework.units;
 
-import com.grasppe.conres.framework.targets.model.axis.GridAxis;
 import com.grasppe.morie.units.AbstractValue;
 
 /**
  * Class description
- *
- *
  * @version        Enter version here..., 11/10/27
  * @author         Enter your name here...
  */

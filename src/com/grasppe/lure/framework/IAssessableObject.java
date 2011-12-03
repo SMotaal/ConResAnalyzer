@@ -1,62 +1,57 @@
 /*
  * @(#)IAssessableObject.java   11/11/26
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.lure.framework;
 
 /**
  * @author daflair
- *
  */
 public interface IAssessableObject {
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean assess();
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean validate();
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean verify();
 
     /**
-     * 	@return
+     *  @return
      */
     public String[] getAssessmentProblems();
 
     /**
-     * 	@return
+     *  @return
      */
     public String[] getValidationProblems();
 
     /**
-     * 	@return
+     *  @return
      */
     public String[] getVerificationProblems();
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean isValid();
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean isVerified();
 }

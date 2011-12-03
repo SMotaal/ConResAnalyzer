@@ -1,12 +1,8 @@
 /*
  * @(#)StopWatch.java   11/11/10
- *
  * Copyright (c) 2011 Copyright © 2001, Sun Microsystems,Inc.. All rights reserved.
- *
  * http://java.sun.com/docs/books/performance/1st_edition/html/JPMeasurement.fm.html
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -16,26 +12,18 @@ package com.grasppe.lure.framework;
 /**
  * A class to help benchmark code
  * It simulates a real stop watch
- *
- *
- *
  * Listing 3-3 shows how you can use this stopwatch class to measure a piece of code. Using this class is simpler than adding the timing code to each operation you want to measure and ensures that errors aren't introduced by the timing mechanism.
- *
  * class TimeTest2 {
  *    public static void main(String[] args) {
- *
  *       Stopwatch timer = new Stopwatch().start();
- *
  *       long total = 0;
  *       for (int i = 0; i < 10000000; i++) {
  *          total += i;
  *       }
- *
  *       timer.stop();
  *       System.out.println(timer.getElapsedTime());
  *    }
  * }
- *
  */
 public class StopWatch {
 
@@ -44,8 +32,6 @@ public class StopWatch {
     private boolean	running   = false;
 
     /**
-     * Method description
-     *
      * @return
      */
     public StopWatch reset() {
@@ -57,8 +43,6 @@ public class StopWatch {
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public StopWatch start() {
@@ -69,8 +53,6 @@ public class StopWatch {
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public StopWatch stop() {
@@ -84,7 +66,6 @@ public class StopWatch {
      * returns elapsed time in milliseconds
      *  if the watch has never been started then
      *  return zero
-     *
      * @return
      */
     public long getElapsedTime() {

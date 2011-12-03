@@ -1,24 +1,29 @@
 /*
  * @(#)ImageWindowMagnifier.java   11/11/17
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.imagej;
 
+import com.grasppe.lure.framework.GrasppeEventDispatcher;
+import com.grasppe.lure.framework.GrasppeEventHandler;
+import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.KeyCode;
+
 import ij.IJ;
 import ij.ImagePlus;
+
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
+
 import ij.util.Java2;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,14 +43,8 @@ import java.awt.event.WindowFocusListener;
 
 import javax.swing.JFrame;
 
-import com.grasppe.lure.framework.GrasppeEventDispatcher;
-import com.grasppe.lure.framework.GrasppeEventHandler;
-import com.grasppe.lure.framework.GrasppeKit;
-import com.grasppe.lure.framework.GrasppeKit.KeyCode;
-
 /**
  * @author daflair
- *
  */
 public class ImageWindowMagnifier extends ImageCanvas
         implements GrasppeEventHandler, MouseMotionListener, MouseListener, WindowFocusListener {		// , MouseListener {
@@ -69,7 +68,6 @@ public class ImageWindowMagnifier extends ImageCanvas
 //  };
 
     /**
-     *
      */
     private static final long	serialVersionUID = 1L;
 
@@ -168,11 +166,8 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param object1
      * @param object2
-     *
      * @return
      */
     public boolean areEqual(Object object1, Object object2) {
@@ -189,10 +184,7 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param imageWindow
-     *
      * @return
      */
     public boolean bindImageWindow(ImageWindow imageWindow) {
@@ -211,11 +203,8 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param source
      * @param listener
-     *
      * @return
      */
     public boolean bindMouseListeners(Component source, Component listener) {
@@ -313,7 +302,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     *
      * @param untoggle
      */
     protected void exitHoveringMode(boolean untoggle) {
@@ -335,7 +323,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     *
      * @param untoggle
      */
     protected void exitTuningMode(boolean untoggle) {
@@ -356,17 +343,15 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
      */
     public void forceRepaint() {
-        //setImageUpdated();
-    	
-        repaint(); //0, 0, this.getWidth(), this.getHeight());
+
+        // setImageUpdated();
+
+        repaint();		// 0, 0, this.getWidth(), this.getHeight());
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean hideMagnifier() {
@@ -377,8 +362,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     @Override
@@ -387,18 +370,14 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     @Override
-	public void mouseExited(MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
         updateMouseLocation(e);
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     @Override
@@ -427,8 +406,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean moveMagnifier() {
@@ -441,11 +418,15 @@ public class ImageWindowMagnifier extends ImageCanvas
         // Rectangle sourceRectangle = new Rectangle(positionOnImage, magnifierSize);
         // setSourceRect(sourceRectangle);
 
-        int	srcRectX = positionOnImage.x - magnifierSize.width / 2,
-			srcRectY = positionOnImage.y - magnifierSize.height / 2;
+        int			srcRectX = positionOnImage.x - magnifierSize.width / 2,
+					srcRectY = positionOnImage.y - magnifierSize.height / 2;
 
-        Rectangle newRect = new Rectangle(srcRectX, srcRectY, magnifierSize.width, magnifierSize.height);
-        GrasppeKit.debugText("Moving", "Setting Source Rectangle at Magnification " + super.getMagnification() + "\t" + GrasppeKit.lastSplit(newRect), 3);
+        Rectangle	newRect  = new Rectangle(srcRectX, srcRectY, magnifierSize.width,
+                                          magnifierSize.height);
+
+        GrasppeKit.debugText("Moving",
+                             "Setting Source Rectangle at Magnification "
+                             + super.getMagnification() + "\t" + GrasppeKit.lastSplit(newRect), 3);
 
         setSourceRect(newRect);
 
@@ -510,18 +491,16 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param g
      */
-//    @Override
+
+//  @Override
     @Override
-	public void paint(Graphics g) {
+    public void paint(Graphics g) {
 
         // Roi   roi = imp.getRoi();
-    	
-        GrasppeKit.debugText("Draw Graphics Attempt", GrasppeKit.lastSplit(srcRect), 3);
 
+        GrasppeKit.debugText("Draw Graphics Attempt", GrasppeKit.lastSplit(srcRect), 3);
 
         try {
             Java2.setBilinearInterpolation(g, true);
@@ -552,8 +531,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean prepareFrame() {
@@ -620,7 +597,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
      */
     protected void resetMode() {
         exitHoveringMode(false);
@@ -628,7 +604,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
      */
     protected void resetToggle() {
         setHoveringToggled(false);
@@ -637,8 +612,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean resizeMagnifer() {
@@ -654,8 +627,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     protected boolean shouldMoveFrame() {
@@ -670,13 +641,10 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean showMagnifier() {
-    	
-    	
+
         magnifierFrame.setVisible(true);
         this.visible = magnifierFrame.isVisible();
 
@@ -684,13 +652,11 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
      */
     public void toFront() {
 
         // @link{http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front}
         java.awt.EventQueue.invokeLater(new Runnable() {
-
 
             public void run() {
                 magnifierFrame.toFront();
@@ -702,14 +668,11 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
      */
 
     public void update() {}
 
     /**
-     * Method description
-     *
      * @param e
      */
     public void updateMouseLocation(MouseEvent e) {
@@ -717,8 +680,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param onScreenX
      * @param onScreenY
      */
@@ -768,8 +729,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean updateVisiblity() {
@@ -807,8 +766,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     public void windowGainedFocus(WindowEvent e) {
@@ -816,8 +773,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     public void windowLostFocus(WindowEvent e) {}
@@ -902,8 +857,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean isHoveringToggled() {
@@ -933,8 +886,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean isTuningToggled() {
@@ -945,7 +896,7 @@ public class ImageWindowMagnifier extends ImageCanvas
      * @return
      */
     @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         return magnifierFrame.isVisible();
     }
 
@@ -1050,8 +1001,6 @@ public class ImageWindowMagnifier extends ImageCanvas
     }
 
     /**
-     * Method description
-     *
      * @param width
      * @param height
      */
@@ -1081,7 +1030,7 @@ public class ImageWindowMagnifier extends ImageCanvas
      * @param visible
      */
     @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
 
         // If setting visible while visible, bring it to front
         if (visible && magnifierFrame.isVisible()) toFront();

@@ -1,10 +1,7 @@
 /*
  * @(#)ContrastAxis.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -15,7 +12,6 @@ import com.grasppe.conres.framework.units.ResolutionValue;
 
 /**
  * @author daflair
- *
  */
 public final class ResolutionAxis extends GridAxis {
 

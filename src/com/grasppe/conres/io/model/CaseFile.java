@@ -1,18 +1,18 @@
 /*
  * @(#)CaseFile.java   11/11/14
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
+
+import com.grasppe.conres.io.IGrasppeFileReader;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.File;
 import java.io.FileFilter;
@@ -20,23 +20,17 @@ import java.io.FilenameFilter;
 
 import java.net.URI;
 
-import com.grasppe.conres.io.IGrasppeFileReader;
-
 /**
  * Verification is a quality control process that is used to evaluate whether a product,
  * service, or system complies with regulations, specifications, or conditions imposed at
  * the start of a development phase. Verification can be in development, scale-up, or
  * production. This is often an internal process.
- *
  * Validation is a quality assurance process of establishing evidence that provides a high
  * degree of assurance that a product, service, or system accomplishes its intended
  * requirements. This often involves acceptance of fitness for purpose with end users and
  * other product stakeholders. This is often an external process.
- *
  * {@link http://en.wikipedia.org/wiki/Verification_and_validation}
- *
  * @author daflair
- *
  */
 public abstract class CaseFile extends File {
 
@@ -125,6 +119,7 @@ public abstract class CaseFile extends File {
     }
 
     /**
+     *  @return
      */
     public IGrasppeFileReader getReader() {
         return null;
@@ -145,7 +140,7 @@ public abstract class CaseFile extends File {
     }
 
     /**
-     * 	@param newFilter
+     *  @param newFilter
      */
     public static void setFileFilter(FileFilter newFilter) {
         fileFilter = newFilter;

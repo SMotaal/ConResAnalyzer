@@ -1,33 +1,36 @@
+/*
+ * @(#)FileChooserFunction.java   11/12/03
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ * This code is not licensed for use and is the property of it's owner.
+ */
+
+
+
 package com.grasppe.conres.framework.cases.operations;
-
-import ij.IJ;
-
-import java.io.File;
-import java.util.TreeSet;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
+import ij.IJ;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.File;
+
+import java.util.TreeSet;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 /**
  * Class description
- *
  * @version        $Revision: 1.0, 11/11/10
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public abstract class FileChooserFunction extends CaseManagerFunction {
 
-    /**
-	 * @return the defaultChooserPath
-	 */
-	public String getDefaultChooserPath() {
-		return defaultChooserPath;
-	}
-
-	String	defaultChooserPath = CaseManagerModel.defaultChooserPath;
+    String				defaultChooserPath = CaseManagerModel.defaultChooserPath;
     File				selectedFile;
     protected boolean	executable = true;
     JFileChooser		fileChooser;
@@ -35,13 +38,19 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
 
     /**
-     * Constructs ...
-     *
      * @param name
      */
     public FileChooserFunction(String name) {
         super(name);
         prepareFileChooser();
+    }
+
+    /**
+     *  @return
+     */
+    protected boolean confirmSelectionInvalid() {
+        return IJ.showMessageWithCancel(
+            name, "This is not a valid selection. Please make a valid selection.");
     }
 
     /*
@@ -50,24 +59,20 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
      */
 
     /**
-     * Method description
-     *
      * @return
      */
     @Override
     protected boolean perfomOperation() {
         prepareFileChooser();
-        boolean canProceed = false;
-        while(!canProceed){
-	        if (fileChooser.showOpenDialog(GrasppeKit.commonFrame)
-	                == JFileChooser.CANCEL_OPTION)
-	            return false;
-	        
-	        if (verifySelection(fileChooser.getSelectedFile()))
-	        	canProceed = true;
-	        else
-	            if (!confirmSelectionInvalid())
-	            	return false;
+
+        boolean	canProceed = false;
+
+        while (!canProceed) {
+            if (fileChooser.showOpenDialog(GrasppeKit.commonFrame) == JFileChooser.CANCEL_OPTION)
+                return false;
+
+            if (verifySelection(fileChooser.getSelectedFile())) canProceed = true;
+            else if (!confirmSelectionInvalid()) return false;
         }
 
         // TODO: Inspect & Verify Scan Images / TDF are in selectedFile
@@ -76,18 +81,8 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
 
         return true;
     }
-    
-    protected boolean confirmSelectionInvalid() {
-    	return IJ.showMessageWithCancel(name,
-                "This is not a valid selection. Please make a valid selection.");
-    }
-    
-    protected boolean verifySelection(File selectedFile) {
-    	return true;
-    }
 
     /**
-     * Method description
      */
     public void prepareFileChooser() {
         fileChooser = new JFileChooser();
@@ -103,14 +98,13 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
 
             fileChooser.setSelectedFile(defaultPath);
         } catch (NullPointerException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
+
             // Not setting initial chooser selection
         }
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean quickSelect() {
@@ -121,12 +115,27 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
             canProceed = execute(true);
         } catch (Exception e) {
             GrasppeKit.debugText(finalName + " Failed",
-                                 finalName + " threw a " + e.getClass().getSimpleName()
-                                 + "\n\n" + e.toString(), 2);
+                                 finalName + " threw a " + e.getClass().getSimpleName() + "\n\n"
+                                 + e.toString(), 2);
             e.printStackTrace();
         }
 
         return canProceed;
+    }
+
+    /**
+     *  @param selectedFile
+     *  @return
+     */
+    protected boolean verifySelection(File selectedFile) {
+        return true;
+    }
+
+    /**
+     * @return the defaultChooserPath
+     */
+    public String getDefaultChooserPath() {
+        return defaultChooserPath;
     }
 
     /**

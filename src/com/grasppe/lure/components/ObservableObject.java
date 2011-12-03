@@ -1,3 +1,14 @@
+/*
+ * @(#)ObservableObject.java   11/12/03
+ * 
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ *
+ * This code is not licensed for use and is the property of it's owner.
+ *
+ */
+
+
+
 package com.grasppe.lure.components;
 
 import com.grasppe.lure.framework.GrasppeKit.Observable;
@@ -5,7 +16,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
- *
  */
 public abstract class ObservableObject implements Observable {
 
@@ -14,7 +24,6 @@ public abstract class ObservableObject implements Observable {
 
     /**
      * Attaches an observer through the observers object which will include the observer in future update() notify calls.
-     *
      * @param observer
      */
     public void attachObserver(Observer observer) {
@@ -23,7 +32,6 @@ public abstract class ObservableObject implements Observable {
 
     /**
      * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
-     *
      * @param observer
      */
     public void detachObserver(Observer observer) {
@@ -31,19 +39,24 @@ public abstract class ObservableObject implements Observable {
     }
 
     /**
+     * 	@param observer
+     */
+    public void notifyObserver(Observer observer) {
+        observer.update();
+    }
+
+    /**
      * Notifies all observer through the observers object which calls update().
-     *
      */
 
     public void notifyObservers() {
         observers.notifyObservers();
     }
 
-    public void notifyObserver(Observer observer) {
-    	observer.update();
-    }
-    
+    /**
+     * 	@return
+     */
     public String observerString() {
-    	return observers.toString();
+        return observers.toString();
     }
 }

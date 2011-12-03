@@ -1,10 +1,7 @@
 /*
  * @(#)CloseCase.java   11/12/02
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -25,20 +22,18 @@ import java.rmi.UnexpectedException;
 
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
- *
  * @version        $Revision: 1.0, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class CloseCase extends CaseManagerCommand {
 
-    protected static final String	name         = "CloseCase";
-    protected static final int		mnemonicKey  = KeyEvent.VK_C;
-    protected boolean				isCaseClosed = true;
-    protected boolean	backgroundMode = false;
+    protected static final String	name           = "CloseCase";
+    protected static final int		mnemonicKey    = KeyEvent.VK_C;
+    protected boolean				isCaseClosed   = true;
+    protected boolean				backgroundMode = false;
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      */
     public CloseCase(ActionListener listener) {
@@ -50,7 +45,6 @@ public class CloseCase extends CaseManagerCommand {
 
     /**
      * Performs the command operations when called by execute().
-     *
      * @return
      */
     @Override
@@ -87,18 +81,16 @@ public class CloseCase extends CaseManagerCommand {
     }
 
     /**
-     * Method description
-     *
      * @param keyEvent
-     *
      * @return
      */
     public boolean quickClose(KeyEvent keyEvent) {
         boolean	canProceed = true;
-        backgroundMode =  true;
+
+        backgroundMode = true;
 
         try {
-            canProceed = forceExecute(); //(keyEvent);
+            canProceed = forceExecute();	// (keyEvent);
             getModel().notifyObservers();
         } catch (Exception e) {
 
@@ -107,6 +99,7 @@ public class CloseCase extends CaseManagerCommand {
                                  + e.toString(), 2);
             canProceed = false;
         }
+
         backgroundMode = false;
 
         return canProceed;
@@ -122,11 +115,14 @@ public class CloseCase extends CaseManagerCommand {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     private boolean updateCaseClosed() {
         CaseManagerModel	model = getModel();
-        boolean				value = !(model.hasCurrentCase());
+        boolean				value;
+
+        if (model == null) value = false;
+        else value = !(model.hasCurrentCase());
 
         GrasppeKit.debugText("isCaseClose", "" + value, 3);
 

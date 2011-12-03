@@ -1,123 +1,33 @@
 /*
  * @(#)ImageFile.java   11/11/15
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
+
+import com.grasppe.lure.framework.GrasppeKit;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 
 import java.net.URI;
-import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.MissingResourceException;
-
-import com.grasppe.conres.framework.imagej.newFrame;
-import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * @author daflair
- *
  */
 public class CaseFolder extends CaseFile {
-	
-	
-	HashMap<Integer, ImageFile> imageFileMap = new HashMap<Integer, ImageFile>();
 
-	/**
-	 * @return the imageFiles
-	 * @throws FileNotFoundException 
-	 */
-	public ImageFile[] getImageFiles() throws FileNotFoundException {
-		if (imageFiles==null || imageFiles.length==0)
-			enumerateImageFiles();
-		return imageFiles;
-	}
-	
-	
-	public ImageFile getImageFile(int toneValue){
-		return imageFileMap.get(toneValue);
-	}
-	
-	public void enumerateImageFiles() throws FileNotFoundException {
-        File[] fileList = listFiles(ImageFile.getFilenameFilter());
-        int		fileCount = fileList.length;
-        
-        setImageFiles(new ImageFile[fileCount]);
-        
-
-        HashSet<Integer> imageToneValues = new HashSet<Integer>();
-		HashSet<Integer> blockToneValues = new HashSet<Integer>();
-		for(int value : getTargetDefinitionFile().getBlockToneValues())
-			blockToneValues.add(new Integer(value));
-				
-        for (int i = 0; i< fileCount; i++) {
-        	ImageFile thisFile = new ImageFile(fileList[i].getAbsolutePath());
-        	getImageFiles()[i] = thisFile;
-        	if (blockToneValues.contains(thisFile.getImageID())) {
-        		imageFileMap.put(thisFile.getImageID(),thisFile);
-        		imageToneValues.add(thisFile.getImageID());
-        	}
-        	else
-        		GrasppeKit.debugText("Enumerting Case Images", "The image " + thisFile.getName() + " was not load since " +
-        				"block value " + thisFile.getImageID() + " was not defined in the target defnition file.", 3);
-        }
-        
-        if (!imageToneValues.containsAll(blockToneValues)) throw new FileNotFoundException("The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n" +
-        		"Blocks in TDF: \t" + blockToneValues.toString() + "\n" +
-        				"Images in Folder: \t" + imageToneValues.toString());
-        
-        return;
-	}
-	
-	public void enumerateTargetDefinitionFiles() {
-        File[] fileList = listFiles(TargetDefinitionFile.getFilenameFilter());
-        int		fileCount = fileList.length;
-        
-        if (fileCount == 1)
-        	setTargetDefinitionFile(new TargetDefinitionFile(fileList[0].getAbsolutePath()));
-		
-	}
-
-	/**
-	 * @param imageFiles the imageFiles to set
-	 */
-	public void setImageFiles(ImageFile[] imageFiles) {
-		this.imageFiles = imageFiles;
-	}
-
-	/**
-	 * @return the targetDefinitionFile
-	 */
-	public TargetDefinitionFile getTargetDefinitionFile() {
-		if (targetDefinitionFile==null)
-			enumerateTargetDefinitionFiles();
-		return targetDefinitionFile;
-	}
-
-	/**
-	 * @param targetDefinitionFile the targetDefinitionFile to set
-	 */
-	public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
-		this.targetDefinitionFile = targetDefinitionFile;
-	}
-
-	protected ImageFile[] imageFiles;
-	protected TargetDefinitionFile targetDefinitionFile;
-	
     protected static FileFilter	fileFilter = new FileFilter() {
 
         public boolean accept(File file) {
@@ -125,6 +35,10 @@ public class CaseFolder extends CaseFile {
         }
 
     };
+    HashMap<Integer, ImageFile>		imageFileMap = new HashMap<Integer, ImageFile>();
+    protected ImageFile[]			imageFiles;
+    protected TargetDefinitionFile	targetDefinitionFile;
+
     /**
      * @param pathname
      */
@@ -153,6 +67,56 @@ public class CaseFolder extends CaseFile {
      */
     public CaseFolder(String parent, String child) {
         super(parent, child);
+    }
+
+    /**
+     *  @throws FileNotFoundException
+     */
+    public void enumerateImageFiles() throws FileNotFoundException {
+        File[]	fileList  = listFiles(ImageFile.getFilenameFilter());
+        int		fileCount = fileList.length;
+
+        setImageFiles(new ImageFile[fileCount]);
+
+        HashSet<Integer>	imageToneValues = new HashSet<Integer>();
+        HashSet<Integer>	blockToneValues = new HashSet<Integer>();
+
+        for (int value : getTargetDefinitionFile().getBlockToneValues())
+            blockToneValues.add(new Integer(value));
+
+        for (int i = 0; i < fileCount; i++) {
+            ImageFile	thisFile = new ImageFile(fileList[i].getAbsolutePath());
+
+            getImageFiles()[i] = thisFile;
+
+            if (blockToneValues.contains(thisFile.getImageID())) {
+                imageFileMap.put(thisFile.getImageID(), thisFile);
+                imageToneValues.add(thisFile.getImageID());
+            } else
+                GrasppeKit.debugText("Enumerting Case Images",
+                                     "The image " + thisFile.getName() + " was not load since "
+                                     + "block value " + thisFile.getImageID()
+                                     + " was not defined in the target defnition file.", 3);
+        }
+
+        if (!imageToneValues.containsAll(blockToneValues))
+            throw new FileNotFoundException(
+                "The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n"
+                + "Blocks in TDF: \t" + blockToneValues.toString() + "\n" + "Images in Folder: \t"
+                + imageToneValues.toString());
+
+        return;
+    }
+
+    /**
+     */
+    public void enumerateTargetDefinitionFiles() {
+        File[]	fileList  = listFiles(TargetDefinitionFile.getFilenameFilter());
+        int		fileCount = fileList.length;
+
+        if (fileCount == 1)
+            setTargetDefinitionFile(new TargetDefinitionFile(fileList[0].getAbsolutePath()));
+
     }
 
     /**
@@ -190,10 +154,7 @@ public class CaseFolder extends CaseFile {
     }
 
     /**
-     * Method description
-     *
      * @param file
-     *
      * @return
      */
     public static boolean validate(File file) {
@@ -201,12 +162,13 @@ public class CaseFolder extends CaseFile {
 
         if (!isDirectory) return false;
 
-        File[] imageFileList = file.listFiles(ImageFile.getFilenameFilter());
-        int		imageCount = imageFileList.length;
-        boolean	hasImages  = imageCount > 0;
-        boolean validImages = true;
+        File[]	imageFileList = file.listFiles(ImageFile.getFilenameFilter());
+        int		imageCount    = imageFileList.length;
+        boolean	hasImages     = imageCount > 0;
+        boolean	validImages   = true;
+
         for (File imageFile : imageFileList) {
-        	validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
+            validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
         }
 
         int		tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
@@ -242,6 +204,33 @@ public class CaseFolder extends CaseFile {
      */
     public static FileFilter getFileFilter() {
         return fileFilter;
+    }
+
+    /**
+     *  @param toneValue
+     *  @return
+     */
+    public ImageFile getImageFile(int toneValue) {
+        return imageFileMap.get(toneValue);
+    }
+
+    /**
+     * @return the imageFiles
+     * @throws FileNotFoundException
+     */
+    public ImageFile[] getImageFiles() throws FileNotFoundException {
+        if ((imageFiles == null) || (imageFiles.length == 0)) enumerateImageFiles();
+
+        return imageFiles;
+    }
+
+    /**
+     * @return the targetDefinitionFile
+     */
+    public TargetDefinitionFile getTargetDefinitionFile() {
+        if (targetDefinitionFile == null) enumerateTargetDefinitionFiles();
+
+        return targetDefinitionFile;
     }
 
     /*
@@ -282,5 +271,19 @@ public class CaseFolder extends CaseFile {
      */
     public static void setFileFilter(FileFilter fileFilter) {
         CaseFolder.fileFilter = (fileFilter);
+    }
+
+    /**
+     * @param imageFiles the imageFiles to set
+     */
+    public void setImageFiles(ImageFile[] imageFiles) {
+        this.imageFiles = imageFiles;
+    }
+
+    /**
+     * @param targetDefinitionFile the targetDefinitionFile to set
+     */
+    public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
+        this.targetDefinitionFile = targetDefinitionFile;
     }
 }

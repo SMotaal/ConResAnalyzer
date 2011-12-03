@@ -1,10 +1,7 @@
 /*
  * @(#)TargetBlockModel.java   11/10/26
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
@@ -42,8 +39,8 @@ public class GridBlock {	// extends ObservableObject {
     }
 
     /**
-     * 	@param xValues
-     * 	@param yValues
+     *  @param xValues
+     *  @param yValues
      */
     public GridBlock(double[] xValues, double[] yValues) {
         super();
@@ -61,8 +58,8 @@ public class GridBlock {	// extends ObservableObject {
     }
 
     /**
-     * 	@param xValues
-     * 	@param yValues
+     *  @param xValues
+     *  @param yValues
      */
     public void generateAxes(double[] xValues, double[] yValues) {
         setXAxis(null);
@@ -101,7 +98,6 @@ public class GridBlock {	// extends ObservableObject {
 
     /**
      * @param column
-     *
      * @return
      */
     public AbstractValue getXValue(int column) {
@@ -131,7 +127,6 @@ public class GridBlock {	// extends ObservableObject {
 
     /**
      * @param row
-     *
      * @return
      */
     public AbstractValue getYValue(int row) {

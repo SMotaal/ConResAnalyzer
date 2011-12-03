@@ -1,28 +1,21 @@
 /*
  * @(#)SmartBlockState.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
 /**
  * @author daflair
- *
  */
 public class SmartBlockState extends BlockState {
 
     /**
-     *
-     *
      * @param sourceState
      */
     public SmartBlockState(ISteppingBlockState sourceState) {
@@ -38,9 +31,6 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * Constructs ...
-     *
-     *
      * @param rows
      * @param columns
      * @param row
@@ -52,37 +42,6 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#copy()
-     *
-     * @return
-     */
-    @Override
-    public SmartBlockState copy() {
-
-        // TODO Auto-generated method stub
-        SmartBlockState	stateCopy = new SmartBlockState(this);
-
-        return stateCopy;
-    }
-
-    /**
-     * (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#isComplete()
-     *
-     * @return
-     */
-    public boolean isComplete() {
-
-        // TODO Check blockMap and determine if each column has an accept/reject boundry
-        // System.out.println("Complete " + checkBlockBoundries());
-        return checkBlockBoundries();
-    }
-
-    /**
-     * Method description
-     *
-     *
      * @return
      */
     public boolean checkBlockBoundries() {
@@ -99,9 +58,20 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * Method description
-     *
-     *
+     * (non-Javadoc)
+     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#copy()
+     * @return
+     */
+    @Override
+    public SmartBlockState copy() {
+
+        // TODO Auto-generated method stub
+        SmartBlockState	stateCopy = new SmartBlockState(this);
+
+        return stateCopy;
+    }
+
+    /**
      * @return
      */
     public int firstMissingBoundary() {
@@ -109,11 +79,7 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param startColumn
-     *
      * @return
      */
     public int firstMissingBoundary(int startColumn) {
@@ -136,47 +102,7 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param column
-     *
-     * @return
-     */
-    public int getColumnBoundary(int column) {
-
-        // TODO Look for the boundary row of a column at the first occurrence accept patch before a reject patch
-        int	acceptBoundary = this.getColumnAcceptBoundary(column);
-        int	rejectBoundary = this.getColumnRejectBoundary(column);
-
-        // printBlock(this.blockMap[column]);
-//      System.out.println(">> Column" + column + " Accept " + acceptBoundary + " Reject " + rejectBoundary);
-        if ((acceptBoundary <= this.getRows()) && (acceptBoundary + 1 == rejectBoundary)) return acceptBoundary;
-
-        return -1;
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param column
-     *
-     * @return
-     */
-    public boolean isColumnClear(int column) {
-        int	acceptBoundary = this.getColumnAcceptBoundary(column);
-        int	rejectBoundary = this.getColumnRejectBoundary(column);
-
-        return (acceptBoundary == -1) && (acceptBoundary == rejectBoundary);
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param column
-     *
      * @return
      */
     public int getColumnAcceptBoundary(int column) {
@@ -194,11 +120,25 @@ public class SmartBlockState extends BlockState {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param column
-     *
+     * @return
+     */
+    public int getColumnBoundary(int column) {
+
+        // TODO Look for the boundary row of a column at the first occurrence accept patch before a reject patch
+        int	acceptBoundary = this.getColumnAcceptBoundary(column);
+        int	rejectBoundary = this.getColumnRejectBoundary(column);
+
+        // printBlock(this.blockMap[column]);
+//      System.out.println(">> Column" + column + " Accept " + acceptBoundary + " Reject " + rejectBoundary);
+        if ((acceptBoundary <= this.getRows()) && (acceptBoundary + 1 == rejectBoundary))
+            return acceptBoundary;
+
+        return -1;
+    }
+
+    /**
+     * @param column
      * @return
      */
     public int getColumnRejectBoundary(int column) {
@@ -213,5 +153,28 @@ public class SmartBlockState extends BlockState {
         }
 
         return -1;
+    }
+
+    /**
+     * @param column
+     * @return
+     */
+    public boolean isColumnClear(int column) {
+        int	acceptBoundary = this.getColumnAcceptBoundary(column);
+        int	rejectBoundary = this.getColumnRejectBoundary(column);
+
+        return (acceptBoundary == -1) && (acceptBoundary == rejectBoundary);
+    }
+
+    /**
+     * (non-Javadoc)
+     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#isComplete()
+     * @return
+     */
+    public boolean isComplete() {
+
+        // TODO Check blockMap and determine if each column has an accept/reject boundry
+        // System.out.println("Complete " + checkBlockBoundries());
+        return checkBlockBoundries();
     }
 }

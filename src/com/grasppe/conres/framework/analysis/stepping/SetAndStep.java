@@ -1,22 +1,17 @@
 /*
  * @(#)SetAndStep.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
 /**
  * @author daflair
- *
  */
 public class SetAndStep extends SteppingStrategy {
 
@@ -24,9 +19,6 @@ public class SetAndStep extends SteppingStrategy {
     protected int	value;
 
     /**
-     * Constructs ...
-     *
-     *
      * @param blockState
      * @param value
      */
@@ -43,9 +35,6 @@ public class SetAndStep extends SteppingStrategy {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override

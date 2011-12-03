@@ -1,10 +1,7 @@
 /*
  * @(#)DinkinsFileFilter.java   11/11/10
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -12,6 +9,7 @@
 package com.grasppe.lure.framework;
 
 import java.io.File;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -20,19 +18,15 @@ import javax.swing.filechooser.FileFilter;
 /**
  * A convenience implementation of FileFilter that filters out
  * all files except for those type extensions that it knows about.
- *
  * Extensions are of the type ".foo", which is typically found on
  * Windows and Unix boxes, but not on Macinthosh. Case is ignored.
- *
  * Example - create a new filter that filerts out all files
  * but gif and jpg image files:
- *
  *     JFileChooser chooser = new JFileChooser();
  *     DinkinsFileFilter filter = new DinkinsFileFilter(
  *                   new String{"gif", "jpg"}, "JPEG & GIF Images")
  *     chooser.addChoosableFileFilter(filter);
  *     chooser.showOpenDialog(this);
- *
  * @version 1.8 08/26/98
  * @author Jeff Dinkins
  */
@@ -48,7 +42,6 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Creates a file filter. If no filters are added, then all
      * files are accepted.
-     *
      * @see #addExtension
      */
     public DinkinsFileFilter() {
@@ -58,9 +51,7 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Creates a file filter that accepts files with the given extension.
      * Example: new DinkinsFileFilter("jpg");
-     *
      * @see #addExtension
-     *
      * @param extension
      */
     public DinkinsFileFilter(String extension) {
@@ -70,12 +61,9 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Creates a file filter from the given string array.
      * Example: new DinkinsFileFilter(String {"gif", "jpg"});
-     *
      * Note that the "." before the extension is not needed adn
      * will be ignored.
-     *
      * @see #addExtension
-     *
      * @param filters
      */
     public DinkinsFileFilter(String[] filters) {
@@ -85,12 +73,9 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Creates a file filter that accepts the given file type.
      * Example: new DinkinsFileFilter("jpg", "JPEG Image Images");
-     *
      * Note that the "." before the extension is not needed. If
      * provided, it will be ignored.
-     *
      * @see #addExtension
-     *
      * @param extension
      * @param description
      */
@@ -103,11 +88,8 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Creates a file filter from the given string array and description.
      * Example: new DinkinsFileFilter(String {"gif", "jpg"}, "Gif and JPG Images");
-     *
      * Note that the "." before the extension is not needed and will be ignored.
-     *
      * @see #addExtension
-     *
      * @param filters
      * @param description
      */
@@ -126,18 +108,14 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Return true if this file should be shown in the directory pane,
      * false if it shouldn't.
-     *
      * Files that begin with "." are ignored.
-     *
      * @see #getExtension
      * @see FileFilter#accepts
-     *
      * @param f
-     *
      * @return
      */
     @Override
-	public boolean accept(File f) {
+    public boolean accept(File f) {
         if (f != null) {
             if (f.isDirectory()) {
                 return true;
@@ -156,16 +134,12 @@ public class DinkinsFileFilter extends FileFilter {
 
     /**
      * Adds a filetype "dot" extension to filter against.
-     *
      * For example: the following code will create a filter that filters
      * out all files except those that end in ".jpg" and ".tif":
-     *
      *   DinkinsFileFilter filter = new DinkinsFileFilter();
      *   filter.addExtension("jpg");
      *   filter.addExtension("tif");
-     *
      * Note that the "." before the extension is not needed and will be ignored.
-     *
      * @param extension
      */
     public void addExtension(String extension) {
@@ -180,16 +154,14 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Returns the human readable description of this filter. For
      * example: "JPEG and GIF Image Files (*.jpg, *.gif)"
-     *
      * @see setDescription
      * @see setExtensionListInDescription
      * @see isExtensionListInDescription
      * @see FileFilter#getDescription
-     *
      * @return
      */
     @Override
-	public String getDescription() {
+    public String getDescription() {
         if (fullDescription == null) {
             if ((description == null) || isExtensionListInDescription()) {
                 fullDescription = (description == null) ? "("
@@ -217,12 +189,9 @@ public class DinkinsFileFilter extends FileFilter {
 
     /**
      * Return the extension portion of the file's name .
-     *
      * @see #getExtension
      * @see FileFilter#accept
-     *
      * @param f
-     *
      * @return
      */
     public String getExtension(File f) {
@@ -242,14 +211,11 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Returns whether the extension list (.jpg, .gif, etc) should
      * show up in the human readable description.
-     *
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
-     *
      * @see getDescription
      * @see setDescription
      * @see setExtensionListInDescription
-     *
      * @return
      */
     public boolean isExtensionListInDescription() {
@@ -259,11 +225,9 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Sets the human readable description of this filter. For
      * example: filter.setDescription("Gif and JPG Images");
-     *
      * @see setDescription
      * @see setExtensionListInDescription
      * @see isExtensionListInDescription
-     *
      * @param description
      */
     public void setDescription(String description) {
@@ -274,14 +238,11 @@ public class DinkinsFileFilter extends FileFilter {
     /**
      * Determines whether the extension list (.jpg, .gif, etc) should
      * show up in the human readable description.
-     *
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
-     *
      * @see getDescription
      * @see setDescription
      * @see isExtensionListInDescription
-     *
      * @param b
      */
     public void setExtensionListInDescription(boolean b) {

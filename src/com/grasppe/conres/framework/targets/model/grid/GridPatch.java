@@ -1,16 +1,12 @@
 /*
  * @(#)GridPatch.java   11/10/26
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.targets.model.grid;
 
@@ -19,51 +15,32 @@ import com.grasppe.morie.units.AbstractValue;
 /**
  * @author daflair
  */
-public class GridPatch { //extends ObservableObject {
+public class GridPatch {	// extends ObservableObject {
 
     /** Field description */
     protected int			patchRow, patchColumn;
     protected AbstractValue	xValue,	yValue;
-    
+
+    /**
+     */
     public GridPatch() {
-    	super();
+        super();
     }
-    
+
+    /**
+     *  @param row
+     *  @param column
+     *  @param xValue
+     *  @param yValue
+     */
     public GridPatch(int row, int column, AbstractValue xValue, AbstractValue yValue) {
-    	this.patchRow = row;
-    	this.patchColumn = column;
-//    	this.xValue = xValue;
-//    	this.yValue = yValue;
-    	setXValue(xValue);
-    	setYValue(yValue);
-    }
+        this.patchRow    = row;
+        this.patchColumn = column;
 
-    /**
-     * @return the xValue
-     */
-    public AbstractValue getXValue() {
-        return xValue;
-    }
-
-    /**
-     * @return the yValue
-     */
-    public AbstractValue getYValue() {
-        return yValue;
-    }
-
-    /**
-     * @param xValue the xValue to set
-     */
-    public void setXValue(AbstractValue xValue) {
-        this.xValue = xValue;
-    }
-
-    /**
-     * @param yValue the yValue to set
-     */
-    public void setYValue(AbstractValue yValue) {
-        this.yValue = yValue;
+//      this.xValue = xValue;
+//      this.yValue = yValue;
+        setXValue(xValue);
+        setYValue(yValue);
     }
 
     /**
@@ -81,6 +58,20 @@ public class GridPatch { //extends ObservableObject {
     }
 
     /**
+     * @return the xValue
+     */
+    public AbstractValue getXValue() {
+        return xValue;
+    }
+
+    /**
+     * @return the yValue
+     */
+    public AbstractValue getYValue() {
+        return yValue;
+    }
+
+    /**
      * @param patchColumn the patchColumn to set
      */
     public void setPatchColumn(int patchColumn) {
@@ -92,5 +83,19 @@ public class GridPatch { //extends ObservableObject {
      */
     public void setPatchRow(int patchRow) {
         this.patchRow = patchRow;
+    }
+
+    /**
+     * @param xValue the xValue to set
+     */
+    public void setXValue(AbstractValue xValue) {
+        this.xValue = xValue;
+    }
+
+    /**
+     * @param yValue the yValue to set
+     */
+    public void setYValue(AbstractValue yValue) {
+        this.yValue = yValue;
     }
 }

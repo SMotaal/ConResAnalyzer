@@ -1,10 +1,7 @@
 /*
  * @(#)CaseManagerModel.java   11/11/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -20,7 +17,6 @@ import java.rmi.UnexpectedException;
 
 /**
  * Class description
- *
  * @version        $Revision: 0.1, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -38,11 +34,11 @@ public class CaseManagerModel extends AbstractModel {
 
     /** Field description */
     protected CaseModel	newCase = null;
-//    protected boolean	locked  = false;
+
+//  protected boolean locked  = false;
 
     /**
      * Constructs a new model with a predefined controller.
-     *
      * @param controller
      */
     public CaseManagerModel(CaseManager controller) {
@@ -93,12 +89,12 @@ public class CaseManagerModel extends AbstractModel {
         notifyObservers();
     }
 
-//    /**
-//     *  @return
-//     */
-//    protected boolean lock() {
-//        return locked = true;
-//    }
+//  /**
+//   *  @return
+//   */
+//  protected boolean lock() {
+//      return locked = true;
+//  }
 
     /**
      *  @throws UnexpectedException
@@ -141,12 +137,12 @@ public class CaseManagerModel extends AbstractModel {
         notifyObservers();
     }
 
-//    /**
-//     *  @return
-//     */
-//    protected boolean unlock() {
-//        return locked = false;
-//    }
+//  /**
+//   *  @return
+//   */
+//  protected boolean unlock() {
+//      return locked = false;
+//  }
 
     /**
      * @return the backgroundCase
@@ -170,6 +166,13 @@ public class CaseManagerModel extends AbstractModel {
     }
 
     /**
+     *  @return
+     */
+    public CaseModel getNewCase() {
+        return newCase;
+    }
+
+    /**
      * @return
      * @throws UnexpectedException
      */
@@ -183,18 +186,11 @@ public class CaseManagerModel extends AbstractModel {
 
         return newCase;
     }
-    
-    public CaseModel getNewCase() {
-    	return newCase;
-    }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean hasCurrentCase() {
-    	
 
         // if (currentCase != null) GrasppeKit.debugText("Current Case", currentCase.toString());
         return (currentCase != null);
@@ -214,10 +210,10 @@ public class CaseManagerModel extends AbstractModel {
 //      return ((newCase != null) && (backgroundCase != null));
     }
 
-//    /**
-//     * @return the locked
-//     */
-//    public boolean isLocked() {
-//        return locked;
-//    }
+//  /**
+//   * @return the locked
+//   */
+//  public boolean isLocked() {
+//      return locked;
+//  }
 }

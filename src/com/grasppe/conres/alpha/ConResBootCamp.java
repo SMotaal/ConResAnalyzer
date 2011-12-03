@@ -1,47 +1,12 @@
 /*
  * @(#)ConResBootCamp.java   11/11/08
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 package com.grasppe.conres.alpha;
-
-import ij.IJ;
-import ij.ImagePlus;
-import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
-import ij.gui.Overlay;
-import ij.gui.PointRoi;
-import ij.io.Opener;
-import ij.plugin.PlugIn;
-
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowListener;
-import java.awt.geom.Point2D;
-
-import javax.media.jai.WarpPolynomial;
-import javax.swing.JFrame;
-import javax.swing.Timer;
 
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
@@ -53,14 +18,40 @@ import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 import com.grasppe.lure.framework.StopWatch;
 
+import ij.IJ;
+
+import ij.gui.ImageCanvas;
+import ij.gui.ImageWindow;
+import ij.gui.Overlay;
+import ij.gui.PointRoi;
+
+import ij.plugin.PlugIn;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowListener;
+import java.awt.geom.Point2D;
+
+import javax.media.jai.WarpPolynomial;
+
+import javax.swing.JFrame;
+
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
- *
  */
 
 /**
  * @author daflair
- *
  */
 public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
@@ -69,8 +60,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     protected static ConResAnalyzer	analyzer;
 
     /**
-     * Method description
-     *
      * @param pointROI
      * @param nR
      * @param nC
@@ -176,14 +165,10 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         /*
          *  public static WarpPolynomial createWarp
          * Returns an instance of WarpPolynomial or its subclasses that approximately maps the given scaled destination image coordinates into the given scaled source image coordinates. The mapping is given by:
-         *
          * x' = postScaleX*(xpoly(x*preScaleX, y*preScaleY));
          * x' = postScaleY*(ypoly(x*preScaleX, y*preScaleY));
-         *
          * Typically, it is useful to set preScaleX to 1.0F/destImage.getWidth() and postScaleX to srcImage.getWidth() so that the input and output of the polynomials lie between 0 and 1.
-         *
          * The degree of the polynomial is supplied as an argument.
-         *
          * sourceCoords - An array of floats containing the source coordinates with X and Y alternating.
          * sourceOffset - the initial entry of sourceCoords to be used.
          * destCoords - An array of floats containing the destination coordinates with X and Y alternating.
@@ -222,7 +207,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         float	preScaleX = 1.0F / width;		// (1.0F/width) preScaleX - The scale factor to apply to input (dest) X positions.
         float	preScaleY = 1.0F / height;		// (1.0F/height) preScaleY - The scale factor to apply to input (dest) Y positions.
         float	postScaleX = width;		// ((float)width) postScaleX - The scale factor to apply to X polynomial output.
-        float	postScaleY = height;		// ((float)height) postScaleY - The scale factor to apply to the Y polynomial output.
+        float	postScaleY = height;	// ((float)height) postScaleY - The scale factor to apply to the Y polynomial output.
 
         /* let's assume a 14 by 14 target grid and a four point clockwise roi set: P0: (0, 3)   P1: (631, 0)    P2: (633, 526)  P3: (2, 529) */
 
@@ -259,8 +244,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         destCoords   = targetCoords;
 
         warp         = WarpPolynomial.createWarp(sourceCoords, sourceOffset, destCoords, destOffset,
-                                         2 * numPoints, 1.0F / width, 1.0F / height, width,
-                                         height, degree);
+                                         2 * numPoints, 1.0F / width, 1.0F / height, width, height,
+                                         degree);
 
         int		nX   = 14;
         int		nY   = 14;
@@ -392,10 +377,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @param pointROI
-     *
      * @return
      */
     public static PointRoi calculateFourthVertex(PointRoi pointROI) {
@@ -470,8 +452,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public static boolean canMagnifyPatch() {
@@ -493,7 +473,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public void createAnalyzerMenu() {
         if (analyzer == null) analyzer = new ConResAnalyzer();
@@ -515,10 +494,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @param pointROI
-     *
      * @return
      */
     public static String debugPoints(PointRoi pointROI) {
@@ -537,37 +513,34 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         return (strPointCount + "\t" + strPoints);
     }
 
-//    /**
-//     * @deprecated Java exits on last window anyway!
-//     */
-//    @Deprecated
-//    public static void delayedExit() {
+//  /**
+//   * @deprecated Java exits on last window anyway!
+//   */
+//  @Deprecated
+//  public static void delayedExit() {
 //
-//        GrasppeKit.debugText("Delayed Exit (" + name + ")",
-//                             "Exiting if no windows open in the next " + (exitDelay / 1000)
-//                             + " seconds!", 2);
+//      GrasppeKit.debugText("Delayed Exit (" + name + ")",
+//                           "Exiting if no windows open in the next " + (exitDelay / 1000)
+//                           + " seconds!", 2);
 //
-//        int				delay         = exitDelay;		// milliseconds
-//        ActionListener	taskPerformer = new ActionListener() {
+//      int               delay         = exitDelay;      // milliseconds
+//      ActionListener    taskPerformer = new ActionListener() {
 //
-//			public void actionPerformed(ActionEvent evt) {
-//                Frame[]	frames = Frame.getFrames();
+//        public void actionPerformed(ActionEvent evt) {
+//              Frame[]   frames = Frame.getFrames();
 //
-//                for (Frame frame : frames)
-//                    if (frame.isVisible()) return;		// visibleFrames++;
+//              for (Frame frame : frames)
+//                  if (frame.isVisible()) return;        // visibleFrames++;
 //
-//                System.exit(0);
-//            }
-//        };
+//              System.exit(0);
+//          }
+//      };
 //
-//        new Timer(delay, taskPerformer).start();
-//    }
+//      new Timer(delay, taskPerformer).start();
+//  }
 
     /**
-     * Method description
-     *
      * @param e
-     *
      * @return
      */
     public boolean dispatchedKeyEvent(KeyEvent e) {
@@ -578,7 +551,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public static void magnifyLastPatch() {
         try {
@@ -591,9 +563,9 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             int	pI = Testing.magnifyPatchIndex;
 
             pI--;
-            
-            pI %= Testing.pointROI.getNCoordinates();
-            
+
+            pI                        %= Testing.pointROI.getNCoordinates();
+
             Testing.magnifyPatchIndex = pI;
 
         } catch (Exception exception) {
@@ -605,7 +577,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public static void magnifyNextPatch() {
         try {
@@ -618,9 +589,9 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             int	pI = Testing.magnifyPatchIndex;
 
             pI++;
-            
-            pI %= Testing.pointROI.getNCoordinates();
-            
+
+            pI                        %= Testing.pointROI.getNCoordinates();
+
             Testing.magnifyPatchIndex = pI;
 
         } catch (Exception exception) {
@@ -635,8 +606,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
      * @param args
      */
     public static void main(String[] args) {
-        	GrasppeKit.setupHooks();
-    		new ConResBootCamp().run("");
+        GrasppeKit.setupHooks();
+        new ConResBootCamp().run("");
     }
 
     /**
@@ -644,8 +615,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
      * @param y
      */
     public static void moveFrame(int x, int y) {
-    	
-    	if (Testing.zoomLock) return;
+
+        if (Testing.zoomLock) return;
 
         if (canMagnifyPatch()) {
             if (Testing.getZoomWindow() == null) return;
@@ -660,10 +631,10 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             int	mX = 100;		// imageWindow.getCanvas().
             int	mY = 100;
 
-            //zoomWindow.setLocation(mX, mY);
-            
+            // zoomWindow.setLocation(mX, mY);
+
             zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
-            
+
             Testing.zoomLock = true;
 
             redrawFrame();
@@ -671,35 +642,35 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             return;
         } else {
 
-        updateMagnifier();
+            updateMagnifier();
 
-        if (Testing.getZoomWindow() == null) return;
+            if (Testing.getZoomWindow() == null) return;
 
-        JFrame		zoomWindow  = Testing.getZoomWindow();
-        ImageWindow	imageWindow = Testing.getImageWindow();
+            JFrame		zoomWindow  = Testing.getZoomWindow();
+            ImageWindow	imageWindow = Testing.getImageWindow();
 
-        Testing.isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x
-                - imageWindow.getX(), y - imageWindow.getY());
+            Testing.isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x
+                    - imageWindow.getX(), y - imageWindow.getY());
 
-        // Sets visible and returns updated zoomWindow.isVisible()
+            // Sets visible and returns updated zoomWindow.isVisible()
 
-        zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
 
-        if (!Testing.isShowZoom()) return;
+            if (!Testing.isShowZoom()) return;
 
-        redrawFrame();
+            redrawFrame();
         }
     }
 
     /**
-     * Method description
      */
     public static void prepareFrame() {
         Testing.setZoomWindow(new JFrame());	// "SpringLayout");
         Testing.getZoomWindow().setUndecorated(true);
         Testing.getZoomWindow().setSize(300, 300);
         Testing.getZoomWindow().setMaximumSize(Testing.getZoomWindow().getSize());
-        //Testing.getZoomWindow().setAlwaysOnTop(true);
+
+        // Testing.getZoomWindow().setAlwaysOnTop(true);
         Testing.getZoomWindow().setFocusableWindowState(false);
         Testing.getZoomWindow().setResizable(false);
 
@@ -707,9 +678,9 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         MagnifierCanvas	zoomCanvas = new MagnifierCanvas(Testing.getImageWindow().getImagePlus());
 
-//        zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
-//        zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
-//        zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
+//      zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
+//      zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
+//      zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
         zoomCanvas.setBackground(Color.black);
 
         // Testing.imageWindow.getCanvas().zoomIn(0, 0);
@@ -762,7 +733,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public static void redrawFrame() {
 
@@ -808,42 +778,44 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         Dimension	imageSize           = imageCanvas.getSize();
         Double		imageScale          = imageCanvas.getMagnification();
 
-        Point		pointerCenter =null, sourceCenter =null;
+        Point		pointerCenter       = null,
+					sourceCenter        = null;
 
         try {
             if (canMagnifyPatch()) {
-                int	pI = Testing.magnifyPatchIndex;
-                
-                PointRoi pointROI = Testing.pointROI; 
+                int			pI        = Testing.magnifyPatchIndex;
 
-                int	pX = pointROI.getXCoordinates()[pI];
-                int	pY = pointROI.getYCoordinates()[pI];
-                
-                Rectangle roiBounds = pointROI.getBounds();
-                
-                double rX = roiBounds.getX();
-                double rY = roiBounds.getY();
-                
-                int fX = (int)rX + pX; 
-                int fY = (int)rY + pY;
+                PointRoi	pointROI  = Testing.pointROI;
 
-//                int gX = Testing.imageWindow.getCanvas().screenX(fX);
-//                int gY = Testing.imageWindow.getCanvas().screenX(fY);
-//                
-//                GrasppeKit.debugText("ROI Bounds:\tr: (" + roiBounds.getX() + ", " + roiBounds.getY() + ")\tp: (" + pX + ", " + pY + ")\tf: (" + fX + ", " + fY + ")\tg: (" + gX + ", " + gY + ")",2);
+                int			pX        = pointROI.getXCoordinates()[pI];
+                int			pY        = pointROI.getYCoordinates()[pI];
+
+                Rectangle	roiBounds = pointROI.getBounds();
+
+                double		rX        = roiBounds.getX();
+                double		rY        = roiBounds.getY();
+
+                int			fX        = (int)rX + pX;
+                int			fY        = (int)rY + pY;
+
+//              int gX = Testing.imageWindow.getCanvas().screenX(fX);
+//              int gY = Testing.imageWindow.getCanvas().screenX(fY);
+//              
+//              GrasppeKit.debugText("ROI Bounds:\tr: (" + roiBounds.getX() + ", " + roiBounds.getY() + ")\tp: (" + pX + ", " + pY + ")\tf: (" + fX + ", " + fY + ")\tg: (" + gX + ", " + gY + ")",2);
 //
-//                Testing.shouldZoomPatch();
+//              Testing.shouldZoomPatch();
 //
-//                Testing.setShowZoom(true);
+//              Testing.setShowZoom(true);
 //
-//                moveFrame(gX, gY);
+//              moveFrame(gX, gY);
 
                 pointerCenter = new Point(fX, fY);
-                
-                sourceCenter= pointerCenter;
 
-                
-                String debugString = "Patch #" + pI + "-" + GrasppeKit.lastSplit(pointerCenter.toString());
+                sourceCenter  = pointerCenter;
+
+                String	debugString = "Patch #" + pI + "-"
+                                     + GrasppeKit.lastSplit(pointerCenter.toString());
+
                 GrasppeKit.debugText("Magnifier", debugString, 3);
 
             } else {
@@ -855,9 +827,10 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
                                               zoomLocation.y - imageLocation.y + pointerCenter.y);
                 } else
                     pointerCenter = imageCanvas.getMousePosition();
-                sourceCenter= new Point((int)(pointerCenter.x / imageScale),
-                        (int)(pointerCenter.y / imageScale));
-                
+
+                sourceCenter = new Point((int)(pointerCenter.x / imageScale),
+                                         (int)(pointerCenter.y / imageScale));
+
             }
         } catch (Exception exception) {
             zoomWindow.setVisible(false);
@@ -899,22 +872,20 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @param arg
      */
-    
-	public void run(String arg) {
+
+    public void run(String arg) {
         IJ.showMessage(name, "Hello world!");
 
         // Testing.
 
         String[]	imageNames = { "CirRe27U_50t.png", "CirRe27U_50i.tif" };
 
-        Testing.imageName         = imageNames[1];
+        Testing.imageName = imageNames[1];
 
-//        GrasppeKit.timestampLevel = 5;
-//        GrasppeKit.debugLevel     = 3;
+//      GrasppeKit.timestampLevel = 5;
+//      GrasppeKit.debugLevel     = 3;
 
         GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
 
@@ -935,9 +906,8 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
-    
+
     public void update() {
 
         // TODO Auto-generated method stub
@@ -945,7 +915,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public static void updateMagnification() {
 
@@ -979,7 +948,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public static void updateMagnifier() {
 
@@ -987,15 +955,14 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         boolean	keyPressed = GrasppeEventDispatcher.isDown(KeyCode.VK_ALT);
         boolean	mouseOver  = Testing.isMouseOverImage;
-        
+
         Testing.setShowZoom(keyPressed && mouseOver);
 
-        //if (!canMagnifyPatch()) Testing.setShowZoom(keyPressed && mouseOver);
+        // if (!canMagnifyPatch()) Testing.setShowZoom(keyPressed && mouseOver);
 
     }
 
     /**
-     * Method description
      */
     public static void updateMagnifyPatch() {
         try {
@@ -1005,30 +972,32 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
                 return;
             }
 
-            int	pI = Testing.magnifyPatchIndex;
-            
-            PointRoi pointROI = Testing.pointROI; 
+            int			pI        = Testing.magnifyPatchIndex;
 
-            int	pX = pointROI.getXCoordinates()[pI];
-            int	pY = pointROI.getYCoordinates()[pI];
-            
-            Rectangle roiBounds = pointROI.getBounds();
-            
-            double rX = roiBounds.getX();
-            double rY = roiBounds.getY();
-            
-            int fX = (int)rX + pX; 
-            int fY = (int)rY + pY;
+            PointRoi	pointROI  = Testing.pointROI;
 
-            int gX = Testing.imageWindow.getCanvas().screenX(fX);
-            int gY = Testing.imageWindow.getCanvas().screenX(fY);
-            
-            GrasppeKit.debugText("ROI Bounds:\tr: (" + roiBounds.getX() + ", " + roiBounds.getY() + ")\tp: (" + pX + ", " + pY + ")\tf: (" + fX + ", " + fY + ")\tg: (" + gX + ", " + gY + ")",2);
+            int			pX        = pointROI.getXCoordinates()[pI];
+            int			pY        = pointROI.getYCoordinates()[pI];
+
+            Rectangle	roiBounds = pointROI.getBounds();
+
+            double		rX        = roiBounds.getX();
+            double		rY        = roiBounds.getY();
+
+            int			fX        = (int)rX + pX;
+            int			fY        = (int)rY + pY;
+
+            int			gX        = Testing.imageWindow.getCanvas().screenX(fX);
+            int			gY        = Testing.imageWindow.getCanvas().screenX(fY);
+
+            GrasppeKit.debugText("ROI Bounds:\tr: (" + roiBounds.getX() + ", " + roiBounds.getY()
+                                 + ")\tp: (" + pX + ", " + pY + ")\tf: (" + fX + ", " + fY
+                                 + ")\tg: (" + gX + ", " + gY + ")", 2);
 
             Testing.shouldZoomPatch();
 
             Testing.setShowZoom(true);
-            
+
             Testing.zoomLock = false;
 
             moveFrame(gX, gY);
@@ -1039,21 +1008,19 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     public static void updateROI(MouseEvent e) {
         if (e.isConsumed()) return;
         if (Testing.getImageWindow() == null) return;
         if (!Testing.getImageWindow().isVisible()) return;
-        
+
         // TODO: Determine whether to add point (click) or clear points (triple
         // click)
         int	clickCount = e.getClickCount();
 
         if (clickCount == 3) Testing.pointROI = null;
-        
+
         canMagnifyPatch();
 
         int	newX = 0;
@@ -1061,34 +1028,34 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         // TODO: Add get mouse position relative to canvas
         Point	mousePosition;
-        
+
         try {
 
-        if (Testing.getZoomWindow() == null | !Testing.getZoomWindow().isVisible()) {
-            mousePosition = Testing.getImageWindow().getCanvas().getMousePosition();
-            newX          = mousePosition.x;
-            newY          = mousePosition.y;
+            if (Testing.getZoomWindow() == null | !Testing.getZoomWindow().isVisible()) {
+                mousePosition = Testing.getImageWindow().getCanvas().getMousePosition();
+                newX          = mousePosition.x;
+                newY          = mousePosition.y;
 
-            if (Testing.pointROI != null) {
-                newX = Testing.getImageWindow().getCanvas().offScreenX(newX);
-                newY = Testing.getImageWindow().getCanvas().offScreenY(newY);
+                if (Testing.pointROI != null) {
+                    newX = Testing.getImageWindow().getCanvas().offScreenX(newX);
+                    newY = Testing.getImageWindow().getCanvas().offScreenY(newY);
+                }
+            } else {
+                Point	mousePosition2 = Testing.zoomCanvas.getMousePosition();
+                Point	tlImage        = Testing.getImageWindow().getCanvas().getLocationOnScreen();
+                Point	tlZoom         = Testing.zoomCanvas.getLocationOnScreen();
+
+                newX = tlZoom.x + mousePosition2.x - tlImage.x;
+                newY = tlZoom.y + mousePosition2.y - tlImage.y;
+
+                if (Testing.pointROI != null) {
+                    newX = Testing.getImageWindow().getCanvas().offScreenX(newX);
+                    newY = Testing.getImageWindow().getCanvas().offScreenY(newY);
+                }
             }
-        } else {
-            Point	mousePosition2 = Testing.zoomCanvas.getMousePosition();
-            Point	tlImage        = Testing.getImageWindow().getCanvas().getLocationOnScreen();
-            Point	tlZoom         = Testing.zoomCanvas.getLocationOnScreen();
 
-            newX = tlZoom.x + mousePosition2.x - tlImage.x;
-            newY = tlZoom.y + mousePosition2.y - tlImage.y;
-
-            if (Testing.pointROI != null) {
-                newX = Testing.getImageWindow().getCanvas().offScreenX(newX);
-                newY = Testing.getImageWindow().getCanvas().offScreenY(newY);
-            }
-        }
-        
         } catch (Exception exception) {
-        	exception.printStackTrace();
+            exception.printStackTrace();
         }
 
         mousePosition = new Point(newX, newY);
@@ -1097,8 +1064,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         int	pointY = newY;		// Testing.imageWindow.getCanvas().offScreenY(mousePosition.y);
 
         if (mousePosition == null) return;
-
-
 
         if ((clickCount == 1) && (Testing.pointROI == null))
             Testing.pointROI = new PointRoi(pointX, pointY,		// mousePosition.x, mousePosition.y,
@@ -1136,17 +1101,16 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         // Testing.zoomCanvas.getImage().updateAndRepaintWindow();
         // Testing.imageWindow.getImagePlus().updateAndRepaintWindow();
 
-//        if (Testing.pointROI.getNCoordinates() == 4) {
-//            GrasppeKit.debugText("Vertex Selection",
-//                                 "\n\t" + debugStrings1 + "\n\t" + "")"debugStrings2, 3);
-//            calculateAffineGrid(Testing.pointROI, 10, 10);
-//        }
+//      if (Testing.pointROI.getNCoordinates() == 4) {
+//          GrasppeKit.debugText("Vertex Selection",
+//                               "\n\t" + debugStrings1 + "\n\t" + "")"debugStrings2, 3);
+//          calculateAffineGrid(Testing.pointROI, 10, 10);
+//      }
         calculateAffineGrid(Testing.pointROI, 10, 10);
     }
 
     /**
      * Class description
-     *
      * @version $Revision: 1.0, 11/11/11
      * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
@@ -1161,32 +1125,54 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             GrasppeEventDispatcher.getInstance();
 
         /** Field description */
-        public static boolean		isMouseOverImage = false;
+        public static boolean	isMouseOverImage = false;
+
+        /** Field description */
         public static ImageWindow	imageWindow;
-        public static JFrame		zoomWindow;
-        public static MagnifierCanvas		zoomCanvas;
-        public static PointRoi				pointROI;
-        public static StopWatch			timer      = new StopWatch();
-        public static String				rootFolder = "/Users/daflair/Documents/data/conres";
-        public static String				caseFolder = "Approval_Scans_ConRes26_FS";
-        public static boolean				showZoom   = false;
-        public static boolean				zoomPatch  = false;
-        public static String				imageName  = "CirRe27U_50i.tif";	// "CirRe27U_50t.png";
-        public static String				inputPath  = getInputPath();
-        public static boolean zoomLock = false;
+
+        /** Field description */
+        public static JFrame	zoomWindow;
+
+        /** Field description */
+        public static MagnifierCanvas	zoomCanvas;
+
+        /** Field description */
+        public static PointRoi	pointROI;
+
+        /** Field description */
+        public static StopWatch	timer = new StopWatch();
+
+        /** Field description */
+        public static String	rootFolder = "/Users/daflair/Documents/data/conres";
+
+        /** Field description */
+        public static String	caseFolder = "Approval_Scans_ConRes26_FS";
+
+        /** Field description */
+        public static boolean	showZoom = false;
+
+        /** Field description */
+        public static boolean	zoomPatch = false;
+
+        /** Field description */
+        public static String	imageName = "CirRe27U_50i.tif";		// "CirRe27U_50t.png";
+
+        /** Field description */
+        public static String	inputPath = getInputPath();
+
+        /** Field description */
+        public static boolean	zoomLock = false;
 
         /** Field description */
         public static int	magnifyPatchIndex = -1;
 
         /**
-         * Constructs ...
          */
         private Testing() {}
 
         /**
          * Outputs elapsed time with generic description without stopping or
          * reseting the timer.
-         *
          * @param description
          */
         public static void checkTimer(String description) {
@@ -1203,7 +1189,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         /**
          * Outputs elapsed time with specified description and resets timer.
-         *
          * @param description
          */
         public static void markTimer(String description) {
@@ -1215,8 +1200,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public static boolean shouldZoomPatch() {
@@ -1260,8 +1243,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public static ImageWindow getImageWindow() {
@@ -1269,8 +1250,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public static String getInputPath() {
@@ -1279,8 +1258,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public static KeyEventDispatcher getKeyEventDispatch() {
@@ -1295,8 +1272,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @return
          */
         public static JFrame getZoomWindow() {
@@ -1339,8 +1314,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @param imageWindow
          */
         public static void setImageWindow(ImageWindow imageWindow) {
@@ -1378,8 +1351,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         }
 
         /**
-         * Method description
-         *
          * @param zoomWindow
          */
         public static void setZoomWindow(JFrame zoomWindow) {

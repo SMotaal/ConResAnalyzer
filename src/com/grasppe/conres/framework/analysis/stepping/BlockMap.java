@@ -1,16 +1,12 @@
 /*
  * @(#)BlockMap.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
@@ -19,7 +15,6 @@ import java.awt.image.WritableRaster;
 
 /**
  * @author daflair
- *
  */
 public class BlockMap {
 
@@ -27,9 +22,6 @@ public class BlockMap {
     BlockState	blockState;
 
     /**
-     * Constructs ...
-     *
-     *
      * @param blockState
      */
     public BlockMap(BlockState blockState) {
@@ -37,12 +29,18 @@ public class BlockMap {
     }
 
     /**
-     * Method description
-     *
-     *
+     * @return
+     */
+    public BufferedImage getImage() {
+        int	columns = this.blockState.getColumns();
+        int	rows    = this.blockState.getRows();
+
+        return this.getImage(columns, rows);
+    }
+
+    /**
      * @param width
      * @param height
-     *
      * @return
      */
     public BufferedImage getImage(int width, int height) {
@@ -73,6 +71,7 @@ public class BlockMap {
                 value = this.blockState.getValue(m, n);
 
                 switch (value) {
+
                 case -2 :
                     data = colors[2];
 
@@ -116,18 +115,5 @@ public class BlockMap {
         raster.setPixel(column, row, (int[])red);
 
         return image;
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
-    public BufferedImage getImage() {
-        int	columns = this.blockState.getColumns();
-        int	rows    = this.blockState.getRows();
-
-        return this.getImage(columns, rows);
     }
 }

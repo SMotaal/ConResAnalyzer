@@ -1,33 +1,26 @@
 /*
  * @(#)CyclesPerMetre.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units.spatial;
-
-
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.InvalidClassException;
 
 import com.grasppe.morie.units.AbstractValue;
 import com.grasppe.morie.units.UnitDefinition;
 import com.grasppe.morie.units.ValueTypes;
 import com.grasppe.morie.units.spatial.length.Metres;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.InvalidClassException;
+
 /**
  * @author daflair
- *
  */
 public class CyclesPerMetre extends SpatialFrequency {
 
@@ -39,11 +32,9 @@ public class CyclesPerMetre extends SpatialFrequency {
 
     /** Field description */
     public static UnitDefinition	unitDefinition = new UnitDefinition(ValueTypes.FREQUENCY,
-                                                         "spatial frequency", "cycles/m");
+                                                      "spatial frequency", "cycles/m");
 
     /**
-     * Constructs ...
-     *
      */
     public CyclesPerMetre() {
         super();
@@ -65,13 +56,10 @@ public class CyclesPerMetre extends SpatialFrequency {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
-	protected UnitDefinition getDefinition() {
+    protected UnitDefinition getDefinition() {
         return unitDefinition;
     }
 
@@ -79,7 +67,7 @@ public class CyclesPerMetre extends SpatialFrequency {
      * @return the denominatorValue
      */
     @Override
-	protected AbstractValue getDenominatorValue() {
+    protected AbstractValue getDenominatorValue() {
         return denominatorValue;
     }
 
@@ -87,7 +75,7 @@ public class CyclesPerMetre extends SpatialFrequency {
      * @return the numeratorValue
      */
     @Override
-	protected AbstractValue getNumeratorValue() {
+    protected AbstractValue getNumeratorValue() {
         return numeratorValue;
     }
 

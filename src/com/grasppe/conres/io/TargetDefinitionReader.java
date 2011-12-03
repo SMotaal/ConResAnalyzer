@@ -1,16 +1,12 @@
 /*
  * @(#)TargetDefinitionReader.java   11/11/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io;
 
@@ -35,28 +31,26 @@ import java.util.List;
 
 /**
  * Reference: Kushal Paudyal http://sanjaal.com/java/tag/java-tab-delimited-file-read-sample-example
- *
  * @author daflair
- *
  */
-public class TargetDefinitionReader extends BufferedReader implements IGrasppeFileReader  {
+public class TargetDefinitionReader extends BufferedReader implements IGrasppeFileReader {
 
     protected String[]	sectionHeads = new String[] { "target", "fiducials", "measurements",
             "options" };
-    protected List<String>		sectionList    = Arrays.asList(sectionHeads);
-    protected HashSet<String>	sections       = new HashSet<String>(Arrays.asList(sectionHeads));
-    protected String			currentSection = "";
-    protected ArrayList<String>	sectionLines   = new ArrayList<String>();
-    protected IConResTargetDefinition file;
-    protected Reader			reader;
+    protected List<String>				sectionList    = Arrays.asList(sectionHeads);
+    protected HashSet<String>			sections       = new HashSet<String>(Arrays.asList(sectionHeads));
+    protected String					currentSection = "";
+    protected ArrayList<String>			sectionLines   = new ArrayList<String>();
+    protected IConResTargetDefinition	file;
+    protected Reader					reader;
 
     /**
      * @param file
-     * @throws Exception 
+     *  @throws IOException
      */
     public TargetDefinitionReader(File file) throws IOException {
         this(new FileReader(file));
-        this.file = (IConResTargetDefinition) file;
+        this.file = (IConResTargetDefinition)file;
         parseFile();
     }
 
@@ -93,37 +87,12 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     public static void main(String[] args) throws FileNotFoundException, Exception {
         String	path =
             "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U.log";
-        TargetDefinitionFile file = new TargetDefinitionFile(path);
-        TargetDefinitionReader reader =  new TargetDefinitionReader(file);
+        TargetDefinitionFile	file   = new TargetDefinitionFile(path);
+        TargetDefinitionReader	reader = new TargetDefinitionReader(file);
+
         System.out.println(file);
     }
 
-    /**
-     * @param lines
-     */
-    protected void parseOptionsSection(ArrayList<String> lines) {    	
-    	int[] nLevels = new int[]{};
-    	int nStart = 3;
-    	try {
-    		if (!lines.get(0).startsWith("Options")) return;
-    		String	fields[] = lines.get(1).split("\t");
-    		int nFields = fields.length;
-    		
-    		nLevels = new int[nFields-nStart];
-    		
-    		for (int i=nStart; i < nFields; i++)
-    			nLevels[i-nStart] = new Float(fields[i]).intValue();
-        	file.setBlockToneValues(nLevels);
-        } catch (NumberFormatException exception) {
-    	} catch (Exception exception) {
-    		exception.printStackTrace();
-    	}
-    	
-
-    	
-        System.out.println("Nlevels:\t" + nLevels.toString());
-    }
-    
     /**
      * @param lines
      */
@@ -148,20 +117,19 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
                     fiducials[i][0] = new Float(fields[2]).floatValue();
                     fiducials[i][1] = new Float(fields[3]).floatValue();
                 }
-            } catch (NumberFormatException exception) {
-
-            } catch (Exception exception) {
-        		exception.printStackTrace();
+            } catch (NumberFormatException exception) {}
+            catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
-        
+
         file.setFiducials(fiducials);
 
         System.out.println("Fiducials:\t" + fiducials.toString());
     }
 
     /**
-     * @throws Exception
+     *  @throws IOException
      */
     public void parseFile() throws IOException {
         String	line;
@@ -171,9 +139,9 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
             String	fields[] = line.split("\t");
 
-//            for (String field : fields)
-//                System.out.print(field + "\t");
-//            System.out.println();
+//          for (String field : fields)
+//              System.out.print(field + "\t");
+//          System.out.println();
         }
     }
 
@@ -198,13 +166,6 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             currentSection = "";
         } else
             sectionLines.add(line);
-    }
-    
-    protected boolean sectionCheck(String head) {
-    	String sectionHead = sectionLines.get(0).toLowerCase();
-    	if (sectionHead.trim().isEmpty() || !sectionHead.startsWith(head.toLowerCase()))
-    		return false;
-    	return currentSection.equals(head.toLowerCase());
     }
 
     /**
@@ -237,21 +198,21 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
                     if (nX == 0) nX = head;
                     else if ((nX > 0) && (nY == 0)) nY = head;
                 }
-            } catch (NumberFormatException exception) {
-            } catch (Exception exception) {
-        		exception.printStackTrace();
+            } catch (NumberFormatException exception) {}
+            catch (Exception exception) {
+                exception.printStackTrace();
             }
 
             try {
-            	if (!fields[2].trim().isEmpty()) x0.add(new Float(fields[2]));
-            	if (!fields[3].trim().isEmpty()) y0.add(new Float(fields[3]));
-            	if (!fields[4].trim().isEmpty()) dX.add(new Float(fields[4]));
-            	if (!fields[5].trim().isEmpty()) dY.add(new Float(fields[5]));
-            	if (!fields[6].trim().isEmpty()) vX.add(new Float(fields[6]));
-            	if (!fields[7].trim().isEmpty()) vY.add(new Float(fields[7]));
-            } catch (NumberFormatException exception) {
-            } catch (Exception exception) {
-        		exception.printStackTrace();
+                if (!fields[2].trim().isEmpty()) x0.add(new Float(fields[2]));
+                if (!fields[3].trim().isEmpty()) y0.add(new Float(fields[3]));
+                if (!fields[4].trim().isEmpty()) dX.add(new Float(fields[4]));
+                if (!fields[5].trim().isEmpty()) dY.add(new Float(fields[5]));
+                if (!fields[6].trim().isEmpty()) vX.add(new Float(fields[6]));
+                if (!fields[7].trim().isEmpty()) vY.add(new Float(fields[7]));
+            } catch (NumberFormatException exception) {}
+            catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
 
@@ -276,11 +237,37 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         measurements.setDimensions(mX, mY, dXF, dYF, new float[] {}, new float[] {});
         measurements.setValues(aX, aY);
-        
+
         file.setMeasurements(measurements);
-        
+
         System.out.println("Measurements:\t" + measurements);
 
+    }
+
+    /**
+     * @param lines
+     */
+    protected void parseOptionsSection(ArrayList<String> lines) {
+        int[]	nLevels = new int[] {};
+        int		nStart  = 3;
+
+        try {
+            if (!lines.get(0).startsWith("Options")) return;
+
+            String	fields[] = lines.get(1).split("\t");
+            int		nFields  = fields.length;
+
+            nLevels = new int[nFields - nStart];
+
+            for (int i = nStart; i < nFields; i++)
+                nLevels[i - nStart] = new Float(fields[i]).intValue();
+            file.setBlockToneValues(nLevels);
+        } catch (NumberFormatException exception) {}
+        catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        System.out.println("Nlevels:\t" + nLevels.toString());
     }
 
     /**
@@ -297,13 +284,25 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     }
 
     /**
-     * Method description
-     *
      * @param lines
      */
     protected void parseTargetSection(ArrayList<String> lines) {
-    	String name = lines.get(1).trim();
-    	file.setName(name);
+        String	name = lines.get(1).trim();
+
+        file.setName(name);
         System.out.println("Target Name:\t" + lines.get(1).trim());
+    }
+
+    /**
+     *  @param head
+     *  @return
+     */
+    protected boolean sectionCheck(String head) {
+        String	sectionHead = sectionLines.get(0).toLowerCase();
+
+        if (sectionHead.trim().isEmpty() ||!sectionHead.startsWith(head.toLowerCase()))
+            return false;
+
+        return currentSection.equals(head.toLowerCase());
     }
 }

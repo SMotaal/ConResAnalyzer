@@ -1,10 +1,7 @@
 /*
  * @(#)BlockState.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
@@ -25,7 +22,6 @@ public class BlockState implements ISteppingBlockState {
     protected int	rows, columns, row,	column;
 
     /**
-     * Constructs ...
      */
     protected BlockState() {}
 

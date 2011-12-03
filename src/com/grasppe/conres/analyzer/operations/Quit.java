@@ -1,15 +1,22 @@
+/*
+ * @(#)Quit.java   11/12/03
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ * This code is not licensed for use and is the property of it's owner.
+ */
+
+
+
 package com.grasppe.conres.analyzer.operations;
 
 import ij.IJ;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import com.grasppe.conres.analyzer.ConResAnalyzer;
-
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
- *
  * @version        $Revision: 1.0, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -20,7 +27,6 @@ public class Quit extends ConResAnalyzerCommand {
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      */
     public Quit(ActionListener listener) {
@@ -32,18 +38,18 @@ public class Quit extends ConResAnalyzerCommand {
 
     /**
      * Performs the command operations when called by execute().
-     *
      * @return
      */
     @Override
-	public boolean perfomCommand() {
-//        if (!controlKeyPressed()) return true;
+    public boolean perfomCommand() {
+
+//      if (!controlKeyPressed()) return true;
 
         if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
-        	System.exit(0);
+            System.exit(0);
 
-//        if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
-//            System.exit(0);
+//      if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
+//          System.exit(0);
 
         return true;	// Action responded to in intended scenario
     }

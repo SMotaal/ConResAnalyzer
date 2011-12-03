@@ -1,10 +1,7 @@
 /*
  * @(#)AnalysisStepperView.java   11/11/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -16,14 +13,12 @@ import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.analysis.stepping.BlockMap;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
-import com.grasppe.lure.components.AbstractModel;
 import com.grasppe.lure.components.AbstractView;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
@@ -43,34 +38,14 @@ import javax.swing.JPanel;
 
 /**
  * Class description
- *
  * @version $Revision: 0.1, 11/11/08
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class AnalysisStepperView extends AbstractView {
-	
-	protected SteppingPreview	canvas= null;
-	protected JFrame	frame= null;
-	
 
-    /* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractView#update()
-	 */
-	@Override
-	public void update() {
-		if(canvas==null) return;
-		canvas.updateStep(); //getModel().getBlockState())
-	}
-
-	/* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractView#getModel()
-	 */
-	@Override
-	protected AnalysisStepperModel getModel() {
-		return (AnalysisStepperModel)super.getModel();
-	}
-
-	protected BlockState	blockState = new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
+    protected SteppingPreview	canvas     = null;
+    protected JFrame			frame      = null;
+    protected BlockState		blockState = new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /**
      * @param controller
@@ -88,7 +63,8 @@ public class AnalysisStepperView extends AbstractView {
         canvas = new SteppingPreview(blockState);
 
         canvas.setSize(500, 500);
-        //canvas.setBackground(Color.blue);
+
+        // canvas.setBackground(Color.blue);
 
         // Instructions Label
         String	labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
@@ -144,11 +120,37 @@ public class AnalysisStepperView extends AbstractView {
         frame.setVisible(true);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractView#update()
+     */
+
     /**
-     * 	@return
+     */
+    @Override
+    public void update() {
+        if (canvas == null) return;
+        canvas.updateStep();	// getModel().getBlockState())
+    }
+
+    /**
+     *  @return
      */
     public AnalysisStepper getController() {
         return (AnalysisStepper)this.controller;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractView#getModel()
+     */
+
+    /**
+     *  @return
+     */
+    @Override
+    protected AnalysisStepperModel getModel() {
+        return (AnalysisStepperModel)super.getControllerModel();
     }
 
     /**
@@ -162,7 +164,7 @@ public class AnalysisStepperView extends AbstractView {
         private BufferedImage	image;
 
         /**
-         * 	@param initialBlockState
+         *  @param initialBlockState
          */
         public SteppingPreview(BlockState initialBlockState) {
             super();
@@ -187,10 +189,10 @@ public class AnalysisStepperView extends AbstractView {
         }
 
         /**
-         * 	@param thisStep
          */
         public void updateStep() {
-            //blockState = thisStep.getFinalState();
+
+            // blockState = thisStep.getFinalState();
 
             BlockMap	blockMap = new BlockMap(getModel().getBlockState());
 

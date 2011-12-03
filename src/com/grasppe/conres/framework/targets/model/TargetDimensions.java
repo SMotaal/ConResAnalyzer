@@ -1,20 +1,15 @@
 /*
  * @(#)TargetDimensions.java   11/11/23
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.targets.model;
 
-import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -23,142 +18,10 @@ import java.util.Arrays;
 
 /**
  * @author daflair
- *
  */
 public class TargetDimensions extends AbstractModel {
 
-    /*
-     * Target Coordinates
-     * Fiducials ULC: (0, 0) URC: (58.5, 0) LRC: (58.5, 45.0)   LLC: (0, 45.0)
-     */
-
-    /**
-	 * @return the dX
-	 */
-	public float getDX() {
-		return dX;
-	}
-
-	/**
-	 * @param dX the dX to set
-	 */
-	public void setDX(float dX) {
-		this.dX = dX;
-	}
-
-	/**
-	 * @return the mX
-	 */
-	public float[] getMX() {
-		return mX;
-	}
-
-	/**
-	 * @param mX the mX to set
-	 */
-	public void setMX(float[] mX) {
-		this.mX = mX;
-	}
-
-	/**
-	 * @return the dY
-	 */
-	public float getDY() {
-		return dY;
-	}
-
-	/**
-	 * @param dY the dY to set
-	 */
-	public void setDY(float dY) {
-		this.dY = dY;
-	}
-
-	/**
-	 * @return the mY
-	 */
-	public float[] getMY() {
-		return mY;
-	}
-
-	/**
-	 * @param mY the mY to set
-	 */
-	public void setMY(float[] mY) {
-		this.mY = mY;
-	}
-
-	/**
-	 * @return the dW
-	 */
-	public float getDW() {
-		return dW;
-	}
-
-	/**
-	 * @param dW the dW to set
-	 */
-	public void setDW(float dW) {
-		this.dW = dW;
-	}
-
-	/**
-	 * @return the dH
-	 */
-	public float getDH() {
-		return dH;
-	}
-
-	/**
-	 * @param dH the dH to set
-	 */
-	public void setDH(float dH) {
-		this.dH = dH;
-	}
-
-	/**
-	 * @return the mN
-	 */
-	public int getMN() {
-		return mN;
-	}
-
-	/**
-	 * @param mN the mN to set
-	 */
-	public void setMN(int mN) {
-		this.mN = mN;
-	}
-
-	/**
-	 * @return the tX
-	 */
-	public float[] getTX() {
-		return tX;
-	}
-
-	/**
-	 * @param tX the tX to set
-	 */
-	public void setTX(float[] tX) {
-		this.tX = tX;
-	}
-
-	/**
-	 * @return the tY
-	 */
-	public float[] getTY() {
-		return tY;
-	}
-
-	/**
-	 * @param tY the tY to set
-	 */
-	public void setTY(float[] tY) {
-		this.tY = tY;
-	}
-
-	float	dX = 4.5F;
+    float	dX = 4.5F;
     float[]	mX = new float[] {
         2.3F, 8.1F, 14F, 19.8F, 25.7F, 31.5F, 37.4F, 43.2F, 49.1F, 54.9F, 60.7F, 66.5F, 72.3F, 78.1F
     };
@@ -174,25 +37,76 @@ public class TargetDimensions extends AbstractModel {
     float[]	tY = new float[] { 0.0F, mY[mN - 1] + mY[1] - mY[0] - dY };
 
     /**
-     *
      */
     public TargetDimensions() {
 
         // TODO Auto-generated constructor stub
     }
 
-//    /**
-//     * @param controller
-//     */
-//    public TargetDimensions(AbstractController controller) {
-//        super(controller);
-//
-//        // TODO Auto-generated constructor stub
-//    }
+    /**
+     * @return the dH
+     */
+    public float getDH() {
+        return dH;
+    }
 
     /**
-     * Method description
-     *
+     * @return the dW
+     */
+    public float getDW() {
+        return dW;
+    }
+
+    /*
+     * Target Coordinates
+     * Fiducials ULC: (0, 0) URC: (58.5, 0) LRC: (58.5, 45.0)   LLC: (0, 45.0)
+     */
+
+    /**
+     * @return the dX
+     */
+    public float getDX() {
+        return dX;
+    }
+
+    /**
+     * @return the dY
+     */
+    public float getDY() {
+        return dY;
+    }
+
+    /**
+     * @return the mN
+     */
+    public int getMN() {
+        return mN;
+    }
+
+    /**
+     * @return the mX
+     */
+    public float[] getMX() {
+        return mX;
+    }
+
+    /**
+     * @return the mY
+     */
+    public float[] getMY() {
+        return mY;
+    }
+
+//  /**
+//   * @param controller
+//   */
+//  public TargetDimensions(AbstractController controller) {
+//      super(controller);
+//
+//      // TODO Auto-generated constructor stub
+//  }
+
+    /**
      * @return
      */
     public float[] getPatchCorners() {
@@ -208,8 +122,48 @@ public class TargetDimensions extends AbstractModel {
     }
 
     /**
-     * Method description
-     *
+     * @return the tX
+     */
+    public float[] getTX() {
+        return tX;
+    }
+
+    /**
+     * @return the tY
+     */
+    public float[] getTY() {
+        return tY;
+    }
+
+    /**
+     * @param dH the dH to set
+     */
+    public void setDH(float dH) {
+        this.dH = dH;
+    }
+
+    /**
+     * @param dW the dW to set
+     */
+    public void setDW(float dW) {
+        this.dW = dW;
+    }
+
+    /**
+     * @param dX the dX to set
+     */
+    public void setDX(float dX) {
+        this.dX = dX;
+    }
+
+    /**
+     * @param dY the dY to set
+     */
+    public void setDY(float dY) {
+        this.dY = dY;
+    }
+
+    /**
      * @param mX
      * @param mY
      * @param dX
@@ -221,11 +175,10 @@ public class TargetDimensions extends AbstractModel {
 
         int	nX = mX.length;
         int	nY = mY.length;
-        
 
         // TODO: Check sizes of arrays
-        // boolean	mSizeEqual = mX.length == mY.length;
-        boolean	mSizeValid = nX > 0 && nY > 0;
+        // boolean  mSizeEqual = mX.length == mY.length;
+        boolean	mSizeValid = (nX > 0) && (nY > 0);
         boolean	tSizeEqual = tX.length == tY.length;
         boolean	tSizeValid = (tX.length <= 2);
 
@@ -234,20 +187,17 @@ public class TargetDimensions extends AbstractModel {
         Arrays.sort(mY);
 
         // TODO: Calculate tX1/tY1 if tX is empty
-        if (tX.length == 0)
-        	tX = new float[] { mX[nX - 1] + mX[1] - mX[0] - dX };
-        if (tY.length == 0)
-        	tY = new float[] { mY[nY - 1] + mY[1] - mY[0] - dY };
-        
+        if (tX.length == 0) tX = new float[] { mX[nX - 1] + mX[1] - mX[0] - dX };
+        if (tY.length == 0) tY = new float[] { mY[nY - 1] + mY[1] - mY[0] - dY };
+
         // TODO: Add tX0/tY0 = 0.0F to single value tX1/tY1.
-        if (tX.length == 1)
-        	tX = new float[] { 0.0F, tX[0] };
-        if (tY.length == 1)
-        	tY = new float[] { 0.0F, tY[0] };
+        if (tX.length == 1) tX = new float[] { 0.0F, tX[0] };
+        if (tY.length == 1) tY = new float[] { 0.0F, tY[0] };
+
         // TODO: Check coordinates
 
         boolean	mMinValid = (mX[0] >= tX[0]) && (mY[0] >= tY[0]);
-        boolean	mMaxValid = (mX[nX-1] <= tX[1]) && (mY[nY-1] <= tY[1]);
+        boolean	mMaxValid = (mX[nX - 1] <= tX[1]) && (mY[nY - 1] <= tY[1]);
 
         // TODO: Check patch dimensions
         boolean	mPatchValid = true;		// until false
@@ -265,7 +215,6 @@ public class TargetDimensions extends AbstractModel {
             mPatchValid = mPatchValid && (dmX >= dX) && (dmY >= dY);
         }
 
-
         this.dX = dX;
         this.dY = dY;
         this.tX = tX;
@@ -273,5 +222,40 @@ public class TargetDimensions extends AbstractModel {
         this.mX = mX;
         this.mY = mY;
 
+    }
+
+    /**
+     * @param mN the mN to set
+     */
+    public void setMN(int mN) {
+        this.mN = mN;
+    }
+
+    /**
+     * @param mX the mX to set
+     */
+    public void setMX(float[] mX) {
+        this.mX = mX;
+    }
+
+    /**
+     * @param mY the mY to set
+     */
+    public void setMY(float[] mY) {
+        this.mY = mY;
+    }
+
+    /**
+     * @param tX the tX to set
+     */
+    public void setTX(float[] tX) {
+        this.tX = tX;
+    }
+
+    /**
+     * @param tY the tY to set
+     */
+    public void setTY(float[] tY) {
+        this.tY = tY;
     }
 }

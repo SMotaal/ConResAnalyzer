@@ -1,29 +1,21 @@
 /*
  * @(#)StepRight.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
 /**
  * @author daflair
- *
  */
 public class StepRight extends SteppingStrategy {
 
     /**
-     * Constructs ...
-     *
-     *
      * @param blockState
      */
     public StepRight(BlockState blockState) {
@@ -38,9 +30,6 @@ public class StepRight extends SteppingStrategy {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override

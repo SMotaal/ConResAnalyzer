@@ -1,29 +1,23 @@
 /*
  * @(#)ImageFile.java   11/11/15
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 
 import java.net.URI;
 
 /**
  * @author daflair
- *
  */
 public class ImageFolder extends CaseFile {
 
@@ -101,10 +95,7 @@ public class ImageFolder extends CaseFile {
     }
 
     /**
-     * Method description
-     *
      * @param file
-     *
      * @return
      */
     public static boolean validate(File file) {
@@ -112,12 +103,13 @@ public class ImageFolder extends CaseFile {
 
         if (!isDirectory) return false;
 
-        File[] imageFileList = file.listFiles(ImageFile.getFilenameFilter());
-        int		imageCount = imageFileList.length;
-        boolean	hasImages  = imageCount > 0;
-        boolean validImages = true;
+        File[]	imageFileList = file.listFiles(ImageFile.getFilenameFilter());
+        int		imageCount    = imageFileList.length;
+        boolean	hasImages     = imageCount > 0;
+        boolean	validImages   = true;
+
         for (File imageFile : imageFileList)
-        	validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
+            validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
 
         int		tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
         boolean	hasTDF   = tdfCount == 1;

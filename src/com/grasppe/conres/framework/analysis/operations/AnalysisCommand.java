@@ -1,10 +1,7 @@
 /*
  * @(#)AnalysisCommand.java   11/11/26
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -21,7 +18,6 @@ import java.awt.event.ActionListener;
 
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
- *
  * @version        $Revision: 1.0, 11/11/08
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -29,7 +25,6 @@ public abstract class AnalysisCommand extends AbstractCommand {
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      * @param name
      */
@@ -40,7 +35,6 @@ public abstract class AnalysisCommand extends AbstractCommand {
 
     /**
      * Returns the correctly-cast model.
-     *
      * @return
      */
     @Override

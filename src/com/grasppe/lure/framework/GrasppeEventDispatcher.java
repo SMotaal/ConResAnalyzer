@@ -1,10 +1,7 @@
 /*
  * @(#)GrasppeEventDispatcher.java   11/11/14
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -19,7 +16,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -37,7 +33,6 @@ import javax.swing.KeyStroke;
 
 /**
  * Class description
- *
  * @version $Revision: 1.0, 11/11/09
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -53,40 +48,31 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     public static boolean	consumedCombination = false;
 
     /** Field description */
-    public KeyboardFocusManager	manager   = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-    protected Observers			observers = new Observers(this);
-    
-    Action closeWindow = new AbstractAction("Close Window") {
- 	   public void actionPerformed(ActionEvent e) {
- 	     // window closing code here
+    public KeyboardFocusManager	manager     = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    protected Observers			observers   = new Observers(this);
+    Action						closeWindow = new AbstractAction("Close Window") {
+
+        public void actionPerformed(ActionEvent e) {
+
+            // window closing code here
             Frame[]	frames = Frame.getFrames();
 
             for (Frame frame : frames)
                 if (frame.isActive()) {
-             	   frame.setVisible(false);
-             	   frame.dispose();
+                    frame.setVisible(false);
+                    frame.dispose();
                 }
- 	   }
- 	 };      
- 	 
-     KeyStroke closeKey = KeyStroke.getKeyStroke(
-    	      KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-    
+        }
+    };
+    KeyStroke	closeKey = KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     /**
-     * Constructs ...
      */
     private GrasppeEventDispatcher() {
         super();
-//        manager.addKeyEventDispatcher(this);  
-    }
-    
-    public void makeClosable(JFrame frame) {
-    	// ref: http://stackoverflow.com/questions/4209975/how-to-have-command-w-close-a-window-on-mac-os-in-java-or-clojure
-    	
-    	// TODO: Figure out how to implement closeWindow!    		
-    	// TODO: Attach closeWindow to frame!
-    	return;
+
+//      manager.addKeyEventDispatcher(this);  
     }
 
     /**
@@ -106,8 +92,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @param handler
      */
     public void attachEventHandler(GrasppeEventHandler handler) {
@@ -115,8 +99,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @param observer
      */
     public void attachObserver(Observer observer) {
@@ -131,8 +113,17 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
+     * 	@param heading
+     * 	@param keyEvent
+     * 	@param level
+     */
+    public void debugPressedKey(String heading, KeyEvent keyEvent, int level) {
+        GrasppeKit.debugText(heading,
+                             GrasppeKit.keyEventString(keyEvent) + " (PressedKeys "
+                             + pressedKeyString() + ")", level);
+    }
+
+    /**
      * @param observer
      */
     public void detachObserver(Observer observer) {
@@ -140,10 +131,7 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @param e
-     *
      * @return
      */
     public boolean dispatchKeyEvent(KeyEvent e) {
@@ -152,41 +140,45 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
         if (!pressedKeys.isEmpty()) {
             consumedCombination = false;
 
-            boolean	eventHandled = false;
+            boolean		eventHandled = false;
 
             Object[]	allObservers = observers.getObserverSet().toArray();
 
             for (Object observerObject : allObservers) {
-            	Observer observer = (Observer) observerObject;
+                Observer	observer = (Observer)observerObject;
+
                 try {
                     if (!(observer instanceof GrasppeEventHandler)) continue;
                 } catch (NullPointerException exception) {
                     observers.detachObserver(observer);
                     continue;
                 }
+
                 eventHandled |= ((GrasppeEventHandler)observer).dispatchedKeyEvent(e);
                 if (eventHandled) consumedCombination = true;
             }
 
-            if (eventHandled)
-            	debugPressedKey("Key Event Handled", e, 4);
-            else
-            	debugPressedKey("Key Event Ignored", e, 5);
+            if (eventHandled) debugPressedKey("Key Event Handled", e, 4);
+            else debugPressedKey("Key Event Ignored", e, 5);
 
         }
 
         return false;
     }
-    
-    public void debugPressedKey(String heading, KeyEvent keyEvent, int level) {
-        GrasppeKit.debugText(heading,
-        		GrasppeKit.keyEventString(keyEvent) + " (PressedKeys "
-                + pressedKeyString() + ")", level);    	
+
+    /**
+     * 	@param frame
+     */
+    public void makeClosable(JFrame frame) {
+
+        // ref: http://stackoverflow.com/questions/4209975/how-to-have-command-w-close-a-window-on-mac-os-in-java-or-clojure
+
+        // TODO: Figure out how to implement closeWindow!
+        // TODO: Attach closeWindow to frame!
+        return;
     }
 
     /**
-     * Method description
-     *
      * @param observer
      */
     public void notifyObserver(Observer observer) {
@@ -194,7 +186,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
      */
 
     public void notifyObservers() {
@@ -202,8 +193,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public static String pressedKeyString() {
@@ -222,8 +211,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @param e
      */
     public static void processKey(KeyEvent e) {
@@ -261,10 +248,7 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
-     *
      * @param keyCode
-     *
      * @return
      */
     public static boolean isDown(KeyCode keyCode) {
@@ -272,7 +256,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
      * @param keyCode
      * @return
      */
@@ -281,7 +264,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
      * @param keyCodes
      * @return
      */
@@ -307,7 +289,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * Method description
      * @param keyCode
      * @return
      */

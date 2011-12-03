@@ -1,16 +1,12 @@
 /*
  * @(#)BlockMapTest.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
@@ -39,7 +35,6 @@ import javax.swing.JPanel;
 
 /**
  * @author daflair
- *
  */
 @SuppressWarnings("serial")
 public class BlockMapTestApp extends Canvas {
@@ -54,8 +49,6 @@ public class BlockMapTestApp extends Canvas {
     private BufferedImage	image;		// private BufferedImage[] image = new BufferedImage[10];
 
     /**
-     * Constructs ...
-     *
      */
     public BlockMapTestApp() {
         BlockState	finalState = this.blockState;
@@ -67,9 +60,6 @@ public class BlockMapTestApp extends Canvas {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param keyCode
      * @param keyModifiers
      */
@@ -84,6 +74,7 @@ public class BlockMapTestApp extends Canvas {
         boolean	snapState = true;
 
         switch (keyCode) {
+
         case KeyEvent.VK_SPACE :
             if (keyModifiers == 1) {
                 if (!this.history.isEmpty()) {
@@ -157,9 +148,6 @@ public class BlockMapTestApp extends Canvas {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param argv
      */
     public static void main(String argv[]) {
@@ -172,16 +160,18 @@ public class BlockMapTestApp extends Canvas {
         JPanel		panel     = new JPanel();
         BoxLayout	layout    = new BoxLayout(panel, BoxLayout.X_AXIS);
         String		labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
-                                + "<pre>Marking patches: (and step over)</pre>" + "<pre>    <b>  Q     </b>"
-                                + "Good</pre>" + "<pre>    <b>  W     </b>" + "Accept</pre>"
-                                + "<pre>    <b>  E     </b>" + "Reject</pre>" + "<pre></pre>"
-                                + "<pre>Moving around:</pre>" + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
-                                + "<pre>    <b>  \u2193     </b>" + "Down</pre>" + "<pre>    <b>  \u2190    </b>"
-                                + "Left</pre>" + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
+                           + "<pre>Marking patches: (and step over)</pre>"
+                           + "<pre>    <b>  Q     </b>" + "Good</pre>" + "<pre>    <b>  W     </b>"
+                           + "Accept</pre>" + "<pre>    <b>  E     </b>" + "Reject</pre>"
+                           + "<pre></pre>" + "<pre>Moving around:</pre>"
+                           + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
+                           + "<pre>    <b>  \u2193     </b>" + "Down</pre>"
+                           + "<pre>    <b>  \u2190    </b>" + "Left</pre>"
+                           + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
 
         // "<pre>    <b>  D     </b>" + "Reject</pre>"
-        + "<pre>    <b>  SP    </b>" + "Step Over</pre>" + "<pre>    <b>\u21E7 SP   </b>" + "Step Back</pre>"
-                                     + "</html>";
+        + "<pre>    <b>  SP    </b>" + "Step Over</pre>" + "<pre>    <b>\u21E7 SP   </b>"
+                                     + "Step Back</pre>" + "</html>";
 
 //
         JLabel	label = new JLabel(labelText, JLabel.LEFT);
@@ -201,9 +191,10 @@ public class BlockMapTestApp extends Canvas {
         frame.pack();
 
         // label.setSize(label.getWidth(),500);
-        GraphicsEnvironment	graphicsEnvironment = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
-        int					x                   = graphicsEnvironment.getCenterPoint().x - frame.getWidth() / 2;
-        int					y                   = graphicsEnvironment.getCenterPoint().y - frame.getHeight() / 2;
+        GraphicsEnvironment	graphicsEnvironment =
+            java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+        int	x = graphicsEnvironment.getCenterPoint().x - frame.getWidth() / 2;
+        int	y = graphicsEnvironment.getCenterPoint().y - frame.getHeight() / 2;
 
         frame.setLocation(x, y);
         frame.setVisible(true);
@@ -230,9 +221,6 @@ public class BlockMapTestApp extends Canvas {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param g
      */
     public void paint(Graphics g) {

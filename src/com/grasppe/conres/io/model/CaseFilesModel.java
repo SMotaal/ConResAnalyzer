@@ -1,31 +1,24 @@
 /*
  * @(#)CaseFilesModel.java   11/11/14
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.io.model;
 
-
+import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.File;
 
-import com.grasppe.lure.components.AbstractController;
-import com.grasppe.lure.components.AbstractModel;
-
 /**
  * @author daflair
- *
  */
 public class CaseFilesModel extends AbstractModel {
 
@@ -33,7 +26,6 @@ public class CaseFilesModel extends AbstractModel {
     protected File[]	otherFiles,	imageFiles,	plotFiles, mapFile;
 
     /**
-     *
      */
     public CaseFilesModel() {
         super();
@@ -47,15 +39,12 @@ public class CaseFilesModel extends AbstractModel {
     }
 
     /**
-     * Constructs ...
-     *
      * @param controller
      * @param caseFolder
      */
     public CaseFilesModel(AbstractController controller, File caseFolder) {}
 
     /**
-     * Method description
      */
     public void traverseFolder() {}
 
@@ -68,8 +57,6 @@ public class CaseFilesModel extends AbstractModel {
     }
 
     /**
-     * Method description
-     *
      * @return
      */
     public boolean verifyFolder() {

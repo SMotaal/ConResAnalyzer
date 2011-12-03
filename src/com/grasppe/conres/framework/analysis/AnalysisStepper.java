@@ -1,16 +1,12 @@
 /*
  * @(#)BlockMapTest.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis;
 
@@ -35,7 +31,6 @@ import java.awt.event.KeyEvent;
 
 /**
  * @author daflair
- *
  */
 public class AnalysisStepper extends AbstractController {
 
@@ -44,12 +39,12 @@ public class AnalysisStepper extends AbstractController {
 
     /**
      * Constructs and attaches a new controller and a new model.
-     * 	@param analysisManager
+     *  @param analysisManager
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
 
-        BlockState	fudgeState = new BlockState(10, 10, 0, 0); //, BlockState.fudgeMap1());
+        BlockState	fudgeState = new BlockState(10, 10, 0, 0);		// , BlockState.fudgeMap1());
 
         getModel().setBlockState(fudgeState);
 
@@ -58,13 +53,13 @@ public class AnalysisStepper extends AbstractController {
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
-     * 	@param analysisManager
+     *  @param analysisManager
      * @param model
      */
-    public AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model) {
+    private AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model) {
         super(model);
         this.analysisManager = analysisManager;
-        stepperView = new AnalysisStepperView(this);
+        stepperView          = new AnalysisStepperView(this);
         attachView(stepperView);
     }
 
@@ -73,8 +68,8 @@ public class AnalysisStepper extends AbstractController {
      * @param keyModifiers
      */
     public void BlockStepKey(int keyCode, int keyModifiers) {		// SteppingStrategy thisStep) {
-    	
-    	//if () return;
+
+        // if () return;
 
         // SmartBlockState smartState = new SmartBlockState(this.blockState);
         SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
@@ -83,67 +78,60 @@ public class AnalysisStepper extends AbstractController {
         System.out.println("Modifier " + keyModifiers);
 
         boolean	snapState = true;
-        boolean goBack = false;
+        boolean	goBack    = false;
 
         switch (keyCode) {
 
         case KeyEvent.VK_SPACE :
             if (keyModifiers == 1) {
-            	goBack = true;
+                goBack = true;
             } else
                 thisStep = new StepNext(smartState);
 
             break;
-            
+
         case KeyEvent.VK_BACK_SPACE :
-        	goBack = true;
-        	break;
+            goBack = true;
+            break;
 
         case KeyEvent.VK_UP :
-        	if(keyModifiers==0)
-        		thisStep = new StepUp(smartState);
+            if (keyModifiers == 0) thisStep = new StepUp(smartState);
             break;
 
         case KeyEvent.VK_DOWN :
-        	if(keyModifiers==0)
-            thisStep = new StepDown(smartState);
+            if (keyModifiers == 0) thisStep = new StepDown(smartState);
 
             break;
 
         case KeyEvent.VK_LEFT :
-        	if(keyModifiers==0)
-            thisStep = new StepLeft(smartState);
+            if (keyModifiers == 0) thisStep = new StepLeft(smartState);
 
             break;
 
         case KeyEvent.VK_RIGHT :
-        	if(keyModifiers==0)
-            thisStep = new StepRight(smartState);
+            if (keyModifiers == 0) thisStep = new StepRight(smartState);
 
             break;
 
         case KeyEvent.VK_G :
-        	if(keyModifiers==0)
-            thisStep = new SetAndStep(smartState, 2);
+            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, 2);
 
             break;
 
         case KeyEvent.VK_A :
-        	if(keyModifiers==0)
-            thisStep = new SetAndStep(smartState, 1);
+            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, 1);
 
             break;
 
         case KeyEvent.VK_R :
-        	if(keyModifiers==0)
-            thisStep = new SetAndStep(smartState, -1);
+            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, -1);
 
             break;
 
         default :
             return;
         }
-        
+
         if (goBack) {
             if (!getModel().getHistory().isEmpty()) {
                 thisStep = new StepBack(smartState, getModel().getHistory());
@@ -151,7 +139,7 @@ public class AnalysisStepper extends AbstractController {
             } else
                 return;
 
-            snapState = false;        	
+            snapState = false;
         }
 
         if (snapState) {
@@ -163,7 +151,7 @@ public class AnalysisStepper extends AbstractController {
         }
 
         thisStep.execute();
-        
+
         getModel().setBlockState(thisStep.getFinalState());
         getStepperView().update();
 
@@ -176,14 +164,7 @@ public class AnalysisStepper extends AbstractController {
 //      this.repaint(1000);
     }
 
-    public void testRun() {
-    	getStepperView().prepareView();
-    }
-    
     /**
-     * Method description
-     *
-     *
      * @param argv
      */
     public static void oldMain(String argv[]) {
@@ -240,6 +221,12 @@ public class AnalysisStepper extends AbstractController {
 //      frame.addWindowListener(windowListener);
 
 //      fail("Not yet implemented"); // TODO
+    }
+
+    /**
+     */
+    public void testRun() {
+        getStepperView().prepareView();
     }
 
     /**

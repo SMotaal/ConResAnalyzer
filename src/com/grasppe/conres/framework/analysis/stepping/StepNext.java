@@ -1,22 +1,17 @@
 /*
  * @(#)StepNext.java   11/08/25
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
 /**
  * @author daflair
- *
  */
 public class StepNext extends SteppingStrategy {
 
@@ -27,9 +22,6 @@ public class StepNext extends SteppingStrategy {
     protected SmartBlockState	smartState;
 
     /**
-     * Constructs ...
-     *
-     *
      * @param blockState
      */
     public StepNext(BlockState blockState) {
@@ -45,9 +37,6 @@ public class StepNext extends SteppingStrategy {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
@@ -61,7 +50,8 @@ public class StepNext extends SteppingStrategy {
         int	acceptBoundary = this.smartState.getColumnAcceptBoundary(column);
         int	rejectBoundary = this.smartState.getColumnRejectBoundary(column);
 
-        System.out.println("Accept " + acceptBoundary + " Reject " + rejectBoundary + " Boundary " + columnBoundary);
+        System.out.println("Accept " + acceptBoundary + " Reject " + rejectBoundary + " Boundary "
+                           + columnBoundary);
         BlockState.printBlock(this.smartState.getBlockMap()[column]);
 
         if (this.smartState.isComplete()) {
@@ -89,13 +79,15 @@ public class StepNext extends SteppingStrategy {
         }
 
         if ((rejectBoundary > -1) && (nextRow(rejectBoundary, column) != row)) {	// -this.step!=row && rejectBoundary!=0) {
-            System.out.println("Moving Up from Reject Boundary " + row + " > " + nextRow(rejectBoundary, column));
+            System.out.println("Moving Up from Reject Boundary " + row + " > "
+                               + nextRow(rejectBoundary, column));
 
             return this.moveUp(rejectBoundary);
         }
 
         if ((acceptBoundary > -1) && (nextRow(acceptBoundary, column) != row)) {	// +this.step!=row && acceptBoundary!=rows-1) {
-            System.out.println("Moving Down from Accept Boundary " + row + " > " + nextRow(acceptBoundary, column));
+            System.out.println("Moving Down from Accept Boundary " + row + " > "
+                               + nextRow(acceptBoundary, column));
 
             return this.moveDown(acceptBoundary);
         }
@@ -106,60 +98,7 @@ public class StepNext extends SteppingStrategy {
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param row
-     * @param column
-     *
-     * @return
-     */
-    private int nextRow(int row, int column) {
-
-        /*
-         *  TODO
-         *
-         * * Next over aligns up with 2nd of the good patches, not the accept ones.
-         * * Finding rows that are not making sense! Priority to most recent.
-         *
-         */
-        int	columns        = this.smartState.getColumns();
-        int	rows           = this.smartState.getRows();
-        int	columnBoundary = this.smartState.getColumnBoundary(column);
-        int	acceptBoundary = this.smartState.getColumnAcceptBoundary(column);
-        int	rejectBoundary = this.smartState.getColumnRejectBoundary(column);
-
-        if (this.smartState.isColumnClear(column)) return Math.max(row - 1, 0);
-        if (rejectBoundary > -1) return Math.max(rejectBoundary - this.step, 0);
-        if (acceptBoundary > -1) return Math.min(acceptBoundary + this.step, rows - 1);
-
-        return row;
-    }
-
-//  private int bound(int value, int min, int max) {
-//      return Math.min(    Math.max(value, min), max);
-//  }
-
-    /**
-     * Method description
-     *
-     *
      * @param boundary
-     *
-     * @return
-     */
-    private boolean moveUp(int boundary) {		// after reject
-        System.out.println("\tmove up");
-
-        return this.validMove(this.moveTo(boundary - this.step, this.smartState.getColumn()));
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param boundary
-     *
      * @return
      */
     private boolean moveDown(int boundary) {	// after accept
@@ -171,11 +110,7 @@ public class StepNext extends SteppingStrategy {
     }
 
     /**
-     * Method description
-     *
-     *
      * @param boundary
-     *
      * @return
      */
     private boolean moveOver(int boundary) {
@@ -198,14 +133,50 @@ public class StepNext extends SteppingStrategy {
     }
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     private boolean moveRight() {
         System.out.println("\tmove backwards");
 
         return this.validMove(this.moveBy(0, -1));
+    }
+
+//  private int bound(int value, int min, int max) {
+//      return Math.min(    Math.max(value, min), max);
+//  }
+
+    /**
+     * @param boundary
+     * @return
+     */
+    private boolean moveUp(int boundary) {		// after reject
+        System.out.println("\tmove up");
+
+        return this.validMove(this.moveTo(boundary - this.step, this.smartState.getColumn()));
+    }
+
+    /**
+     * @param row
+     * @param column
+     * @return
+     */
+    private int nextRow(int row, int column) {
+
+        /*
+         *  TODO
+         * * Next over aligns up with 2nd of the good patches, not the accept ones.
+         * * Finding rows that are not making sense! Priority to most recent.
+         */
+        int	columns        = this.smartState.getColumns();
+        int	rows           = this.smartState.getRows();
+        int	columnBoundary = this.smartState.getColumnBoundary(column);
+        int	acceptBoundary = this.smartState.getColumnAcceptBoundary(column);
+        int	rejectBoundary = this.smartState.getColumnRejectBoundary(column);
+
+        if (this.smartState.isColumnClear(column)) return Math.max(row - 1, 0);
+        if (rejectBoundary > -1) return Math.max(rejectBoundary - this.step, 0);
+        if (acceptBoundary > -1) return Math.min(acceptBoundary + this.step, rows - 1);
+
+        return row;
     }
 }

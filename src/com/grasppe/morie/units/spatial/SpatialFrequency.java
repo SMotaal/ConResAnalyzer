@@ -1,31 +1,24 @@
 /*
  * @(#)SpatialFrequency.java   11/10/24
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the properyty of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.morie.units.spatial;
 
-
+import com.grasppe.morie.units.AbstractRate;
+import com.grasppe.morie.units.FrequencyTypes;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.InvalidClassException;
 
-import com.grasppe.morie.units.AbstractRate;
-import com.grasppe.morie.units.FrequencyTypes;
-
 /**
  * @author daflair
- *
  */
 public abstract class SpatialFrequency extends AbstractRate {
 
@@ -33,7 +26,6 @@ public abstract class SpatialFrequency extends AbstractRate {
     public static final FrequencyTypes	frequencyType = FrequencyTypes.SPATIAL;
 
     /**
-     *
      */
     protected SpatialFrequency() {
         super();
@@ -60,9 +52,6 @@ public abstract class SpatialFrequency extends AbstractRate {
      */
 
     /**
-     * Method description
-     *
-     *
      * @return
      */
     @Override
@@ -88,14 +77,11 @@ public abstract class SpatialFrequency extends AbstractRate {
 //  }
 
     /**
-     * Method description
-     *
-     *
      * @return
      * @throws InvalidClassException
      */
     @Override
-	public final CyclesPerMetre standardValue() throws InvalidClassException {
+    public final CyclesPerMetre standardValue() throws InvalidClassException {
         return new CyclesPerMetre(this);
     }
 }

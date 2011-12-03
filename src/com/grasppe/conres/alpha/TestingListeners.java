@@ -1,4 +1,16 @@
+/*
+ * @(#)TestingListeners.java   11/12/03
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ * This code is not licensed for use and is the property of it's owner.
+ */
+
+
+
 package com.grasppe.conres.alpha;
+
+import com.grasppe.lure.framework.GrasppeKit;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Frame;
 import java.awt.Point;
@@ -10,11 +22,8 @@ import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import com.grasppe.lure.framework.GrasppeKit;
-
 /**
  * Class description
- *
  * @version $Revision: 1.0, 11/11/11
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -70,8 +79,8 @@ public class TestingListeners {
         public void mouseMoved(MouseEvent e) {
 
             // e.getSource().getClass().equals(ImageCanvas.class);
-        	//if (!ConResBootCamp.canMagnifyPatch())
-        		ConResBootCamp.moveFrame(e.getXOnScreen(), e.getYOnScreen());
+            // if (!ConResBootCamp.canMagnifyPatch())
+            ConResBootCamp.moveFrame(e.getXOnScreen(), e.getYOnScreen());
             debugEvent("IJMotionListener", e);
             e.consume();
         }
@@ -102,8 +111,8 @@ public class TestingListeners {
             debugEvent("Window", e);	// GrasppeKit.debugText("Window Closed ("
 
             // + name + ")", e.toString());
-//            if ((visibleFrames == 1) && ConResBootCamp.Testing.getZoomWindow().isVisible()) ConResBootCamp.delayedExit();
-//            if (visibleFrames == 0) ConResBootCamp.delayedExit();
+//          if ((visibleFrames == 1) && ConResBootCamp.Testing.getZoomWindow().isVisible()) ConResBootCamp.delayedExit();
+//          if (visibleFrames == 0) ConResBootCamp.delayedExit();
         }
 
         public void windowClosing(WindowEvent e) {
@@ -139,7 +148,6 @@ public class TestingListeners {
 
     /**
      * Outputs debug information and event details
-     *
      * @param grouping
      * @param e
      */
@@ -149,7 +157,6 @@ public class TestingListeners {
 
     /**
      * Outputs debug information and event details
-     *
      * @param grouping
      * @param e
      */
@@ -159,7 +166,6 @@ public class TestingListeners {
 
     /**
      * Outputs debug information and event details
-     *
      * @param label
      * @param grouping
      * @param e
@@ -169,18 +175,17 @@ public class TestingListeners {
         String	cursorString = "";
 
         try {
-            Point	cursorLocation = ConResBootCamp.Testing.getImageWindow().getCanvas().getCursorLoc();
+            Point	cursorLocation =
+                ConResBootCamp.Testing.getImageWindow().getCanvas().getCursorLoc();
 
             cursorString = "\t" + cursorLocation.toString();
         } catch (Exception exception) {}
 
-        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + cursorString,
-                             level);
+        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + cursorString, level);
     }
 
     /**
      * Outputs debug information and event details
-     *
      * @param label
      * @param grouping
      * @param e
@@ -189,7 +194,6 @@ public class TestingListeners {
     static void debugEvent(String label, String grouping, WindowEvent e, int level) {
         String	testString = "";
 
-        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + testString,
-                             level);
+        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + testString, level);
     }
 }

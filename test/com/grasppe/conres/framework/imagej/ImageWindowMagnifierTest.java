@@ -1,16 +1,12 @@
 /*
  * @(#)ImageWindowMagnifierTest.java   11/11/18
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.imagej;
 
@@ -27,7 +23,6 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * @author daflair
- *
  */
 public class ImageWindowMagnifierTest implements GrasppeEventHandler {
 
@@ -43,7 +38,6 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     ImageWindowMagnifier	imageMagnifier;
 
     /**
-     * Constructs ...
      */
     public ImageWindowMagnifierTest() {
 
@@ -68,10 +62,7 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     }
 
     /**
-     * Method description
-     *
      * @param e
-     *
      * @return
      */
     public boolean dispatchedKeyEvent(KeyEvent e) {
@@ -97,7 +88,6 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     }
 
     /**
-     * Method description
      */
     public void update() {
 

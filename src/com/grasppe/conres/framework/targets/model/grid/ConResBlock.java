@@ -1,10 +1,7 @@
 /*
  * @(#)ConResBlock.java   11/10/27
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -16,28 +13,14 @@ import com.grasppe.conres.framework.targets.model.axis.ResolutionAxis;
 import com.grasppe.conres.framework.units.ContrastValue;
 import com.grasppe.conres.framework.units.ResolutionValue;
 import com.grasppe.conres.framework.units.ToneValue;
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * @author daflair
- *
  */
 public class ConResBlock extends GridBlock {
 
-    /**
-	 * @return the zValue
-	 */
-	public ToneValue getZValue() {
-		return zValue;
-	}
-
-	/**
-	 * @param zValue the zValue to set
-	 */
-	public void setZValue(ToneValue zValue) {
-		this.zValue = zValue;
-	}
-
-	protected static String
+    protected static String
 		xLabel                           = "Contrast, Log step increments",
 		yLabel                           = "Resolution, Line Pairs per Millimeter, Log steps";
     protected static String
@@ -47,8 +30,7 @@ public class ConResBlock extends GridBlock {
 							activeColumn = 0;
     protected ToneValue		zValue;
     protected ConResBlock	parentBlock = null;
-    
-    protected String blockImage = null;
+    protected String		blockImage  = null;
 
     /**
      * @param toneValue
@@ -92,8 +74,6 @@ public class ConResBlock extends GridBlock {
     }
 
     /**
-     * Method description
-     *
      * @param xValues
      * @param yValues
      */
@@ -101,6 +81,20 @@ public class ConResBlock extends GridBlock {
     public void generateAxes(double[] xValues, double[] yValues) {
         setXAxis(new ContrastAxis(xValues));
         setYAxis(new ResolutionAxis(yValues));
+    }
+
+    /**
+     *  @return
+     */
+    public String toString() {
+        try {
+            return (GrasppeKit.cat(new String[] { getClass().getSimpleName(),
+                    " @ " + activeRow + ", " + activeColumn,
+                    "(" + xValues.length + "x" + yValues.length + " / " + zValue.getValue()
+                    + ")" }));
+        } catch (Exception exception) {
+            return "";
+        }
     }
 
     /**
@@ -157,11 +151,25 @@ public class ConResBlock extends GridBlock {
     }
 
     /**
+     * @return the zValue
+     */
+    public ToneValue getZValue() {
+        return zValue;
+    }
+
+    /**
      *  @param row
      *  @param column
      */
     public void setActivePatch(int row, int column) {
 
         // TODO: Create central mechanism for active patch!
+    }
+
+    /**
+     * @param zValue the zValue to set
+     */
+    public void setZValue(ToneValue zValue) {
+        this.zValue = zValue;
     }
 }

@@ -1,10 +1,7 @@
 /*
  * @(#)OpenCase.java   11/11/26
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -24,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.rmi.UnexpectedException;
@@ -33,7 +29,6 @@ import java.util.concurrent.CancellationException;
 
 /**
  *         Defines Case Manager's New Case actions and command, using the EAC pattern.
- *
  *         @version        $Revision: 1.0, 11/11/08
  *         @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -49,7 +44,6 @@ public class OpenCase extends CaseManagerCommand {
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      * @param controller TODO
      */
@@ -61,6 +55,38 @@ public class OpenCase extends CaseManagerCommand {
     }
 
     /**
+     *  @param e
+     *  @return
+     */
+    private boolean confirmSelectOtherCase(IOException e) {
+        return IJ.showMessageWithCancel(name,
+                                        "The selected case folder is missing some files.\n\n"
+                                        + e.getMessage() + "\n\n"
+                                        + "Do you want to select another folder?");
+
+//      e.printStackTrace();
+    }
+
+    /**
+     *  @param newCase
+     */
+    private void finalizeOpenCase(CaseModel newCase) {
+        if (newCase.filesLoaded) {
+            try {
+                getModel().discardBackgroundCase();
+            } catch (UnexpectedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                getModel().restoreBackgroundCase();
+            } catch (UnexpectedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      *  @param caseFolder
      *  @return
      *  @throws CancellationException
@@ -69,7 +95,7 @@ public class OpenCase extends CaseManagerCommand {
 
         boolean		canProceed    = true;
 
-        CaseModel	newCase  = null;
+        CaseModel	newCase       = null;
 
         boolean		userCancelled = false;
 
@@ -80,11 +106,11 @@ public class OpenCase extends CaseManagerCommand {
         }
 
         newCase.path = caseFolder.getAbsolutePath();
-        
+
         try {
             getCaseManager().loadCase(newCase);
-        } catch (IOException e) {            
-            canProceed = confirmSelectOtherCase(e);
+        } catch (IOException e) {
+            canProceed    = confirmSelectOtherCase(e);
             userCancelled = !canProceed;
         }
 
@@ -106,8 +132,7 @@ public class OpenCase extends CaseManagerCommand {
                 "Open Case Unsuccessful",
                 "New case was not created... Reverting cases in the case manager model.", 3);
 
-            if (newCase != null)
-            	finalizeOpenCase(newCase);
+            if (newCase != null) finalizeOpenCase(newCase);
 
             getModel().notifyObservers();
 
@@ -117,30 +142,6 @@ public class OpenCase extends CaseManagerCommand {
 
         return canProceed;
 
-    }
-    
-    private void finalizeOpenCase(CaseModel newCase) {
-        if (newCase.filesLoaded) {
-            try {
-                getModel().discardBackgroundCase();
-            } catch (UnexpectedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                getModel().restoreBackgroundCase();
-            } catch (UnexpectedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    private boolean confirmSelectOtherCase(IOException e) {
-    	return IJ.showMessageWithCancel(name,
-                "The selected case folder is missing some files.\n\n" + e.getMessage() + "\n\n"
-                + "Do you want to select another folder?");
-    	
-//        e.printStackTrace();
     }
 
     /**
@@ -152,7 +153,7 @@ public class OpenCase extends CaseManagerCommand {
         if (!canExecute()) return false;
 
         boolean	canProceed = false;
-        
+
         GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
         if (!getModel().canGetNewCase())
             new UnexpectedException(
@@ -174,12 +175,13 @@ public class OpenCase extends CaseManagerCommand {
             // TODO: Verify case folder!
             // TODO: Confirm and close current case before attempting to switching cases
             try {
-            canProceed = ((CloseCase)this.controller.getCommandHandler().getCommand(
-                "CloseCase")).quickClose(getKeyEvent());
+                canProceed = ((CloseCase)this.controller.getCommandHandler().getCommand(
+                    "CloseCase")).quickClose(getKeyEvent());
             } catch (Exception exception) {
-            	canProceed = true;
-            	exception.printStackTrace();
+                canProceed = true;
+                exception.printStackTrace();
             }
+
             if (!canProceed) break;		// Alternative scenario succeeded
 
             try {
@@ -197,7 +199,7 @@ public class OpenCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
-    	canExecute(true);		// getModel().hasCurrentCase());
+        canExecute(true);		// getModel().hasCurrentCase());
         super.update();
     }
 
@@ -214,5 +216,4 @@ public class OpenCase extends CaseManagerCommand {
     public void setCaseManager(CaseManager caseManager) {
         this.controller = caseManager;
     }
-
 }

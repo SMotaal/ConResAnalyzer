@@ -1,22 +1,17 @@
 /*
  * @(#)TargetDimensions.java   11/11/23
- *
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 /**
- *
  */
 package com.grasppe.conres.framework.targets.model;
 
 /**
  * @author daflair
- *
  */
 public class TargetMeasurements extends TargetDimensions {
 
@@ -25,24 +20,9 @@ public class TargetMeasurements extends TargetDimensions {
     protected float[]	zValues;
 
     /**
-     *
      */
     public TargetMeasurements() {
-    	super();
-    }
-
-    /**
-     * @return the zValues
-     */
-    public float[] getZValues() {
-        return zValues;
-    }
-
-    /**
-     * @param zValues the zValues to set
-     */
-    public void setZValues(float[] zValues) {
-        this.zValues = zValues;
+        super();
     }
 
     /**
@@ -60,6 +40,33 @@ public class TargetMeasurements extends TargetDimensions {
     }
 
     /**
+     * @return the zValues
+     */
+    public float[] getZValues() {
+        return zValues;
+    }
+
+    /**
+     *  @param xValues
+     *  @param yValues
+     */
+    public void setValues(float[] xValues, float[] yValues) {
+        setXValues(xValues);
+        setYValues(yValues);
+    }
+
+    /**
+     *  @param xValues
+     *  @param yValues
+     *  @param zValues
+     */
+    public void setValues(float[] xValues, float[] yValues, float[] zValues) {
+        setXValues(xValues);
+        setYValues(yValues);
+        setZValues(zValues);
+    }
+
+    /**
      * @param xValues the xValues to set
      */
     public void setXValues(float[] xValues) {
@@ -72,15 +79,11 @@ public class TargetMeasurements extends TargetDimensions {
     public void setYValues(float[] yValues) {
         this.yValues = yValues;
     }
-    
-    public void setValues(float[] xValues, float[] yValues, float[] zValues) {
-        setXValues(xValues);
-        setYValues(yValues);
-        setZValues(zValues);
-    }
-    
-    public void setValues(float[] xValues, float[] yValues) {
-        setXValues(xValues);
-        setYValues(yValues);
+
+    /**
+     * @param zValues the zValues to set
+     */
+    public void setZValues(float[] zValues) {
+        this.zValues = zValues;
     }
 }

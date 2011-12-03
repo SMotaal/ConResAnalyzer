@@ -1,10 +1,7 @@
 /*
  * @(#)NewCase.java   11/11/26
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
@@ -21,7 +18,6 @@ import java.awt.event.KeyEvent;
 
 /**
  *         Defines Case Manager's New Case actions and command, using the EAC pattern.
- *        
  *         @version        $Revision: 1.0, 11/11/08
  *         @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -31,13 +27,11 @@ public class NewCase extends CaseManagerCommand {
     protected static final int		mnemonicKey = KeyEvent.VK_N;
 
     /**
-     *
      */
     private CaseManager	caseManager;
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      * @param caseManager TODO
      */
@@ -50,7 +44,6 @@ public class NewCase extends CaseManagerCommand {
 
     /**
      * Performs the command operations when called by execute().
-     *
      * @return
      */
     @Override
@@ -95,11 +88,12 @@ public class NewCase extends CaseManagerCommand {
         if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
 
         try {
-//            getModel().currentCase    = getModel().newCase;		// Make current the new case
-//            getModel().newCase        = null;					// Clear new case
-//            getModel().backgroundCase = null;					// clear background case
-        	getModel().promoteNewCase();
-            canProceed                = true;
+
+//          getModel().currentCase    = getModel().newCase;       // Make current the new case
+//          getModel().newCase        = null;                 // Clear new case
+//          getModel().backgroundCase = null;                 // clear background case
+            getModel().promoteNewCase();
+            canProceed = true;
             getModel().notifyObservers();
         } catch (Exception e) {
             GrasppeKit.debugText("New Case Failure",
@@ -121,7 +115,7 @@ public class NewCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
-    	canExecute(true);		// getModel().hasCurrentCase());
+        canExecute(true);		// getModel().hasCurrentCase());
         super.update();
     }
 

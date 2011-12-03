@@ -1,21 +1,15 @@
 /*
  * @(#)MarkBlock.java   11/11/26
- * 
  * Copyright (c) 2011 Saleh Abdel Motaal
- *
  * This code is not licensed for use and is the property of it's owner.
- *
  */
 
 
 
 package com.grasppe.conres.framework.targets.operations;
 
-import com.grasppe.conres.framework.cases.CaseManager;
-import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
-import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -24,7 +18,6 @@ import java.awt.event.KeyEvent;
 
 /**
  *         Defines Case Manager's New Case actions and command, using the EAC pattern.
- *        
  *         @version        $Revision: 1.0, 11/11/08
  *         @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
@@ -34,33 +27,45 @@ public class SelectBlock extends TargetManagerCommand {
     protected static final int		mnemonicKey = KeyEvent.VK_B;
 
     /**
-     *
      */
     private TargetManager	controller;
 
     /**
      * Constructs a realization of AbstractCommand.
-     *
      * @param listener
      * @param controller TODO
      */
     public SelectBlock(TargetManager controller, ActionListener listener) {
         super(listener, name);
-        this.controller  = controller;
+        this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
         controller.getModel().attachObserver(this);
         update();
     }
 
     /**
+     *  @return
+     */
+    protected boolean canSelectBlocks() {
+        if (getModel() == null) return false;
+
+        ConResTarget	target = getModel().getActiveTarget();
+
+        if (target == null) return false;
+
+        return target.getTargetBlocks().length > 0;
+    }
+
+    /**
      * Performs the command operations when called by execute().
-     *
      * @return
      */
     @Override
     public boolean perfomCommand() {
         boolean	canProceed = canExecute();
+
         canProceed = new SelectBlockOperation(controller).execute(true);
+
         return canProceed;
     }
 
@@ -69,15 +74,10 @@ public class SelectBlock extends TargetManagerCommand {
      */
     @Override
     public void update() {
-    	boolean newState  = canSelectBlocks();
-    	canExecute(newState);		// getModel().hasCurrentCase());
+        boolean	newState = canSelectBlocks();
+
+        canExecute(newState);		// getModel().hasCurrentCase());
         super.update();
-    }
-    
-    protected boolean canSelectBlocks() {
-    	ConResTarget target = getModel().getActiveTarget();
-    	if (target==null) return false;
-    	return target.getTargetBlocks().length>0;
     }
 
 //  /**
