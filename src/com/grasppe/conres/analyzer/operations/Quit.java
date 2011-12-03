@@ -37,7 +37,7 @@ public class Quit extends ConResAnalyzerCommand {
      */
     @Override
 	public boolean perfomCommand() {
-        if (!controlKeyPressed()) return true;
+//        if (!controlKeyPressed()) return true;
 
         if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
         	System.exit(0);

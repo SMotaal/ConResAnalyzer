@@ -10,7 +10,7 @@ import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectCaseFolder extends FileChooserOperation {
+public class SelectCaseFolder extends FileChooserFunction {
 
     protected static final String	name = "SelectCaseFolder"; 
 

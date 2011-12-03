@@ -102,8 +102,8 @@ public class TestingListeners {
             debugEvent("Window", e);	// GrasppeKit.debugText("Window Closed ("
 
             // + name + ")", e.toString());
-            if ((visibleFrames == 1) && ConResBootCamp.Testing.getZoomWindow().isVisible()) ConResBootCamp.delayedExit();
-            if (visibleFrames == 0) ConResBootCamp.delayedExit();
+//            if ((visibleFrames == 1) && ConResBootCamp.Testing.getZoomWindow().isVisible()) ConResBootCamp.delayedExit();
+//            if (visibleFrames == 0) ConResBootCamp.delayedExit();
         }
 
         public void windowClosing(WindowEvent e) {

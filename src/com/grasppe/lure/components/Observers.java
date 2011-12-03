@@ -1,6 +1,6 @@
 /*
  * @(#)Observers.java   11/11/27
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -17,6 +17,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -39,7 +40,7 @@ public class Observers implements Observable {
     }
 
     /**
-     * 	@param observable
+     *  @param observable
      */
     public Observers(Observable observable) {
         this.observable = observable;
@@ -53,7 +54,7 @@ public class Observers implements Observable {
     public void attachObserver(Observer observer) {
         GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()));
         observerSet.add(observer);
-
+        notifyObservers();
         // TODO Implement throwing exceptions for attach of existing element
     }
 
@@ -65,12 +66,12 @@ public class Observers implements Observable {
     public void detachObserver(Observer observer) {
         GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()));
         observerSet.remove(observer);
-
+        notifyObservers();
         // TODO Implement throwing exceptions for detach of missing element
     }
 
     /**
-     * 	@param observer
+     *  @param observer
      */
     public void notifyObserver(Observer observer) {
         observer.update();
@@ -83,6 +84,8 @@ public class Observers implements Observable {
     public void notifyObservers() {
 
         observerSet.toArray();
+        
+        try{
 
         for (Object object : observerSet) {
             Observer	observer = (Observer)object;
@@ -91,9 +94,12 @@ public class Observers implements Observable {
                 if (observable == null) notifyObserver(observer);
                 else observable.notifyObserver(observer);
             } catch (Exception exception) {
-            	observerSet.remove(observer);
-            	exception.printStackTrace();
+                observerSet.remove(observer);
+//                exception.printStackTrace();
             }
+        }
+        } catch (ConcurrentModificationException exception) {
+        	
         }
 
 //      Iterator<Observer>    observerIterator = observerSet.iterator();
@@ -115,7 +121,27 @@ public class Observers implements Observable {
     }
 
     /**
-     * 	@return
+     *  @return
+     */
+    public String toString() {
+
+//      observerSet.toArray();
+//
+//      for (Object object : observerSet) {
+//          Observer  observer = (Observer)object;
+//
+//          try {}
+//          catch (Exception exception) {
+//              observerSet.remove(observer);
+//              exception.printStackTrace();
+//          }
+//      }
+        return "" + observerSet.size() + ((observerSet.size() > 1) ? " observers"
+                : " observer");
+    }
+
+    /**
+     *  @return
      */
     public Iterator<Observer> getIterator() {
         return observerSet.iterator();		// new HashSet<Observer>(observerSet).iterator();

@@ -8,7 +8,7 @@ import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.lure.components.AbstractModel;
-import com.grasppe.lure.components.AbstractOperation;
+import com.grasppe.lure.components.AbstractFunction;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
@@ -19,7 +19,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectCornersOperation extends TargetManagerOperation implements Observer {
+public class SelectCornersOperation extends TargetManagerFunction implements Observer {
 
 	protected static final String	name = "SelectCorners";
 	AbstractModel model;

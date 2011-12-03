@@ -1,6 +1,6 @@
 package com.grasppe.conres.framework.cases.operations;
 
-import com.grasppe.lure.components.AbstractOperation;
+import com.grasppe.lure.components.AbstractFunction;
 
 /**
  * Class description
@@ -8,12 +8,12 @@ import com.grasppe.lure.components.AbstractOperation;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public abstract class CaseManagerOperation extends AbstractOperation {
+public abstract class CaseManagerFunction extends AbstractFunction {
 
     /**
      * @param name
      */
-    public CaseManagerOperation(String name) {
+    public CaseManagerFunction(String name) {
         super(name);
     }
 }

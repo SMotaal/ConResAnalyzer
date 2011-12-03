@@ -2,6 +2,7 @@ package com.grasppe.lure.components;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InvalidObjectException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -151,7 +152,11 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
             // TODO: update() on attachModel()
             // TODO: handle attach will fail if model is empty
-        	this.model.attachController(this);
+        	//this.model.attachController(this);
+        	if (getModel() != null) {
+        		getModel().attachController(this);
+        		
+        	}
 //            this.model.attachObserver(this);
         }
         
@@ -183,7 +188,9 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             // TODO: update() on attachView()
             // TODO: handle attach will fail if view is empty
             // TODO: handle attach will fail if model is empty
-            this.model.attachView(view);
+            //this.model.attachView(view);
+        	if (getModel() != null)
+        		getModel().attachView(view);
         }
 
         /**
@@ -210,7 +217,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         public void detachModel() {
 
             // TODO: update() on detachModel()
-            this.model.detachObserver(this);
+        	getModel().detachObserver(this);
         }
 
         /**
@@ -221,7 +228,11 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
         public void detachView(AbstractView view) {
 
             // TODO: update() on detachView()
-            this.model.detachObserver(view);
+        	try {
+				getModel().detachView(view);
+			} catch (InvalidObjectException e) {
+//				e.printStackTrace();
+			}
         }
 
         /**
@@ -288,19 +299,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             if (commands == null) resetCommands();
             if (commands.isEmpty()) createCommands();
         }
-
-//        /**
-//         * Decorator-style assignment of a listener to an AbstractModel.
-//         *
-//         * @param listener
-//         *
-//         * @return
-//         */
-//        public static AbstractController withActionListener(AbstractModel model, ActionListener listener) {
-//            AbstractController newController = new AbstractController(model);
-//            newController.attachListener(listener);
-//            return newController;
-//        }
 
         /**
          * Returns the local command with the specified name from the commands map.

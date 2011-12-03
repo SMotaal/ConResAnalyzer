@@ -135,7 +135,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
          */
         public boolean canExecute() {
 
-            // update();
             return executable;
         }
 
@@ -210,6 +209,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             
             } catch (Exception exception) {
             	GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
+            	exception.printStackTrace();
             	executing = false;
             	executed  = false;
             	return false;            	
@@ -218,24 +218,38 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
             return executed;
         }
 
-        /**
-         * Method description
-         *
-         * @param forcedAction
-         *
-         * @return
-         */
-        public final boolean execute(boolean forcedAction) {
+//        /**
+//         * Method description
+//         *
+//         * @param forcedAction
+//         *
+//         * @return
+//         */
+//        public final boolean execute(boolean forcedAction) {
+//
+//            // update();
+//            // if (forcedAction)
+//            executed = false;
+//
+//            // if (forcedAction)
+//            canExecute(forcedAction);
+//
+//            return execute();
+//        }
+        
+        public final boolean forceExecute() {
             GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()));
-
-            // update();
-            // if (forcedAction)
+        	
             executed = false;
-
-            // if (forcedAction)
-            canExecute(forcedAction);
-
+            canExecute(true); 
             return execute();
+        }
+        public final boolean forceExecute(KeyEvent e) {
+            setKeyEvent(e);
+            forceExecute();
+            setKeyEvent();
+
+            return executed;
         }
 
         /**
@@ -252,23 +266,23 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
             return executed;
         }
-
-        /**
-         * Method description
-         *
-         *
-         * @param forcedAction
-         * @param e
-         *
-         * @return
-         */
-        public final boolean execute(boolean forcedAction, KeyEvent e) {
-            setKeyEvent(e);
-            execute(forcedAction);
-            setKeyEvent();
-
-            return executed;
-        }
+//
+//        /**
+//         * Method description
+//         *
+//         *
+//         * @param forcedAction
+//         * @param e
+//         *
+//         * @return
+//         */
+//        public final boolean execute(boolean forcedAction, KeyEvent e) {
+//            setKeyEvent(e);
+//            execute(forcedAction);
+//            setKeyEvent();
+//
+//            return executed;
+//        }
 
         /**
          * Detaches from the model when being finalize through garbage collection.
@@ -312,7 +326,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
          * Called by the model indirectly during notify. It will set executable to false if using model is true and the model. This method may be overridden as long as super.update() is called first in order to preserve the model checking logic.
          */
         public void update() {
-        	notifyObservers();
+//        	notifyObservers();
             //canExecute(!useModel || (model != null));		// either not using model or model is not empty!
 
 

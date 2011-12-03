@@ -1,5 +1,5 @@
 /*
- * @(#)AbstractOperation.java   11/11/26
+ * @(#)AbstractFunction.java   11/11/26
  * 
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -27,7 +27,7 @@ import javax.swing.Icon;
  *     @version        $Revision: 1.0, 11/11/09
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class AbstractOperation extends AbstractAction {		// implements Observer, Observable {
+public class AbstractFunction extends AbstractAction {		// implements Observer, Observable {
 
     protected boolean	executable = false;
     protected boolean	executed   = false;
@@ -41,14 +41,14 @@ public class AbstractOperation extends AbstractAction {		// implements Observer,
     /**
      * Constructs ...
      */
-    public AbstractOperation() {
+    public AbstractFunction() {
         super();
     }
 
     /**
      * @param name
      */
-    public AbstractOperation(String name) {
+    public AbstractFunction(String name) {
         super(name);
     }
 
@@ -56,7 +56,7 @@ public class AbstractOperation extends AbstractAction {		// implements Observer,
      * @param name
      * @param icon
      */
-    public AbstractOperation(String name, Icon icon) {
+    public AbstractFunction(String name, Icon icon) {
         super(name, icon);
     }
 

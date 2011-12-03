@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
      * @param file
      * @throws Exception 
      */
-    public TargetDefinitionReader(File file) throws Exception {
+    public TargetDefinitionReader(File file) throws IOException {
         this(new FileReader(file));
         this.file = (IConResTargetDefinition) file;
         parseFile();
@@ -162,7 +163,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     /**
      * @throws Exception
      */
-    public void parseFile() throws Exception {
+    public void parseFile() throws IOException {
         String	line;
 
         while ((line = super.readLine()) != null) {

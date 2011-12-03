@@ -32,7 +32,7 @@ import javax.swing.JFrame;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectBlockOperation extends TargetManagerOperation implements Observer {
+public class SelectBlockOperation extends TargetManagerFunction implements Observer {
 
     protected static final String	name = "SelectBlock";
     
@@ -55,7 +55,7 @@ public class SelectBlockOperation extends TargetManagerOperation implements Obse
 
     /*
      *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractOperation#perfomOperation()
+     * @see com.grasppe.lure.components.AbstractFunction#perfomOperation()
      */
 
     /**

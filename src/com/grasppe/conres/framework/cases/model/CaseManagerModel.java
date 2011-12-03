@@ -38,16 +38,7 @@ public class CaseManagerModel extends AbstractModel {
 
     /** Field description */
     protected CaseModel	newCase = null;
-    protected boolean	locked  = false;
-
-    /**
-     * Constructs a new model object with no predefined controller.
-     * 	@param controller
-     */
-
-//  public CaseManagerModel() {
-//      super();
-//  }
+//    protected boolean	locked  = false;
 
     /**
      * Constructs a new model with a predefined controller.
@@ -94,7 +85,7 @@ public class CaseManagerModel extends AbstractModel {
 //      if (newCase == null)  // return;
 //          throw new UnexpectedException(
 //              "Case manager could not discard a new case since it does not exist.");
-        if (backgroundCase != null) currentCase = backgroundCase;
+        // if (backgroundCase != null) currentCase = backgroundCase;
 
 //      newCase        = null;
         backgroundCase = null;
@@ -102,12 +93,12 @@ public class CaseManagerModel extends AbstractModel {
         notifyObservers();
     }
 
-    /**
-     *  @return
-     */
-    protected boolean lock() {
-        return locked = true;
-    }
+//    /**
+//     *  @return
+//     */
+//    protected boolean lock() {
+//        return locked = true;
+//    }
 
     /**
      *  @throws UnexpectedException
@@ -150,12 +141,12 @@ public class CaseManagerModel extends AbstractModel {
         notifyObservers();
     }
 
-    /**
-     *  @return
-     */
-    protected boolean unlock() {
-        return locked = false;
-    }
+//    /**
+//     *  @return
+//     */
+//    protected boolean unlock() {
+//        return locked = false;
+//    }
 
     /**
      * @return the backgroundCase
@@ -182,7 +173,7 @@ public class CaseManagerModel extends AbstractModel {
      * @return
      * @throws UnexpectedException
      */
-    public CaseModel getNewCase() throws UnexpectedException {
+    public CaseModel getNewCaseModel() throws UnexpectedException {
         if (!canGetNewCase())		// (backgroundCase != null) && (currentCase != null))
             throw new UnexpectedException(
                 "Case manager could not create a new case since it already has both a background case and a current case.");
@@ -192,6 +183,10 @@ public class CaseManagerModel extends AbstractModel {
 
         return newCase;
     }
+    
+    public CaseModel getNewCase() {
+    	return newCase;
+    }
 
     /**
      * Method description
@@ -199,6 +194,7 @@ public class CaseManagerModel extends AbstractModel {
      * @return
      */
     public boolean hasCurrentCase() {
+    	
 
         // if (currentCase != null) GrasppeKit.debugText("Current Case", currentCase.toString());
         return (currentCase != null);
@@ -218,10 +214,10 @@ public class CaseManagerModel extends AbstractModel {
 //      return ((newCase != null) && (backgroundCase != null));
     }
 
-    /**
-     * @return the locked
-     */
-    public boolean isLocked() {
-        return locked;
-    }
+//    /**
+//     * @return the locked
+//     */
+//    public boolean isLocked() {
+//        return locked;
+//    }
 }

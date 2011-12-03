@@ -54,7 +54,7 @@ import javax.swing.Timer;
 public class GrasppeKit {
 
     /** Field description */
-    private static int	debugLevel = 10;		// default level is 3
+    private static int	debugLevel = 3;		// default level is 3
     private static int	debugDefault = 4;		// default level is 3
 
     /** Field description */
@@ -714,11 +714,11 @@ public class GrasppeKit {
      * @return
      */
     public static String cat(String word1, String word2, String delimiter) {
-        String	text = word1.trim();
+        String	text = (word1!=null) ? word1.trim() : "";
 
         if (text.isEmpty()) return word2.trim();
 
-        if (!word2.trim().isEmpty()) text += delimiter + word2.trim();
+        if (word2!=null && !word2.trim().isEmpty()) text += delimiter + word2.trim();
 
         return text;
     }
@@ -1122,13 +1122,9 @@ public class GrasppeKit {
             public void checkPermission(Permission perm) {
 
                 /* Allow everything else. */
-
-                // if (perm.getName().startsWith(exitVM))
             	if (debugLevelChecks(5))
                 System.out.println("Check " + perm.getName() + ": "+ perm.getActions().trim()
                                    + "\t" + perm.toString());
-
-                // perm.getName()
             }
 
             @Override

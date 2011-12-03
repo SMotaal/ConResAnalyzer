@@ -10,7 +10,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 public abstract class ObservableObject implements Observable {
 
     /** Field description */
-    protected Observers	observers = new Observers();
+    protected Observers	observers = new Observers(this);
 
     /**
      * Attaches an observer through the observers object which will include the observer in future update() notify calls.
@@ -41,5 +41,9 @@ public abstract class ObservableObject implements Observable {
 
     public void notifyObserver(Observer observer) {
     	observer.update();
+    }
+    
+    public String observerString() {
+    	return observers.toString();
     }
 }

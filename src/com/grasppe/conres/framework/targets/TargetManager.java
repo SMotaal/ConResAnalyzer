@@ -36,6 +36,8 @@ import com.grasppe.lure.framework.GrasppeKit;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -109,7 +111,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      * 	@param targetDefinitionFile
      * 	@throws Exception
      */
-    public void loadTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) throws Exception {
+    public void loadTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) throws IOException {
 
         // TODO: Create reader and read target from Case Manager current case
     	//TargetDefinitionFile file = targetDefinitionFile.getTargetDefinitionFile();

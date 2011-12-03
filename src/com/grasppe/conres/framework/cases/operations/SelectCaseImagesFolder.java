@@ -16,10 +16,10 @@ import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectCaseImagesFolder extends FileChooserOperation {
+public class SelectCaseImagesFolder extends FileChooserFunction {
 
     /* (non-Javadoc)
-	 * @see com.grasppe.conres.framework.cases.operations.FileChooserOperation#verifySelection(java.io.File)
+	 * @see com.grasppe.conres.framework.cases.operations.FileChooserFunction#verifySelection(java.io.File)
 	 */
 	@Override
 	protected boolean verifySelection(File selectedFile) {

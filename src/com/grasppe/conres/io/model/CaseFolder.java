@@ -73,7 +73,7 @@ public class CaseFolder extends CaseFile {
         	}
         	else
         		GrasppeKit.debugText("Enumerting Case Images", "The image " + thisFile.getName() + " was not load since " +
-        				"block value " + thisFile.getImageID() + " was not defined in the target defnition file.");
+        				"block value " + thisFile.getImageID() + " was not defined in the target defnition file.", 3);
         }
         
         if (!imageToneValues.containsAll(blockToneValues)) throw new FileNotFoundException("The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n" +

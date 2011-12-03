@@ -82,7 +82,7 @@ public class NewCase extends CaseManagerCommand {
                              "New case will be created and passed for metadata entry", 3);
 
         try {
-            getModel().getNewCase();		// getModel().Case//new getModel()canProceed..CaseModel();
+            getModel().getNewCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
             getModel().notifyObservers();
             canProceed = true;
         } catch (Exception e) {

@@ -1,12 +1,27 @@
+/*
+ * @(#)CloseCase.java   11/12/02
+ * 
+ * Copyright (c) 2011 Saleh Abdel Motaal
+ *
+ * This code is not licensed for use and is the property of it's owner.
+ *
+ */
+
+
+
 package com.grasppe.conres.framework.cases.operations;
+
+import com.grasppe.conres.framework.cases.model.CaseManagerModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 import ij.IJ;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.rmi.UnexpectedException;
 
-import com.grasppe.lure.framework.GrasppeKit;
+import java.rmi.UnexpectedException;
 
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
@@ -16,8 +31,10 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class CloseCase extends CaseManagerCommand {
 
-    protected static final String	name        = "CloseCase";
-    protected static final int		mnemonicKey = KeyEvent.VK_C;
+    protected static final String	name         = "CloseCase";
+    protected static final int		mnemonicKey  = KeyEvent.VK_C;
+    protected boolean				isCaseClosed = true;
+    protected boolean	backgroundMode = false;
 
     /**
      * Constructs a realization of AbstractCommand.
@@ -37,34 +54,34 @@ public class CloseCase extends CaseManagerCommand {
      * @return
      */
     @Override
-	public boolean perfomCommand() {
-        boolean	canProceed = !isCaseClosed(); // && !getModel().isBusy();		// canExecute();
+    public boolean perfomCommand() {
+        boolean	canProceed = !isCaseClosed;		// && !getModel().isBusy();      // canExecute();
 
         GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 3);
+
         if (!canProceed) {
-        	notifyObservers();
-        	return true;		// Action responded to in alternative scenario
+            notifyObservers();
+
+            return true;	// Action responded to in alternative scenario
         }
+
         if (!altPressed())
-            canProceed = IJ.showMessageWithCancel(name,
-                "Do you want to close the current case?");
+            canProceed = IJ.showMessageWithCancel(name, "Do you want to close the current case?");
         if (!canProceed) return true;		// Action responded to in alternative scenario
         GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", 3);
-//        getModel().backgroundCase = getModel().currentCase;
-//        getModel().currentCase    = null;
 
         try {
-        	getModel().backgroundCurrentCase();
-        	
-    	} catch (UnexpectedException e) {
-//    		IJ.showMessage(e.getMessage());
-    		e.printStackTrace();
-    	}        	
+            getModel().backgroundCurrentCase();
+            if (!backgroundMode) getModel().discardBackgroundCase();
+
+        } catch (UnexpectedException e) {
+            e.printStackTrace();
+        }
+
         GrasppeKit.debugText("Closed Case Success",
-                             "Moved current case to background and cleared current case.",
-                             3);
+                             "Moved current case to background and cleared current case.", 3);
         getModel().notifyObservers();
-    	notifyObservers();
+        notifyObservers();
 
         return true;	// Action responded to in intended scenario
     }
@@ -77,21 +94,20 @@ public class CloseCase extends CaseManagerCommand {
      * @return
      */
     public boolean quickClose(KeyEvent keyEvent) {
-        boolean	canProceed;
+        boolean	canProceed = true;
+        backgroundMode =  true;
 
         try {
-            canProceed = execute(true, keyEvent);		// Don't care if a case was closed
-            canProceed = isCaseClosed();				// Only care that no case is open!
-
-            // getModel().notifyObservers();
+            canProceed = forceExecute(); //(keyEvent);
+            getModel().notifyObservers();
         } catch (Exception e) {
 
-            // forget about current case!
             GrasppeKit.debugText("Close Case Attempt",
                                  "Failed to close case or no case was open!" + "\n\n"
                                  + e.toString(), 2);
             canProceed = false;
         }
+        backgroundMode = false;
 
         return canProceed;
     }
@@ -101,20 +117,22 @@ public class CloseCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
-    	canExecute(!isCaseClosed());	//
+        canExecute(!updateCaseClosed());	//
         super.update();
     }
 
     /**
-     * Method description
-     *
-     * @return
+     * 	@return
      */
-    public boolean isCaseClosed() {
-        boolean	value = !(getModel().hasCurrentCase());
+    private boolean updateCaseClosed() {
+        CaseManagerModel	model = getModel();
+        boolean				value = !(model.hasCurrentCase());
 
         GrasppeKit.debugText("isCaseClose", "" + value, 3);
 
+        isCaseClosed = value;
+
         return value;
+
     }
 }

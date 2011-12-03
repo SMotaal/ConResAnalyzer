@@ -91,7 +91,6 @@ public class CornerSelectorView extends AbstractView
      */
     public CornerSelectorView(CornerSelector controller) {
         super(controller);
-        this.model = controller.getModel();
     }
 
     /**
@@ -1287,7 +1286,7 @@ public class CornerSelectorView extends AbstractView
      * @return
      */
     public CornerSelectorModel getModel() {
-        return (CornerSelectorModel)model;
+        return (CornerSelectorModel)super.getModel();
     }
 
     /**

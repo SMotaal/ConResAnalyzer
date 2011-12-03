@@ -537,31 +537,31 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         return (strPointCount + "\t" + strPoints);
     }
 
-    /**
-     * @deprecated Java exits on last window anyway!
-     */
-    @Deprecated
-    public static void delayedExit() {
-
-        GrasppeKit.debugText("Delayed Exit (" + name + ")",
-                             "Exiting if no windows open in the next " + (exitDelay / 1000)
-                             + " seconds!", 2);
-
-        int				delay         = exitDelay;		// milliseconds
-        ActionListener	taskPerformer = new ActionListener() {
-
-			public void actionPerformed(ActionEvent evt) {
-                Frame[]	frames = Frame.getFrames();
-
-                for (Frame frame : frames)
-                    if (frame.isVisible()) return;		// visibleFrames++;
-
-                System.exit(0);
-            }
-        };
-
-        new Timer(delay, taskPerformer).start();
-    }
+//    /**
+//     * @deprecated Java exits on last window anyway!
+//     */
+//    @Deprecated
+//    public static void delayedExit() {
+//
+//        GrasppeKit.debugText("Delayed Exit (" + name + ")",
+//                             "Exiting if no windows open in the next " + (exitDelay / 1000)
+//                             + " seconds!", 2);
+//
+//        int				delay         = exitDelay;		// milliseconds
+//        ActionListener	taskPerformer = new ActionListener() {
+//
+//			public void actionPerformed(ActionEvent evt) {
+//                Frame[]	frames = Frame.getFrames();
+//
+//                for (Frame frame : frames)
+//                    if (frame.isVisible()) return;		// visibleFrames++;
+//
+//                System.exit(0);
+//            }
+//        };
+//
+//        new Timer(delay, taskPerformer).start();
+//    }
 
     /**
      * Method description
@@ -707,9 +707,9 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         MagnifierCanvas	zoomCanvas = new MagnifierCanvas(Testing.getImageWindow().getImagePlus());
 
-        zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
-        zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
-        zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
+//        zoomCanvas.addMouseListener(TestingListeners.IJMouseListener);
+//        zoomCanvas.addMouseMotionListener(TestingListeners.IJMotionListener);
+//        zoomCanvas.addMouseWheelListener(TestingListeners.IJWheelListener);
         zoomCanvas.setBackground(Color.black);
 
         // Testing.imageWindow.getCanvas().zoomIn(0, 0);
@@ -931,162 +931,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 //        testImageWindow();
 //        testImageJMouseListeners();
 //        testMagnifier();
-
-    }
-
-    /**
-     * Method description
-     */
-    public void testImageJMouseListeners() {
-
-        /* Static Variables */
-
-        /* Static Members */
-        MouseMotionListener	motionListener = TestingListeners.IJMotionListener;
-        MouseWheelListener	wheelListener  = TestingListeners.IJWheelListener;
-        MouseListener		mouseListener  = TestingListeners.IJMouseListener;
-        ImageWindow			imageWindow    = Testing.getImageWindow();
-
-        /* Local Variables */
-
-        /* Test Statements */
-        imageWindow.getCanvas().addMouseListener(mouseListener);
-        imageWindow.getCanvas().addMouseMotionListener(motionListener);
-        imageWindow.getCanvas().addMouseWheelListener(wheelListener);
-
-        /* Static Updates */
-
-    }
-
-    /**
-     * Opens an ImagePlus image using Opener and creates and displays it in an
-     * ImageWindow;
-     */
-    public void testImageWindow() {
-
-        /* Static Variables */
-
-        /* Static Members */
-        ImageWindow		imageWindow    = Testing.getImageWindow();
-        WindowListener	windowListener = TestingListeners.WindowEventListener;
-
-        /* Local Variables */
-        Opener		opener;
-        ImagePlus	imagePlus;
-
-        /* Test Statements */
-
-        Testing.startTimer();
-
-        opener = new Opener();
-
-        String	imagePath = Testing.getInputPath();
-
-        imagePlus = opener.openImage(imagePath);
-        Testing.checkTimer("Opened ImagePlus " + imagePlus.getTitle());
-
-        // imagePlus.getProcessor().autoThreshold(); // 128);
-        // Testing.checkTimer("Auto Threshold " + imagePlus.getTitle());
-
-        Testing.setImageWindow(new ImageWindow(imagePlus));		// Initialize static
-
-        // variable here
-        imageWindow = Testing.getImageWindow();
-        Testing.checkTimer("Created ImageWindow " + imagePlus.getTitle());
-
-        // imageWindow.
-
-        // imageWindow.getCanvas().zoom100Percent();
-        // Testing.checkTimer("Zoomed " + imagePlus.getTitle());
-
-        Testing.getImageWindow().getCanvas().fitToWindow();
-
-        imageWindow.setVisible(true);
-        Testing.checkTimer("ImageWindow Displayed " + imagePlus.getTitle());
-
-        imageWindow.addWindowListener(windowListener);
-
-        /* Static Updates */
-
-    }
-
-    /**
-     * Method description
-     */
-    public void testMagnifier() {
-        prepareFrame();
-
-        /* Static Variables */
-
-        /* Static Members */
-        JFrame				frame          = Testing.getZoomWindow();
-        ImageWindow			imageWindow    = Testing.getImageWindow();
-        MouseMotionListener	motionListener = TestingListeners.IJMotionListener;
-
-        /* Local Variables */
-
-        /* Test Statements */
-        frame.addMouseMotionListener(motionListener);
-        frame.addMouseListener(TestingListeners.IJMouseListener);
-        imageWindow.getCanvas().addMouseMotionListener(motionListener);
-
-        /* Static Updates */
-    }
-
-    /**
-     * Method description
-     */
-    public void testProgessBar() {
-
-        /* Static Variables */
-
-        /* Static Members */
-
-        /* Local Variables */
-
-        /* Test Statements */
-
-        /* Static Updates */
-
-    }
-
-    /**
-     * Method description
-     */
-    public void testROIFinder() {
-        Point[]	points = new Point[] { new Point(0, 0), new Point(1, 0), new Point(1, 1),
-                                       new Point(0, 1) };
-
-        Point	origin  = new Point(0, 0);
-        int		stretch = 1;
-
-        for (int p = 0; p < 4; p++) {
-
-            // TODO: calculate other three points with origin and stretch
-            int			pA       = (p + 1) % 4,
-						pB       = (p + 2) % 4,
-						pC       = (p + 3) % 4;
-            Point[]		points2  = new Point[] { points[pA], points[pB], points[pC] };
-            int[]		xs       = new int[] { points2[0].x, points2[1].x, points2[2].x };
-            int[]		ys       = new int[] { points2[0].y, points2[1].y, points2[2].y };
-            PointRoi	pointROI = new PointRoi(xs, ys, xs.length);
-
-            GrasppeKit.debugText("Points Selection", debugPoints(pointROI));
-
-            PointRoi	newROI = calculateFourthVertex(pointROI);
-
-            GrasppeKit.debugText("Points Determined", debugPoints(newROI));
-        }
-    }
-
-    /**
-     * Method description
-     */
-    public void testVertexSelectionTool() {
-
-        // testMagnifier()
-
-        /* when click, mark ImageJ roi */
 
     }
 

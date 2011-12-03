@@ -18,7 +18,7 @@ import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
  * @version        $Revision: 1.0, 11/11/10
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public abstract class FileChooserOperation extends CaseManagerOperation {
+public abstract class FileChooserFunction extends CaseManagerFunction {
 
     /**
 	 * @return the defaultChooserPath
@@ -39,7 +39,7 @@ public abstract class FileChooserOperation extends CaseManagerOperation {
      *
      * @param name
      */
-    public FileChooserOperation(String name) {
+    public FileChooserFunction(String name) {
         super(name);
         prepareFileChooser();
     }
