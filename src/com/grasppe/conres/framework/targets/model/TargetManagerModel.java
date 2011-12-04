@@ -87,7 +87,13 @@ public class TargetManagerModel extends AbstractModel {
      * @param activeBlock the activeBlock to set
      */
     public void setActiveBlock(GridBlock activeBlock) {
-        getActiveTarget().setActiveBlock(activeBlock);
+        try {
+
+            getActiveTarget().setActiveBlock(activeBlock);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
         notifyObservers();
     }
 
@@ -95,6 +101,8 @@ public class TargetManagerModel extends AbstractModel {
      * @param activeTarget the activeTarget to set
      */
     public void setActiveTarget(ConResTarget activeTarget) {
+        boolean	updated = false;
+
         try {
             if (activeTarget == null) if (this.activeTarget != null) {
                 this.backgroundTarget = this.activeTarget;
@@ -102,13 +110,20 @@ public class TargetManagerModel extends AbstractModel {
             } else {
                 if (this.backgroundTarget != null) this.activeTarget = this.backgroundTarget;
             }
-            if (this.activeTarget == activeTarget) return;
+            if ((this.activeTarget != null) && (this.activeTarget != activeTarget)) updated = true;
             this.activeTarget = activeTarget;
+
+            // Set active block to 0 if null
+            if ((this.activeTarget.getActiveBlock() == null)
+                    && (this.activeTarget.getTargetBlocks().length > 0))
+                this.activeTarget.setActiveBlock(this.activeTarget.getTargetBlocks()[0]);
+
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
-        notifyObservers();
+        if (updated) notifyObservers();
+
     }
 
     /**

@@ -55,7 +55,7 @@ public class AnalyzeBlock extends AnalysisCommand {
         analysisStepper.testRun();
 
 //      CornerSelector conrnerSelector = new CornerSelector(controller);
-//      canProceed = new SelectCornersOperation(conrnerSelector).execute(true);
+//      canProceed = new SelectCornersFunction(conrnerSelector).execute(true);
 
         return true;
     }

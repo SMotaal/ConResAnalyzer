@@ -1,6 +1,6 @@
 /*
  * @(#)AbstractController.java   11/12/03
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -53,7 +53,7 @@ public class AbstractController implements Observer, ActionListener {
     }
 
     /**
-     * 	@param listener
+     *  @param listener
      */
     public AbstractController(ActionListener listener) {
         this();
@@ -61,8 +61,8 @@ public class AbstractController implements Observer, ActionListener {
     }
 
     /**
-     * 	@param model
-     * 	@param listener
+     *  @param model
+     *  @param listener
      */
     public AbstractController(AbstractModel model, ActionListener listener) {
         this(model);
@@ -120,7 +120,7 @@ public class AbstractController implements Observer, ActionListener {
     }
 
     /**
-     * 	@param listener
+     *  @param listener
      */
     public void attachListener(ActionListener listener) {
         this.actionListener = listener;
@@ -308,28 +308,28 @@ public class AbstractController implements Observer, ActionListener {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected AbstractModel getNewModel() {
         return null;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean hasListener() {
         return actionListener != null;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean hasModel() {
         return getModel() != null;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public boolean hasView() {
         return getModel().hasViews();

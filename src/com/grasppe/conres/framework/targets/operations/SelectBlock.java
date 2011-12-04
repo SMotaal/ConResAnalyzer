@@ -64,7 +64,7 @@ public class SelectBlock extends TargetManagerCommand {
     public boolean perfomCommand() {
         boolean	canProceed = canExecute();
 
-        canProceed = new SelectBlockOperation(controller).execute(true);
+        canProceed = new SelectBlockFunction(controller).execute(true);
 
         return canProceed;
     }

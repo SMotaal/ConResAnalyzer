@@ -231,7 +231,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             aY[i] = vY.get(i).floatValue();
         }
 
-        // TODO: Change to handle multiple dX / dY if needed later
+        // TODO: Change to handle multiple xSpan / ySpan if needed later
         float	dXF = dX.get(0).floatValue();
         float	dYF = dY.get(0).floatValue();
 

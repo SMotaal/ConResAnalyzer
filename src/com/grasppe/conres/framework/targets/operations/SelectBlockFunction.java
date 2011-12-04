@@ -1,5 +1,5 @@
 /*
- * @(#)SelectBlockOperation.java   11/11/26
+ * @(#)SelectBlockFunction.java   11/11/26
  * Copyright (c) 2011 Saleh Abdel Motaal
  * This code is not licensed for use and is the property of it's owner.
  */
@@ -27,21 +27,21 @@ import javax.swing.JFrame;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectBlockOperation extends TargetManagerFunction implements Observer {
+public class SelectBlockFunction extends TargetManagerFunction implements Observer {
 
     protected static final String	name = "SelectBlock";
     AbstractModel					model;
 
     /**
      */
-    public SelectBlockOperation() {
+    public SelectBlockFunction() {
         super(name);
     }
 
     /**
      *  @param controller
      */
-    public SelectBlockOperation(TargetManager controller) {
+    public SelectBlockFunction(TargetManager controller) {
         this();
         setModel(controller.getModel());
     }
@@ -75,15 +75,9 @@ public class SelectBlockOperation extends TargetManagerFunction implements Obser
             listItems[i] = "Block " + (i + 1);
             blockMap.put(listItems[i], block);
             if ((activeBlock != null) && (activeBlock == block)) activeItem = listItems[i];
+            else activeItem = listItems[0];
         }
 
-//      String    listItems[] = {
-//          "Block " + i++, "Block " + i++, "Block " + i++, "Block " + i++, "Block " + i++,
-//          "Block " + i++, "Block " + i++, "Block " + i++
-//      };
-
-//      String    selectedBlock = ListDialog.showDialog(new JFrame(), new JFrame(),
-//                                 "Baby names ending in O:", "Name Chooser", listItems, "", "");
         JFrame	frame = new JFrame();
 
         // Ref: http://www.java2s.com/Code/Java/Swing-Components/Usethismodaldialogtolettheuserchooseonestringfromalonglist.htm

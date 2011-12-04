@@ -803,7 +803,7 @@ public class GrasppeKit {
 
     /**
      *  @param text
-     * 	@param level
+     *  @param level
      */
     private static void debugTextOut(String text, int level) {
         Caller	caller = getCaller(5);

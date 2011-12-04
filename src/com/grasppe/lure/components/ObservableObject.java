@@ -1,6 +1,6 @@
 /*
  * @(#)ObservableObject.java   11/12/03
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -39,7 +39,7 @@ public abstract class ObservableObject implements Observable {
     }
 
     /**
-     * 	@param observer
+     *  @param observer
      */
     public void notifyObserver(Observer observer) {
         observer.update();
@@ -54,7 +54,7 @@ public abstract class ObservableObject implements Observable {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public String observerString() {
         return observers.toString();

@@ -72,7 +72,7 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     private GrasppeEventDispatcher() {
         super();
 
-//      manager.addKeyEventDispatcher(this);  
+        manager.addKeyEventDispatcher(this);
     }
 
     /**
@@ -113,9 +113,9 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * 	@param heading
-     * 	@param keyEvent
-     * 	@param level
+     *  @param heading
+     *  @param keyEvent
+     *  @param level
      */
     public void debugPressedKey(String heading, KeyEvent keyEvent, int level) {
         GrasppeKit.debugText(heading,
@@ -167,7 +167,7 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     * 	@param frame
+     *  @param frame
      */
     public void makeClosable(JFrame frame) {
 

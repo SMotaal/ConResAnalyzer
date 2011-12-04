@@ -11,7 +11,10 @@ package com.grasppe.conres.alpha;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
+import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.imagej.MagnifierCanvas;
+import com.grasppe.conres.framework.targets.operations.MarkBlock;
+import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -631,7 +634,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
             int	mX = 100;		// imageWindow.getCanvas().
             int	mY = 100;
 
-            // zoomWindow.setLocation(mX, mY);
+            // zoomWindow.setLocation(xCenters, yCenters);
 
             zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
 
@@ -892,6 +895,13 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
         eventDispatcher.attachEventHandler(this);
 
         createAnalyzerMenu();
+
+        CaseFolder	caseFolder =
+            new CaseFolder("/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS");
+
+        ((OpenCase)analyzer.getCaseManager().getCommand("OpenCase")).openCase(caseFolder);
+
+        ((MarkBlock)analyzer.getTargetManager().getCommand("MarkBlock")).execute();
 
 //      if (GrasppeEventDispatcher.isDown(KeyCode.VK_SHIFT))
 //      Testing.imageName = imageNames[1];

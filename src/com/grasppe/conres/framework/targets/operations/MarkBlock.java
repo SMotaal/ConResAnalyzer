@@ -67,7 +67,7 @@ public class MarkBlock extends TargetManagerCommand {
 
         CornerSelector	conrnerSelector = controller.getCornerSelector();		// new CornerSelector(controller);
 
-        canProceed = new SelectCornersOperation(conrnerSelector).execute(true);
+        canProceed = new SelectCornersFunction(conrnerSelector).execute(true);
 
         return true;
     }

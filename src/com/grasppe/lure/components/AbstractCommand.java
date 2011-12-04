@@ -1,6 +1,6 @@
 /*
  * @(#)AbstractCommand.java   11/12/03
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -281,7 +281,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
 //  }
 
     /**
-     * 	@return
+     *  @return
      */
     public final boolean forceExecute() {
         GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()));
@@ -293,8 +293,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     }
 
     /**
-     * 	@param e
-     * 	@return
+     *  @param e
+     *  @return
      */
     public final boolean forceExecute(KeyEvent e) {
         setKeyEvent(e);
@@ -314,7 +314,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     }
 
     /**
-     * 	@param observer
+     *  @param observer
      */
     public void notifyObserver(Observer observer) {
         observers.notifyObserver(observer);

@@ -15,6 +15,8 @@ import com.grasppe.conres.io.model.IConResTargetDefinition;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractModel;
 
+import ij.gui.PointRoi;
+
 /**
  * Class description
  * @version $Revision: 0.1, 11/11/08
@@ -35,6 +37,7 @@ public class CornerSelectorModel extends AbstractModel {
     protected TargetDimensions	imageDimensions;
     protected BlockROI			blockROI;
     protected PatchSetROI		patchSetROI;
+    protected PointRoi			overlayROI;
     protected boolean			visibleView    = false;
     protected boolean			validSelection = false;		// set by controller.validateSelection()
     protected boolean			finalizedView  = false;		// after window close

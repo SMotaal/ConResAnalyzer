@@ -131,8 +131,9 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         debugViewFrame = new JFrame(debugViewString);
 
 //      debugViewFrame.setResizable(false);
-        debugViewFrame.setUndecorated(true);
+        debugViewFrame.setFocusable(false);
         debugViewFrame.setEnabled(false);
+        debugViewFrame.setUndecorated(true);
 
         Container	pane   = debugViewFrame.getContentPane();
 

@@ -12,13 +12,9 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
-import javax.swing.JFrame;
 
 /**
  * Class description
@@ -28,6 +24,15 @@ import javax.swing.JFrame;
 public class CornerSelectorListeners {
 
     static int	debugginLevel = 5;
+
+    /**
+     * Outputs debug information and event details
+     * @param grouping
+     * @param e
+     */
+    static void debugEvent(String grouping, WindowEvent e) {
+        debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
+    }
 
 //  /** Field description */
 //  public static MouseListener   IJMouseListener = new MouseListener() {
@@ -84,88 +89,59 @@ public class CornerSelectorListeners {
 //      }
 //  };
 
-    /** Field description */
-    public static WindowListener	WindowEventListener = new WindowListener() {
-
-        public void windowActivated(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-
-        public void windowClosed(WindowEvent e) {
-            notify();
-
-            Frame[]	frames        = Frame.getFrames();
-            int		visibleFrames = 0;
-
-            for (Frame frame : frames)
-                if (frame.isVisible()) visibleFrames++;
-
-            debugEvent("Window", e);
-
-            JFrame	zoomFrame = CornerSelectorView.CornerSelectorCommons.getZoomWindow();
-
-            if ((visibleFrames == 1) && zoomFrame.isVisible()) zoomFrame.setVisible(false);		// CornerSelectorView.delayedExit();
-            if (visibleFrames == 0) System.exit(0);		// CornerSelectorView.delayedExit();
-        }
-
-        public void windowClosing(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-
-        public void windowDeactivated(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-
-        public void windowDeiconified(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-
-        public void windowIconified(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-
-        public void windowOpened(WindowEvent e) {
-            debugEvent("Window", e);
-        }
-    };
-
-    /**
-     * Outputs debug information and event details
-     * @param grouping
-     * @param e
-     */
-    static void debugEvent(String grouping, MouseEvent e) {
-        debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
-    }
+//    /** Field description */
+//    public static WindowListener  WindowEventListener = new WindowListener() {
+//
+//        public void windowActivated(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//
+//        public void windowClosed(WindowEvent e) {
+//            notify();
+//
+//            Frame[]   frames        = Frame.getFrames();
+//            int       visibleFrames = 0;
+//
+//            for (Frame frame : frames)
+//                if (frame.isVisible()) visibleFrames++;
+//
+//            debugEvent("Window", e);
+//
+//            JFrame    zoomFrame = CornerSelectorView.getZoomWindow();
+//
+//            if ((visibleFrames == 1) && zoomFrame.isVisible()) zoomFrame.setVisible(false);       // CornerSelectorView.delayedExit();
+//            if (visibleFrames == 0) System.exit(0);       // CornerSelectorView.delayedExit();
+//        }
+//
+//        public void windowClosing(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//
+//        public void windowDeactivated(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//
+//        public void windowDeiconified(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//
+//        public void windowIconified(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//
+//        public void windowOpened(WindowEvent e) {
+//            debugEvent("Window", e);
+//        }
+//    };
 
     /**
      * Outputs debug information and event details
+     * 	@param view
      * @param grouping
      * @param e
      */
-    static void debugEvent(String grouping, WindowEvent e) {
-        debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
-    }
-
-    /**
-     * Outputs debug information and event details
-     * @param label
-     * @param grouping
-     * @param e
-     * @param level
-     */
-    static void debugEvent(String label, String grouping, MouseEvent e, int level) {
-        String	cursorString = "";
-
-        try {
-            Point	cursorLocation =
-                CornerSelectorView.CornerSelectorCommons.getImageWindow().getCanvas()
-                    .getCursorLoc();
-
-            cursorString = "\t" + cursorLocation.toString();
-        } catch (Exception exception) {}
-
-        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + cursorString, level);
+    static void debugEvent(CornerSelectorView view, String grouping, MouseEvent e) {
+        debugEvent(view, GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
     }
 
     /**
@@ -179,5 +155,26 @@ public class CornerSelectorListeners {
         String	testString = "";
 
         GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + testString, level);
+    }
+
+    /**
+     * Outputs debug information and event details
+     * 	@param view
+     * @param label
+     * @param grouping
+     * @param e
+     * @param level
+     */
+    static void debugEvent(CornerSelectorView view, String label, String grouping, MouseEvent e,
+                           int level) {
+        String	cursorString = "";
+
+        try {
+            Point	cursorLocation = view.getImageWindow().getCanvas().getCursorLoc();
+
+            cursorString = "\t" + cursorLocation.toString();
+        } catch (Exception exception) {}
+
+        GrasppeKit.debugText((grouping + " Event").trim(), "Mouse " + label + cursorString, level);
     }
 }

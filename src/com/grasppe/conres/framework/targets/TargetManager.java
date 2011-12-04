@@ -154,7 +154,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public ImageFile getBlockImage(int toneValue) {
-    	if (getActiveCase()==null) return null;
+        if (getActiveCase() == null) return null;
+
         return getActiveCase().caseFolder.getImageFile(toneValue);
     }
 
@@ -205,5 +206,4 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * @(#)SelectCornersOperation.java   11/12/03
+ * @(#)SelectCornersFunction.java   11/12/03
  * Copyright (c) 2011 Saleh Abdel Motaal
  * This code is not licensed for use and is the property of it's owner.
  */
@@ -25,7 +25,7 @@ import javax.management.openmbean.InvalidOpenTypeException;
  * @version        $Revision: 1.0, 11/11/09
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class SelectCornersOperation extends TargetManagerFunction implements Observer {
+public class SelectCornersFunction extends TargetManagerFunction implements Observer {
 
     protected static final String	name = "SelectCorners";
     AbstractModel					model;
@@ -35,14 +35,14 @@ public class SelectCornersOperation extends TargetManagerFunction implements Obs
 
     /**
      */
-    public SelectCornersOperation() {
+    public SelectCornersFunction() {
         super(name);
     }
 
     /**
      *  @param controller
      */
-    public SelectCornersOperation(CornerSelector controller) {
+    public SelectCornersFunction(CornerSelector controller) {
         this();
         this.controller = controller;
         setModel(controller.getModel());
@@ -117,7 +117,7 @@ public class SelectCornersOperation extends TargetManagerFunction implements Obs
 //    
 //  public static void main(String[] args) {
 //
-//      (new SelectCornersOperation()).perfomOperation();
+//      (new SelectCornersFunction()).perfomOperation();
 //      return;
 //  }
 //  
