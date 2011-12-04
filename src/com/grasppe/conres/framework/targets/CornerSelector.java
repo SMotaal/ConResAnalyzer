@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.targets;
 
 import com.grasppe.conres.framework.imagej.CornerSelectorView;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
+import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractController;
@@ -46,6 +47,10 @@ public class CornerSelector extends AbstractController {
     private CornerSelector(TargetManager targetManager, CornerSelectorModel model) {
         super(model);
         this.targetManager = targetManager;
+        
+        TargetDimensions targetDimensions = targetManager.getModel().getActiveTarget().getDimensions();
+        model.setTargetDimensions(targetDimensions);
+//        model.getTargetDimensions(targetManager.)
         getManagerModel().attachObserver(this);
     }
 

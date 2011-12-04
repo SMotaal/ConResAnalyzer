@@ -11,6 +11,7 @@
 package com.grasppe.conres.framework.targets.model.grid;
 
 import com.grasppe.conres.framework.targets.model.TargetDimensions;
+import com.grasppe.conres.framework.targets.model.TargetMeasurements;
 import com.grasppe.conres.framework.targets.model.axis.ContrastAxis;
 import com.grasppe.conres.framework.targets.model.axis.ResolutionAxis;
 import com.grasppe.conres.framework.targets.model.axis.ToneAxis;
@@ -21,13 +22,21 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ConResTarget extends GridTarget {
 
-    protected static ToneAxis		zAxis;
+    /**
+	 * @return the measurements
+	 */
+	public TargetMeasurements getMeasurements() {
+		return measurements;
+	}
+
+	protected static ToneAxis		zAxis;
     protected static ResolutionAxis	yAxis;
     protected static ContrastAxis	xAxis;
 
     /** Field description */
     protected ConResBlock[]		targetBlocks;
     protected TargetDimensions	dimensions;
+    protected TargetMeasurements	measurements;
 
     /**
      * @param blockSteps
@@ -61,8 +70,15 @@ public class ConResTarget extends GridTarget {
      *  @param yValues
      *  @param xValues
      */
-    public ConResTarget(int[] blockToneValues, float[] yValues, float[] xValues) {
+    private ConResTarget(float[] blockToneValues, float[] yValues, float[] xValues) {
         this(asDouble(blockToneValues), asDouble(yValues), asDouble(xValues));
+    }
+    
+    public ConResTarget(TargetMeasurements targetMeasurements) {
+      this(targetMeasurements.getZValues(),
+    		  targetMeasurements.getYValues(),
+    		  targetMeasurements.getXValues());
+      this.measurements = targetMeasurements;
     }
 
     /**
@@ -70,12 +86,17 @@ public class ConResTarget extends GridTarget {
      *  @return
      */
     public static double[] asDouble(float[] array) {
+    	try {
         double[]	newArray = new double[array.length];
 
         for (int i = 0; i < array.length; i++)		// float value : blockToneValues)
             newArray[i] = (double)array[i];
 
         return newArray;
+    	} catch (Exception exception) {
+    		exception.printStackTrace();
+    		return new double[]{};
+    	}
     }
 
     /**
@@ -129,7 +150,12 @@ public class ConResTarget extends GridTarget {
      * @return the dimensions
      */
     public TargetDimensions getDimensions() {
-        return dimensions;
+    	try {
+        return (TargetDimensions)measurements;
+    	} catch (Exception exception) {
+    		exception.printStackTrace();
+    	}
+		return null;
     }
 
     /**

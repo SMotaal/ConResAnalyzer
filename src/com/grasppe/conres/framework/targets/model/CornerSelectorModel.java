@@ -38,9 +38,10 @@ public class CornerSelectorModel extends AbstractModel {
     protected BlockROI			blockROI;
     protected PatchSetROI		patchSetROI;
     protected PointRoi			overlayROI;
-    protected boolean			visibleView    = false;
-    protected boolean			validSelection = false;		// set by controller.validateSelection()
-    protected boolean			finalizedView  = false;		// after window close
+    protected int				magnifyPatchIndex = -1;
+    protected boolean			visibleView       = false;
+    protected boolean			validSelection    = false;		// set by controller.validateSelection()
+    protected boolean			finalizedView     = false;		// after window close
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -69,6 +70,20 @@ public class CornerSelectorModel extends AbstractModel {
      */
     public TargetDimensions getImageDimensions() {
         return imageDimensions;
+    }
+
+    /**
+     * @return the magnifyPatchIndex
+     */
+    public int getMagnifyPatchIndex() {
+        return magnifyPatchIndex;
+    }
+
+    /**
+     * @return the overlayROI
+     */
+    public PointRoi getOverlayROI() {
+        return overlayROI;
     }
 
     /**
@@ -119,12 +134,13 @@ public class CornerSelectorModel extends AbstractModel {
     public boolean isVisibleView() {
         return visibleView;
     }
-
-    /**
-     *  @param blockROI
-     */
-    public void setBlockROI(BlockROI blockROI) {
-        this.blockROI = blockROI;
+    
+    public void setBlockROI(PointRoi blockROI) {
+    	if (blockROI==null) this.blockROI = null;
+    	else if (blockROI instanceof BlockROI)
+    		this.blockROI = (BlockROI) blockROI;
+    	else
+    		this.blockROI = new BlockROI(blockROI.getPolygon());
     }
 
     /**
@@ -142,10 +158,29 @@ public class CornerSelectorModel extends AbstractModel {
     }
 
     /**
-     *  @param patchSetROI
+     * @param magnifyPatchIndex the magnifyPatchIndex to set
      */
-    public void setPatchSetROI(PatchSetROI patchSetROI) {
-        this.patchSetROI = patchSetROI;
+    public void setMagnifyPatchIndex(int magnifyPatchIndex) {
+        this.magnifyPatchIndex = magnifyPatchIndex;
+    }
+
+    /**
+     * @param overlayROI the overlayROI to set
+     */
+    public void setOverlayROI(PointRoi overlayROI) {
+    	if (overlayROI==null) this.overlayROI = null;
+    	else if (overlayROI.getClass().equals(PointRoi.class))
+    		this.overlayROI = overlayROI;
+    	else
+    		this.overlayROI = new BlockROI(overlayROI.getPolygon());
+    }
+    
+    public void setPatchSetROI(PointRoi patchSetROI) {
+    	if (patchSetROI==null) this.patchSetROI = null;
+    	else if (patchSetROI instanceof PatchSetROI)
+    		this.patchSetROI = (PatchSetROI) patchSetROI;
+    	else    	
+    		this.patchSetROI = new PatchSetROI(patchSetROI.getPolygon());
     }
 
     /**

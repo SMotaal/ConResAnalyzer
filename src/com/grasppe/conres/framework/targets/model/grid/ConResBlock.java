@@ -89,9 +89,8 @@ public class ConResBlock extends GridBlock {
     public String toString() {
         try {
             return (GrasppeKit.cat(new String[] { getClass().getSimpleName(),
-                    " @ " + activeRow + ", " + activeColumn,
-                    "(" + xValues.length + "x" + yValues.length + " / " + zValue.getValue()
-                    + ")" }));
+            		"[" + zValue.getValue() + "%] @ " + activeRow + ", " + activeColumn,
+                    "(" + xValues.length + "x" + yValues.length + ")" }));
         } catch (Exception exception) {
             return "";
         }

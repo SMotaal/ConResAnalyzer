@@ -33,9 +33,8 @@ public class PatchSetROI extends PointRoi implements IAssessableObject {
      * @param poly
      *  @param requiredLength
      */
-    public PatchSetROI(Polygon poly, int requiredLength) {
+    public PatchSetROI(Polygon poly) {
         super(poly);
-        this.requiredLength = requiredLength;
     }
 
     /**
@@ -43,9 +42,8 @@ public class PatchSetROI extends PointRoi implements IAssessableObject {
      * @param oy
      *  @param requiredLength
      */
-    public PatchSetROI(int ox, int oy, int requiredLength) {
+    public PatchSetROI(int ox, int oy) {
         super(ox, oy);
-        this.requiredLength = requiredLength;
     }
 
     /**
@@ -54,21 +52,13 @@ public class PatchSetROI extends PointRoi implements IAssessableObject {
      * @param imp
      *  @param requiredLength
      */
-    public PatchSetROI(int sx, int sy, ImagePlus imp, int requiredLength) {
+    public PatchSetROI(int sx, int sy, ImagePlus imp) {
         super(sx, sy, imp);
-        this.requiredLength = requiredLength;
 
     }
-
-    /**
-     * @param ox
-     * @param oy
-     * @param points
-     *  @param requiredLength
-     */
-    public PatchSetROI(int[] ox, int[] oy, int points, int requiredLength) {
-        super(ox, oy, points);
-        this.requiredLength = requiredLength;
+    
+    public PatchSetROI(int[] ox, int[] oy, int points) {
+        super(ox, oy, points);    	
     }
 
     /**

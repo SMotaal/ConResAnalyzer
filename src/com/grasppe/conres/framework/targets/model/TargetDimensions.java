@@ -11,6 +11,7 @@
 package com.grasppe.conres.framework.targets.model;
 
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -40,6 +41,15 @@ public class TargetDimensions extends AbstractModel {
     /**
      */
     public TargetDimensions() {}
+    
+    public String toString() {
+    	String countString = "" + xCount + "x" + yCount;
+    	Float xSize = new Float(xBounds[1]-xBounds[0]);
+    	Float ySize = new Float(yBounds[1]-yBounds[0]);
+    	String sizeString = "" + xSize.toString() + "x" + ySize.toString(); 
+    	
+    	return getClass().getSimpleName() + " " + sizeString + " [" + countString + " patches]";
+    }
 
     /**
      * @return the bounds of the patch set in clockwise sequence

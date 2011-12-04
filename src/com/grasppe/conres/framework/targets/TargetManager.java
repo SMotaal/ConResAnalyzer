@@ -79,9 +79,10 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public static ConResTarget buildTargetModel(IConResTargetDefinition targetDefinition) {
-        return new ConResTarget(targetDefinition.getBlockToneValues(),
-                                targetDefinition.getMeasurements().getYValues(),
-                                targetDefinition.getMeasurements().getXValues());
+//        return new ConResTarget(targetDefinition.getBlockToneValues(),
+//                                targetDefinition.getMeasurements().getYValues(),
+//                                targetDefinition.getMeasurements().getXValues());
+    	return new ConResTarget(targetDefinition.getMeasurements());
     }
 
     /**

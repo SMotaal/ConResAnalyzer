@@ -234,6 +234,16 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      */
     public void setBlockToneValues(int[] blockToneValues) {
         this.blockToneValues = blockToneValues;
+        
+        this.measurements.setZValues(null);
+        if (blockToneValues==null || blockToneValues.length==0)
+        	return;
+
+       	float[] floatValues = new float[blockToneValues.length];
+       	for (int i = 0; i < blockToneValues.length; i++)
+       		floatValues[i] = new Float(blockToneValues[i]);
+       	
+       	this.measurements.setZValues(floatValues);
     }
 
     /*
