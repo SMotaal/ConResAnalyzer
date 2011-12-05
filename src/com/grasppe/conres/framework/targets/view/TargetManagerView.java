@@ -24,8 +24,6 @@ public class TargetManagerView extends AbstractView {
      */
     public TargetManagerView(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -59,6 +57,6 @@ public class TargetManagerView extends AbstractView {
      */
     @Override
     protected TargetManagerModel getModel() {
-        return (TargetManagerModel)super.getControllerModel();
+        return (TargetManagerModel)getControllerModel();
     }
 }

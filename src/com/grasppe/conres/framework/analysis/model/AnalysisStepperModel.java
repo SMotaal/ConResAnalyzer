@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.analysis.model;
 
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -24,11 +25,28 @@ import java.util.List;
  */
 public class AnalysisStepperModel extends AbstractModel {
 
-    /** Field description */
-    private BlockState	blockState = new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
+    /**
+	 * @return the activeBlock
+	 */
+	public ConResBlock getActiveBlock() {
+		return activeBlock;
+	}
+
+	/**
+	 * @param activeBlock the activeBlock to set
+	 */
+	public void setActiveBlock(ConResBlock activeBlock) {
+		this.activeBlock = activeBlock;
+		notifyObservers();
+	}
+
+	/** Field description */
+    private BlockState	blockState = null; //new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /** Field description */
     private List<int[]>	history = new ArrayList<int[]>();		// @SuppressWarnings("rawtypes")
+    
+    private ConResBlock activeBlock = null;
 
     /**
      * Constructs a new model object with no predefined controller.

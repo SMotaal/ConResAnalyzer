@@ -39,6 +39,9 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     protected AbstractController	commandHandler;
     protected Observers				observers = new Observers(this);
     protected KeyEvent				keyEvent;
+    
+    
+    int dbg = 3;
 
 //  protected GrasppeKit        grasppeKit     = GrasppeKit.getInstance();
 
@@ -135,13 +138,13 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     public boolean completed() {
         if (!executed) {
             executed = true;
-            GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()));
+            GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()), dbg);
 
             return true;
         }
 
         GrasppeKit.debugText("Command Execution Duplicity Error", GrasppeKit.lastSplit(toString()),
-                             2);
+                             dbg);
 
         return false;
     }
@@ -182,7 +185,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         if (!canExecute()) update();
         if (!canExecute())
             throw new IllegalStateException(getName() + " could not execute in its current state.");
-        GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()));
+        GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()),dbg);
 
         try {
             executing = true;
@@ -195,7 +198,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
 
             executing = false;
             executed  = true;
-            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()));
+            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()), dbg);
 
         } catch (Exception exception) {
             GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
@@ -249,7 +252,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
             model.detachObserver(this);
             GrasppeKit.debugText("Command Finalize/Detatch Succeeded",
                                  model.getClass().getSimpleName() + " is no longer attached to "
-                                 + GrasppeKit.lastSplit(toString()));
+                                 + GrasppeKit.lastSplit(toString()),dbg);
         } catch (Exception e) {
 
             // Command has no model and can finalize immediately
@@ -284,7 +287,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      *  @return
      */
     public final boolean forceExecute() {
-        GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()));
+        GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()),dbg);
 
         executed = false;
         canExecute(true);
@@ -353,9 +356,9 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         // canExecute(!useModel || (model != null));     // either not using model or model is not empty!
 
         if (canExecute()) {
-            GrasppeKit.debugText("Abstract Command Update", getName() + " can execute.");
+            GrasppeKit.debugText("Abstract Command Update", getName() + " can execute.", dbg);
         } else {
-            GrasppeKit.debugText("Abstract Command Update", getName() + " cannot execute.");
+            GrasppeKit.debugText("Abstract Command Update", getName() + " cannot execute.",dbg);
         }
 
     }
@@ -417,7 +420,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     public void setMnemonicKey(int mnemonicKey) {
         this.mnemonicKey = mnemonicKey;
         GrasppeKit.debugText("Setting Action Mnemonic",
-                             "The key '" + this.mnemonicKey + "' is assigned to " + getName());
+                             "The key '" + this.mnemonicKey + "' is assigned to " + getName(),dbg);
 
         // super.putValue(Action.MNEMONIC_KEY, mnemonicKey);
     }

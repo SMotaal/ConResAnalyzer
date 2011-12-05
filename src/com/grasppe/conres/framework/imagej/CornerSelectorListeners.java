@@ -23,7 +23,7 @@ import java.awt.event.WindowEvent;
  */
 public class CornerSelectorListeners {
 
-    static int	debugginLevel = 5;
+    static int	dbg = 3;
 
     /**
      * Outputs debug information and event details
@@ -31,7 +31,7 @@ public class CornerSelectorListeners {
      * @param e
      */
     static void debugEvent(String grouping, WindowEvent e) {
-        debugEvent(GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
+        debugEvent(GrasppeKit.getCaller().methodName, grouping, e, dbg);
     }
 
 //  /** Field description */
@@ -141,7 +141,7 @@ public class CornerSelectorListeners {
      * @param e
      */
     static void debugEvent(CornerSelectorView view, String grouping, MouseEvent e) {
-        debugEvent(view, GrasppeKit.getCaller().methodName, grouping, e, debugginLevel);
+        debugEvent(view, GrasppeKit.getCaller().methodName, grouping, e, dbg);
     }
 
     /**

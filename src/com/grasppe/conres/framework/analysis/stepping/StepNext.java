@@ -49,6 +49,9 @@ public class StepNext extends SteppingStrategy {
         int	columnBoundary = this.smartState.getColumnBoundary(column);
         int	acceptBoundary = this.smartState.getColumnAcceptBoundary(column);
         int	rejectBoundary = this.smartState.getColumnRejectBoundary(column);
+        
+        // TODO: Implement goodBoundary aware stepping
+        int	goodBoundary   = this.smartState.getColumnGoodBoundary(column);
 
         System.out.println("Accept " + acceptBoundary + " Reject " + rejectBoundary + " Boundary "
                            + columnBoundary);

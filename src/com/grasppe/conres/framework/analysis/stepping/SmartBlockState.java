@@ -118,6 +118,24 @@ public class SmartBlockState extends BlockState {
 
         return -1;
     }
+    
+    /**
+     * @param column
+     * @return
+     */
+    public int getColumnGoodBoundary(int column) {
+        int	thisRow, nextRow;
+        int	rows = this.getRows();
+
+        for (int row = 0; row < rows - 1; row++) {
+            thisRow = this.blockMap[column][row];
+            if (row == rows - 1) nextRow = 0;
+            else nextRow = this.blockMap[column][row + 1];
+            if ((thisRow ==2) && (nextRow!= 2)) return row;
+        }
+
+        return -1;
+    }    
 
     /**
      * @param column

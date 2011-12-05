@@ -15,6 +15,7 @@ import com.grasppe.conres.framework.targets.model.TargetMeasurements;
 import com.grasppe.conres.framework.targets.model.axis.ContrastAxis;
 import com.grasppe.conres.framework.targets.model.axis.ResolutionAxis;
 import com.grasppe.conres.framework.targets.model.axis.ToneAxis;
+import com.grasppe.conres.framework.units.ToneValue;
 import com.grasppe.lure.framework.GrasppeKit;
 
 /**
@@ -55,6 +56,7 @@ public class ConResTarget extends GridTarget {
 
         for (int i = 0; i < nBlocks; i++) {		// (AbstractValue value : zAxis.getValues())
             targetBlocks[i] = new ConResBlock(blockSteps[i], columnSteps, rowSteps);
+            targetBlocks[i].setZValue((ToneValue)zAxis.getValues()[i]);
         }
 
         // Setup row axis

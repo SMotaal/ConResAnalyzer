@@ -46,6 +46,8 @@ public abstract class AbstractView extends ObservableObject implements Observer 
     protected JPanel					debugPanel      = null;
     JLabel								debugTitleLabel = new JLabel("<html><b>" + getClass().getSimpleName() + "</b></html>");
 
+    int dbg = 3;
+    
     /**
      * @param controller
      */
@@ -119,7 +121,7 @@ public abstract class AbstractView extends ObservableObject implements Observer 
             debugViewPanels.add(debugPanel);
             addDebugView(debugPanel);
         } catch (Exception exception) {
-            GrasppeKit.debugText("DebugView", exception.getMessage(), 2);
+            GrasppeKit.debugText("DebugView", exception.getMessage(), dbg);
         }
     }
 
@@ -166,7 +168,7 @@ public abstract class AbstractView extends ObservableObject implements Observer 
 //      try {
 //          updateDebugLabels();
 //      } catch (Exception exception) {
-//          GrasppeKit.debugText("DebugView", exception.getMessage(), 2);
+//          GrasppeKit.debugText("DebugView", exception.getMessage(), dbg);
 //      }
 //
 //      updateDebugFrame();
@@ -197,7 +199,9 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         int	frameHeight   = debugViewFrame.getHeight();
 
         debugViewFrame.setLocation(25, displayHeight - frameHeight - 55);
-        debugViewFrame.setVisible(true);
+        
+        if (!debugViewFrame.isVisible())
+        	debugViewFrame.setVisible(true);
     }
 
     /**
@@ -257,7 +261,7 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         } catch (Exception exception) {
             debugTitleLabel.setText("<html><b>" + getClass().getSimpleName()
                                     + "</b>&nbsp;(?)</html>");
-            GrasppeKit.debugText("DebugView", exception.getMessage(), 2);
+            GrasppeKit.debugText("DebugView", exception.getMessage(), dbg);
         }
 
         return;
@@ -269,7 +273,7 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         try {
             updateDebugLabels();
         } catch (Exception exception) {
-            GrasppeKit.debugText("DebugView", exception.getMessage(), 2);
+            GrasppeKit.debugText("DebugView", exception.getMessage(), dbg);
             prepareDebugView();
         }
 

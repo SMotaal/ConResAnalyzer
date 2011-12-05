@@ -51,7 +51,7 @@ public class CloseCase extends CaseManagerCommand {
     public boolean perfomCommand() {
         boolean	canProceed = !isCaseClosed;		// && !getModel().isBusy();      // canExecute();
 
-        GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", 3);
+        GrasppeKit.debugText("Close Case Attempt", "will be checking isCaseClosed()", dbg);
 
         if (!canProceed) {
             notifyObservers();
@@ -62,7 +62,7 @@ public class CloseCase extends CaseManagerCommand {
         if (!altPressed())
             canProceed = IJ.showMessageWithCancel(name, "Do you want to close the current case?");
         if (!canProceed) return true;		// Action responded to in alternative scenario
-        GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", 3);
+        GrasppeKit.debugText("Close Case Proceeds", "User confirmed close.", dbg);
 
         try {
             getModel().backgroundCurrentCase();
@@ -73,7 +73,7 @@ public class CloseCase extends CaseManagerCommand {
         }
 
         GrasppeKit.debugText("Closed Case Success",
-                             "Moved current case to background and cleared current case.", 3);
+                             "Moved current case to background and cleared current case.", dbg);
         getModel().notifyObservers();
         notifyObservers();
 
@@ -114,6 +114,7 @@ public class CloseCase extends CaseManagerCommand {
         super.update();
     }
 
+    int dbg = 3;
     /**
      *  @return
      */
@@ -124,7 +125,7 @@ public class CloseCase extends CaseManagerCommand {
         if (model == null) value = false;
         else value = !(model.hasCurrentCase());
 
-        GrasppeKit.debugText("isCaseClose", "" + value, 3);
+        GrasppeKit.debugText("isCaseClose", "" + value, dbg);
 
         isCaseClosed = value;
 

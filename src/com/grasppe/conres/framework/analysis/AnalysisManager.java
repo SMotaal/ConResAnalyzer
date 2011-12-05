@@ -11,7 +11,10 @@ package com.grasppe.conres.framework.analysis;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.operations.AnalyzeBlock;
+import com.grasppe.conres.framework.analysis.view.AnalysisManagerView;
 import com.grasppe.conres.framework.cases.CaseManager;
+import com.grasppe.conres.framework.targets.TargetManager;
+import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -29,8 +32,20 @@ import java.util.LinkedHashMap;
  */
 public class AnalysisManager extends AbstractController {
 
+    /**
+	 * @return the analysisStepper
+	 */
+	public AnalysisStepper getAnalysisStepper() {
+		if (analysisStepper==null)
+			analysisStepper = new AnalysisStepper(this);
+		return analysisStepper;
+	}
+
+	int	dbg = 2;
+
     /** Field description */
     public ConResAnalyzer	analyzer;
+    protected AnalysisStepper analysisStepper;
 
     /**
      * @param listener
@@ -44,7 +59,28 @@ public class AnalysisManager extends AbstractController {
      */
     public AnalysisManager(ConResAnalyzer analyzer) {
         this((ActionListener)analyzer);
+        attachView(new AnalysisManagerView(this));
         setAnalyzer(analyzer);
+        getTargetManagerModel().attachObserver(this);
+    }
+
+    /**
+     * 	@param object1
+     * 	@param object2
+     * 	@return
+     */
+    private boolean areEqual(Object object1, Object object2) {
+        if ((object1 == null) || (object2 == null)) return false;
+
+        if (!object1.getClass().equals(object2.getClass())
+                &&!object2.getClass().equals(object1.getClass()))
+            return false;
+
+        try {
+            return object1.equals(object2);
+        } catch (Exception exception) {
+            return false;
+        }
     }
 
     /**
@@ -54,6 +90,46 @@ public class AnalysisManager extends AbstractController {
     public void createCommands() {
         commands = new LinkedHashMap<String, AbstractCommand>();
         putCommand(new AnalyzeBlock(this, this));
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractController#update()
+     */
+
+    /**
+     */
+    @Override
+    public void update() {
+        super.update();
+        updateTargetManager();
+    }
+
+    /**
+     */
+    public void updateTargetManager() {
+        boolean	updateActiveTarget,	updateActiveBlock;
+
+        if ((updateActiveTarget = areEqual(getModel().getActiveTarget(),
+                                           getTargetManagerModel().getActiveTarget())) == false)
+            getModel().setActiveTarget(getTargetManagerModel().getActiveTarget());
+
+        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(),
+                                          getTargetManagerModel().getActiveBlock())) == false)
+            getModel().setActiveBlock(getTargetManagerModel().getActiveBlock());
+
+        GrasppeKit.debugText(getClass().getSimpleName() + " Update",
+                             GrasppeKit.cat((updateActiveTarget) ? "updateActiveTarget"
+                : "", (updateActiveBlock) ? "updateActiveBlock"
+                                          : ""), dbg);
+        
+        if (updateActiveTarget || updateActiveBlock) {
+        	if (getAnalysisStepper()!=null)
+        		getAnalysisStepper().updateActiveBlock();
+        }
+
+        return;
+
     }
 
     /**
@@ -83,10 +159,24 @@ public class AnalysisManager extends AbstractController {
      */
     @Override
     protected AnalysisManagerModel getNewModel() {
-        GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", 2);
+        GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", dbg);
 
         return new AnalysisManagerModel();
 
+    }
+    
+    /**
+     * 	@return
+     */
+    public TargetManager getTargetManager() {
+        return getAnalyzer().getTargetManager();
+    }
+
+    /**
+     * 	@return
+     */
+    public TargetManagerModel getTargetManagerModel() {
+        return getTargetManager().getModel();
     }
 
     /**

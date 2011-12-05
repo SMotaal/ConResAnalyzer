@@ -50,9 +50,9 @@ public class AnalyzeBlock extends AnalysisCommand {
     public boolean perfomCommand() {
         boolean			canProceed      = canExecute();
 
-        AnalysisStepper	analysisStepper = new AnalysisStepper(controller);
+//        AnalysisStepper	analysisStepper = new AnalysisStepper(controller);
 
-        analysisStepper.testRun();
+        controller.getAnalysisStepper().testRun();
 
 //      CornerSelector conrnerSelector = new CornerSelector(controller);
 //      canProceed = new SelectCornersFunction(conrnerSelector).execute(true);

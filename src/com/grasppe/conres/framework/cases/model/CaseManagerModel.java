@@ -65,6 +65,7 @@ public class CaseManagerModel extends AbstractModel {
         getController().backgroundCurrentCase();
 
     }
+    
 
     /**
      *  @return
@@ -191,14 +192,8 @@ public class CaseManagerModel extends AbstractModel {
      * @return
      */
     public boolean hasCurrentCase() {
-
-        // if (currentCase != null) GrasppeKit.debugText("Current Case", currentCase.toString());
         return (currentCase != null);
 
-//      if (backgroundCase != null) GrasppeKit.debugText("Current Case", backgroundCase.toString());
-//      else GrasppeKit.debugText("Current Case", "null!");
-//
-//      return ((currentCase != null) | ((currentCase != null) && (backgroundCase != null)));
     }
 
     /**

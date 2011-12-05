@@ -201,6 +201,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         return true;
     }
+    int dbg = 3;
 
     /**
      * @param source
@@ -211,6 +212,7 @@ public class ImageWindowMagnifier extends ImageCanvas
         boolean	isMouseListener       = listener instanceof MouseListener,
 				isMouseMotionListener = listener instanceof MouseMotionListener,
 				isMouseWheelListener  = listener instanceof MouseWheelListener;
+        
 
         if (isMouseListener) source.addMouseListener((MouseListener)listener);
         if (isMouseMotionListener) source.addMouseMotionListener((MouseMotionListener)listener);
@@ -227,7 +229,7 @@ public class ImageWindowMagnifier extends ImageCanvas
                              "Binding to " + GrasppeKit.simpleName(source) + " <== "
                              + GrasppeKit.simpleName(listener) + " as "
                              + GrasppeKit.catWords(new String[] { strMouseListener,
-                strMouseMotionListener, strMouseWheelListener }), 4);
+                strMouseMotionListener, strMouseWheelListener }), dbg);
 
         // .getClass().getSimpleName()
 
@@ -240,14 +242,14 @@ public class ImageWindowMagnifier extends ImageCanvas
      */
     public boolean dispatchedKeyEvent(KeyEvent e) {
 
-        // GrasppeKit.debugText("Dispatch Key Event", GrasppeKit.keyEventString(e) + "...", 4);
+        // GrasppeKit.debugText("Dispatch Key Event", GrasppeKit.keyEventString(e) + "...", dbg);
         if (GrasppeEventDispatcher.consumedCombination) return false;
 
-        // GrasppeKit.debugText("Dispatch Key Event", GrasppeKit.keyEventString(e) + "... Handling", 4);
+        // GrasppeKit.debugText("Dispatch Key Event", GrasppeKit.keyEventString(e) + "... Handling", dbg);
         if (updateVisiblity()) {
             GrasppeEventDispatcher.consumeCombination();
             GrasppeKit.debugText("Dispatch Key Event",
-                                 GrasppeKit.keyEventString(e) + "... Success", 4);
+                                 GrasppeKit.keyEventString(e) + "... Success", dbg);
 
             return true;
         }
@@ -267,7 +269,7 @@ public class ImageWindowMagnifier extends ImageCanvas
             debugKey = GrasppeKit.cat(debugKey,
                                       "Toggle Pressed "
                                       + GrasppeKit.lastSplit(hoveringToggleKeyCode));
-        GrasppeKit.debugText("Hovering", "Entering Hovering Mode... " + debugKey, 3);
+        GrasppeKit.debugText("Hovering", "Entering Hovering Mode... " + debugKey, dbg);
 
         if (!toggled && isTuning()) return;
         if (isTuningToggled()) exitTuningMode(toggled);
@@ -275,7 +277,7 @@ public class ImageWindowMagnifier extends ImageCanvas
         hoveringMode    = true;
         hoveringToggled = toggled ? !isHoveringToggled()
                                   : false;		// toggled;
-        GrasppeKit.debugText("Hovering", "Entering Hovering Mode... " + debugKey + " Success", 3);
+        GrasppeKit.debugText("Hovering", "Entering Hovering Mode... " + debugKey + " Success", dbg);
     }
 
     /**
@@ -290,7 +292,7 @@ public class ImageWindowMagnifier extends ImageCanvas
                                       "Toggle Pressed "
                                       + GrasppeKit.lastSplit(tuningToggleKeyCode));
 
-        GrasppeKit.debugText("Tuning", "Entering Tuning Mode... " + debugKey, 3);
+        GrasppeKit.debugText("Tuning", "Entering Tuning Mode... " + debugKey, dbg);
 
         // if (isTuningToggled()) return;
         if (isHoveringToggled()) exitHoveringMode(true);
@@ -298,7 +300,7 @@ public class ImageWindowMagnifier extends ImageCanvas
         tuningMode    = true;
         tuningToggled = toggled ? !isTuningToggled()
                                 : false;	// toggled;
-        GrasppeKit.debugText("Tuning", "Entering Tuning Mode... " + debugKey + " Success", 3);
+        GrasppeKit.debugText("Tuning", "Entering Tuning Mode... " + debugKey + " Success", dbg);
     }
 
     /**
@@ -313,13 +315,13 @@ public class ImageWindowMagnifier extends ImageCanvas
             debugKey = GrasppeKit.cat(debugKey,
                                       "Toggle Pressed "
                                       + GrasppeKit.lastSplit(hoveringToggleKeyCode));
-        GrasppeKit.debugText("Hovering", "Exiting Hovering Mode... " + debugKey, 3);
+        GrasppeKit.debugText("Hovering", "Exiting Hovering Mode... " + debugKey, dbg);
         if (!untoggle && hoveringToggled) return;
         if (isHoveringKeyPressed()) return;
         staticMode      = false;
         hoveringMode    = false;
         hoveringToggled = false;
-        GrasppeKit.debugText("Hovering", "Exiting Hovering Mode... " + debugKey + " Success", 3);
+        GrasppeKit.debugText("Hovering", "Exiting Hovering Mode... " + debugKey + " Success", dbg);
     }
 
     /**
@@ -333,13 +335,13 @@ public class ImageWindowMagnifier extends ImageCanvas
             debugKey = GrasppeKit.cat(debugKey,
                                       "Toggle Pressed "
                                       + GrasppeKit.lastSplit(tuningToggleKeyCode));
-        GrasppeKit.debugText("Tuning", "Exiting Tuning Mode... " + debugKey, 3);
+        GrasppeKit.debugText("Tuning", "Exiting Tuning Mode... " + debugKey, dbg);
         if (!untoggle && tuningToggled) return;
         if (isTuningKeyPressed()) return;
         staticMode    = false;
         tuningMode    = false;
         tuningToggled = false;
-        GrasppeKit.debugText("Tuning", "Exiting Tuning Mode... " + debugKey + " Success", 3);
+        GrasppeKit.debugText("Tuning", "Exiting Tuning Mode... " + debugKey + " Success", dbg);
     }
 
     /**
@@ -409,7 +411,7 @@ public class ImageWindowMagnifier extends ImageCanvas
      * @return
      */
     public boolean moveMagnifier() {
-        GrasppeKit.debugText("Moving", "Move Magnifier...", 4);
+        GrasppeKit.debugText("Moving", "Move Magnifier...", dbg);
         if (positionOnImage == null) return false;
         if (magnifierPosition != null)
             if (areEqual(magnifierPosition, positionOnImage)) return false;
@@ -426,7 +428,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         GrasppeKit.debugText("Moving",
                              "Setting Source Rectangle at Magnification "
-                             + super.getMagnification() + "\t" + GrasppeKit.lastSplit(newRect), 3);
+                             + super.getMagnification() + "\t" + GrasppeKit.lastSplit(newRect), dbg);
 
         setSourceRect(newRect);
 
@@ -435,7 +437,7 @@ public class ImageWindowMagnifier extends ImageCanvas
         // TODO: move the center of the magnifier frame on the image window relative to the image coordinates
         if (shouldMoveFrame() /* if not static and imageWindow visible */) {
 
-            GrasppeKit.debugText("Moving", "Move Frame... " + mouseOverCanvas, 4);
+            GrasppeKit.debugText("Moving", "Move Frame... " + mouseOverCanvas, dbg);
 
             try {
                 Point	imagePosition = imageCanvas.getLocationOnScreen();
@@ -448,7 +450,7 @@ public class ImageWindowMagnifier extends ImageCanvas
                 GrasppeKit.debugText("Moving",
                                      "Magnifier Center:\t" + imageCanvas.screenX(iX) + ", "
                                      + imageCanvas.screenX(iY) + "  \tSize:\t" + iW + ", " + iH
-                                     + "  \tMagnification:\t" + magnification, 4);
+                                     + "  \tMagnification:\t" + magnification, dbg);
 
 //              iX = (int)(iX * magnification);
 //              iY = (int)(iY  / magnification);
@@ -460,14 +462,14 @@ public class ImageWindowMagnifier extends ImageCanvas
 
                 GrasppeKit.debugText("Moving",
                                      "Magnifier Center:\t" + iX + ", " + iY + "  \tSize:\t" + iW
-                                     + ", " + iH + "  \tWindow:\t" + cX + ", " + cY, 4);
+                                     + ", " + iH + "  \tWindow:\t" + cX + ", " + cY, dbg);
 
                 int	nX = cX + iX - iW / 2,
 					nY = cY + iY - iH / 2;
 
-                GrasppeKit.debugText("Moving", "Moving frame to " + nX + ", " + nY, 4);
+                GrasppeKit.debugText("Moving", "Moving frame to " + nX + ", " + nY, dbg);
                 magnifierFrame.setLocation(new Point(nX, nY));
-                GrasppeKit.debugText("Moving", "Move Frame... Updaing", 4);
+                GrasppeKit.debugText("Moving", "Move Frame... Updaing", dbg);
 
                 int	sX = imagePosition.x + imageCanvas.screenX(positionOnImage.x),
 					sY = imagePosition.y + imageCanvas.screenY(positionOnImage.y);
@@ -477,7 +479,7 @@ public class ImageWindowMagnifier extends ImageCanvas
                 if (!mouseOverCanvas) return false;
 
                 positionOnScreen = new Point(sX, sY);
-                GrasppeKit.debugText("Moving", "Move Frame... Success", 4);
+                GrasppeKit.debugText("Moving", "Move Frame... Success", dbg);
             } catch (Exception exception) {
                 magnifierFrame.setVisible(false);
             }
@@ -485,7 +487,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         magnifierPosition = positionOnImage;
 
-        GrasppeKit.debugText("Moving", "Move Magnifier... Success", 4);
+        GrasppeKit.debugText("Moving", "Move Magnifier... Success", dbg);
 
         return true;
     }
@@ -500,7 +502,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         // Roi   roi = imp.getRoi();
 
-        GrasppeKit.debugText("Draw Graphics Attempt", GrasppeKit.lastSplit(srcRect), 3);
+        GrasppeKit.debugText("Draw Graphics Attempt", GrasppeKit.lastSplit(srcRect), dbg);
 
         try {
             Java2.setBilinearInterpolation(g, true);
@@ -515,7 +517,7 @@ public class ImageWindowMagnifier extends ImageCanvas
             g.drawImage(img, 0, 0, screenX(srcRect.width), screenY(srcRect.height), srcRect.x,
                         srcRect.y, srcRect.x + srcRect.width, srcRect.y + srcRect.height, null);
 
-            GrasppeKit.debugText("Draw Graphics Success", GrasppeKit.lastSplit(srcRect), 3);
+            GrasppeKit.debugText("Draw Graphics Success", GrasppeKit.lastSplit(srcRect), dbg);
 
             return;
 
@@ -527,7 +529,7 @@ public class ImageWindowMagnifier extends ImageCanvas
             IJ.outOfMemory("Paint");
         }
 
-        GrasppeKit.debugText("Draw Graphics Failure", GrasppeKit.lastSplit(srcRect), 3);
+        GrasppeKit.debugText("Draw Graphics Failure", GrasppeKit.lastSplit(srcRect), dbg);
     }
 
     /**
@@ -583,10 +585,10 @@ public class ImageWindowMagnifier extends ImageCanvas
 //
 //      contentPane.add(zoomCanvas); // TODO: make boarder layout center
 //
-//      GrasppeKit.debugText("Zoom Frame", "Content Pane " + contentPane.getBounds().toString(), 3);
+//      GrasppeKit.debugText("Zoom Frame", "Content Pane " + contentPane.getBounds().toString(), dbg);
 //      GrasppeKit.debugText("Zoom Frame",
-//                           "Frame " + magnifierFrame.getBounds().toString(), 3);
-//      GrasppeKit.debugText("Zoom Frame", "Zoom Canvas " + zoomCanvas.getBounds().toString(), 3);
+//                           "Frame " + magnifierFrame.getBounds().toString(), dbg);
+//      GrasppeKit.debugText("Zoom Frame", "Zoom Canvas " + zoomCanvas.getBounds().toString(), dbg);
 //
 //      double    windowZoom = Testing.getImageWindow().getCanvas().getMagnification();
 //
@@ -691,7 +693,7 @@ public class ImageWindowMagnifier extends ImageCanvas
             mouseOverCanvas = imageCanvas.contains(rX, rY);
             GrasppeKit.debugText("Mouse Location",
                                  onScreenX + ", " + onScreenY + " within imageCanvas: "
-                                 + mouseOverCanvas, 4);
+                                 + mouseOverCanvas, dbg);
 
 //          if (isHoveringKeyPressed() && isHovering() &&!mouseOverCanvas) {
 //            exitHoveringMode(false);
@@ -723,7 +725,7 @@ public class ImageWindowMagnifier extends ImageCanvas
             if (isHovering()) setVisible(false);
             GrasppeKit.debugText("Mouse Location",
                                  onScreenX + ", " + onScreenY
-                                 + " within imageCanvas: caused exception", 4);
+                                 + " within imageCanvas: caused exception", dbg);
         }
 
     }
@@ -1037,7 +1039,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         GrasppeKit.debugText("Visible",
                              "Front: " + (visible && magnifierFrame.isVisible()) + "\tToggleOn: "
-                             + (!visible && (hoveringToggled ^ tuningToggled)), 3);
+                             + (!visible && (hoveringToggled ^ tuningToggled)), dbg);
 
 //      // Do not hide if in a toggled mode
 //      if (!visible && (hoveringToggled ^ tuningToggled)) if (showMagnifier()) return;
@@ -1048,7 +1050,7 @@ public class ImageWindowMagnifier extends ImageCanvas
         GrasppeKit.debugText("Visible",
                              "Set to " + visible + "\tFrame: " + magnifierFrame.isVisible()
                              + "\tCanvas: " + isVisible() + "\t"
-                             + GrasppeKit.lastSplit(getBounds()), 3);
+                             + GrasppeKit.lastSplit(getBounds()), dbg);
 
         // If frame visibility was not changed then don't reflect updated status
         // if (visible != magnifierFrame.isVisible()) return;

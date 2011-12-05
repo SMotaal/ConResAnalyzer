@@ -32,6 +32,8 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
     CornerSelectorView				view;		// = new CornerSelectorView();
     CornerSelector					controller;
     boolean							openWindow = false;
+    
+    int dbg = 3;
 
     /**
      */
@@ -54,11 +56,13 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
      */
     @Override
     protected boolean perfomOperation() {
+    	
+    	controller.showSelectorView();
 
         // prepareView();
 //      new CornerSelectorView(controller).run(null);
 
-        view.run(null);
+//        view.run(null);
 
 //      setCornerSelectorVisibile(true);
 //      
@@ -101,7 +105,7 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
     /**
      */
     public void update() {
-        GrasppeKit.debugText("OBSERVED", 2);
+        GrasppeKit.debugText("OBSERVED", dbg);
 
         // boolean cornersValid = view.blockROI!=null && view.blockROI.getNCoordinates()==4;
         // boolean centresVaiid = view.patchSetROI!=null && view.patchSetROI.getNCoordinates() >10;

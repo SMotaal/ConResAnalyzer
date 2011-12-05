@@ -24,8 +24,29 @@ public class AnalysisManagerView extends AbstractView {
      */
     public AnalysisManagerView(AnalysisManager controller) {
         super(controller);
+    }
 
-        // TODO Auto-generated constructor stub
+    /**
+     */
+    @Override
+    protected void updateDebugLabels() {
+        AnalysisManagerModel	model = getModel();
+
+        if (model == null) return;
+
+        try {
+            updateDebugLabel("activeTarget", model.getActiveTarget());
+        } catch (Exception exception) {
+            updateDebugLabel("activeTarget", "");
+        }
+
+        try {
+            updateDebugLabel("activeBlock", model.getActiveBlock());
+        } catch (Exception exception) {
+            updateDebugLabel("activeBlock", "");
+        }
+
+        super.updateDebugLabels();
     }
 
     /**
@@ -33,6 +54,6 @@ public class AnalysisManagerView extends AbstractView {
      */
     @Override
     protected AnalysisManagerModel getModel() {
-        return (AnalysisManagerModel)super.getControllerModel();
+        return (AnalysisManagerModel)getControllerModel();
     }
 }

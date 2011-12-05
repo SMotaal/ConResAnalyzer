@@ -10,6 +10,8 @@
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
+import com.grasppe.lure.framework.GrasppeKit;
+
 /**
  * @author daflair
  */
@@ -47,7 +49,7 @@ public class BlockState implements ISteppingBlockState {
         this.columns  = columns;
         this.row      = row;
         this.column   = column;
-        this.blockMap = new int[rows][columns];
+        this.blockMap = new int[columns][rows];
     }
 
     /**
@@ -271,6 +273,8 @@ public class BlockState implements ISteppingBlockState {
     public int getRows() {
         return rows;
     }
+    
+    int dbg = 2;
 
     /**
      * @param row
@@ -278,6 +282,7 @@ public class BlockState implements ISteppingBlockState {
      * @return
      */
     public int getValue(int row, int column) {
+//    	GrasppeKit.debugText("BlockState", "Get Value: " + row + ", " + column + " [" + blockMap[0].length + "x" + blockMap.length + "]", dbg);
         return this.blockMap[column][row];
     }
 

@@ -11,6 +11,7 @@
 package com.grasppe.conres.framework.analysis;
 
 import com.grasppe.conres.analyzer.ConResAnalyzer;
+import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SetAndStep;
@@ -23,6 +24,7 @@ import com.grasppe.conres.framework.analysis.stepping.StepRight;
 import com.grasppe.conres.framework.analysis.stepping.StepUp;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.lure.components.AbstractController;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -34,7 +36,36 @@ import java.awt.event.KeyEvent;
  */
 public class AnalysisStepper extends AbstractController {
 
-    protected AnalysisManager		analysisManager = null;
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractController#update()
+	 */
+	@Override
+	public void update() {
+		super.update();
+	}
+	
+	public void updateActiveBlock() {
+		
+		
+		getModel().setActiveBlock(getAnalysisManagerModel().getActiveBlock());
+		
+		int blockColumns = getActiveBlock().getXAxis().getValues().length;
+		int blockRows = getActiveBlock().getYAxis().getValues().length;
+		
+        BlockState	blockState = new BlockState(blockRows, blockColumns, 0, 0);		// , BlockState.fudgeMap1());
+
+        getModel().setBlockState(blockState);
+		
+		
+	}
+	
+	public ConResBlock getActiveBlock() {
+		return getModel().getActiveBlock();
+	}
+	
+    int dbg = 3;
+
+	protected AnalysisManager		analysisManager = null;
     protected AnalysisStepperView	stepperView     = null;
 
     /**
@@ -43,13 +74,19 @@ public class AnalysisStepper extends AbstractController {
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
+        getAnalysisManager().getModel().attachObserver(this);
 
-        BlockState	fudgeState = new BlockState(10, 10, 0, 0);		// , BlockState.fudgeMap1());
-
-        getModel().setBlockState(fudgeState);
+//        BlockState	fudgeState = new BlockState(10, 10, 0, 0);		// , BlockState.fudgeMap1());
+//
+//        getModel().setBlockState(fudgeState);
+        
+        //updateActiveBlock();
+        
 
         return;
     }
+    
+    
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
@@ -234,6 +271,13 @@ public class AnalysisStepper extends AbstractController {
      */
     public AnalysisManager getAnalysisManager() {
         return analysisManager;
+    }
+
+    /**
+     * 	@return
+     */
+    public AnalysisManagerModel getAnalysisManagerModel() {
+        return getAnalysisManager().getModel();
     }
 
     //

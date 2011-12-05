@@ -46,6 +46,8 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
 
     /** Field description */
     public static boolean	consumedCombination = false;
+    
+    public static boolean globalKeys = false;
 
     /** Field description */
     public KeyboardFocusManager	manager     = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -72,7 +74,8 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     private GrasppeEventDispatcher() {
         super();
 
-        manager.addKeyEventDispatcher(this);
+        if (globalKeys)
+        	manager.addKeyEventDispatcher(this);
     }
 
     /**

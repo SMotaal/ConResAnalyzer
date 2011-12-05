@@ -36,6 +36,8 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     JFileChooser		fileChooser;
     FileSelectionMode	fileSelectionMode = FileSelectionMode.FILES_AND_DIRECTORIES;
     TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
+    
+    int dbg = 3;
 
     /**
      * @param name
@@ -116,7 +118,7 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
         } catch (Exception e) {
             GrasppeKit.debugText(finalName + " Failed",
                                  finalName + " threw a " + e.getClass().getSimpleName() + "\n\n"
-                                 + e.toString(), 2);
+                                 + e.toString(), dbg);
             e.printStackTrace();
         }
 

@@ -475,12 +475,12 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
                 actionName = ((AbstractCommand)action).getName();
                 GrasppeKit.debugText("Command Menu Item",
                                      "getName ==> " + actionName + " ==> "
-                                     + GrasppeKit.humanCase(actionName), 4);
+                                     + GrasppeKit.humanCase(actionName));
             } catch (Exception exception) {
                 actionName = action.toString();
                 GrasppeKit.debugText("Command Menu Item",
                                      "toString ==> " + actionName + " ==> "
-                                     + GrasppeKit.humanCase(actionName), 4);
+                                     + GrasppeKit.humanCase(actionName));
             }
 
             setText(GrasppeKit.humanCase(actionName, true));
@@ -490,12 +490,12 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
                 actionMnemonic = ((AbstractCommand)action).getMnemonicKey();
                 GrasppeKit.debugText("Command Menu Item",
                                      "getMnemonicKey ==> " + (char)actionMnemonic + " (int "
-                                     + actionMnemonic + ")", 4);
+                                     + actionMnemonic + ")");
             } catch (Exception exception) {
                 actionMnemonic = actionName.charAt(0);
                 GrasppeKit.debugText("Command Menu Item",
                                      "actionName ==> " + (char)actionMnemonic + " (int "
-                                     + actionMnemonic + ")", 4);
+                                     + actionMnemonic + ")");
             }
 
             setMnemonic(actionMnemonic);
@@ -520,12 +520,11 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
                 ((AbstractCommand)getAction()).setKeyEvent(e);		// execute(e);
                 this.doClick();
                 ((AbstractCommand)getAction()).setKeyEvent();
-                GrasppeKit.debugText("Command Menu KeyEvent Handled", GrasppeKit.keyEventString(e),
-                                     4);
+                GrasppeKit.debugText("Command Menu KeyEvent Handled", GrasppeKit.keyEventString(e));
             } catch (Exception exception) {
                 GrasppeKit.debugText("Command Menu KeyEvent Exception",
                                      GrasppeKit.keyEventString(e) + " ==> Exception thrown\n\n"
-                                     + exception.getMessage(), 2);
+                                     + exception.getMessage(), 3);
             }
         }
 

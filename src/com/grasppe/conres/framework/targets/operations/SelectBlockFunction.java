@@ -20,6 +20,7 @@ import com.sun.snippets.ListDialog;
 
 import java.util.HashMap;
 
+import javax.sound.midi.ControllerEventListener;
 import javax.swing.JFrame;
 
 /**
@@ -31,6 +32,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
 
     protected static final String	name = "SelectBlock";
     AbstractModel					model;
+    TargetManager controller;
 
     /**
      */
@@ -44,6 +46,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
     public SelectBlockFunction(TargetManager controller) {
         this();
         setModel(controller.getModel());
+        this.controller = controller;
     }
 
     /*
@@ -72,7 +75,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         for (int i = 0; i < blocks.length; i++) {		// ConResBlock block : blocks) {
             ConResBlock	block = blocks[i];
 
-            listItems[i] = "Block " + (i + 1);
+            listItems[i] = "RTV " + block.getZValue().getValue() + "%";//"Block " + (i + 1);
             blockMap.put(listItems[i], block);
             if ((activeBlock != null) && (activeBlock == block)) activeItem = listItems[i];
             else activeItem = listItems[0];
@@ -82,11 +85,14 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
 
         // Ref: http://www.java2s.com/Code/Java/Swing-Components/Usethismodaldialogtolettheuserchooseonestringfromalonglist.htm
         String	selectedItem = ListDialog.showDialog(frame, frame, "Available Blocks:",
-                                  "Block Chooser", listItems, activeItem, "                    ");
+                                  "Block Chooser", listItems, activeItem, "   " + listItems[0]);
 
         ConResBlock	selectedBlock = blockMap.get(selectedItem);
 
         getModel().setActiveBlock(selectedBlock);
+        
+//        controller.
+        controller.loadImage();
 
         return true;
     }

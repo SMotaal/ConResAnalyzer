@@ -69,7 +69,7 @@ public class TargetDimensions extends AbstractModel {
      * @return the xBounds
      */
     public float[] getXBounds() {
-        xBounds = new float[] { 0.0F, getXCenters()[getXCount() - 1] + getXRepeat() - getXSpan() };
+        xBounds = new float[] { 0.0F, getXCenters()[getXCount() - 1] + getXRepeat() - getXSpan()/2 };
 
         return xBounds;
     }
@@ -110,7 +110,7 @@ public class TargetDimensions extends AbstractModel {
      * @return the yBounds
      */
     public float[] getYBounds() {
-        yBounds = new float[] { 0.0F, getYCenters()[getYCount() - 1] + getYRepeat() - getYSpan() };
+        yBounds = new float[] { 0.0F, getYCenters()[getYCount() - 1] + getYRepeat() - getYSpan()/2 };
 
         return yBounds;
     }

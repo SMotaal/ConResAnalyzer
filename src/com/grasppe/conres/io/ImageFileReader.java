@@ -35,6 +35,8 @@ public class ImageFileReader implements IGrasppeFileReader {
 
     TreeMap<Integer, SanselanImageTag>	tagMap = new TreeMap<Integer, SanselanImageTag>();
     protected ImageFile					file;
+    
+    int dbg = 3;
 
     /**
      * @param file
@@ -102,7 +104,7 @@ public class ImageFileReader implements IGrasppeFileReader {
         SpatialFrequency	resolution = getResolutionValue(unit, xValue, yValue);
 
         file.setResolution(resolution);
-        GrasppeKit.debugText("Read Image", "Saneslan Metadata: \t" + file);
+        GrasppeKit.debugText("Read Image", "Saneslan Metadata: \t" + file, dbg);
     }
 
     /**

@@ -68,7 +68,7 @@ public class BlockMap {
         for (int m = 0; m < rows; m++) {
             for (int n = 0; n < columns; n++) {
                 data  = colors[0];
-                value = this.blockState.getValue(m, n);
+                value = this.blockState.getValue(m,n);//m, n);
 
                 switch (value) {
 
@@ -110,6 +110,8 @@ public class BlockMap {
                 // System.out.println("Row "+ n + " Column " + m + " Value " + value);
                 raster.setPixel(n, m, (int[])data);
             }
+            
+//            m = m;
         }
 
         raster.setPixel(column, row, (int[])red);

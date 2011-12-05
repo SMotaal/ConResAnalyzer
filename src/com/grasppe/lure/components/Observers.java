@@ -27,6 +27,7 @@ public class Observers implements Observable {
 
     protected Observable	observable;
     protected boolean		updating = false;
+    int dbg = 3;
 
     /** Field description */
     protected Set<Observer>	observerSet = new HashSet<Observer>();
@@ -50,7 +51,7 @@ public class Observers implements Observable {
     public void attachObserver(Observer observer) {
         if (observable == observer) return;
 
-        GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()));
+        GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()),dbg);
         observerSet.add(observer);
         notifyObservers();
 
@@ -61,7 +62,7 @@ public class Observers implements Observable {
      * @param observer
      */
     public void detachObserver(Observer observer) {
-        GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()));
+        GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()),dbg);
         observerSet.remove(observer);
         notifyObservers();
 
@@ -105,12 +106,12 @@ public class Observers implements Observable {
 
 //      Iterator<Observer>    observerIterator = observerSet.iterator();
 //
-//      if (!observerIterator.hasNext()) GrasppeKit.debugText("Observer Update Failed", toString());
+//      if (!observerIterator.hasNext()) GrasppeKit.debugText("Observer Update Failed", toString(),dbg);
 //
 //      while (observerIterator.hasNext()) {
 //          Observer  thisObserver = observerIterator.next();
 //
-//          GrasppeKit.debugText("Observer Update", " ==> " + GrasppeKit.lastSplit(thisObserver.toString()));
+//          GrasppeKit.debugText("Observer Update", " ==> " + GrasppeKit.lastSplit(thisObserver.toString()),dbg);
 //          
 //          if (observable==null)
 //            notifyObserver(thisObserver);

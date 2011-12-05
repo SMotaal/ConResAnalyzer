@@ -38,6 +38,8 @@ public class CaseFolder extends CaseFile {
     HashMap<Integer, ImageFile>		imageFileMap = new HashMap<Integer, ImageFile>();
     protected ImageFile[]			imageFiles;
     protected TargetDefinitionFile	targetDefinitionFile;
+    
+    int dbg = 3;
 
     /**
      * @param pathname
@@ -96,7 +98,7 @@ public class CaseFolder extends CaseFile {
                 GrasppeKit.debugText("Enumerting Case Images",
                                      "The image " + thisFile.getName() + " was not load since "
                                      + "block value " + thisFile.getImageID()
-                                     + " was not defined in the target defnition file.", 3);
+                                     + " was not defined in the target defnition file.", dbg);
         }
 
         if (!imageToneValues.containsAll(blockToneValues))

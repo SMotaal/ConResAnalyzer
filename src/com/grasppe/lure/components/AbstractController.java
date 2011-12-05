@@ -37,6 +37,7 @@ public class AbstractController implements Observer, ActionListener {
     protected ActionListener							actionListener;
     protected AbstractController						commandHandler;
 
+    int dbg = 3;
     /**
      */
     public AbstractController() {
@@ -76,7 +77,7 @@ public class AbstractController implements Observer, ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             getCommand(e.getActionCommand()).execute();
-            GrasppeKit.debugText("Command Event Handled", e.getActionCommand());
+            GrasppeKit.debugText("Command Event Handled", e.getActionCommand(),dbg);
         } catch (Exception exception) {
             GrasppeKit.debugText("Command Event Ignored", e.getActionCommand(), 2);
         }
@@ -220,7 +221,7 @@ public class AbstractController implements Observer, ActionListener {
             str += keyIterator.next();
         }
 
-        GrasppeKit.debugText("Command Keys (" + getClass().getSimpleName() + ")", str, 2);
+        GrasppeKit.debugText("Command Keys (" + getClass().getSimpleName() + ")", str, dbg);
     }
 
     /**

@@ -25,6 +25,7 @@ public class NewCase extends CaseManagerCommand {
 
     protected static final String	name        = "NewCase";
     protected static final int		mnemonicKey = KeyEvent.VK_N;
+    int dbg = 3;
 
     /**
      */
@@ -54,7 +55,7 @@ public class NewCase extends CaseManagerCommand {
         // TODO: Show imageFolderChooser, if can create new case with images, confirm and close case before creating new case
         SelectCaseImagesFolder	selectCaseImagesFolder = new SelectCaseImagesFolder();
 
-        GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
+        GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", dbg);
 
         // TODO: Show imageFolderChooser
 //      canProceed = false;
@@ -72,7 +73,7 @@ public class NewCase extends CaseManagerCommand {
 
         // TODO: Create new case in metadata entry state
         GrasppeKit.debugText("New Case Creation",
-                             "New case will be created and passed for metadata entry", 3);
+                             "New case will be created and passed for metadata entry", dbg);
 
         try {
             getModel().getNewCaseModel();		// getModel().Case//new getModel()canProceed..CaseModel();
@@ -105,7 +106,7 @@ public class NewCase extends CaseManagerCommand {
 
         if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
         GrasppeKit.debugText("New Case Success",
-                             "Created new case and reorganize cases in the case manager model.", 3);
+                             "Created new case and reorganize cases in the case manager model.", dbg);
 
         return true;	// Action responded to in intended scenario
     }

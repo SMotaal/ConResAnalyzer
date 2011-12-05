@@ -41,6 +41,7 @@ public class OpenCase extends CaseManagerCommand {
     /**
      */
     private CaseManager	controller;
+    int					dbg = 3;
 
     /**
      * Constructs a realization of AbstractCommand.
@@ -123,14 +124,14 @@ public class OpenCase extends CaseManagerCommand {
 
             GrasppeKit.debugText("Open Case Success",
                                  "Created new CaseModel for " + getModel().getCurrentCase().title
-                                 + " and reorganize cases in the case manager model.", 3);
+                                 + " and reorganize cases in the case manager model.", dbg);
 
             getModel().notifyObservers();
 
         } else {
             GrasppeKit.debugText(
                 "Open Case Unsuccessful",
-                "New case was not created... Reverting cases in the case manager model.", 3);
+                "New case was not created... Reverting cases in the case manager model.", dbg);
 
             if (newCase != null) finalizeOpenCase(newCase);
 
@@ -154,7 +155,7 @@ public class OpenCase extends CaseManagerCommand {
 
         boolean	canProceed = false;
 
-        GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", 3);
+        GrasppeKit.debugText("Open Case Attempt", "Call SelectCaseFolder", dbg);
         if (!getModel().canGetNewCase())
             new UnexpectedException(
                 "Unexpectedly... could not make room for a new case right now!").printStackTrace();
@@ -168,8 +169,10 @@ public class OpenCase extends CaseManagerCommand {
             if (canProceed)
                 GrasppeKit.debugText("Open Case Selected",
                                      "SelectCaseFolder returned "
-                                     + selectCaseFolder.getSelectedFile().getAbsolutePath(), 3);
-            else GrasppeKit.debugText("Open Case Cancled", "SelectCaseFolder was not completed", 3);
+                                     + selectCaseFolder.getSelectedFile().getAbsolutePath(), dbg);
+            else
+                GrasppeKit.debugText("Open Case Cancled", "SelectCaseFolder was not completed",
+                                     dbg);
             if (!canProceed) break;		// Action responded to in alternative scenario
 
             // TODO: Verify case folder!

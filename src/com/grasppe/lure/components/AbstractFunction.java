@@ -31,6 +31,8 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     protected double	progress   = 0.0;
     protected ExitCodes	exitCode   = ExitCodes.PENDING;
 
+    int dbg = 3;
+    
     /** Field description */
     public String	name = getClass().getSimpleName();
 
@@ -71,12 +73,12 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
         if (isExecuted()) return false;		// TODO: Implement duplicity resolution
         if (!isExecutable())
             throw new IllegalStateException(getName() + " is not currently executable.");
-        GrasppeKit.debugText("Operation Execution Started", GrasppeKit.lastSplit(toString()));
+        GrasppeKit.debugText("Operation Execution Started", GrasppeKit.lastSplit(toString()),dbg);
         executing = true;
         setExecuted(perfomOperation());
         executing = false;
-        if (isExecuted()) setExitCode(ExitCodes.SUCCESS);		// GrasppeKit.debugText("Operation Execution Ends", GrasppeKit.lastSplit(toString()));
-        else setExitCode(ExitCodes.FAILED);		// GrasppeKit.debugText("Operation Execution Failed", GrasppeKit.lastSplit(toString()), 2);
+        if (isExecuted()) setExitCode(ExitCodes.SUCCESS);		// GrasppeKit.debugText("Operation Execution Ends", GrasppeKit.lastSplit(toString()),dbg);
+        else setExitCode(ExitCodes.FAILED);		// GrasppeKit.debugText("Operation Execution Failed", GrasppeKit.lastSplit(toString()), dbg);
 
         return isExecuted();
     }
@@ -86,7 +88,7 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
      * @return
      */
     public final boolean execute(boolean forcedAction) {
-        GrasppeKit.debugText("Operation Execution Forced", GrasppeKit.lastSplit(toString()));
+        GrasppeKit.debugText("Operation Execution Forced", GrasppeKit.lastSplit(toString()),dbg);
 
         // if (forcedAction)
         setExecuted(false);
@@ -177,32 +179,32 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
 
         case SUCCESS :
             GrasppeKit.debugText("Operation completed successfuly",
-                                 GrasppeKit.lastSplit(toString()));
+                                 GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case FAILED :
-            GrasppeKit.debugText("Operation execution failed", GrasppeKit.lastSplit(toString()));
+            GrasppeKit.debugText("Operation execution failed", GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case CANCELED :
             GrasppeKit.debugText("Operation execution terminated by user",
-                                 GrasppeKit.lastSplit(toString()));
+                                 GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case FORCED :
             GrasppeKit.debugText("Operation execution interrupeted before completition",
-                                 GrasppeKit.lastSplit(toString()));
+                                 GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case UNEXPECTED :
             GrasppeKit.debugText(
                 "Operation execution failed or terminated before yielding valid results",
-                GrasppeKit.lastSplit(toString()));
+                GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case INACCESSIBLERESOURCE :
             GrasppeKit.debugText("Operation execution failed to access the necessary resources",
-                                 GrasppeKit.lastSplit(toString()));
+                                 GrasppeKit.lastSplit(toString()),dbg);
             break;
 
         case PENDING :

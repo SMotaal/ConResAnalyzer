@@ -39,6 +39,8 @@ public class CaseManager extends AbstractController implements ActionListener {
 
     /** Field description */
     public ConResAnalyzer	analyzer;
+    
+    int dbg = 3;
 
     /**
      * @param listener
@@ -160,7 +162,7 @@ public class CaseManager extends AbstractController implements ActionListener {
      */
     @Override
     protected AbstractModel getNewModel() {
-        GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", 2);
+        GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", dbg);
 
         return new CaseManagerModel(this);
     }

@@ -66,6 +66,7 @@ public class TargetManagerModel extends AbstractModel {
      * @return the activeBlock
      */
     public ConResBlock getActiveBlock() {
+    	if (getActiveTarget()==null) return null;
         return (ConResBlock)getActiveTarget().getActiveBlock();
     }
 

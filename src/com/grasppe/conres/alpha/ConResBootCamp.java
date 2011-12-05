@@ -901,7 +901,7 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
 
         ((OpenCase)analyzer.getCaseManager().getCommand("OpenCase")).openCase(caseFolder);
 
-        ((MarkBlock)analyzer.getTargetManager().getCommand("MarkBlock")).execute();
+//        ((MarkBlock)analyzer.getTargetManager().getCommand("MarkBlock")).execute();
 
 //      if (GrasppeEventDispatcher.isDown(KeyCode.VK_SHIFT))
 //      Testing.imageName = imageNames[1];
