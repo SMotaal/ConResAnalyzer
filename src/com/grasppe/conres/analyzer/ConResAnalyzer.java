@@ -10,11 +10,13 @@ package com.grasppe.conres.analyzer;
 
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.analyzer.operations.Quit;
+import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.components.IAuxiliaryCaseManager;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -31,10 +33,19 @@ import java.util.LinkedHashMap;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-    protected CaseManager			caseManager;
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractController#getView()
+	 */
+	@Override
+	public ConResAnalyzerView getView() {
+		return analyzerView;
+	}
+
+	protected CaseManager			caseManager;
     protected TargetManager			targetManager;
     protected AnalysisManager		analysisManager;
     protected AbstractController[]	managers;		// = new AbstractController[]{caseManager, targetManager,analysisManager};
+    protected ConResAnalyzerView	analyzerView;
 
     // protected LinkedHashMap<String, AbstractCommand>  commands;
 
@@ -43,18 +54,23 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     public ConResAnalyzer() {
         this(new ConResAnalyzerModel());
+        analyzerView = new ConResAnalyzerView(this);
+        attachView(analyzerView);
         updateCommands();
         setCaseManager(new CaseManager(this));
         setTargetManager(new TargetManager(this));
         setAnalysisManager(new AnalysisManager(this));
         managers = new AbstractController[] { caseManager, targetManager, analysisManager };
+        analyzerView.prepareView();
     }
+    
+    
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
      * @param model
      */
-    public ConResAnalyzer(ConResAnalyzerModel model) {
+    private ConResAnalyzer(ConResAnalyzerModel model) {
         super(model);
     }
 

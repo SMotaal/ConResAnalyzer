@@ -50,4 +50,6 @@ public interface ISteppingBlockState {
      * @return
      */
     int getRows();
+    
+    int getFirstColumn();
 }

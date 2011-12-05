@@ -10,18 +10,24 @@
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
-import com.grasppe.lure.framework.GrasppeKit;
-
 /**
  * @author daflair
  */
 public class BlockState implements ISteppingBlockState {
 
-    /** Field description */
+    /* (non-Javadoc)
+	 * @see com.grasppe.conres.framework.analysis.stepping.ISteppingBlockState#getFirstColumn()
+	 */
+	public int getFirstColumn() {
+		return firstColumn;
+	}
+
+	/** Field description */
     protected int	blockMap[][];
 
     /** Field description */
-    protected int	rows, columns, row,	column;
+    protected int	rows, columns, row,	column,	firstColumn;
+    int				dbg = 2;
 
     /**
      */
@@ -31,11 +37,23 @@ public class BlockState implements ISteppingBlockState {
      * @param sourceState
      */
     protected BlockState(ISteppingBlockState sourceState) {
-        this.rows     = sourceState.getRows();
-        this.columns  = sourceState.getColumns();
-        this.row      = sourceState.getRow();
-        this.column   = sourceState.getColumn();
+        this.rows    = sourceState.getRows();
+        this.columns = sourceState.getColumns();
+        this.row     = sourceState.getRow();
+        this.firstColumn = sourceState.getFirstColumn();
+        // this.column   = sourceState.getColumn();
+        setColumn(sourceState.getColumn());
         this.blockMap = sourceState.getBlockMap();
+    }
+
+    /**
+     * @param rows
+     * @param columns
+     * 	@param firstColumn
+     */
+    public BlockState(int rows, int columns, int firstColumn) {
+        this(rows, columns, 0, firstColumn);
+        this.firstColumn = firstColumn;
     }
 
     /**
@@ -45,10 +63,12 @@ public class BlockState implements ISteppingBlockState {
      * @param column
      */
     public BlockState(int rows, int columns, int row, int column) {
-        this.rows     = rows;
-        this.columns  = columns;
-        this.row      = row;
-        this.column   = column;
+        this.rows    = rows;
+        this.columns = columns;
+        this.row     = row;
+
+        // this.column   = column;
+        setColumn(column);
         this.blockMap = new int[columns][rows];
     }
 
@@ -60,10 +80,12 @@ public class BlockState implements ISteppingBlockState {
      * @param blockMap
      */
     public BlockState(int rows, int columns, int row, int column, int blockMap[][]) {
-        this.rows     = rows;
-        this.columns  = columns;
-        this.row      = row;
-        this.column   = column;
+        this.rows    = rows;
+        this.columns = columns;
+        this.row     = row;
+
+        // this.column   = column;
+        setColumn(column);
         this.blockMap = blockMap;
     }
 
@@ -273,8 +295,6 @@ public class BlockState implements ISteppingBlockState {
     public int getRows() {
         return rows;
     }
-    
-    int dbg = 2;
 
     /**
      * @param row
@@ -282,7 +302,8 @@ public class BlockState implements ISteppingBlockState {
      * @return
      */
     public int getValue(int row, int column) {
-//    	GrasppeKit.debugText("BlockState", "Get Value: " + row + ", " + column + " [" + blockMap[0].length + "x" + blockMap.length + "]", dbg);
+
+//      GrasppeKit.debugText("BlockState", "Get Value: " + row + ", " + column + " [" + blockMap[0].length + "x" + blockMap.length + "]", dbg);
         return this.blockMap[column][row];
     }
 
@@ -290,7 +311,8 @@ public class BlockState implements ISteppingBlockState {
      * @param column the column to set
      */
     public void setColumn(int column) {
-        this.column = column;
+        if (column < firstColumn) this.column = firstColumn;
+        else this.column = column;
     }
 
     /**

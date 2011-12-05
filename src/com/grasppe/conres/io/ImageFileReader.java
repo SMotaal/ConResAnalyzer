@@ -13,6 +13,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.morie.units.spatial.SpatialFrequency;
 import com.grasppe.morie.units.spatial.resolution.PixelsPerInch;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
@@ -35,8 +36,7 @@ public class ImageFileReader implements IGrasppeFileReader {
 
     TreeMap<Integer, SanselanImageTag>	tagMap = new TreeMap<Integer, SanselanImageTag>();
     protected ImageFile					file;
-    
-    int dbg = 3;
+    int									dbg = 2;
 
     /**
      * @param file
@@ -68,6 +68,94 @@ public class ImageFileReader implements IGrasppeFileReader {
      *  @throws ImageReadException
      */
     public void readInformation() throws IOException, ImageReadException {
+        String	fileExtension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+
+        String	tiffEx        = "tif";
+        String	pngEx         = "png";
+        String	jpgEx         = "jpg";
+
+        boolean	isTiff        = fileExtension.matches(tiffEx);
+        boolean	isPng         = fileExtension.matches(pngEx);
+        boolean	isJpg         = fileExtension.matches(jpgEx);
+
+        if (isTiff) readPngInformation(); //readTiffInformation();
+        else if (isPng) readPngInformation();
+        else if (isJpg) readPngInformation();
+        else throw new IOException("Could not read " + file.getName() + ". File extension " + fileExtension
+                                   + " is not a supported image type.");
+    }
+
+    /**
+     *  @throws IOException
+     *  @throws ImageReadException
+     */
+    public void readPngInformation() throws IOException, ImageReadException {
+    	
+    	ImageInfo	imageInfo = null;
+
+    	try {
+    		imageInfo = Sanselan.getImageInfo(file);
+    	} catch (Exception exception) {
+    		throw new IOException("Could not read " + file.getName() + ". " + exception.getMessage());
+    	}
+
+        int			colorType = imageInfo.getColorType();
+        int			channels, depth;
+        String colorMode = "";
+
+        switch (colorType) {
+
+        case ImageInfo.COLOR_TYPE_BW :
+        	if(colorMode.isEmpty()) colorMode = "B/W";
+        case ImageInfo.COLOR_TYPE_GRAYSCALE :
+        	if(colorMode.isEmpty()) colorMode = "Gray";
+            channels = 1;
+            break;
+
+        case ImageInfo.COLOR_TYPE_RGB :
+        	if(colorMode.isEmpty()) colorMode = "RGB";
+            channels = 3;
+            break;
+
+        case ImageInfo.COLOR_TYPE_CMYK :
+        	if(colorMode.isEmpty()) colorMode = "CMYK";
+            channels = 4;
+            break;
+        case ImageInfo.COLOR_TYPE_OTHER :
+        	if(colorMode.isEmpty()) colorMode = "Other";
+        case ImageInfo.COLOR_TYPE_UNKNOWN :
+        	if(colorMode.isEmpty()) colorMode = "Unknown";
+        default :
+            channels = 0;
+        }
+        
+        if(colorMode.isEmpty()) colorMode = "File";
+        
+        if (channels<1 || channels>3)
+            throw new IOException("Could not read " + file.getName() + ". " + colorMode + " color mode is not supported.");
+
+        file.setChannels(channels);
+        file.setBitDepth(imageInfo.getBitsPerPixel());
+        file.setWidth(imageInfo.getWidth());
+        file.setHeight(imageInfo.getHeight());
+        
+        int widthDPI = imageInfo.getPhysicalWidthDpi();
+        int heightDPI = imageInfo.getPhysicalHeightDpi();
+        
+        if (widthDPI!=heightDPI)
+        	throw new IOException("Could not read " + file.getName() + ". Images with non-square pixel ratios not supported.");
+
+        SpatialFrequency	resolution = getResolutionValue(2, widthDPI, heightDPI);
+
+        file.setResolution(resolution);
+        GrasppeKit.debugText("Read Image", "Saneslan Image Info: \t" + file, dbg);
+    }
+
+    /**
+     *  @throws IOException
+     *  @throws ImageReadException
+     */
+    public void readTiffInformation() throws IOException, ImageReadException {
 
         // Ref: http://commons.apache.org/sanselan/xref-test/org/apache/sanselan/sampleUsage/MetadataExample.html
 

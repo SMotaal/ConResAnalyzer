@@ -307,6 +307,17 @@ public class AbstractController implements Observer, ActionListener {
     public AbstractModel getModel() {
         return this.model;
     }
+    
+    public AbstractView getView(){
+    	return getView(0);
+    }
+    
+    public AbstractView getView(int index){
+    	if (getModel()==null) return null;
+    	AbstractView[] views = getModel().views.toArray(new AbstractView[0]);
+    	if (views.length > index) return views[index];
+    	return null;
+    }
 
     /**
      *  @return

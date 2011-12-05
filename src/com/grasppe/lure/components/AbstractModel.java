@@ -15,6 +15,7 @@ import java.io.InvalidObjectException;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *     Models handle the data portion of a component. A model indirectly notifies a controller and any number of views of any changes to the data. The controller is responsible for initiating all attach/detach calls, however the model keeps track of observer view objects with special implementation.
@@ -24,7 +25,7 @@ import java.util.Set;
 public class AbstractModel extends ObservableObject {
 
     protected AbstractController	controller;
-    protected Set<AbstractView>		views = new HashSet<AbstractView>();
+    protected HashSet<AbstractView>		views = new HashSet<AbstractView>();
 
 //  protected GrasppeKit            grasppeKit     = GrasppeKit.getInstance();
 
@@ -55,9 +56,15 @@ public class AbstractModel extends ObservableObject {
      * @param view
      */
     protected void attachView(AbstractView view) {
-        if (views.contains(view)) return;
-        super.attachObserver(view);
-        views.add(view);
+    	if (!(view instanceof AbstractView)) return;
+    	try {
+	    	AbstractView castView = (AbstractView) view;
+	        if (views.contains(view)) return;
+	        super.attachObserver(view);
+	        views.add(view);
+    	} catch (Exception exception) {
+    		// attachView(view);
+    	}
     }
 
     /**

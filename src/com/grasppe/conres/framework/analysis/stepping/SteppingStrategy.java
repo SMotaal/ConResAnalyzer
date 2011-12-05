@@ -65,8 +65,9 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
     protected boolean moveTo(int row, int column) {
         this.undoState = this.getFinalState();
         this.setFinalState(this.getFinalState().copy());
-        this.getFinalState().row    = row;
-        this.getFinalState().column = column;
+        this.getFinalState().setRow(row);//    = row;
+        this.getFinalState().setColumn(column);//    = row;
+//        this.getFinalState().column = column;
         System.out.println("Move to Row " + row + "/" + this.startState.getRows() + " Column "
                            + column + "/" + this.startState.getColumns());
 

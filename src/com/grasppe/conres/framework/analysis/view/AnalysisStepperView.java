@@ -236,9 +236,13 @@ public class AnalysisStepperView extends AbstractView {
 
         	BlockState blockState = getBlockState();
             BlockMap	blockMap = new BlockMap(blockState);
+            
 
             int row = blockState.getRow();
             int column = blockState.getColumn();
+            
+//            int firstColumn = getTargetManager().getFirstColumnIndex();
+//            if (column<firstColumn) blockState.setColumn(firstColumn);
             
             Image patchImage = getTargetManager().getPatchImage(row, column);
             

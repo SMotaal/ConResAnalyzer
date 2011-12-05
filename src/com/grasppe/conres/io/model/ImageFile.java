@@ -33,13 +33,16 @@ import java.util.Arrays;
  * @author daflair
  */
 public class ImageFile extends CaseFile {
+	
+	int dbg = 3;
 
     protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
-                                                 "*i.tif" }));
+                                                 "*i.tif", "*i.tiff", "*i.png", "*i.jpg" }));
     protected static FilenameFilter	filenameFilter = new FilenameFilter() {
 
         public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith("i.tif");
+        	String filename = name.toLowerCase().replace("ff", "f");
+            return filename.endsWith("i.tif") || filename.endsWith("i.png") || filename.endsWith("i.jpg");
         }
     };
     protected int				channels = 0,
@@ -137,7 +140,7 @@ public class ImageFile extends CaseFile {
 
         setImageID(suffixCode);
 
-        return name.toLowerCase().replace("ff", "f").endsWith("i.tif");		// true;
+        return filenameFilter.accept(dir, name);//name.toLowerCase().replace("ff", "f").endsWith("i.tif") || || name.toLowerCase().endsWith("i.png");		// true;
     }
 
     /**
@@ -222,6 +225,8 @@ public class ImageFile extends CaseFile {
      * @return the imageID
      */
     public int getImageID() {
+    	
+    	int dbg = 2;
         File	dir       = this.getParentFile();
         String	name      = this.getName();
         String	baseName  = FilenameUtils.getBaseName(name);
@@ -229,12 +234,16 @@ public class ImageFile extends CaseFile {
         String	suffix    = GrasppeKit.lastSplit(name, ".").toLowerCase();
 
         // String suffixCode = suffix.substring(suffix.indexOf("_")+1,suffix.indexOf(".")-1);
-        int	suffixCode = new Integer(suffix.substring(suffix.indexOf("_") + 1,
-                             suffix.indexOf(".") - 1)).intValue();		// new Integer(suffix.split("_")[1]);
+        try {
+        	int suffixCode = new Integer(baseName.toLowerCase().substring(baseName.length()-3, baseName.length()-1)).intValue();
+            setImageID(suffixCode);
+            return imageID;
+        } catch (Exception exception) {
+//        	exception.printStackTrace();
+        	GrasppeKit.debugText("GetImageID",exception.getMessage(),dbg);
+        }
+    	return -1;
 
-        setImageID(suffixCode);
-
-        return imageID;
     }
 
     /**

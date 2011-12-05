@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 
 import java.net.URI;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -104,10 +105,37 @@ public class CaseFolder extends CaseFile {
         if (!imageToneValues.containsAll(blockToneValues))
             throw new FileNotFoundException(
                 "The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n"
-                + "Blocks in TDF: \t" + blockToneValues.toString() + "\n" + "Images in Folder: \t"
-                + imageToneValues.toString());
+                + "Blocks in TDF: \t" + sortedString(blockToneValues) + "\n" + "Images in Folder: \t"
+                + sortedString(imageToneValues));
 
         return;
+    }
+    
+    private String sortedString(HashSet<Integer> set){
+    	try {
+    		Integer[] setArray = sortedArray(set);
+    		return Arrays.toString(setArray);
+    	} catch (Exception exception) {
+    		return "";
+    	}    	
+    }
+    
+    private Integer[] sortedArray(HashSet<Integer> set){
+    	Integer[] setArray = set.toArray(new Integer[0]);
+    	
+    	try {
+    		Arrays.sort(setArray);
+    		return setArray;
+    	} catch (Exception exception) {
+    		return null;
+    	}
+    	
+//    	int[] sortingArray = new int[setArray.length];
+//    	
+//    	for (int i = 0; i < integerList.size(); i++) {
+//    		intArray[i] = integerList.get(i);
+//    	
+//    	Arrays.
     }
 
     /**
@@ -118,22 +146,6 @@ public class CaseFolder extends CaseFile {
 
         if (fileCount == 1)
             setTargetDefinitionFile(new TargetDefinitionFile(fileList[0].getAbsolutePath()));
-
-    }
-
-    /**
-     * @param args
-     * @throws Exception
-     * @throws FileNotFoundException
-     */
-    public static void main(String[] args) throws FileNotFoundException, Exception {
-        String		testFile = "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
-
-        CaseFolder	file     = new CaseFolder(testFile);
-
-        boolean		isValid  = file.validate();
-
-        System.out.println(file.toString() + " is valid: " + isValid);
 
     }
 

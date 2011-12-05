@@ -27,6 +27,7 @@ import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.IAuxiliaryCaseManager;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.morie.units.AbstractValue;
 
 import ij.ImagePlus;
 
@@ -267,6 +268,28 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
         return new TargetManagerModel();
     }
+    
+    /**
+     * 	@param row
+     * 	@param column
+     * 	@return
+     */
+    public int getFirstColumnIndex() {
+    	//AbstractValue[] blockValues = getModel().getActiveTarget().getzAxis().getValues();//getCornerSelectorModel().getTargetDefinitionFile().getBlockToneValues();
+    	AbstractValue[] contrastValues = getModel().getActiveBlock().getXAxis().getValues();
+    	int blockValue = (int)getModel().getActiveBlock().getZValue().getValue();
+    	
+    	int i = 0;
+    	
+    	for (i = 0; i < contrastValues.length; i++) {
+    		int columnValue = (int)Math.round(contrastValues[i].getValue()/2);
+    		int lowValue = blockValue - columnValue;
+    		int highValue = blockValue + columnValue;
+    		if (lowValue>=0 && highValue <= 100)
+    			return i;
+    	}
+    	return i;
+    }
 
     /**
      * 	@param row
@@ -291,10 +314,12 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             
             
 
-            int			cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
+//            int			cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
             int			cH          = (int)((polygon.ypoints[1] - polygon.ypoints[0])*1.5);
             
-            cW = cH;
+            cH = Math.max(cH, 550);
+            
+            int cW = cH;
 
             int			x1          = cX - (cW / 2),
 						x2          = cX + (cW / 2);

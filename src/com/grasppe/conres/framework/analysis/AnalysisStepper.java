@@ -24,6 +24,7 @@ import com.grasppe.conres.framework.analysis.stepping.StepRight;
 import com.grasppe.conres.framework.analysis.stepping.StepUp;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
+import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.lure.components.AbstractController;
 
@@ -47,17 +48,27 @@ public class AnalysisStepper extends AbstractController {
 	public void updateActiveBlock() {
 		
 		
-		getModel().setActiveBlock(getAnalysisManagerModel().getActiveBlock());
+		getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
 		
 		int blockColumns = getActiveBlock().getXAxis().getValues().length;
 		int blockRows = getActiveBlock().getYAxis().getValues().length;
 		
-        BlockState	blockState = new BlockState(blockRows, blockColumns, 0, 0);		// , BlockState.fudgeMap1());
+        int firstColumn = getTargetManager().getFirstColumnIndex();
+        //if (column<firstColumn) blockState.setColumn(firstColumn);
+		
+        BlockState	blockState = new BlockState(blockRows, blockColumns, firstColumn);		// , BlockState.fudgeMap1());
 
         getModel().setBlockState(blockState);
 		
 		
 	}
+	
+    /**
+     * 	@return
+     */
+    public TargetManager getTargetManager() {
+        return getAnalysisManager().getTargetManager();
+    }
 	
 	public ConResBlock getActiveBlock() {
 		return getModel().getActiveBlock();
