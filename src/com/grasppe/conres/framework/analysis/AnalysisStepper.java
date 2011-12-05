@@ -59,7 +59,12 @@ public class AnalysisStepper extends AbstractController {
         BlockState	blockState = new BlockState(blockRows, blockColumns, firstColumn);		// , BlockState.fudgeMap1());
 
         getModel().setBlockState(blockState);
-		
+        
+        getStepperView().loadBlockFiles();
+        
+        if (getModel().getBlockState()==null) {
+        	getModel().setBlockState(new BlockState(blockRows, blockColumns, firstColumn));
+        }
 		
 	}
 	
@@ -201,6 +206,7 @@ public class AnalysisStepper extends AbstractController {
         thisStep.execute();
 
         getModel().setBlockState(thisStep.getFinalState());
+        getStepperView().saveScratchFile();
         getStepperView().update();
 
         // smartState = new SmartBlockState(thisStep.finalState);

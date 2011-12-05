@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<jardesc>
+    <jar path="/Users/daflair/Documents/workspace/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ConResAnalyzer/ConResAnalyzerAlpha.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=ConResAnalyzer/src&lt;com.grasppe.conres.analyzer{ConResAnalyzerMain.java[ConResAnalyzerMain" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <folder path="/ConResAnalyzer/bin"/>
+        <folder path="/ConResAnalyzer/test"/>
+        <javaElement handleIdentifier="=jblas/src\/main\/java"/>
+        <javaElement handleIdentifier="=sanselan/src\/main\/java"/>
+        <folder path="/ConResAnalyzer/pmdoc"/>
+        <folder path="/ConResAnalyzer/libraries"/>
+        <javaElement handleIdentifier="=ConResAnalyzer/src"/>
+        <folder path="/ConResAnalyzer/target"/>
+        <javaElement handleIdentifier="=jblas/src\/main\/resources"/>
+        <folder path="/ConResAnalyzer/gestures-wrapper"/>
+    </selectedElements>
+</jardesc>

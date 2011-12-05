@@ -10,19 +10,25 @@
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
+import com.grasppe.lure.framework.GrasppeKit;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * @author daflair
  */
 public class BlockState implements ISteppingBlockState {
 
-    /* (non-Javadoc)
-	 * @see com.grasppe.conres.framework.analysis.stepping.ISteppingBlockState#getFirstColumn()
-	 */
-	public int getFirstColumn() {
-		return firstColumn;
-	}
-
-	/** Field description */
+    /** Field description */
     protected int	blockMap[][];
 
     /** Field description */
@@ -37,10 +43,11 @@ public class BlockState implements ISteppingBlockState {
      * @param sourceState
      */
     protected BlockState(ISteppingBlockState sourceState) {
-        this.rows    = sourceState.getRows();
-        this.columns = sourceState.getColumns();
-        this.row     = sourceState.getRow();
+        this.rows        = sourceState.getRows();
+        this.columns     = sourceState.getColumns();
+        this.row         = sourceState.getRow();
         this.firstColumn = sourceState.getFirstColumn();
+
         // this.column   = sourceState.getColumn();
         setColumn(sourceState.getColumn());
         this.blockMap = sourceState.getBlockMap();
@@ -49,7 +56,7 @@ public class BlockState implements ISteppingBlockState {
     /**
      * @param rows
      * @param columns
-     * 	@param firstColumn
+     *  @param firstColumn
      */
     public BlockState(int rows, int columns, int firstColumn) {
         this(rows, columns, 0, firstColumn);
@@ -244,6 +251,66 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
+     *  @param filename
+     * @throws IOException 
+     */
+    public void readFile(String filename) throws IOException {
+        File	file = new File(filename);
+
+        try {
+            BufferedReader		bufferedReader = new BufferedReader(new FileReader(file));
+            int					fileRows       = 0;
+            int					fileColumns    = 0;
+            int					firstColumn    = 0;
+
+            ArrayList<String>	lines          = new ArrayList<String>();
+            String				line           = "";
+
+            while ((line = bufferedReader.readLine()) != null) {
+                int	rowLength = line.trim().split(",").length;
+
+                fileColumns = Math.max(fileColumns, rowLength);
+                if (rowLength == fileColumns) lines.add(line);
+            }
+
+            fileRows = lines.size();
+
+            Iterator<String>	iterator = lines.iterator();
+
+            int[][]				fileData = new int[fileColumns][fileRows];
+
+            int					row      = 0, column;
+
+            while (iterator.hasNext()) {
+            	line = iterator.next();
+                String	rowFields[] = line.trim().split(",");
+
+                for (column = 0; column < fileColumns; column++) {
+                    int	cellValue = new Integer(rowFields[column]).intValue();
+
+                    if (cellValue == -2) {
+                        cellValue   = 0;
+                        firstColumn = Math.max(firstColumn, column);
+                    }
+
+                    fileData[column][row] = cellValue;
+                }
+
+                row++;
+            }
+
+            setRows(fileRows);
+            setColumns(fileColumns);
+            setRow(0);
+            setColumn(0);
+            setBlockMap(fileData);
+        } catch (IOException exception) {
+        	GrasppeKit.debugText("Read CSV Error", exception.getMessage(), 2);
+        	throw exception;
+        }
+    }
+
+    /**
      * @param blockData
      * @return
      */
@@ -259,6 +326,39 @@ public class BlockState implements ISteppingBlockState {
                 newData[n][m] = blockData[m][n];
 
         return newData;
+    }
+
+    /**
+     *  @param filename
+     */
+    public void writeFile(String filename) {
+
+        // Ref: http://www.mkyong.com/java/how-to-export-data-to-csv-file-java/
+        try {
+            FileWriter	writer = new FileWriter(filename);
+
+            for (int r = 0; r < rows; r++) {
+                String[]	rowData   = new String[columns];
+                String		rowString = "";
+
+                for (int c = 0; c < columns; c++) {
+                    if (c < firstColumn) {
+                        rowString = GrasppeKit.cat(rowString, "-2", ",");
+                    } else {
+                        String	cellString = "" + blockMap[c][r];		// (blockMap[c][r] == 0) ? "" : "" +blockMap[c][r];
+
+                        rowData[c] = "" + cellString;
+                        rowString  = GrasppeKit.cat(rowString, cellString, ",");
+                    }
+                }
+                writer.append(rowString + "\n");
+            }
+
+            writer.flush();
+            writer.close();
+        } catch (IOException exception) {
+        	GrasppeKit.debugText("Write CSV Error", exception.getMessage(), 2);
+        }
     }
 
     /**
@@ -280,6 +380,18 @@ public class BlockState implements ISteppingBlockState {
      */
     public int getColumns() {
         return columns;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.framework.analysis.stepping.ISteppingBlockState#getFirstColumn()
+     */
+
+    /**
+     *  @return
+     */
+    public int getFirstColumn() {
+        return firstColumn;
     }
 
     /**
@@ -308,6 +420,13 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
+     * @param blockMap the blockMap to set
+     */
+    protected void setBlockMap(int[][] blockMap) {
+        this.blockMap = blockMap;
+    }
+
+    /**
      * @param column the column to set
      */
     public void setColumn(int column) {
@@ -316,10 +435,24 @@ public class BlockState implements ISteppingBlockState {
     }
 
     /**
+     * @param columns the columns to set
+     */
+    protected void setColumns(int columns) {
+        this.columns = columns;
+    }
+
+    /**
      * @param row the row to set
      */
     public void setRow(int row) {
         this.row = row;
+    }
+
+    /**
+     * @param rows the rows to set
+     */
+    protected void setRows(int rows) {
+        this.rows = rows;
     }
 
     /**

@@ -8,7 +8,6 @@
 
 package com.grasppe.conres.analyzer;
 
-import com.grasppe.conres.alpha.ConResBootCamp;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -19,15 +18,25 @@ import com.grasppe.lure.framework.GrasppeKit;
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class ConResAnalyzerMain {
+
     /**
      * @param args
      */
     public static void main(String[] args) {
-        GrasppeKit.setupHooks();
-//        new ConResBootCamp().run("");
-        ConResAnalyzer analyzer = new ConResAnalyzer();
-        ConResAnalyzerModel	analyzerModel = analyzer.getModel();
-        ConResAnalyzerView	analyzerView  = (ConResAnalyzerView) analyzer.getView(); //new ConResAnalyzerView(analyzer);
+
+    	// Thread	runningThread = 
+    	new Thread() {
+			
+			public void run() {
+                GrasppeKit.setupHooks();
+
+//              new ConResBootCamp().run("");
+                ConResAnalyzer		analyzer      = new ConResAnalyzer();
+                ConResAnalyzerModel	analyzerModel = analyzer.getModel();
+                ConResAnalyzerView	analyzerView  = (ConResAnalyzerView)analyzer.getView();		// new ConResAnalyzerView(analyzer);
+				
+			}
+		}.start();
 
     }
 }

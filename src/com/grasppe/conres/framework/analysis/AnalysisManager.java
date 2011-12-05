@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.analysis;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.operations.AnalyzeBlock;
+import com.grasppe.conres.framework.analysis.operations.ExportAnalysis;
 import com.grasppe.conres.framework.analysis.view.AnalysisManagerView;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.TargetManager;
@@ -90,6 +91,7 @@ public class AnalysisManager extends AbstractController {
     public void createCommands() {
         commands = new LinkedHashMap<String, AbstractCommand>();
         putCommand(new AnalyzeBlock(this, this));
+        putCommand(new ExportAnalysis(this, this));
     }
 
     /*

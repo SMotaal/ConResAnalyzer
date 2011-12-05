@@ -12,6 +12,10 @@ package com.grasppe.conres.framework.analysis.stepping;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * @author daflair
@@ -118,4 +122,29 @@ public class BlockMap {
 
         return image;
     }
+    
+    /**
+     * 	@param filename
+     */
+    public void writeFile(String filename) {
+    	// Ref: http://www.mkyong.com/java/how-to-export-data-to-csv-file-java/
+        try {
+            FileWriter	writer = new FileWriter(filename);
+
+            for (int r = 0; r < blockState.rows; r++) {
+                String[]	rowData = new String[blockState.columns];
+
+                for (int c = 0; c < blockState.columns; c++) {
+                    rowData[c] = "" + blockState.blockMap[c][r];
+                }
+
+                writer.append(GrasppeKit.cat(rowData, ","));
+            }
+
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }    
 }

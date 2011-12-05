@@ -14,6 +14,7 @@ import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.framework.targets.operations.MarkBlock;
@@ -291,6 +292,25 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     	return i;
     }
 
+    	
+
+    /**
+     * 	@param row
+     * 	@param column
+     * 	@return
+     */
+    public ConResPatch getPatch(int row, int column) {
+    	
+    	int dbg = 2;
+    	
+    	try {
+    		getModel().getActiveBlock().setActivePatch(row, column);
+    		return getModel().getActiveBlock().getPatch(row, column);
+    	} catch (Exception exception) {
+    		GrasppeKit.debugText("Get Patch", exception.getMessage(), 2);
+    		return null;
+    	}
+    }
     /**
      * 	@param row
      * 	@param column
@@ -298,9 +318,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public Image getPatchImage(int row, int column) {
     	
-    	int dbg = 2;
-    	
-
+    	int dbg = 3;
 
         try {
 
@@ -345,7 +363,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             return patchImage;
             
         } catch (Exception exception) {
-            exception.printStackTrace();
+//            exception.printStackTrace();
+        	GrasppeKit.debugText("Get Patch Image", exception.getMessage(), 2);
         }
         return null;
     }

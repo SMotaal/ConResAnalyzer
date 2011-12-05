@@ -199,15 +199,21 @@ public class CornerSelector extends AbstractController {
      *  @return
      */
     public String getPatchCenterROIFilePath() {
+    	return generateFilename("i.roi.zip");
+    }
+    
+    public String generateFilename(String suffix) {
 
         // TODO: Determine roi filename
         if (getBlockImage() == null) return null;
 
-        String	filename = FilenameUtils.getBaseName(getBlockImage().getName()) + ".roi.zip";
+        String imageName = FilenameUtils.getBaseName(getBlockImage().getName());
+        String	fileName = imageName.substring(0,imageName.length()-1) + suffix;
 
-        return getBlockImage().getParentFile() + File.separator + filename;
+        return getBlockImage().getParentFile() + File.separator + fileName;
 
     }
+
 
     /**
      * @return the selectorView

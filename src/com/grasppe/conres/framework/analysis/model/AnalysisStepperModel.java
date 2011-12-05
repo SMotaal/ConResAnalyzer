@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.analysis.model;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -25,28 +26,13 @@ import java.util.List;
  */
 public class AnalysisStepperModel extends AbstractModel {
 
-    /**
-	 * @return the activeBlock
-	 */
-	public ConResBlock getActiveBlock() {
-		return activeBlock;
-	}
-
-	/**
-	 * @param activeBlock the activeBlock to set
-	 */
-	public void setActiveBlock(ConResBlock activeBlock) {
-		this.activeBlock = activeBlock;
-		notifyObservers();
-	}
-
-	/** Field description */
-    private BlockState	blockState = null; //new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
+    /** Field description */
+    private BlockState	blockState = null;		// new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /** Field description */
-    private List<int[]>	history = new ArrayList<int[]>();		// @SuppressWarnings("rawtypes")
-    
-    private ConResBlock activeBlock = null;
+    private List<int[]>	history     = new ArrayList<int[]>();		// @SuppressWarnings("rawtypes")
+    private ConResBlock	activeBlock = null;
+    private ConResPatch	activePatch = null;
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -64,6 +50,20 @@ public class AnalysisStepperModel extends AbstractModel {
     }
 
     /**
+     * @return the activeBlock
+     */
+    public ConResBlock getActiveBlock() {
+        return activeBlock;
+    }
+
+    /**
+     * @return the activePatch
+     */
+    public ConResPatch getActivePatch() {
+        return activePatch;
+    }
+
+    /**
      * @return the blockState
      */
     public BlockState getBlockState() {
@@ -75,6 +75,21 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public List<int[]> getHistory() {
         return history;
+    }
+
+    /**
+     * @param activeBlock the activeBlock to set
+     */
+    public void setActiveBlock(ConResBlock activeBlock) {
+        this.activeBlock = activeBlock;
+        notifyObservers();
+    }
+
+    /**
+     * @param activePatch the activePatch to set
+     */
+    public void setActivePatch(ConResPatch activePatch) {
+        this.activePatch = activePatch;
     }
 
     /**

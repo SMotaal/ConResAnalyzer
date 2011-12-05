@@ -2,15 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Grasppe</groupId>
   <artifactId>ConResAnalyzer</artifactId>
+  <packaging>pom</packaging>
+  <name>ConResAnalyzer Alpha</name>
   <version>0.0.1-SNAPSHOT</version>
+  <description>		</description>
   <dependencies>
-  	<dependency>
-  		<groupId>org.jblas</groupId>
-  		<artifactId>jblas</artifactId>
-  		<version>1.2.1</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
   	<dependency>
   		<groupId>org.apache.commons</groupId>
   		<artifactId>commons-io</artifactId>

@@ -102,7 +102,9 @@ public class ConResBlock extends GridBlock {
      * @return
      */
     public ConResPatch getPatch(int row, int column) {
-        return (ConResPatch)super.getPatch(row, column);
+        //return (ConResPatch)super.getPatch(row, column);
+        return new ConResPatch(row, column, getXValue(column), getYValue(row));
+
     }
 
     /**

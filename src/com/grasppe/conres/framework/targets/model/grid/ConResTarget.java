@@ -23,7 +23,7 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ConResTarget extends GridTarget {
 
-    /**
+	/**
 	 * @return the measurements
 	 */
 	public TargetMeasurements getMeasurements() {

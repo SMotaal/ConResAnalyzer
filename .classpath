@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="ConResAnalyzerPlugInA0.java" kind="src" path="src"/>
-	<classpathentry kind="src" path="gestures-wrapper"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/daflair/Downloads/ImageJ/ImageJ/ImageJ64.app/Contents/Resources/Java/ij.jar" sourcepath="/Users/daflair/Documents/workspace/libraries/ij145s/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry excluding=".*|ConResAnalyzerPlugInA0.java" kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry exported="true" kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="/Users/daflair/Downloads/ImageJ/ImageJ/ImageJ64.app/Contents/Resources/Java/ij.jar" sourcepath="/Users/daflair/Documents/workspace/libraries/ij145s/src"/>
 	<classpathentry kind="src" path="/sanselan"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

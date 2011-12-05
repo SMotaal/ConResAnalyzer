@@ -3,6 +3,8 @@
 	<name>ConResIJ</name>
 	<comment></comment>
 	<projects>
+		<project>jblas</project>
+		<project>sanselan</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

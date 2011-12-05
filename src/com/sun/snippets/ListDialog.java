@@ -41,21 +41,29 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+
+import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 
 /**
  * Use this modal dialog to let the user choose one string from a long list. See
@@ -87,11 +95,21 @@ public class ListDialog extends JDialog implements ActionListener {
         super(frame, title, true);
 
         // Create and initialize the buttons.
-        JButton	cancelButton = new JButton("Cancel");
+        final JButton	cancelButton = new JButton("Cancel");
 
         cancelButton.addActionListener(this);
+        KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+        Action escapeAction = new AbstractAction() {
+            // close the frame when the user presses escape
+            public void actionPerformed(ActionEvent e) {
+            	cancelButton.doClick();
+            }
+        }; 
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
+        getRootPane().getActionMap().put("ESCAPE", escapeAction);
 
-        //
+        
+        
         final JButton	setButton = new JButton("Set");
 
         setButton.setActionCommand("Set");
@@ -135,26 +153,26 @@ public class ListDialog extends JDialog implements ActionListener {
         };
 
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        list.setFont(list.getFont().deriveFont(14.0F));
 
         if (longValue != null) {
-            list.setPrototypeCellValue(longValue);		// get extra space
+            list.setPrototypeCellValue(longValue + "   ");		// get extra space
         }
+        
 
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
         list.addMouseListener(new MouseAdapter() {
-
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     setButton.doClick();	// emulate button click
                 }
             }
-
         });
 
         JScrollPane	listScroller = new JScrollPane(list);
 
-        listScroller.setPreferredSize(new Dimension(250, 80));
+        listScroller.setPreferredSize(new Dimension(250, 300));
         listScroller.setAlignmentX(LEFT_ALIGNMENT);
 
         // Create a container so that we can add a title around
@@ -166,6 +184,8 @@ public class ListDialog extends JDialog implements ActionListener {
         listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
 
         JLabel	label = new JLabel(labelText);
+        
+        label.setFont(label.getFont().deriveFont(16.0F));
 
         label.setLabelFor(list);
         listPane.add(label);
