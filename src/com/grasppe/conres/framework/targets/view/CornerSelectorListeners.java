@@ -6,7 +6,7 @@
 
 
 
-package com.grasppe.conres.framework.imagej;
+package com.grasppe.conres.framework.targets.view;
 
 import com.grasppe.lure.framework.GrasppeKit;
 

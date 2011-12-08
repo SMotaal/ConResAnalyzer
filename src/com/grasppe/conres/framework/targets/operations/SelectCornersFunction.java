@@ -8,9 +8,9 @@
 
 package com.grasppe.conres.framework.targets.operations;
 
-import com.grasppe.conres.framework.imagej.CornerSelectorView;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
+import com.grasppe.conres.framework.targets.view.CornerSelectorView;
 import com.grasppe.lure.components.AbstractModel;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;

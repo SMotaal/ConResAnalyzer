@@ -67,9 +67,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         this.setFinalState(this.getFinalState().copy());
         this.getFinalState().setRow(row);//    = row;
         this.getFinalState().setColumn(column);//    = row;
-//        this.getFinalState().column = column;
-        System.out.println("Move to Row " + row + "/" + this.startState.getRows() + " Column "
-                           + column + "/" + this.startState.getColumns());
+//        System.out.println("Move to Row " + row + "/" + this.startState.getRows() + " Column " + column + "/" + this.startState.getColumns());
 
         return this.isValidPosition();
     }
@@ -90,10 +88,8 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     public boolean undo() {
-
-        // TODO Auto-generated method stub
         // this.finalState = this.startState.copy();
-        System.out.println("Undo step!");
+//        System.out.println("Undo step!");
         this.setFinalState(this.undoState);
 
         return true;
@@ -125,10 +121,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      * @return
      */
     public boolean isValid() {
-
-        // TODO Auto-generated method stub
-        System.out.println("Position " + this.isValidPosition() + " Unique "
-                           + this.notEquivalent());
+//        System.out.println("Position " + this.isValidPosition() + " Unique " + this.notEquivalent());
 
         return this.isValidPosition() && this.notEquivalent();
     }
@@ -142,17 +135,17 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         int	blockRows    = this.startState.getRows();
         int	blockColumns = this.startState.getColumns();
 
-        System.out.print(">> Row " + finalRow + "/" + blockRows + " Column " + finalColumn + "/"
-                         + blockColumns);
+//        System.out.print(">> Row " + finalRow + "/" + blockRows + " Column " + finalColumn + "/"
+//                         + blockColumns);
 
         if ((finalColumn >= 0) && (finalColumn < blockColumns) && (finalRow >= 0)
                 && (finalRow < blockRows)) {
-            System.out.print(" is on the grid\n");
+//            System.out.print(" is on the grid\n");
 
             return true;
         }
 
-        System.out.print(" is off the grid\n");
+//        System.out.print(" is off the grid\n");
 
         return false;
     }

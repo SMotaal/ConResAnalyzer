@@ -6,8 +6,9 @@
 
 
 
-package com.grasppe.conres.framework.imagej;
+package com.grasppe.conres.framework.targets.view;
 
+import com.grasppe.conres.framework.imagej.MagnifierCanvas;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetDimensions;
@@ -823,75 +824,24 @@ public class CornerSelectorView extends AbstractView
         // TODO: get the convex boundary of the four pointROI
         Polygon		roiPolygon = pointROI.getConvexHull();
 
-        PointRoi	newROI     = new PointRoi(roiPolygon);
+//        PointRoi	newROI     = new PointRoi(roiPolygon);
 
-        int[]		roiXs      = newROI.getXCoordinates(),
-					roiYs      = newROI.getYCoordinates();
+        int[]		roiXs      = roiPolygon.xpoints,
+					roiYs      = roiPolygon.ypoints;
 
-        if (roiXs.length != 4)
-            throw new InvalidAttributesException(
-                "Input point count needed for sorting must be 4 and not " + roiXs.length);		// return null;
-
-        // TODO: sort the points - find distance between each point and top left
-        int	maxdXY  = 0,
-			mindXY  = 0;
-        int	maxdXYi = 0,
-			mindXYi = 0;
-
-        for (int p = 0; p < 4; p++) {
-            int	roidX  = roiXs[p];
-            int	roidY  = roiYs[p];
-            int	roidXY = round(Math.sqrt(Math.pow(roidX, 2) + Math.pow(roidY, 2)));
-
-            if (roidXY > maxdXY) {
-                maxdXYi = p;
-                maxdXY  = roidXY;
-            }
-
-            if (mindXY == 0) mindXY = maxdXY;
-
-            if (roidXY < mindXY) {
-                mindXYi = p;
-                mindXY  = roidXY;
-            }
-        }
-
-        int[]	sortedIs = new int[4];
+        int[]	sortedIs = getController().sortRectangleROIIndex(roiXs, roiYs); //new int[4];
         int[]	sortedXs = new int[4];
         int[]	sortedYs = new int[4];
-        int		sI       = 0;
-
-        // TODO: Sort the points, clockwise, top-left, top-right, bottom-right, bottom-left
-        for (int p = 0; p < 4; p++) {
-            if (p == mindXYi) sortedIs[0] = p;
-            else if (p == maxdXYi) sortedIs[2] = p;
-            else {
-                if (sI == 0) {
-                    sortedIs[1] = p;
-                    sI          = p;	// 1;
-                } else {
-                    if (roiXs[sI] < roiXs[p]) {
-                        sortedIs[3] = 1;
-                        sortedIs[1] = p;
-                    } else if (roiXs[sI] > roiXs[p]) sortedIs[3] = p;
-                }
-            }
-        }
-
-        int	tlX = newROI.getBounds().getLocation().x,
-			tlY = newROI.getBounds().getLocation().y;
 
         for (int p = 0; p < 4; p++) {
-            sI           = sortedIs[p];
-            sortedXs[sI] = tlX + roiXs[p];
-            sortedYs[sI] = tlY + roiYs[p];
+            int i       = sortedIs[p];
+            sortedXs[p] = roiXs[i];
+            sortedYs[p] = roiYs[i];
         }
 
         PointRoi	sortedROI = new PointRoi(sortedXs, sortedYs, 4);
 
         getModel().setBlockROI(new BlockROI(sortedROI.getPolygon()));
-
-        // cornerSelectorCommons.sortedROI = sortedROI; // new PointRoi(sortedXs, sortedYs, 4);
 
     }
 
@@ -1097,7 +1047,7 @@ public class CornerSelectorView extends AbstractView
     @SuppressWarnings("restriction")
     private void warpPatchGrid() {
 
-        int	dbg = 3;
+        int	dbg = 2;
 
         // TODO: WarpPolynomial
 
@@ -1165,7 +1115,7 @@ public class CornerSelectorView extends AbstractView
         int[]		sortedYs     = sortedROI.getPolygon().ypoints;
 
         int			sourceOffset = 0;		// sourceOffset - the initial entry of sourceCoords to be used.
-        int[]		s            = { 2, 1, 0, 3 };
+        int[]		s            = { 0, 1, 2, 3 };
         float[]		imageCoords  = new float[] {	// sourceCoords - An array of floats containing the source coordinates with X and Y alternating.
             sortedXs[s[0]], sortedYs[s[0]], sortedXs[s[1]], sortedYs[s[1]], sortedXs[s[2]],
             sortedYs[s[2]], sortedXs[s[3]], sortedYs[s[3]]
