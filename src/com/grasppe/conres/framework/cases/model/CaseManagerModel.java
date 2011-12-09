@@ -155,7 +155,7 @@ public class CaseManagerModel extends AbstractModel {
     /**
      *  @return
      */
-    private CaseManager getController() {
+    public CaseManager getController() {
         return (CaseManager)controller;
     }
 

@@ -13,6 +13,7 @@ package com.grasppe.conres.framework.analysis;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
+import com.grasppe.conres.framework.analysis.stepping.BlockMap;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SetAndStep;
 import com.grasppe.conres.framework.analysis.stepping.SmartBlockState;
@@ -26,83 +27,45 @@ import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+
+import javax.swing.ImageIcon;
 
 /**
  * @author daflair
  */
 public class AnalysisStepper extends AbstractController {
 
-    /* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractController#update()
-	 */
-	@Override
-	public void update() {
-		super.update();
-	}
-	
-	public void updateActiveBlock() {
-		
-		
-		getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
-		
-		int blockColumns = getActiveBlock().getXAxis().getValues().length;
-		int blockRows = getActiveBlock().getYAxis().getValues().length;
-		
-        int firstColumn = getTargetManager().getFirstColumnIndex();
-        //if (column<firstColumn) blockState.setColumn(firstColumn);
-		
-        BlockState	blockState = new BlockState(blockRows, blockColumns, firstColumn);		// , BlockState.fudgeMap1());
-
-        getModel().setBlockState(blockState);
-        
-        getStepperView().loadBlockFiles();
-        
-        if (getModel().getBlockState()==null) {
-        	getModel().setBlockState(new BlockState(blockRows, blockColumns, firstColumn));
-        }
-		
-	}
-	
-    /**
-     * 	@return
-     */
-    public TargetManager getTargetManager() {
-        return getAnalysisManager().getTargetManager();
-    }
-	
-	public ConResBlock getActiveBlock() {
-		return getModel().getActiveBlock();
-	}
-	
-    int dbg = 3;
-
-	protected AnalysisManager		analysisManager = null;
+    int								dbg             = 3;
+    protected AnalysisManager		analysisManager = null;
     protected AnalysisStepperView	stepperView     = null;
-
-    /**
+	/**
      * Constructs and attaches a new controller and a new model.
      *  @param analysisManager
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
-        getAnalysisManager().getModel().attachObserver(this);
 
-//        BlockState	fudgeState = new BlockState(10, 10, 0, 0);		// , BlockState.fudgeMap1());
-//
-//        getModel().setBlockState(fudgeState);
-        
-        //updateActiveBlock();
-        
+//      getAnalysisManager().getModel().attachController(this);
+//      getAnalysisManager().getModel().attachObserver(this);
 
         return;
     }
-    
-    
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
@@ -128,7 +91,7 @@ public class AnalysisStepper extends AbstractController {
         SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
         SteppingStrategy	thisStep   = new StepNext(smartState);
 
-        System.out.println("Modifier " + keyModifiers);
+//      System.out.println("Modifier " + keyModifiers);
 
         boolean	snapState = true;
         boolean	goBack    = false;
@@ -205,17 +168,7 @@ public class AnalysisStepper extends AbstractController {
 
         thisStep.execute();
 
-        getModel().setBlockState(thisStep.getFinalState());
-        getStepperView().saveScratchFile();
-        getStepperView().update();
-
-        // smartState = new SmartBlockState(thisStep.finalState);
-//      this.blockState = thisStep.getFinalState();
-//
-//      BlockMap  blockMap = new BlockMap(this.blockState);
-//
-//      this.image = blockMap.getImage();
-//      this.repaint(1000);
+        setNewBlockState(thisStep.getFinalState());
     }
 
     /**
@@ -279,8 +232,191 @@ public class AnalysisStepper extends AbstractController {
 
     /**
      */
-    public void testRun() {
-        getStepperView().prepareView();
+    private void pushUpdates() {
+        getModel().notifyObservers();
+    }
+
+    /**
+     */
+    public void showView() {
+    	getTargetManager().loadImage();
+        getStepperView().setVisible(true);
+    }
+
+    // This method returns a buffered image with the contents of an image
+
+    /**
+     *  @param image
+     *  @return
+     */
+    public static BufferedImage toBufferedImage(Image image) {
+        if (image instanceof BufferedImage) {
+            return (BufferedImage)image;
+        }
+
+        // This code ensures that all the pixels in the image are loaded
+        image = new ImageIcon(image).getImage();
+
+        // Determine if the image has transparent pixels; for this method's
+        // implementation, see Determining If an Image Has Transparent Pixels
+        boolean	hasAlpha = false;		// hasAlpha(image);
+
+        // Create a buffered image with a format that's compatible with the screen
+        BufferedImage		bimage = null;
+        GraphicsEnvironment	ge     = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        try {
+
+            // Determine the type of transparency of the new buffered image
+            int	transparency = Transparency.OPAQUE;
+
+            if (hasAlpha) {
+                transparency = Transparency.BITMASK;
+            }
+
+            // Create the buffered image
+            GraphicsDevice			gs = ge.getDefaultScreenDevice();
+            GraphicsConfiguration	gc = gs.getDefaultConfiguration();
+
+            bimage = gc.createCompatibleImage(image.getWidth(null), image.getHeight(null),
+                                              transparency);
+        } catch (HeadlessException exception) {
+        	GrasppeKit.debugText("Image Generation Error", exception.getMessage(), 2);
+        }
+
+        if (bimage == null) {
+
+            // Create a buffered image using the default color model
+            int	type = BufferedImage.TYPE_INT_RGB;
+
+            if (hasAlpha) {
+                type = BufferedImage.TYPE_INT_ARGB;
+            }
+
+            bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
+        }
+
+        // Copy image to buffered image
+        Graphics	g = bimage.createGraphics();
+
+        // Paint the image onto the buffered image
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+
+        return bimage;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractController#update()
+     */
+
+    /**
+     */
+    @Override
+    public void update() {
+        super.update();
+    }
+
+    /**
+     */
+    public void updateActiveBlock() {
+    	
+        setScratchEnabled(false);
+        
+        ConResBlock activeBlock =  getTargetManager().getModel().getActiveBlock();
+        
+        if (activeBlock==null) {
+        	getModel().setActiveBlock(null);
+        	setNewBlockState(null);
+        	setScratchEnabled(false);
+        	getStepperView().setVisible(false);
+        	return;
+        }
+        
+        if (getModel().getActiveBlock() == activeBlock)
+        	return;
+        
+        getStepperView().setVisible(false);
+
+        getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
+
+        int			blockColumns = getActiveBlock().getXAxis().getValues().length;
+        int			blockRows    = getActiveBlock().getYAxis().getValues().length;
+
+        int			firstColumn  = getTargetManager().getFirstColumnIndex();
+
+        BlockState	blockState   = new BlockState(blockRows, blockColumns, firstColumn);	// , BlockState.fudgeMap1());
+
+        loadBlockFiles(blockState);
+        setNewBlockState(blockState);
+
+        if (getModel().getBlockState() == null) {
+            getModel().setBlockState(new BlockState(blockRows, blockColumns, firstColumn));
+            pushUpdates();
+        }
+        
+        setScratchEnabled(true);
+
+    }
+
+    /**
+     *  @param newState
+     */
+    public void setNewBlockState(BlockState newState) {
+
+        try {
+        	if (newState==null) {
+        		getModel().setActivePatch(null);
+        		updatePatchPreviews(-1, -1);
+        		pushUpdates();
+        	}
+            getModel().setBlockState(newState);
+
+            BlockState	currentState = getModel().getBlockState();
+            int			row          = currentState.getRow();
+            int			column       = currentState.getColumn();
+            
+            saveScratchFile();
+
+            ConResPatch	patchModel   = getTargetManager().getPatch(row, column);
+
+            getModel().setActivePatch(patchModel);
+            updatePatchPreviews(row, column);
+
+            pushUpdates();
+        } catch (Exception exception) {
+        	GrasppeKit.debugText("Block State Update Error", exception.getMessage(), 2);
+        }
+
+    }
+
+    /**
+     *  @param row
+     *  @param column
+     */
+    public void updatePatchPreviews(int row, int column) {
+        try {
+        	if (row < 0 || column < 0) {
+        		getModel().setPatchImage(null);
+        		getModel().setImage(null);
+        		return;
+        	}
+            Image		patchImage = getTargetManager().getPatchImage(row, column);
+            BlockMap	blockMap   = new BlockMap(getModel().getBlockState());
+
+            getModel().setPatchImage(patchImage);
+            getModel().setImage(blockMap.getImage());
+        } catch (Exception exception) {
+        	GrasppeKit.debugText("Patch Preview Upodate Error", exception.getMessage(), 2);
+        }
+    }
+
+    /**
+     *  @return
+     */
+    public ConResBlock getActiveBlock() {
+        return getModel().getActiveBlock();
     }
 
     /**
@@ -291,26 +427,11 @@ public class AnalysisStepper extends AbstractController {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public AnalysisManagerModel getAnalysisManagerModel() {
         return getAnalysisManager().getModel();
     }
-
-    //
-    // /**
-    // *  @param targetDefinitionFile
-    // *  @throws Exception
-    // */
-    // public void loadTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile)
-    // throws Exception {
-    //
-    // // TODO: Create reader and read target from Case Manager current case
-    // // TargetDefinitionFile file = targetDefinitionFile.getTargetDefinitionFile();
-    // TargetDefinitionReader    reader = new TargetDefinitionReader(targetDefinitionFile);
-    //
-    // getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
-    // }
 
     /**
      * @return the analyzer
@@ -334,18 +455,77 @@ public class AnalysisStepper extends AbstractController {
         return stepperView;
     }
 
-//
-//  /**
-//   * Method description
-//   *
-//   *
-//   * @param g
-//   */
-//  public void paint(Graphics g) {
-//      int   iScale  = 50;
-//      int   iWidth  = this.image.getWidth();
-//      int   iHeight = this.image.getHeight();
-//
-//      g.drawImage(this.image, 0, 0, iWidth * iScale, iHeight * iScale, this);
-//  }
+    /**
+     *  @return
+     */
+    public TargetManager getTargetManager() {
+        return getAnalysisManager().getTargetManager();
+    }
+
+	/**
+	 */
+	public void loadBlockFiles(BlockState blockState) {
+	    setScratchEnabled(false);
+	
+	    try {
+	        loadCSVFile(blockState);
+	        setScratchEnabled(true);
+	    } catch (Exception exception) {
+	        GrasppeKit.debugText("Load CSV Error", exception.getMessage(), 2);
+	    }
+	
+	    try {
+	        if (!isScratchEnabled()) loadScratchFile(blockState);
+	    } catch (Exception exception) {
+	        GrasppeKit.debugText("Load Scratch Error", exception.getMessage(), 2);
+	    }	    
+	    update();
+	}
+
+	/**
+	     *  @throws Exception
+	     */
+	    public void loadCSVFile(BlockState blockState) throws Exception {
+	        try {
+	            String	filename = getTargetManager().generateFilename("a.csv");
+	
+	            blockState.readFile(filename);
+	        } catch (Exception exception) {
+	            throw exception;
+	        }
+	    }
+
+	/**
+	     *  @throws Exception
+	     */
+	    public void loadScratchFile(BlockState blockState) throws Exception {
+	        try {
+	            String	filename = getTargetManager().generateFilename("s.csv");
+	            blockState.readFile(filename);
+	        } catch (Exception exception) {
+	            throw exception;
+	        }
+	    }
+
+	/**
+	 */
+	public void saveScratchFile() {
+	    if (!isScratchEnabled()) return;
+	
+	    try {
+	        String	filename = getTargetManager().generateFilename("s.csv");
+	
+	        getModel().getBlockState().writeFile(filename);
+	    } catch (Exception exception) {
+	    	GrasppeKit.debugText("Save Scratch Error", exception.getMessage(), 2);
+	    }
+	}
+
+	public boolean isScratchEnabled() {
+		return getModel().isScratchEnabled();
+	}
+
+	public void setScratchEnabled(boolean scratchEnabled) {
+		getModel().setScratchEnabled(scratchEnabled);
+	}
 }

@@ -13,6 +13,7 @@ import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.conres.framework.targets.model.grid.GridBlock;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * Class description
@@ -43,6 +44,7 @@ public class TargetManagerModel extends AbstractModel {
      */
     public void backgroundCurrentTarget() {
         if (getActiveTarget() == null) return;
+//        setActiveBlock(null);
         setBackgroundTarget(getActiveTarget());
         setActiveTarget(null);
     }
@@ -66,7 +68,8 @@ public class TargetManagerModel extends AbstractModel {
      * @return the activeBlock
      */
     public ConResBlock getActiveBlock() {
-    	if (getActiveTarget()==null) return null;
+        if (getActiveTarget() == null) return null;
+
         return (ConResBlock)getActiveTarget().getActiveBlock();
     }
 
@@ -84,6 +87,21 @@ public class TargetManagerModel extends AbstractModel {
         return backgroundTarget;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractModel#getController()
+     */
+
+    /**
+     *  @return
+     */
+    @Override
+    public TargetManager getController() {
+
+        // TODO Auto-generated method stub
+        return (TargetManager)super.getController();
+    }
+
     /**
      * @param activeBlock the activeBlock to set
      */
@@ -91,8 +109,9 @@ public class TargetManagerModel extends AbstractModel {
         try {
 
             getActiveTarget().setActiveBlock(activeBlock);
+            if (activeBlock!=null) getController().loadImage();
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugText("Active Block Update Error", exception.getMessage(), 2);
         }
 
         notifyObservers();
@@ -105,22 +124,27 @@ public class TargetManagerModel extends AbstractModel {
         boolean	updated = false;
 
         try {
-            if (activeTarget == null) if (this.activeTarget != null) {
-                this.backgroundTarget = this.activeTarget;
-                this.activeTarget     = null;
+            if (activeTarget == null) {
+                if (this.activeTarget != null) {
+                    this.backgroundTarget = this.activeTarget;
+                    this.activeTarget     = null;
+                } else {
+                    if (this.backgroundTarget != null) this.activeTarget = this.backgroundTarget;
+                }
+                
+                updated = true;
             } else {
-                if (this.backgroundTarget != null) this.activeTarget = this.backgroundTarget;
+
+                if (activeTarget.getActiveBlock() == null && activeTarget.getTargetBlocks() != null && activeTarget.getTargetBlocks().length > 0)
+                        activeTarget.setActiveBlock(activeTarget.getTargetBlocks()[0]);
+
+                if (this.activeTarget != activeTarget) {
+                	updated = true;
+                	this.activeTarget = activeTarget;
+                }
             }
-            if ((this.activeTarget != null) && (this.activeTarget != activeTarget)) updated = true;
-            this.activeTarget = activeTarget;
-
-            // Set active block to 0 if null
-            if ((this.activeTarget.getActiveBlock() == null)
-                    && (this.activeTarget.getTargetBlocks().length > 0))
-                this.activeTarget.setActiveBlock(this.activeTarget.getTargetBlocks()[0]);
-
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugText("Active Target Update Error", exception.getMessage(), 2);
         }
 
         if (updated) notifyObservers();

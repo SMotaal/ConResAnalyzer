@@ -92,7 +92,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         getModel().setActiveBlock(selectedBlock);
         
 //        controller.
-        controller.loadImage();
+//        controller.loadImage();
 
         return true;
     }

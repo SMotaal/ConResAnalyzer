@@ -16,6 +16,9 @@ import com.grasppe.lure.components.AbstractModel;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +33,14 @@ public class AnalysisStepperModel extends AbstractModel {
     private BlockState	blockState = null;		// new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /** Field description */
-    private List<int[]>	history     = new ArrayList<int[]>();		// @SuppressWarnings("rawtypes")
-    private ConResBlock	activeBlock = null;
-    private ConResPatch	activePatch = null;
+    private List<int[]>		history     = new ArrayList<int[]>();		// @SuppressWarnings("rawtypes")
+    private ConResBlock		activeBlock = null;
+    private ConResPatch		activePatch = null;
+    private BufferedImage
+		image                           = null,
+		patchImage                      = null;
+
+	private boolean	scratchEnabled = false;
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -64,10 +72,30 @@ public class AnalysisStepperModel extends AbstractModel {
     }
 
     /**
+     * @return the image
+     */
+    public BufferedImage getBlockMapImage() {
+        return image;
+    }
+
+    /**
      * @return the blockState
      */
     public BlockState getBlockState() {
         return blockState;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractModel#getController()
+     */
+
+    /**
+     *  @return
+     */
+    @Override
+    public AnalysisStepper getController() {
+        return (AnalysisStepper)super.getController();
     }
 
     /**
@@ -78,28 +106,46 @@ public class AnalysisStepperModel extends AbstractModel {
     }
 
     /**
+     * @return the patchImage
+     */
+    public BufferedImage getPatchImage() {
+        return patchImage;
+    }
+
+    /**
      * @param activeBlock the activeBlock to set
      */
     public void setActiveBlock(ConResBlock activeBlock) {
-        this.activeBlock = activeBlock;
-        notifyObservers();
+        try {
+            if (this.activeBlock == activeBlock) return;
+            this.activeBlock = activeBlock;
+            // notifyObservers();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     /**
      * @param activePatch the activePatch to set
      */
     public void setActivePatch(ConResPatch activePatch) {
-        this.activePatch = activePatch;
+        try {
+            if (this.activePatch == activePatch) return;
+            this.activePatch = activePatch;
+            // notifyObservers();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     /**
      * @param blockState the blockState to set
      */
     public void setBlockState(BlockState blockState) {
-        this.blockState = blockState;
-
         try {
-            notifyObservers();
+            if (this.blockState == blockState) return;
+            this.blockState = blockState;
+            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -109,7 +155,60 @@ public class AnalysisStepperModel extends AbstractModel {
      * @param history the history to set
      */
     public void setHistory(List<int[]> history) {
-        this.history = history;
-        notifyObservers();
+        try {
+            if (this.history == history) return;
+            this.history = history;
+            // notifyObservers();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
+
+    /**
+     * @param image the image to set
+     */
+    public void setImage(BufferedImage image) {
+        try {
+        	if (this.image ==image) return;
+            this.image = image;
+            // notifyObservers();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * @param image the image to set
+     */
+    public void setImage(Image image) {
+        setImage(getController().toBufferedImage(image));
+    }
+
+    /**
+     * @param patchImage the patchImage to set
+     */
+    public void setPatchImage(BufferedImage patchImage) {
+        try {
+        	if (this.patchImage==patchImage);
+            this.patchImage = patchImage;
+            // notifyObservers();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * @param patchImage the patchImage to set
+     */
+    public void setPatchImage(Image patchImage) {
+        setPatchImage(getController().toBufferedImage(patchImage));
+    }
+
+	public boolean isScratchEnabled() {
+		return scratchEnabled;
+	}
+
+	public void setScratchEnabled(boolean scratchEnabled) {
+		this.scratchEnabled = scratchEnabled;
+	}
 }

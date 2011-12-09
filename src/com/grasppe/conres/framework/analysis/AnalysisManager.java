@@ -16,6 +16,8 @@ import com.grasppe.conres.framework.analysis.view.AnalysisManagerView;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -111,14 +113,28 @@ public class AnalysisManager extends AbstractController {
      */
     public void updateTargetManager() {
         boolean	updateActiveTarget,	updateActiveBlock;
+        
+        ConResTarget activeTarget = getTargetManagerModel().getActiveTarget();
+        
+        if (activeTarget==null) {
+        	getModel().setActiveTarget(null);
+        	updateActiveTarget = true;
+        } else {
+        	if ((updateActiveTarget = areEqual(getModel().getActiveTarget(),
+        			activeTarget)) == false)
+        		getModel().setActiveTarget(activeTarget);        	
+        }
+        
+        ConResBlock activeBlock = getTargetManagerModel().getActiveBlock();
 
-        if ((updateActiveTarget = areEqual(getModel().getActiveTarget(),
-                                           getTargetManagerModel().getActiveTarget())) == false)
-            getModel().setActiveTarget(getTargetManagerModel().getActiveTarget());
-
-        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(),
-                                          getTargetManagerModel().getActiveBlock())) == false)
-            getModel().setActiveBlock(getTargetManagerModel().getActiveBlock());
+        if (activeBlock==null) {
+        	getModel().setActiveBlock(null);
+        	updateActiveBlock = true;
+        } else {
+	        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(),
+	        		activeBlock)) == false)
+	            getModel().setActiveBlock(activeBlock);
+        }
 
         GrasppeKit.debugText(getClass().getSimpleName() + " Update",
                              GrasppeKit.cat((updateActiveTarget) ? "updateActiveTarget"
@@ -128,8 +144,8 @@ public class AnalysisManager extends AbstractController {
         if (updateActiveTarget || updateActiveBlock) {
         	if (getAnalysisStepper()!=null)
         		getAnalysisStepper().updateActiveBlock();
+        	getModel().notifyObservers();
         }
-
         return;
 
     }

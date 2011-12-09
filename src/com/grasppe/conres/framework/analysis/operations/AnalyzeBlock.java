@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.analysis.operations;
 
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -50,12 +51,7 @@ public class AnalyzeBlock extends AnalysisCommand {
     public boolean perfomCommand() {
         boolean			canProceed      = canExecute();
 
-//        AnalysisStepper	analysisStepper = new AnalysisStepper(controller);
-
-        controller.getAnalysisStepper().testRun();
-
-//      CornerSelector conrnerSelector = new CornerSelector(controller);
-//      canProceed = new SelectCornersFunction(conrnerSelector).execute(true);
+        controller.getAnalysisStepper().showView();
 
         return true;
     }
@@ -65,21 +61,22 @@ public class AnalyzeBlock extends AnalysisCommand {
      */
     @Override
     public void update() {
-        canExecute(true);		// canMarkBlocks());       // getModel().hasCurrentCase());
+        canExecute(canAnalyzeBlock());		// canMarkBlocks());       // getModel().hasCurrentCase());
         super.update();
     }
+    
+    /**
+     *  @return
+     */
+    protected boolean canAnalyzeBlock() {
+        try {
+            ConResBlock	block = getModel().getActiveBlock();
 
-//  protected boolean canMarkBlocks() {
-//    ConResBlock block = getModel().getActiveBlock();
-////      if (block==null) return false;
-//    return block!=null;
-//  }    
+            return block != null;
+        } catch (Exception exception) {
+            return false;
+        }
 
-//  /**
-//   * @return the mnemonicKey
-//   */
-//  @Override
-//  public int getMnemonicKey() {
-//    return mnemonicKey;
-//  }
+    }
+
 }

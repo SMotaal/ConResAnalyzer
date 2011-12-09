@@ -50,6 +50,8 @@ public class Observers implements Observable {
      */
     public void attachObserver(Observer observer) {
         if (observable == observer) return;
+        
+        if (observerSet.contains(observer)) return;
 
         GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()),dbg);
         observerSet.add(observer);
@@ -80,11 +82,13 @@ public class Observers implements Observable {
      */
     public void notifyObservers() {
 
-        if (updating) return;
+        if (updating) {
+        	return;
+        }
 
         updating = true;
 
-        observerSet.toArray();
+//        observerSet.toArray();
 
         try {
 

@@ -10,6 +10,8 @@ package com.grasppe.conres.analyzer;
 
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
+import com.grasppe.conres.framework.cases.operations.OpenCase;
+import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.lure.framework.GrasppeKit;
 
 /**
@@ -34,9 +36,22 @@ public class ConResAnalyzerMain {
                 ConResAnalyzer		analyzer      = new ConResAnalyzer();
                 ConResAnalyzerModel	analyzerModel = analyzer.getModel();
                 ConResAnalyzerView	analyzerView  = (ConResAnalyzerView)analyzer.getView();		// new ConResAnalyzerView(analyzer);
+                
+                initializeTest(analyzer);
 				
 			}
 		}.start();
 
+    }
+    
+    public static void initializeTest(ConResAnalyzer analyzer) {
+        CaseFolder	caseFolder =
+                new CaseFolder("/Users/daflair/Documents/Data/ConRes/ConRes-Approval-0600");
+
+            ((OpenCase)analyzer.getCaseManager().getCommand("OpenCase")).openCase(caseFolder);
+            
+            //analyzer.targetManager.loadImage();
+            
+//            ((MarkBlock)analyzer.getTargetManager().getCommand("MarkBlock")).execute();
     }
 }

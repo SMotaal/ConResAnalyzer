@@ -46,7 +46,7 @@ public class SelectBlock extends TargetManagerCommand {
     /**
      *  @return
      */
-    protected boolean canSelectBlocks() {
+    protected boolean canSelectBlock() {
         if (getModel() == null) return false;
 
         ConResTarget	target = getModel().getActiveTarget();
@@ -74,7 +74,7 @@ public class SelectBlock extends TargetManagerCommand {
      */
     @Override
     public void update() {
-        boolean	newState = canSelectBlocks();
+        boolean	newState = canSelectBlock();
 
         canExecute(newState);		// getModel().hasCurrentCase());
         super.update();

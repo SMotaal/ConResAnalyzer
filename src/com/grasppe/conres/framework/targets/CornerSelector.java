@@ -11,21 +11,18 @@ package com.grasppe.conres.framework.targets;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.framework.targets.view.CornerSelectorView;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.framework.GrasppeKit;
 
-import ij.gui.PointRoi;
-import ij.gui.Roi;
 
-import ij.plugin.frame.RoiManager;
 
-import org.apache.commons.io.FilenameUtils;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.File;
 import java.io.FileNotFoundException;
 
 import java.util.Arrays;
@@ -73,7 +70,6 @@ public class CornerSelector extends AbstractController {
 
         model.setTargetDimensions(targetDimensions);
 
-//      model.getTargetDimensions(targetManager.)
         getManagerModel().attachObserver(this);
     }
 
@@ -87,80 +83,19 @@ public class CornerSelector extends AbstractController {
     }
 
     /**
-     *  @param suffix
-     *  @return
-     */
-    public String generateFilename(String suffix) {
-
-        // TODO: Determine roi filename
-        if (getBlockImage() == null) return null;
-
-        String	imageName = FilenameUtils.getBaseName(getBlockImage().getName());
-        String	fileName  = imageName.substring(0, imageName.length() - 1) + suffix;
-
-        return getBlockImage().getParentFile() + File.separator + fileName;
-
-    }
-
-    /**
      */
     public void loadImage() {
         targetManager.loadImage();
     }
 
     /**
-     * @throws FileNotFoundException
-     *  @throws InvalidActivityException
-     */
-    public void loadPatchCenterROIs() throws FileNotFoundException, InvalidActivityException {
-
-        String	roiFilePath = getPatchCenterROIFilePath();
-
-        // TODO: Check if can get a file path
-        if ((roiFilePath == null) || roiFilePath.trim().isEmpty())
-            throw new InvalidActivityException("Unable to determine a vlid path to load roi file");
-
-        File	roiFile = new File(roiFilePath);
-
-        // TODO: Check that file exists
-        if (!roiFile.exists()) throw new FileNotFoundException(roiFilePath + " was not found");
-
-        // TODO: now load ROIs
-
-        RoiManager	roiManager = new RoiManager(true);
-
-        roiManager.runCommand("Open", roiFilePath);
-
-        Roi[]	fileROIs = roiManager.getRoisAsArray();
-
-        if ((fileROIs.length > 0) && (fileROIs[0] instanceof PointRoi)) {
-            getModel().setPatchSetROI((PointRoi)fileROIs[0]);
-            if (fileROIs.length == 2) getModel().setBlockROI((PointRoi)fileROIs[1]);
-
-            // getModel().setOverlayROI(getModel().getPatchSetROI());
-            PatchSetROI	patchSetROI = getModel().getPatchSetROI();
-
-            getSelectorView().setOverlayROI(patchSetROI);
-        }
-
-        return;
-
-    }
-
-    /**
-     */
-    public void savePatchCenterROIs() {
-        if (!isSelectionValid()) return;
-
-        RoiManager	roiManager = new RoiManager(true);
-
-        // TODO: Add points to manager
-        roiManager.addRoi(getModel().getPatchSetROI());
-        roiManager.addRoi(getModel().getBlockROI());
-
-        roiManager.runCommand("Save", getPatchCenterROIFilePath());
-
-    }
+	 * @throws FileNotFoundException
+	 *  @throws InvalidActivityException
+	 * @deprecated Use {@link com.grasppe.conres.framework.targets.TargetManager#loadPatchCenterROIs(com.grasppe.conres.framework.targets.CornerSelector)} instead
+	 */
+	public void loadPatchCenterROIs() throws FileNotFoundException, InvalidActivityException {
+		getTargetManager().loadPatchCenterROIs(this);
+	}
 
     /**
      */
@@ -169,9 +104,9 @@ public class CornerSelector extends AbstractController {
 
         try {
             getSelectorView().clearBlockPoints();
-            loadPatchCenterROIs();
-        } catch (Exception exception) {
-            exception.printStackTrace();
+            getTargetManager().loadPatchCenterROIs(this);
+        }  catch (Exception exception) {
+        	GrasppeKit.debugText("Show Corner Selector Error", exception.getMessage(), 2);
         }
     }
 
@@ -254,9 +189,28 @@ public class CornerSelector extends AbstractController {
     @Override
     public void update() {
 
-//      if (isSelectionValid())
-//          savePatchCenterROIs();
-        getModel().setTargetImageFile(getBlockImage());
+        ConResBlock activeBlock =  getTargetManager().getModel().getActiveBlock();
+        
+        if (activeBlock==null)
+			getSelectorView().setVisible(false);
+        
+        try {
+        	
+        	if (getModel().getImagePlus()==null)
+        		getSelectorView().setVisible(false);
+        	
+        	if (getSelectorView().getImageWindow().getImagePlus() != getModel().getImagePlus())
+        		showSelectorView();
+        		        	
+        } catch (Exception exception) {
+        	
+        }
+
+    	if (getBlockImage()!=null)
+    		getModel().setTargetImageFile(getBlockImage());
+    	else
+    		getModel().setTargetImageFile(null);
+    	
         super.update();
     }
 
@@ -304,7 +258,7 @@ public class CornerSelector extends AbstractController {
      *  @return
      */
     public String getPatchCenterROIFilePath() {
-        return generateFilename("i.roi.zip");
+        return getTargetManager().generateFilename("i.roi.zip");
     }
 
     /**
@@ -312,9 +266,9 @@ public class CornerSelector extends AbstractController {
      */
     public PatchSetROI getPatchSetROI() {
         try {
-            if (!isSelectionValid()) loadPatchCenterROIs();
+            if (!isSelectionValid()) getTargetManager().loadPatchCenterROIs(this);
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugText("Load ROI Error", exception.getMessage(), 2);
         }
 
         if (isSelectionValid()) return getModel().getPatchSetROI();
@@ -343,5 +297,12 @@ public class CornerSelector extends AbstractController {
      */
     public void setSelectorView(CornerSelectorView selectorView) {
         this.selectorView = selectorView;
+    }
+    
+    /**
+     *  @return
+     */
+    public TargetManager getTargetManager() {
+        return targetManager;
     }
 }

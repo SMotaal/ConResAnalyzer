@@ -57,7 +57,7 @@ public class AnalysisManagerModel extends AbstractModel {
      */
     public void setActiveBlock(ConResBlock activeBlock) {
         this.activeBlock = activeBlock;
-        notifyObservers();
+//        notifyObservers();
     }
 
     /**
@@ -65,6 +65,6 @@ public class AnalysisManagerModel extends AbstractModel {
      */
     public void setActiveTarget(ConResTarget activeTarget) {
         this.activeTarget = activeTarget;
-        notifyObservers();
+//        notifyObservers();
     }
 }

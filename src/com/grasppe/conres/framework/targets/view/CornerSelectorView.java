@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.targets.view;
 
 import com.grasppe.conres.framework.imagej.MagnifierCanvas;
 import com.grasppe.conres.framework.targets.CornerSelector;
+import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.roi.BlockROI;
@@ -191,10 +192,16 @@ public class CornerSelectorView extends AbstractView
         setOverlayROI(getModel().getPatchSetROI());
         getModel().setMagnifyPatchIndex(0);
 
-        if (getModel().isValidSelection()) getController().savePatchCenterROIs();
+        if (getModel().isValidSelection()) getTargetManager().savePatchCenterROIs(getController());
 
-//      notifyObservers();
-
+    }
+    
+    
+    /**
+     *  @return
+     */
+    public TargetManager getTargetManager() {
+        return getController().getTargetManager();
     }
 
     /**
@@ -766,7 +773,7 @@ public class CornerSelectorView extends AbstractView
 
         ImageWindow	imageWindow = getImageWindow();
 
-        if ((imageWindow != null) && imageWindow.isVisible()) {
+        if (imageWindow != null) {//&& imageWindow.isVisible()) {
             imageWindow.setVisible(false);
             imageWindow.dispose();
         } else {
@@ -774,6 +781,8 @@ public class CornerSelectorView extends AbstractView
 
             eventDispatcher.attachEventHandler(this);
         }
+        
+        getTargetManager().loadImage();
 
         ImageFile	blockImageFile = getController().getBlockImage();
 
@@ -1333,4 +1342,9 @@ public class CornerSelectorView extends AbstractView
     public void setZoomWindow(JFrame zoomWindow) {
         this.zoomWindow = zoomWindow;
     }
+
+	public void setVisible(boolean visible) {
+		if (imageWindow!=null)
+			imageWindow.setVisible(visible);
+	}
 }

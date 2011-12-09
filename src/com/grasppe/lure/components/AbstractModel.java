@@ -24,10 +24,22 @@ import java.util.TreeSet;
  */
 public class AbstractModel extends ObservableObject {
 
-    protected AbstractController	controller;
-    protected HashSet<AbstractView>		views = new HashSet<AbstractView>();
+    /**
+	 * @return the controller
+	 */
+	public AbstractController getController() {
+		return controller;
+	}
 
-//  protected GrasppeKit            grasppeKit     = GrasppeKit.getInstance();
+	/**
+	 * @return the views
+	 */
+	public HashSet<AbstractView> getViews() {
+		return views;
+	}
+
+	protected AbstractController	controller;
+    protected HashSet<AbstractView>		views = new HashSet<AbstractView>();
 
     /**
      * Constructs a new model object with no predefined controller.

@@ -32,29 +32,31 @@ import com.grasppe.morie.units.AbstractValue;
 
 import ij.ImagePlus;
 
+import ij.gui.PointRoi;
+import ij.gui.Roi;
 import ij.io.Opener;
+
+import ij.plugin.frame.RoiManager;
+
+import org.apache.commons.io.FilenameUtils;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageFilter;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.LinkedHashMap;
 
 import javax.activity.InvalidActivityException;
-import javax.imageio.ImageIO;
 
 /**
  * Class description
@@ -91,33 +93,11 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
-     */
-    public void loadImage() {
-
-//      try {
-    	try {
-    		getCornerSelector().loadPatchCenterROIs();
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-    	
-    	
-        Opener		opener    = new Opener();
-        ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
-
-        getCornerSelectorModel().setImagePlus(imagePlus);
-        
-
-//      } catch (Exception exception) {
-//          exception.printStackTrace();
-//      }
-    }
-
-    /**
      *  @throws IllegalAccessException
      */
     public void backgroundCurrentCase() throws IllegalAccessException {
         getModel().backgroundCurrentTarget();
+        getModel().notifyObservers();
     }
 
     /**
@@ -149,6 +129,45 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
+     *  @param suffix
+     *  @return
+     */
+    public String generateFilename(String suffix) {
+
+        if (getBlockImage() == null) return null;
+
+        String	imageName = FilenameUtils.getBaseName(getBlockImage().getName());
+        String	fileName  = imageName.substring(0, imageName.length() - 1) + suffix;
+
+        return getBlockImage().getParentFile() + File.separator + fileName;
+
+    }
+    
+    protected String loadedImagePath = "";
+
+    /**
+     */
+    public void loadImage() {
+    	
+    	if (getBlockImage()!=null && getBlockImage().getAbsolutePath()!=loadedImagePath) {
+	        try {
+	            loadPatchCenterROIs(getCornerSelector());
+	        } catch (Exception exception) {
+	        	GrasppeKit.debugText("Load ROI Error", exception.getMessage(), 2);
+	        }
+	
+	        Opener		opener    = new Opener();
+	        ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
+	
+	        getCornerSelectorModel().setImagePlus(imagePlus);
+	        loadedImagePath = getBlockImage().getAbsolutePath();
+	        
+	        getModel().notifyObservers();
+    	}
+
+    }
+
+    /**
      *  @param targetDefinitionFile
      *  @throws IOException
      */
@@ -169,6 +188,20 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
+     * @param cornerSelector TODO
+     */
+    public static void savePatchCenterROIs(CornerSelector cornerSelector) {		// if (!cornerSelector.isSelectionValid()) return;
+
+        RoiManager	roiManager = new RoiManager(true);
+
+        roiManager.addRoi(cornerSelector.getModel().getPatchSetROI());
+        roiManager.addRoi(cornerSelector.getModel().getBlockROI());
+
+        roiManager.runCommand("Save", cornerSelector.getPatchCenterROIFilePath());
+
+    }
+
+    /**
      *  @return
      */
     public CaseModel getActiveCase() {
@@ -186,6 +219,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public ImageFile getBlockImage() {
+    	if (getModel().getActiveBlock()==null) return null;
         return getBlockImage(getModel().getActiveBlock());
     }
 
@@ -194,6 +228,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public ImageFile getBlockImage(ConResBlock block) {
+    	if (block==null) return null;
         return getBlockImage(new Double(block.getZValue().value).intValue());
     }
 
@@ -218,13 +253,15 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public CornerSelector getCornerSelector() {
-        if (cornerSelector == null) cornerSelector = new CornerSelector(this);
-
+        if (cornerSelector == null) {
+        	cornerSelector = new CornerSelector(this);
+        	getModel().attachObserver(cornerSelector);
+        }
         return cornerSelector;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     private CornerSelectorModel getCornerSelectorModel() {
 
@@ -233,7 +270,29 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
-     * 	@return
+     *  @return
+     */
+    public int getFirstColumnIndex() {
+
+        // AbstractValue[] blockValues = getModel().getActiveTarget().getzAxis().getValues();//getCornerSelectorModel().getTargetDefinitionFile().getBlockToneValues();
+        AbstractValue[]	contrastValues = getModel().getActiveBlock().getXAxis().getValues();
+        int				blockValue     = (int)getModel().getActiveBlock().getZValue().getValue();
+
+        int				i              = 0;
+
+        for (i = 0; i < contrastValues.length; i++) {
+            int	columnValue = (int)Math.round(contrastValues[i].getValue() / 2);
+            int	lowValue    = blockValue - columnValue;
+            int	highValue   = blockValue + columnValue;
+
+            if ((lowValue >= 0) && (highValue <= 100)) return i;
+        }
+
+        return i;
+    }
+
+    /**
+     *  @return
      */
     private ImagePlus getImagePlus() {
         CornerSelectorModel	model = getCornerSelectorModel();
@@ -243,8 +302,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         try {
             if (model.getImagePlus() == null) loadImage();
         } catch (Exception exception) {
-            exception.printStackTrace();
-
+        	GrasppeKit.debugText("Get ImagePlus Error", exception.getMessage(), 2);
             return null;
         }
 
@@ -269,56 +327,37 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
         return new TargetManagerModel();
     }
-    
-    /**
-     * 	@param row
-     * 	@param column
-     * 	@return
-     */
-    public int getFirstColumnIndex() {
-    	//AbstractValue[] blockValues = getModel().getActiveTarget().getzAxis().getValues();//getCornerSelectorModel().getTargetDefinitionFile().getBlockToneValues();
-    	AbstractValue[] contrastValues = getModel().getActiveBlock().getXAxis().getValues();
-    	int blockValue = (int)getModel().getActiveBlock().getZValue().getValue();
-    	
-    	int i = 0;
-    	
-    	for (i = 0; i < contrastValues.length; i++) {
-    		int columnValue = (int)Math.round(contrastValues[i].getValue()/2);
-    		int lowValue = blockValue - columnValue;
-    		int highValue = blockValue + columnValue;
-    		if (lowValue>=0 && highValue <= 100)
-    			return i;
-    	}
-    	return i;
-    }
-
-    	
 
     /**
-     * 	@param row
-     * 	@param column
-     * 	@return
+     *  @param row
+     *  @param column
+     *  @return
      */
     public ConResPatch getPatch(int row, int column) {
-    	
-    	int dbg = 2;
-    	
-    	try {
-    		getModel().getActiveBlock().setActivePatch(row, column);
-    		return getModel().getActiveBlock().getPatch(row, column);
-    	} catch (Exception exception) {
-    		GrasppeKit.debugText("Get Patch", exception.getMessage(), 2);
-    		return null;
-    	}
+
+        int	dbg = 2;
+
+        try {
+            getModel().getActiveBlock().setActivePatch(row, column);
+
+            return getModel().getActiveBlock().getPatch(row, column);
+        } catch (Exception exception) {
+            GrasppeKit.debugText("Get Patch Error", exception.getMessage(), 2);
+
+            return null;
+        }
     }
+
     /**
-     * 	@param row
-     * 	@param column
-     * 	@return
+     *  @param row
+     *  @param column
+     *  @return
      */
     public Image getPatchImage(int row, int column) {
     	
-    	int dbg = 3;
+    	if (getModel().getActiveBlock()==null) return null;
+
+        int	dbg = 3;
 
         try {
 
@@ -326,51 +365,52 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             int			cI          = (column * stepsY) + row;
 
             PatchSetROI	patchSetROI = getPatchSetROI();
-            Polygon polygon = patchSetROI.getPolygon();
+            Polygon		polygon     = patchSetROI.getPolygon();
             int			cX          = polygon.xpoints[cI];
             int			cY          = polygon.ypoints[cI];
-            
-            
 
-//            int			cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
-            int			cH          = (int)((polygon.ypoints[1] - polygon.ypoints[0])*1.5);
-            
+//          int           cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
+            int	cH = (int)((polygon.ypoints[1] - polygon.ypoints[0]) * 1.5);
+
             cH = Math.max(cH, 550);
-            
-            int cW = cH;
 
-            int			x1          = cX - (cW / 2),
-						x2          = cX + (cW / 2);
-            int			y1          = cY - cH / 2,
-						y2          = cY + cH / 2;
+            int	cW = cH;
 
-            GrasppeKit.debugText("Get Patch Image", "Patch: " + row + ", " + column + "\tCenter:" + cX + ", " + cY + "\tCorner:" + x1 + ", " + y1);
-            
-            ImagePlus	imagePlus   = getImagePlus();
+            int	x1 = cX - (cW / 2),
+				x2 = cX + (cW / 2);
+            int	y1 = cY - cH / 2,
+				y2 = cY + cH / 2;
+
+            GrasppeKit.debugText("Get Patch Image",
+                                 "Patch: " + row + ", " + column + "\tCenter:" + cX + ", " + cY
+                                 + "\tCorner:" + x1 + ", " + y1);
+
+            ImagePlus	imagePlus = getImagePlus();
 
             if (imagePlus == null) return null;
 
             Image	image = imagePlus.getImage();
 
             if (image == null) return null;
-            
-            ImageProducer patchImageProducer = new FilteredImageSource(image.getSource(), new CropImageFilter(x1, y1, cW, cH));
-            
-            Toolkit toolkit= Toolkit.getDefaultToolkit();
-            
-            Image patchImage = toolkit.createImage(patchImageProducer);
-            
+
+            ImageProducer	patchImageProducer = new FilteredImageSource(image.getSource(),
+                                                   new CropImageFilter(x1, y1, cW, cH));
+
+            Toolkit	toolkit    = Toolkit.getDefaultToolkit();
+
+            Image	patchImage = toolkit.createImage(patchImageProducer);
+
             return patchImage;
-            
+
         } catch (Exception exception) {
-//            exception.printStackTrace();
-        	GrasppeKit.debugText("Get Patch Image", exception.getMessage(), 2);
+            GrasppeKit.debugText("Get Patch Image Error", exception.getMessage(), 2);
         }
+
         return null;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public PatchSetROI getPatchSetROI() {
         if (cornerSelector == null) return null;
@@ -392,4 +432,44 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
     }
+
+	/**
+	 * @throws FileNotFoundException
+	 *  @param cornerSelector TODO
+	 * @throws InvalidActivityException
+	 */
+	public void loadPatchCenterROIs(CornerSelector cornerSelector) throws FileNotFoundException, InvalidActivityException {
+	
+	    String	roiFilePath = cornerSelector.getPatchCenterROIFilePath();
+	
+	    // TODO: Check if can get a file path
+	    if ((roiFilePath == null) || roiFilePath.trim().isEmpty())
+	        throw new InvalidActivityException("Unable to determine a vlid path to load roi file");
+	
+	    File	roiFile = new File(roiFilePath);
+	
+	    // TODO: Check that file exists
+	    if (!roiFile.exists()) throw new FileNotFoundException(roiFilePath + " was not found");
+	
+	    // TODO: now load ROIs
+	
+	    RoiManager	roiManager = new RoiManager(true);
+	
+	    roiManager.runCommand("Open", roiFilePath);
+	
+	    Roi[]	fileROIs = roiManager.getRoisAsArray();
+	
+	    if ((fileROIs.length > 0) && (fileROIs[0] instanceof PointRoi)) {
+	        cornerSelector.getModel().setPatchSetROI((PointRoi)fileROIs[0]);
+	        if (fileROIs.length == 2) cornerSelector.getModel().setBlockROI((PointRoi)fileROIs[1]);
+	
+	        // getModel().setOverlayROI(getModel().getPatchSetROI());
+	        PatchSetROI	patchSetROI = cornerSelector.getModel().getPatchSetROI();
+	
+	        cornerSelector.getSelectorView().setOverlayROI(patchSetROI);
+	    }
+	
+	    return;
+	
+	}
 }

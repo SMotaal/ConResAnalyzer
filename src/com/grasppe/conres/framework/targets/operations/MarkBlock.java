@@ -46,7 +46,7 @@ public class MarkBlock extends TargetManagerCommand {
     /**
      *  @return
      */
-    protected boolean canMarkBlocks() {
+    protected boolean canMarkBlock() {
         try {
             ConResBlock	block = getModel().getActiveBlock();
 
@@ -77,7 +77,7 @@ public class MarkBlock extends TargetManagerCommand {
      */
     @Override
     public void update() {
-        canExecute(canMarkBlocks());	// getModel().hasCurrentCase());
+        canExecute(canMarkBlock());	// getModel().hasCurrentCase());
         super.update();
     }
 

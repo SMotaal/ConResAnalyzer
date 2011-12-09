@@ -10,6 +10,8 @@ package com.grasppe.conres.framework.analysis.operations;
 
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
+import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
+import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -58,7 +60,7 @@ public class ExportAnalysis extends AnalysisCommand {
         boolean			canProceed      = canExecute();
 
         try {
-	        String filename = controller.getTargetManager().getCornerSelector().generateFilename("a.csv");
+	        String filename = controller.getTargetManager().generateFilename("a.csv");
 	        controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
 	        IJ.showMessage("Analysis grid exported to " + FilenameUtils.getName(filename) + ".");
         } catch (Exception exception) {
@@ -74,7 +76,29 @@ public class ExportAnalysis extends AnalysisCommand {
      */
     @Override
     public void update() {
-        canExecute(true);		// canMarkBlocks());       // getModel().hasCurrentCase());
+        canExecute(canExportAnalysis());		// canMarkBlocks());       // getModel().hasCurrentCase());
         super.update();
     }
+    
+    /**
+     *  @return
+     */
+    protected boolean canExportAnalysis() {
+        try {
+//          ConResBlock	block = getModel().getActiveBlock();
+//        	return block != null;
+            return controller.getAnalysisStepper().getModel().getBlockState()!=null;
+        } catch (Exception exception) {
+            return false;
+        }
+
+    }
+    
+    /**
+     * Returns a correctly-cast model.
+     * @return
+     */
+    public AnalysisManagerModel getModel() {
+        return controller.getModel();
+    }    
 }
