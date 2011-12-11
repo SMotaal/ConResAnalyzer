@@ -33,7 +33,7 @@ public class LinePairsPerMillimetre extends SpatialFrequency {
 
     /** Field description */
     public static UnitDefinition	unitDefinition = new UnitDefinition(ValueTypes.FREQUENCY,
-                                                      "image addressibility", "line-pair/mm");
+                                                      "image addressibility", "l2/mm");
 
     /**
      */

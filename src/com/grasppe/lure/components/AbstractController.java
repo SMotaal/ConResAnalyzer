@@ -37,7 +37,7 @@ public class AbstractController implements Observer, ActionListener {
     protected ActionListener							actionListener;
     protected AbstractController						commandHandler;
 
-    int dbg = 3;
+    int dbg = 0;
     /**
      */
     public AbstractController() {
@@ -76,13 +76,12 @@ public class AbstractController implements Observer, ActionListener {
      */
     public void actionPerformed(ActionEvent e) {
         try {
-            getCommand(e.getActionCommand()).execute();
-            GrasppeKit.debugText("Command Event Handled", e.getActionCommand(),dbg);
+        		getCommand(e.getActionCommand()).execute();
         } catch (Exception exception) {
-            GrasppeKit.debugText("Command Event Ignored", e.getActionCommand(), 2);
+            GrasppeKit.debugError("Executing " + e.getActionCommand(), exception, 4);
         }
 
-        if (actionListener != null) actionListener.actionPerformed(e);		// Pass up the chain of responsibility
+//        if (actionListener != null) actionListener.actionPerformed(e);		// Pass up the chain of responsibility
     }
 
     /**
@@ -252,7 +251,7 @@ public class AbstractController implements Observer, ActionListener {
         try {
             if (getModel() != null) getModel().notifyObservers();
         } catch (Exception exception) {
-            GrasppeKit.debugText("ControllerUpdate", exception.getMessage(), 2);
+            GrasppeKit.debugError("Updating Controller", exception, 5);
         }
     }
 
@@ -375,7 +374,7 @@ public class AbstractController implements Observer, ActionListener {
      */
     public void setModel(AbstractModel newModel) throws IllegalAccessException {
         if (this.model != null & !this.canDetach())
-            throw new IllegalAccessException("Cannot detach from current model");
+            throw new IllegalAccessException("Cannot detach from current model.");
         if (this.model != null) detachModel();
         attachModel(newModel);
     }

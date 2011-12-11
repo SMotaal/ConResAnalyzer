@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.cases.model;
 
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -43,6 +44,10 @@ public class CaseManagerModel extends AbstractModel {
      */
     public CaseManagerModel(CaseManager controller) {
         super(controller);
+        
+        if(GrasppeKit.isRunningJar())  {
+        	defaultChooserPath = getClass().getResource(getClass().getSimpleName()+".class").getPath();
+        }
     }
 
     /**

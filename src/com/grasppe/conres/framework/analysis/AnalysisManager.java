@@ -44,7 +44,7 @@ public class AnalysisManager extends AbstractController {
 		return analysisStepper;
 	}
 
-	int	dbg = 2;
+	int	dbg = 0;
 
     /** Field description */
     public ConResAnalyzer	analyzer;

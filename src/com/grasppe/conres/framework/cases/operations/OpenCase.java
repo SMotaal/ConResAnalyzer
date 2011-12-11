@@ -36,12 +36,13 @@ public class OpenCase extends CaseManagerCommand {
 
     protected static final String	name               = "OpenCase";
     protected static final int		mnemonicKey        = KeyEvent.VK_O;
+    protected static final String description = "Open an existing case or create a new case from a folder with scanned images and a target definition file.";
     String							defaultChooserPath = CaseManagerModel.defaultChooserPath;
 
     /**
      */
     private CaseManager	controller;
-    int					dbg = 3;
+    int					dbg = 0;
 
     /**
      * Constructs a realization of AbstractCommand.
@@ -52,6 +53,7 @@ public class OpenCase extends CaseManagerCommand {
         super(listener, name);
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         update();
     }
 
@@ -137,7 +139,7 @@ public class OpenCase extends CaseManagerCommand {
 
             getModel().notifyObservers();
 
-            if (userCancelled) throw new CancellationException("User cancelled the request");
+            if (userCancelled) throw new CancellationException("User cancelled the open case request.");
             else canProceed = false;
         }
 

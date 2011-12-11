@@ -36,6 +36,7 @@ import javax.swing.KeyStroke;
  * @version $Revision: 1.0, 11/11/09
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
+@Deprecated
 public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
 
     /** Field description */

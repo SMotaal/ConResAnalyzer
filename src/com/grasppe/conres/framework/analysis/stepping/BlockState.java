@@ -16,6 +16,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class BlockState implements ISteppingBlockState {
 
     /** Field description */
     protected int	rows, columns, row,	column,	firstColumn;
-    int				dbg = 2;
+    int				dbg = 0;
 
     /**
      */
@@ -304,8 +305,11 @@ public class BlockState implements ISteppingBlockState {
             setRow(0);
             setColumn(0);
             setBlockMap(fileData);
+        } catch (FileNotFoundException exception) {
+        	GrasppeKit.debugError("Reading Analysis Grid File", exception, 5);
+        	throw exception;        	
         } catch (IOException exception) {
-        	GrasppeKit.debugText("Read CSV Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Reading Analysis Grid File", exception, 3);
         	throw exception;
         }
     }
@@ -357,7 +361,7 @@ public class BlockState implements ISteppingBlockState {
             writer.flush();
             writer.close();
         } catch (IOException exception) {
-        	GrasppeKit.debugText("Write CSV Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Writing Analysis Grid Error", exception, 2);
         }
     }
 

@@ -33,7 +33,7 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
     CornerSelector					controller;
     boolean							openWindow = false;
     
-    int dbg = 3;
+    int dbg = 0;
 
     /**
      */

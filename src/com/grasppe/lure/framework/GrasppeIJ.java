@@ -17,6 +17,7 @@ import ij.io.FileInfo;
 /**
  * @author daflair
  */
+@Deprecated
 public class GrasppeIJ {
 
     /**
@@ -177,14 +178,14 @@ public class GrasppeIJ {
             return GrasppeKit.lookupByEnumValue(value, ImageTypes.class);
         }
     }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        // TODO Auto-generated method stub
-        System.out.println(CompressionModes.get(1) + " isa "
-                           + CompressionModes.get(0).getClass().getName());
-    }
+//
+//    /**
+//     * @param args
+//     */
+//    public static void main(String[] args) {
+//
+//        // TODO Auto-generated method stub
+//        System.out.println(CompressionModes.get(1) + " isa "
+//                           + CompressionModes.get(0).getClass().getName());
+//    }
 }

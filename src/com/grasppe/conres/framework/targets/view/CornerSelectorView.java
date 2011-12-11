@@ -90,7 +90,7 @@ public class CornerSelectorView extends AbstractView
 
     /** Field description */
     public boolean	zoomPatch = false;
-    int				dbg       = 3;
+    int				dbg       = 0;
 
     /**
      * @param controller
@@ -180,7 +180,7 @@ public class CornerSelectorView extends AbstractView
      */
     public void calculateAffineGrid() {		// PointRoi pointROI, int nR, int nC) {
 
-        int	dbg = 2;
+        int	dbg = 0;
 
         try {
             sortROIs();		// cornerSelectorCommons.overlayROI);
@@ -1013,7 +1013,7 @@ public class CornerSelectorView extends AbstractView
      */
     public void updateROI(MouseEvent e) {
 
-//      int dbg = 2;
+//      int dbg = 0;
         if (e.isConsumed()) return;
         if (getImageWindow() == null) return;
         if (!getImageWindow().isVisible()) return;
@@ -1056,7 +1056,7 @@ public class CornerSelectorView extends AbstractView
     @SuppressWarnings("restriction")
     private void warpPatchGrid() {
 
-        int	dbg = 2;
+        int	dbg = 0;
 
         // TODO: WarpPolynomial
 

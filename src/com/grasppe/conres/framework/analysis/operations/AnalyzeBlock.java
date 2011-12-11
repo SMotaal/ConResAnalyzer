@@ -26,6 +26,8 @@ public class AnalyzeBlock extends AnalysisCommand {
 
     protected static final String	name        = "AnalyzeBlock";
     protected static final int		mnemonicKey = KeyEvent.VK_M;
+    protected static final String description = "Visually evaluate the patches of the current target block.";
+
 
     /**
      */
@@ -40,6 +42,7 @@ public class AnalyzeBlock extends AnalysisCommand {
         super(listener, name);
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         update();
     }
 

@@ -31,7 +31,7 @@ public class AbstractFunction extends AbstractAction {		// implements Observer, 
     protected double	progress   = 0.0;
     protected ExitCodes	exitCode   = ExitCodes.PENDING;
 
-    int dbg = 3;
+    int dbg = 0;
     
     /** Field description */
     public String	name = getClass().getSimpleName();

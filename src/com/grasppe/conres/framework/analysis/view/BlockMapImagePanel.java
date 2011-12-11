@@ -12,42 +12,57 @@
 package com.grasppe.conres.framework.analysis.view;
 
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
-import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
-
 /**
  * Class description
  *  @version        $Revision: 1.0, 11/12/08
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class BlockMapImagePanel extends JPanel implements Observer {
+public class BlockMapImagePanel extends PatchBoundView {	// JPanel implements Observer {
 
     AnalysisStepperModel	model          = null;
+    int						defaultScale     = 5;
+    int						defaultWidth     = 100,
+							defaultHeight    = 100;
     int						imageScale     = 10;
-    int						imageWidth     = 200,
-							imageHeight    = 200;
+    int						imageWidth     = 100,
+							imageHeight    = 100;
     int						blockMapWidth  = 10,
 							blockMapHeight = 10;
 
     /**
-     * Create the panel.
+     * Create the panel with a model.
+     *  @param model
      */
-    public BlockMapImagePanel() {
-    	//setBackground(Color.BLUE);
+    public BlockMapImagePanel(AnalysisStepperModel model) {
+        super(model);
+        prepareView();
+    }
 
-    	setMinimumSize(new Dimension(imageWidth, imageHeight));
-    	setSize(getMinimumSize()); //new Dimension(imageWidth, imageHeight));
+    /**
+     *  @param g
+     */
+    public void paint(Graphics g) {
+        super.paint(g);
+
+        try {
+            g.drawImage(getBlockMapImage(), 0, 0, imageWidth, imageHeight, this);
+        } catch (Exception exception) {}
+    }
+
+    /**
+     */
+    public void prepareView() {
+        setMinimumSize(new Dimension(imageWidth, imageHeight));
+        setSize(getMinimumSize());		// new Dimension(imageWidth, imageHeight));
 
         addComponentListener(new ComponentAdapter() {
 
@@ -57,42 +72,6 @@ public class BlockMapImagePanel extends JPanel implements Observer {
 
         });
 
-//        setLayout(new BorderLayout(0, 0));
-    }
-
-    /**
-     * Create the panel with a model.
-     * 	@param model
-     */
-    public BlockMapImagePanel(AnalysisStepperModel model) {
-        this();
-        attachModel(model);        
-    }
-
-    /**
-     *  @param model
-     */
-    public void attachModel(AnalysisStepperModel model) {
-//        model.attachObserver(this);
-        this.model = model;
-        update();
-    }
-
-    /**
-     *  @param g
-     */
-    public void paint(Graphics g) {
-    	super.paint(g);
-        try {
-            g.drawImage(getBlockMapImage(), 0,0,imageWidth, imageHeight, this);
-        } catch (Exception exception) {}
-    }
-
-    /**
-     */
-    public void update() {
-        updateSize();
-        this.repaint(); //100);
     }
 
     /**
@@ -102,10 +81,12 @@ public class BlockMapImagePanel extends JPanel implements Observer {
             BufferedImage	blockMapImage  = getModel().getBlockMapImage();
             int				blockMapWidth  = blockMapImage.getWidth(),
 							blockMapHeight = blockMapImage.getHeight();
-            int				imageScale     = this.imageScale;//(int)Math.floor(getMaxmimumPanelDimension()/getMaxmimumBlockDimension());
+            int				imageScale     = this.imageScale;		// (int)Math.floor(getMaxmimumPanelDimension()/getMaxmimumBlockDimension());
 
             if ((this.imageScale != imageScale) || (this.blockMapWidth != blockMapWidth)
                     || (this.blockMapHeight != blockMapHeight)) {
+            	
+            	if (imageScale<defaultScale) imageScale = defaultScale;
                 this.imageScale     = imageScale;
 
                 this.blockMapWidth  = blockMapWidth;
@@ -114,12 +95,14 @@ public class BlockMapImagePanel extends JPanel implements Observer {
                 this.imageWidth     = blockMapWidth * imageScale;
                 this.imageHeight    = blockMapHeight * imageScale;
                 
-                //setMinimumSize(new Dimension(imageWidth, imageHeight));
-            }
 
-            setSize(new Dimension(imageWidth, imageHeight));
-            setMinimumSize(new Dimension(imageWidth, imageHeight));
+            }
+            if (this.imageWidth < defaultWidth) this.imageWidth = defaultWidth;
+            if (this.imageHeight < defaultHeight) this.imageHeight = defaultHeight;
+
             setPreferredSize(new Dimension(imageWidth, imageHeight));
+//            setSize(new Dimension(imageWidth, imageHeight));
+//            setMinimumSize(new Dimension(imageWidth, imageHeight));
 
         } catch (NullPointerException exception) {
 
@@ -128,7 +111,7 @@ public class BlockMapImagePanel extends JPanel implements Observer {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected BufferedImage getBlockMapImage() {
         try {
@@ -139,7 +122,7 @@ public class BlockMapImagePanel extends JPanel implements Observer {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected int getMaxmimumBlockDimension() {
         return Math.max(getModel().getBlockState().getColumns(),
@@ -147,16 +130,9 @@ public class BlockMapImagePanel extends JPanel implements Observer {
     }
 
     /**
-     * 	@return
-     */
-    protected int getMaxmimumPanelDimension() {
-        return (int)Math.max(Math.max(getSize().getWidth(), getSize().getHeight()),imageWidth);
-    }
-
-    /**
      *  @return
      */
-    protected AnalysisStepperModel getModel() {
-        return model;
+    protected int getMaxmimumPanelDimension() {
+        return (int)Math.max(Math.max(getSize().getWidth(), getSize().getHeight()), imageWidth);
     }
 }

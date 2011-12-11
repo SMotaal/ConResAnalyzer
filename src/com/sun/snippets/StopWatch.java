@@ -7,7 +7,7 @@
 
 
 
-package com.grasppe.lure.framework;
+package com.sun.snippets;
 
 /**
  * A class to help benchmark code

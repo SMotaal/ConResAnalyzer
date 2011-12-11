@@ -65,8 +65,8 @@ public abstract class AbstractValue {
 
             // TODO Auto-generated catch block
             e.printStackTrace();
-            System.out.println("Cloning: " + toString());
-            System.out.println("    to " + newValue.toString());
+//            System.out.println("Cloning: " + toString());
+//            System.out.println("    to " + newValue.toString());
         } catch (IllegalAccessException e) {
 
             // TODO Auto-generated catch block
@@ -81,7 +81,7 @@ public abstract class AbstractValue {
      * @param name
      */
     protected static void debugType(AbstractValue value, String name) {
-        System.out.println("[" + name + "] " + value.toString());
+//        System.out.println("[" + name + "] " + value.toString());
 
 //      if (value.getDefinition().valueType == ValueTypes.ABSTRACT)
 //          System.out.println(name + " is abstract " + value.getDefinition().abstractType + " in "

@@ -10,6 +10,7 @@
  */
 package com.grasppe.conres.io.model;
 
+import com.grasppe.conres.io.ImageFileReader;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -40,7 +41,7 @@ public class CaseFolder extends CaseFile {
     protected ImageFile[]			imageFiles;
     protected TargetDefinitionFile	targetDefinitionFile;
     
-    int dbg = 3;
+    int dbg = 0;
 
     /**
      * @param pathname
@@ -89,8 +90,13 @@ public class CaseFolder extends CaseFile {
 
         for (int i = 0; i < fileCount; i++) {
             ImageFile	thisFile = new ImageFile(fileList[i].getAbsolutePath());
+        	try {
+        		thisFile = (new ImageFileReader((ImageFile)thisFile)).getFile();
+			} catch (Exception exception) {
+				GrasppeKit.debugError("Loading Image File", exception, 2);
+			}        	
 
-            getImageFiles()[i] = thisFile;
+            setImageFile(i,thisFile);
 
             if (blockToneValues.contains(thisFile.getImageID())) {
                 imageFileMap.put(thisFile.getImageID(), thisFile);
@@ -287,6 +293,9 @@ public class CaseFolder extends CaseFile {
         CaseFolder.fileFilter = (fileFilter);
     }
 
+    public void setImageFile(int i, ImageFile imageFile) {
+    	this.imageFiles[i] = imageFile;
+    }
     /**
      * @param imageFiles the imageFiles to set
      */

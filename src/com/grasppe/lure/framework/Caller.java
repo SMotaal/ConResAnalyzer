@@ -36,6 +36,12 @@ public class Caller {
     /** Field description */
     public int	lineNumber;
 
+    /** Field description */
+    public int	callerIndex;
+
+    /** Field description */
+    public String	fileName;
+
     /**
      */
     public Caller() {
@@ -48,9 +54,12 @@ public class Caller {
      * @param className
      * @param methodName
      * @param lineNumber
+     * 	@param fileName
+     * 	@param callerIndex
      */
     public Caller(StackTraceElement[] stackTraceElements, StackTraceElement caller,
-                  String className, String methodName, int lineNumber) {
+                  String className, String methodName, int lineNumber, String fileName,
+                  int callerIndex) {
         this();
         this.stackTraceElements = stackTraceElements;
         this.caller             = caller;
@@ -58,6 +67,8 @@ public class Caller {
         this.simpleName         = GrasppeKit.lastSplit(className);
         this.methodName         = methodName;
         this.lineNumber         = lineNumber;
+        this.fileName           = fileName;
+        this.callerIndex        = callerIndex;
     }
 
 //  public static Caller  newCaller(StackTraceElement[] stackTraceElements, StackTraceElement caller,

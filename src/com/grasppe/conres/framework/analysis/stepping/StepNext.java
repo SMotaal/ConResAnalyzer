@@ -53,49 +53,46 @@ public class StepNext extends SteppingStrategy {
         // TODO: Implement goodBoundary aware stepping
         int	goodBoundary   = this.smartState.getColumnGoodBoundary(column);
 
-        System.out.println("Accept " + acceptBoundary + " Reject " + rejectBoundary + " Boundary "
-                           + columnBoundary);
-        BlockState.printBlock(this.smartState.getBlockMap()[column]);
+//        System.out.println("Accept " + acceptBoundary + " Reject " + rejectBoundary + " Boundary " + columnBoundary);
+//        BlockState.printBlock(this.smartState.getBlockMap()[column]);
 
         if (this.smartState.isComplete()) {
-            System.out.println("Moving Nowhere! Game Over");
+//            System.out.println("Moving Nowhere! Game Over");
 
             return true;
         }
 
         if (columnBoundary > -1) {
-            System.out.println("Moving Over");
+//            System.out.println("Moving Over");
 
             return this.moveOver(columnBoundary);
         }
 
         if (rejectBoundary == 0) {
-            System.out.println("Moving Over from Reject Boundary");
+//            System.out.println("Moving Over from Reject Boundary");
 
             return this.moveOver(columnBoundary);
         }
 
         if (acceptBoundary == this.smartState.getRows() - 1) {
-            System.out.println("Moving Over from Accept Boundary");
+//            System.out.println("Moving Over from Accept Boundary");
 
             return this.moveOver(columnBoundary);
         }
 
         if ((rejectBoundary > -1) && (nextRow(rejectBoundary, column) != row)) {	// -this.step!=row && rejectBoundary!=0) {
-            System.out.println("Moving Up from Reject Boundary " + row + " > "
-                               + nextRow(rejectBoundary, column));
+//            System.out.println("Moving Up from Reject Boundary " + row + " > " + nextRow(rejectBoundary, column));
 
             return this.moveUp(rejectBoundary);
         }
 
         if ((acceptBoundary > -1) && (nextRow(acceptBoundary, column) != row)) {	// +this.step!=row && acceptBoundary!=rows-1) {
-            System.out.println("Moving Down from Accept Boundary " + row + " > "
-                               + nextRow(acceptBoundary, column));
+//            System.out.println("Moving Down from Accept Boundary " + row + " > " + nextRow(acceptBoundary, column));
 
             return this.moveDown(acceptBoundary);
         }
 
-        System.out.println("Moving Over Anyway");
+//        System.out.println("Moving Over Anyway");
 
         return this.moveOver(-1);
     }
@@ -105,7 +102,7 @@ public class StepNext extends SteppingStrategy {
      * @return
      */
     private boolean moveDown(int boundary) {	// after accept
-        System.out.println("\tmove down");
+//        System.out.println("\tmove down");
 
         return this.validMove(this.moveTo(boundary + this.step, this.smartState.getColumn()));
 
@@ -117,7 +114,7 @@ public class StepNext extends SteppingStrategy {
      * @return
      */
     private boolean moveOver(int boundary) {
-        System.out.println("\tmove over");
+//        System.out.println("\tmove over");
 
         int	column  = this.smartState.getColumn();
         int	row     = this.smartState.getRow();
@@ -130,7 +127,7 @@ public class StepNext extends SteppingStrategy {
 
         boolean	movedOver = this.validMove(this.moveTo(row, column));
 
-        System.out.println("\tMOVED OVER " + movedOver);
+//        System.out.println("\tMOVED OVER " + movedOver);
 
         return movedOver;
     }
@@ -139,7 +136,7 @@ public class StepNext extends SteppingStrategy {
      * @return
      */
     private boolean moveRight() {
-        System.out.println("\tmove backwards");
+//        System.out.println("\tmove backwards");
 
         return this.validMove(this.moveBy(0, -1));
     }
@@ -153,7 +150,7 @@ public class StepNext extends SteppingStrategy {
      * @return
      */
     private boolean moveUp(int boundary) {		// after reject
-        System.out.println("\tmove up");
+//        System.out.println("\tmove up");
 
         return this.validMove(this.moveTo(boundary - this.step, this.smartState.getColumn()));
     }

@@ -195,7 +195,7 @@ public class ListDialogRunner {
 
                         if (f.canDisplay('A')) {
                             fontName = existingFamilyNames[j];
-                            System.out.println("Using font: " + fontName);
+//                            System.out.println("Using font: " + fontName);
                         }
                     }
 

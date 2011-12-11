@@ -27,7 +27,7 @@ public class Observers implements Observable {
 
     protected Observable	observable;
     protected boolean		updating = false;
-    int dbg = 3;
+    int dbg = 0;
 
     /** Field description */
     protected Set<Observer>	observerSet = new HashSet<Observer>();

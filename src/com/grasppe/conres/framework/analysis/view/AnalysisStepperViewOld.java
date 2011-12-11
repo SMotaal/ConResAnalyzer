@@ -50,13 +50,13 @@ import javax.swing.JPanel;
 public class AnalysisStepperViewOld extends AbstractView {
 
     protected SteppingPreview	canvas = null;
-    protected PatchImagePanel patchImagePanel = null;
+    protected PatchBoundView patchImagePanel = null;
     protected BlockMapImagePanel blockMapImagePanel = null;
     protected JFrame			frame  = null;
     protected JLabel			label  = null;
 
 //  protected BlockState      blockState = new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
-    int		dbg            = 3;
+    int		dbg            = 0;
     boolean	scratchEnabled = false;
 
     /**
@@ -77,13 +77,13 @@ public class AnalysisStepperViewOld extends AbstractView {
             loadCSVFile();
             scratchEnabled = true;
         } catch (Exception exception) {
-            GrasppeKit.debugText("Load CSV Error", exception.getMessage(), 2);
+            GrasppeKit.debugError("Loading Analysis Grid File", exception, 5);
         }
 
         try {
             if (!scratchEnabled) loadScratchFile();
         } catch (Exception exception) {
-            GrasppeKit.debugText("Load Scratch Error", exception.getMessage(), 2);
+            GrasppeKit.debugError("Loading Analysis Scratch File", exception, 5);
         }		// exception2.printStackTrace();
         
         update();
@@ -127,7 +127,7 @@ public class AnalysisStepperViewOld extends AbstractView {
      */
     public void prepareView() {
 
-//      int dbg = 2;
+//      int dbg = 0;
 
         // if (getTargetManager().getModel().getActiveBlock() != getModel().getActiveBlock())
 //      getTargetManager().LoadImage();
@@ -361,7 +361,7 @@ public class AnalysisStepperViewOld extends AbstractView {
         public void updateStep() {
 
             // blockState = thisStep.getFinalState();
-        	int dbg = 4;
+        	int dbg = 0;
 //
 //            BlockState	blockState = getBlockState();
 //            BlockMap	blockMap   = new BlockMap(blockState);

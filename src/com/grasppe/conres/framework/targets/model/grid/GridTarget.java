@@ -53,7 +53,7 @@ public class GridTarget extends ObservableObject {
         blockAxis.generateValues();
         rowAxis.generateValues();
         columnAxis.generateValues();
-        System.out.println("Created axis values successfully.");
+//        System.out.println("Created axis values successfully.");
     }
 
     /**

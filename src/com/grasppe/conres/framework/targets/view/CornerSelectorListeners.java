@@ -23,7 +23,7 @@ import java.awt.event.WindowEvent;
  */
 public class CornerSelectorListeners {
 
-    static int	dbg = 3;
+    static int	dbg = 0;
 
     /**
      * Outputs debug information and event details

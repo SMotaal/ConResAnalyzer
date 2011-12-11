@@ -25,21 +25,23 @@ public class NewCase extends CaseManagerCommand {
 
     protected static final String	name        = "NewCase";
     protected static final int		mnemonicKey = KeyEvent.VK_N;
-    int dbg = 3;
+    protected static final String description = "Open a new case from a folder with a scanned images and a target definition file.";
+    int dbg = 0;
 
     /**
      */
-    private CaseManager	caseManager;
+    private CaseManager	controller;
 
     /**
      * Constructs a realization of AbstractCommand.
      * @param listener
-     * @param caseManager TODO
+     * @param controller TODO
      */
-    public NewCase(CaseManager caseManager, ActionListener listener) {
+    public NewCase(CaseManager controller, ActionListener listener) {
         super(listener, name);
-        this.caseManager  = caseManager;
+        this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         update();
     }
 
@@ -67,7 +69,7 @@ public class NewCase extends CaseManagerCommand {
         // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
 
         // TODO: Confirm and close current case before attempting to switching cases
-        canProceed = ((CloseCase)this.caseManager.getCommandHandler().getCommand(
+        canProceed = ((CloseCase)this.controller.getCommandHandler().getCommand(
             "CloseCase")).quickClose(getKeyEvent());
         if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario
 

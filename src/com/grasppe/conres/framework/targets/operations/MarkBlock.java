@@ -26,6 +26,8 @@ public class MarkBlock extends TargetManagerCommand {
 
     protected static final String	name        = "MarkBlock";
     protected static final int		mnemonicKey = KeyEvent.VK_M;
+    protected static final String description = "Visually identify the corner points of a target image.";
+
 
     /**
      */
@@ -40,6 +42,7 @@ public class MarkBlock extends TargetManagerCommand {
         super(listener, name);
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         update();
     }
 

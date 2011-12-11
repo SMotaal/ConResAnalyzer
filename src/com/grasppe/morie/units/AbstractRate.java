@@ -151,19 +151,19 @@ public abstract class AbstractRate extends AbstractValue {
         // Debug!
         String	pfx = "\t\t";
 
-        System.out.println(pfx + "Comparison Details:");
-        System.out.println(pfx + "\tidtType: " + idtType + " <== " + idtNumeratorType + " / "
-                           + idtDenominatorType);
-        System.out.println(pfx + "\teqvType: " + eqvType + " <== " + eqvNumeratorType + " / "
-                           + eqvDenominatorType);
-        System.out.println(pfx + "\trevType: " + revType + " <== " + revNumeratorType + " / "
-                           + revDenominatorType);
+//        System.out.println(pfx + "Comparison Details:");
+//        System.out.println(pfx + "\tidtType: " + idtType + " <== " + idtNumeratorType + " / "
+//                           + idtDenominatorType);
+//        System.out.println(pfx + "\teqvType: " + eqvType + " <== " + eqvNumeratorType + " / "
+//                           + eqvDenominatorType);
+//        System.out.println(pfx + "\trevType: " + revType + " <== " + revNumeratorType + " / "
+//                           + revDenominatorType);
 
         if (cntType) {
             RateRelations	relation = checkContigency(eqvNumeratorType, eqvDenominatorType,
                                          revNumeratorType, revDenominatorType);
 
-            System.out.println(pfx + "Contingency relation: " + relation);
+//            System.out.println(pfx + "Contingency relation: " + relation);
 
             return relation;
         } else {
@@ -262,19 +262,19 @@ public abstract class AbstractRate extends AbstractValue {
             break;
 
         default :
-            System.out.println(pfx + "\tFrom:\t" + components[1][0].toString() + " / "
-                               + components[1][1].toString());
-            System.out.println(pfx + "\tTo:\t" + components[0][0].toString() + " / "
-                               + components[0][1].toString());
+//            System.out.println(pfx + "\tFrom:\t" + components[1][0].toString() + " / "
+//                               + components[1][1].toString());
+//            System.out.println(pfx + "\tTo:\t" + components[0][0].toString() + " / "
+//                               + components[0][1].toString());
             throw new InvalidClassException(
                 "Cannot conver between incompatible rates with non-equivalent components." + "\n\t"
                 + inputRate.toString() + " is not compatible with " + this.toString() + " (found "
                 + relation.toString() + ")");
         }
 
-        System.out.println(pfx + "Converting between compatible rates with equivalent components."
-                           + "\n" + pfx + "\t" + inputRate.toString() + " converts to "
-                           + this.toString() + " (found " + relation.toString() + ")");
+//        System.out.println(pfx + "Converting between compatible rates with equivalent components."
+//                           + "\n" + pfx + "\t" + inputRate.toString() + " converts to "
+//                           + this.toString() + " (found " + relation.toString() + ")");
     }
 
     /**

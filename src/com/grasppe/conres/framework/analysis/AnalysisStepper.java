@@ -39,7 +39,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -51,18 +50,16 @@ import javax.swing.ImageIcon;
  */
 public class AnalysisStepper extends AbstractController {
 
-    int								dbg             = 3;
+    int								dbg             = 0;
     protected AnalysisManager		analysisManager = null;
     protected AnalysisStepperView	stepperView     = null;
-	/**
+
+    /**
      * Constructs and attaches a new controller and a new model.
      *  @param analysisManager
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
-
-//      getAnalysisManager().getModel().attachController(this);
-//      getAnalysisManager().getModel().attachObserver(this);
 
         return;
     }
@@ -85,16 +82,11 @@ public class AnalysisStepper extends AbstractController {
      */
     public void BlockStepKey(int keyCode, int keyModifiers) {		// SteppingStrategy thisStep) {
 
-        // if () return;
-
-        // SmartBlockState smartState = new SmartBlockState(this.blockState);
         SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
         SteppingStrategy	thisStep   = new StepNext(smartState);
 
-//      System.out.println("Modifier " + keyModifiers);
-
-        boolean	snapState = true;
-        boolean	goBack    = false;
+        boolean				snapState  = true;
+        boolean				goBack     = false;
 
         switch (keyCode) {
 
@@ -172,6 +164,50 @@ public class AnalysisStepper extends AbstractController {
     }
 
     /**
+     * 	@param blockState
+     */
+    public void loadBlockFiles(BlockState blockState) {
+        setScratchEnabled(false);
+
+        try {
+            loadCSVFile(blockState);
+            setScratchEnabled(true);
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Loading Analysis Grid File", exception, 5);
+        }
+
+        try {
+            if (!isScratchEnabled()) loadScratchFile(blockState);
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Load Analysis Scratch File", exception, 5);
+        }
+
+        setScratchEnabled(true);
+        update();
+    }
+
+    /**
+     * 	@param blockState
+     *      @throws Exception
+     */
+    public void loadCSVFile(BlockState blockState) throws Exception {
+            String	filename = getTargetManager().generateFilename("a.csv");
+
+            blockState.readFile(filename);
+    }
+
+    /**
+     * 	@param blockState
+     *      @throws Exception
+     */
+    public void loadScratchFile(BlockState blockState) throws Exception {
+            String	filename = getTargetManager().generateFilename("s.csv");
+
+            blockState.readFile(filename);
+            setScratchEnabled(true);
+    }
+
+    /**
      * @param argv
      */
     public static void oldMain(String argv[]) {
@@ -238,8 +274,24 @@ public class AnalysisStepper extends AbstractController {
 
     /**
      */
+    public void saveScratchFile() {
+        if (!isScratchEnabled()) return;
+
+        try {
+            String	filename = getTargetManager().generateFilename("s.csv");
+
+            getModel().getBlockState().writeFile(filename);
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Saving Analysis Scratch", exception, 2);
+        }
+    }
+
+    /**
+     */
     public void showView() {
-    	getTargetManager().loadImage();
+        getTargetManager().loadImage();
+        update();
+        updateActiveBlock();
         getStepperView().setVisible(true);
     }
 
@@ -281,7 +333,7 @@ public class AnalysisStepper extends AbstractController {
             bimage = gc.createCompatibleImage(image.getWidth(null), image.getHeight(null),
                                               transparency);
         } catch (HeadlessException exception) {
-        	GrasppeKit.debugText("Image Generation Error", exception.getMessage(), 2);
+            GrasppeKit.debugError("Generating Buffered Image", exception, 2);
         }
 
         if (bimage == null) {
@@ -321,22 +373,22 @@ public class AnalysisStepper extends AbstractController {
     /**
      */
     public void updateActiveBlock() {
-    	
-        setScratchEnabled(false);
-        
-        ConResBlock activeBlock =  getTargetManager().getModel().getActiveBlock();
-        
-        if (activeBlock==null) {
-        	getModel().setActiveBlock(null);
-        	setNewBlockState(null);
-        	setScratchEnabled(false);
-        	getStepperView().setVisible(false);
-        	return;
+
+        ConResBlock	activeBlock = getTargetManager().getModel().getActiveBlock();
+
+        if (activeBlock == null) {
+            getModel().setActiveBlock(null);
+            setNewBlockState(null);
+            setScratchEnabled(false);
+            getStepperView().setVisible(false);
+
+            return;
         }
-        
-        if (getModel().getActiveBlock() == activeBlock)
-        	return;
-        
+
+        if (getModel().getActiveBlock() == activeBlock) return;
+
+        setScratchEnabled(false);
+
         getStepperView().setVisible(false);
 
         getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
@@ -355,39 +407,8 @@ public class AnalysisStepper extends AbstractController {
             getModel().setBlockState(new BlockState(blockRows, blockColumns, firstColumn));
             pushUpdates();
         }
-        
+
         setScratchEnabled(true);
-
-    }
-
-    /**
-     *  @param newState
-     */
-    public void setNewBlockState(BlockState newState) {
-
-        try {
-        	if (newState==null) {
-        		getModel().setActivePatch(null);
-        		updatePatchPreviews(-1, -1);
-        		pushUpdates();
-        	}
-            getModel().setBlockState(newState);
-
-            BlockState	currentState = getModel().getBlockState();
-            int			row          = currentState.getRow();
-            int			column       = currentState.getColumn();
-            
-            saveScratchFile();
-
-            ConResPatch	patchModel   = getTargetManager().getPatch(row, column);
-
-            getModel().setActivePatch(patchModel);
-            updatePatchPreviews(row, column);
-
-            pushUpdates();
-        } catch (Exception exception) {
-        	GrasppeKit.debugText("Block State Update Error", exception.getMessage(), 2);
-        }
 
     }
 
@@ -397,18 +418,20 @@ public class AnalysisStepper extends AbstractController {
      */
     public void updatePatchPreviews(int row, int column) {
         try {
-        	if (row < 0 || column < 0) {
-        		getModel().setPatchImage(null);
-        		getModel().setImage(null);
-        		return;
-        	}
+            if ((row < 0) || (column < 0)) {
+                getModel().setPatchImage(null);
+                getModel().setImage(null);
+
+                return;
+            }
+
             Image		patchImage = getTargetManager().getPatchImage(row, column);
             BlockMap	blockMap   = new BlockMap(getModel().getBlockState());
 
             getModel().setPatchImage(patchImage);
             getModel().setImage(blockMap.getImage());
         } catch (Exception exception) {
-        	GrasppeKit.debugText("Patch Preview Upodate Error", exception.getMessage(), 2);
+            GrasppeKit.debugError("Updating Patch Preview", exception, 2);
         }
     }
 
@@ -462,70 +485,50 @@ public class AnalysisStepper extends AbstractController {
         return getAnalysisManager().getTargetManager();
     }
 
-	/**
-	 */
-	public void loadBlockFiles(BlockState blockState) {
-	    setScratchEnabled(false);
-	
-	    try {
-	        loadCSVFile(blockState);
-	        setScratchEnabled(true);
-	    } catch (Exception exception) {
-	        GrasppeKit.debugText("Load CSV Error", exception.getMessage(), 2);
-	    }
-	
-	    try {
-	        if (!isScratchEnabled()) loadScratchFile(blockState);
-	    } catch (Exception exception) {
-	        GrasppeKit.debugText("Load Scratch Error", exception.getMessage(), 2);
-	    }	    
-	    update();
-	}
+    /**
+     * 	@return
+     */
+    public boolean isScratchEnabled() {
+        return getModel().isScratchEnabled();
+    }
 
-	/**
-	     *  @throws Exception
-	     */
-	    public void loadCSVFile(BlockState blockState) throws Exception {
-	        try {
-	            String	filename = getTargetManager().generateFilename("a.csv");
-	
-	            blockState.readFile(filename);
-	        } catch (Exception exception) {
-	            throw exception;
-	        }
-	    }
+    /**
+     *  @param newState
+     */
+    public void setNewBlockState(BlockState newState) {
 
-	/**
-	     *  @throws Exception
-	     */
-	    public void loadScratchFile(BlockState blockState) throws Exception {
-	        try {
-	            String	filename = getTargetManager().generateFilename("s.csv");
-	            blockState.readFile(filename);
-	        } catch (Exception exception) {
-	            throw exception;
-	        }
-	    }
+        try {
+            if (newState == null) {
+                getModel().setActivePatch(null);
+                getModel().setBlockState(null);
+                updatePatchPreviews(-1, -1);
+                pushUpdates();
+            } else {
+                getModel().setBlockState(newState);
 
-	/**
-	 */
-	public void saveScratchFile() {
-	    if (!isScratchEnabled()) return;
-	
-	    try {
-	        String	filename = getTargetManager().generateFilename("s.csv");
-	
-	        getModel().getBlockState().writeFile(filename);
-	    } catch (Exception exception) {
-	    	GrasppeKit.debugText("Save Scratch Error", exception.getMessage(), 2);
-	    }
-	}
+                BlockState	currentState = getModel().getBlockState();
+                int			row          = currentState.getRow();
+                int			column       = currentState.getColumn();
 
-	public boolean isScratchEnabled() {
-		return getModel().isScratchEnabled();
-	}
+                saveScratchFile();
 
-	public void setScratchEnabled(boolean scratchEnabled) {
-		getModel().setScratchEnabled(scratchEnabled);
-	}
+                ConResPatch	patchModel = getTargetManager().getPatch(row, column);
+
+                getModel().setActivePatch(patchModel);
+                updatePatchPreviews(row, column);
+
+                pushUpdates();
+            }
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Setting Block State", exception, 2);
+        }
+
+    }
+
+    /**
+     * 	@param scratchEnabled
+     */
+    public void setScratchEnabled(boolean scratchEnabled) {
+        getModel().setScratchEnabled(scratchEnabled);
+    }
 }

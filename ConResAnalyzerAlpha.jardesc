@@ -11,15 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <folder path="/ConResAnalyzer/bin"/>
-        <folder path="/ConResAnalyzer/test"/>
-        <javaElement handleIdentifier="=jblas/src\/main\/java"/>
-        <javaElement handleIdentifier="=sanselan/src\/main\/java"/>
-        <folder path="/ConResAnalyzer/pmdoc"/>
-        <folder path="/ConResAnalyzer/libraries"/>
         <javaElement handleIdentifier="=ConResAnalyzer/src"/>
-        <folder path="/ConResAnalyzer/target"/>
-        <javaElement handleIdentifier="=jblas/src\/main\/resources"/>
-        <folder path="/ConResAnalyzer/gestures-wrapper"/>
     </selectedElements>
 </jardesc>

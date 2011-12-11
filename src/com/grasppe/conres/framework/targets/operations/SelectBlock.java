@@ -25,6 +25,7 @@ public class SelectBlock extends TargetManagerCommand {
 
     protected static final String	name        = "SelectBlock";
     protected static final int		mnemonicKey = KeyEvent.VK_B;
+    protected static final String description = "Select a target block to work with.";
 
     /**
      */
@@ -39,6 +40,7 @@ public class SelectBlock extends TargetManagerCommand {
         super(listener, name);
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         controller.getModel().attachObserver(this);
         update();
     }

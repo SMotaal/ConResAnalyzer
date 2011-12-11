@@ -48,6 +48,16 @@ public class ConResPatch extends GridPatch {
 
         return positionString + "\n" + valueString;
     }
+    
+    public String htmlString() {
+    	
+    	String positionString = "<b>Position:</b>\t" + columnLabels[getPatchColumn()] + getPatchRow();
+    	String valueString = "<b>Contrast:</b>\t" + Math.round(getXValue().getValue())+"%\n" +
+    			"<b>Resolution:</b>\t" + Math.round(getYValue().value*100)/100.0 + " " + getYValue().getSymbol(); //GrasppeKit.cat(getXValue().toString(), getYValue().toString());
+
+        return "<html><pre style='font-family:sans-serif'>"+ positionString + "\n\n" + valueString + "</pre></html>" ;
+
+    }
 
     /**
      * @return the xValue

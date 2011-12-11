@@ -16,6 +16,9 @@ import java.io.FileNotFoundException;
 
 import java.net.URI;
 
+import com.grasppe.conres.io.ImageFileReader;
+import com.grasppe.lure.framework.GrasppeKit;
+
 /**
  * @author daflair
  */
@@ -60,21 +63,21 @@ public class ImageFolder extends CaseFile {
         super(parent, child);
     }
 
-    /**
-     * @param args
-     * @throws Exception
-     * @throws FileNotFoundException
-     */
-    public static void main(String[] args) throws FileNotFoundException, Exception {
-        String		testFile = "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
-
-        ImageFolder	file     = new ImageFolder(testFile);
-
-        boolean		isValid  = file.validate();
-
-        System.out.println(file.toString() + " is valid: " + isValid);
-
-    }
+//    /**
+//     * @param args
+//     * @throws Exception
+//     * @throws FileNotFoundException
+//     */
+//    public static void main(String[] args) throws FileNotFoundException, Exception {
+//        String		testFile = "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS";
+//
+//        ImageFolder	file     = new ImageFolder(testFile);
+//
+//        boolean		isValid  = file.validate();
+//
+//        System.out.println(file.toString() + " is valid: " + isValid);
+//
+//    }
 
     /*
      *  (non-Javadoc)
@@ -108,8 +111,16 @@ public class ImageFolder extends CaseFile {
         boolean	hasImages     = imageCount > 0;
         boolean	validImages   = true;
 
-        for (File imageFile : imageFileList)
+        for (File imageFile : imageFileList) {
+        	try {
+				imageFile = (new ImageFileReader((ImageFile)imageFile)).getFile();
+			} catch (Exception exception) {
+				GrasppeKit.debugError("Loading Image File", exception, 2);
+				exception.printStackTrace();
+			}
+        	
             validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
+        }
 
         int		tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
         boolean	hasTDF   = tdfCount == 1;

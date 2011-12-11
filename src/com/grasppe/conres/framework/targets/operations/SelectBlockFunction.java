@@ -30,7 +30,14 @@ import javax.swing.JFrame;
  */
 public class SelectBlockFunction extends TargetManagerFunction implements Observer {
 
-    protected static final String	name = "SelectBlock";
+    /**
+	 * @return the controller
+	 */
+	protected TargetManager getController() {
+		return controller;
+	}
+
+	protected static final String	name = "SelectBlock";
     AbstractModel					model;
     TargetManager controller;
 
@@ -68,7 +75,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         ConResBlock						activeBlock = getModel().getActiveBlock();
         String							activeItem  = "";
 
-        HashMap<String, ConResBlock>	blockMap    = new HashMap<String, ConResBlock>();
+        HashMap<String, ConResBlock>	targetBlockMap    = new HashMap<String, ConResBlock>();
 
         String							listItems[] = new String[blocks.length];
 
@@ -76,7 +83,7 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
             ConResBlock	block = blocks[i];
 
             listItems[i] = "RTV " + block.getZValue().getValue() + "%";//"Block " + (i + 1);
-            blockMap.put(listItems[i], block);
+            targetBlockMap.put(listItems[i], block);
             if ((activeBlock != null) && (activeBlock == block)) activeItem = listItems[i];
             else activeItem = listItems[0];
         }
@@ -87,12 +94,9 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         String	selectedItem = ListDialog.showDialog(frame, frame, "Available Blocks:",
                                   "Block Chooser", listItems, activeItem, "   " + listItems[0]);
 
-        ConResBlock	selectedBlock = blockMap.get(selectedItem);
+        ConResBlock	selectedBlock = targetBlockMap.get(selectedItem);
 
-        getModel().setActiveBlock(selectedBlock);
-        
-//        controller.
-//        controller.loadImage();
+        getController().setActiveBlock(selectedBlock);
 
         return true;
     }

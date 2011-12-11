@@ -31,6 +31,7 @@ public class CloseCase extends CaseManagerCommand {
     protected static final int		mnemonicKey    = KeyEvent.VK_C;
     protected boolean				isCaseClosed   = true;
     protected boolean				backgroundMode = false;
+    protected static final String description = "Close the current case.";
 
     /**
      * Constructs a realization of AbstractCommand.
@@ -39,6 +40,7 @@ public class CloseCase extends CaseManagerCommand {
     public CloseCase(ActionListener listener) {
         super(listener, name);
         super.mnemonicKey = mnemonicKey;
+        super.description = description;        
         getModel().attachObserver(this);
         update();
     }
@@ -114,7 +116,7 @@ public class CloseCase extends CaseManagerCommand {
         super.update();
     }
 
-    int dbg = 3;
+    int dbg = 0;
     /**
      *  @return
      */

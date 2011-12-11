@@ -16,10 +16,14 @@ import ij.io.FileInfo;
 
 import com.sun.xml.internal.ws.util.StringUtils;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+
+import java.net.URL;
 
 import java.security.Permission;
 
@@ -60,8 +64,10 @@ public class GrasppeKit {
     public static final JFrame	commonFrame = new JFrame();
 
     /** Field description */
-    public static boolean	debugNatively = true;
-    private static boolean	isHooked      = false;
+    public static boolean	debugNatively             = true;
+    private static boolean	isHooked                  = false;
+    private static boolean	runningJar                = checkRunningJar();
+    private static boolean	windowOpactiyNotSupported = false;
 
     /**
      * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.
@@ -69,7 +75,6 @@ public class GrasppeKit {
     private GrasppeKit() {
         super();
         setDebugTimeStamp(timestampLevel);
-
     }
 
     /**
@@ -740,8 +745,44 @@ public class GrasppeKit {
     /**
      *  @return
      */
+    public static boolean checkRunningJar() {
+        String	className     = GrasppeKit.class.getSimpleName();
+        URL		classResource = GrasppeKit.class.getResource(className + ".class");
+
+        runningJar = classResource.toString().toLowerCase().trim().startsWith("jar");
+
+        return runningJar;
+    }
+
+    /**
+     *  @return
+     */
     private static boolean debugDefaultChecks() {
         return debugLevelChecks(debugDefault);
+    }
+
+    /**
+     * Output debug text with extended StackTraceElement details.
+     * @param headline  the parent component or operation
+     *  @param exception
+     * @param level
+     */
+    public static void debugError(String headline, Exception exception, int level) {
+        String	text = exception.getClass().getSimpleName() + " - " + exception.getMessage();
+
+        debugErrorOut(debugString(headline, text), level);
+    }
+
+    /**
+     *  @param text
+     *  @param level
+     */
+    private static void debugErrorOut(String text, int level) {
+
+//      if (level==0 && !debugDefaultChecks()) return;
+//        else if (level>0 && !debugLevelChecks(level)) return;
+        if (level < 5) debugOutput(text, "E", level);
+        else debugOutput(text, "W", level);
     }
 
     /**
@@ -750,6 +791,21 @@ public class GrasppeKit {
      */
     private static boolean debugLevelChecks(int level) {
         return (level < debugLevel);
+    }
+
+    /**
+     *  @param text
+     *  @param symbol
+     *  @param level
+     */
+    private static void debugOutput(String text, String symbol, int level) {
+        Caller	caller = getCaller(5);
+        String	lText  = (level == 0) ? symbol + "-D"
+                                      : (symbol + "-" + level);
+        String	output = (lText + "\t" + text + "\t" + getCallerLink(caller));
+
+        if (debugNatively) System.out.println(output);
+        else IJ.showMessage(output);
     }
 
     /**
@@ -766,7 +822,6 @@ public class GrasppeKit {
      * @param text  the body of the debug text
      */
     public static void debugText(String text) {
-        if (!debugDefaultChecks()) return;
         debugTextOut(text, 0);
     }
 
@@ -776,7 +831,6 @@ public class GrasppeKit {
      * @param level
      */
     public static void debugText(String text, int level) {
-        if (!debugLevelChecks(level)) return;
         debugTextOut(text, level);
     }
 
@@ -786,7 +840,6 @@ public class GrasppeKit {
      * @param text
      */
     public static void debugText(String headline, String text) {
-        if (!debugDefaultChecks()) return;
         debugTextOut(debugString(headline, text), 0);
     }
 
@@ -797,7 +850,6 @@ public class GrasppeKit {
      * @param level
      */
     public static void debugText(String headline, String text, int level) {
-        if (!debugLevelChecks(level)) return;
         debugTextOut(debugString(headline, text), level);
     }
 
@@ -806,13 +858,9 @@ public class GrasppeKit {
      *  @param level
      */
     private static void debugTextOut(String text, int level) {
-        Caller	caller = getCaller(5);
-        String	lText  = (level == 0) ? "L-D"
-                                      : ("L-" + level);
-        String	output = (lText + "\t" + text + "\t\t[" + getCallerString(caller) + "]");
-
-        if (debugNatively) System.out.println(output);
-        else IJ.showMessage(output);
+        if ((level == 0) &&!debugDefaultChecks()) return;
+        else if ((level > 0) &&!debugLevelChecks(level)) return;
+        debugOutput(text, "L", level);
     }
 
     /**
@@ -1188,11 +1236,29 @@ public class GrasppeKit {
             String				className          = caller.getClassName();
             String				methodName         = caller.getMethodName();
             int					lineNumber         = caller.getLineNumber();
+            String				fileName           = caller.getFileName();
+            int					callerIndex        = traversals;
 
-            return new Caller(stackTraceElements, caller, className, methodName, lineNumber);
+            return new Caller(stackTraceElements, caller, className, methodName, lineNumber,
+                              fileName, callerIndex);
         } catch (Exception exception) {
             return null;
         }
+    }
+
+    /**
+     * Traverse the call stack to determine and return where a method was called from.
+     * @param caller
+     * @return the class name, method name, and line number of the fourth stack trace element
+     */
+    public static String getCallerLink(Caller caller) {
+
+//      return "" + caller.methodName + "::" + "(" + caller.simpleName + ".java:" + caller.lineNumber+")";
+        StackTraceElement	stackElement = caller.stackTraceElements[caller.callerIndex];
+
+//      System.out.printf("%s.%s(%s:%s)%n", s.getClassName(), s.getMethodName(), s.getFileName(), s.getLineNumber());
+        return lastSplit(stackElement.getClassName()) + "." + stackElement.getMethodName() + " ("
+               + stackElement.getFileName() + ":" + stackElement.getLineNumber() + ")";
     }
 
     /**
@@ -1210,6 +1276,17 @@ public class GrasppeKit {
      */
     public static String getCallerString(Caller caller) {
         return caller.simpleName + "." + caller.methodName + ":" + caller.lineNumber;
+    }
+
+    /**
+     *  @return
+     */
+    public static int getControlModifierMask() {
+        String	osName = System.getProperty("os.name");
+        boolean	isMac  = (osName.toLowerCase().contains("mac"));
+
+        if (isMac) return InputEvent.META_DOWN_MASK;
+        else return InputEvent.CTRL_DOWN_MASK;
     }
 
     /**
@@ -1261,6 +1338,13 @@ public class GrasppeKit {
     }
 
     /**
+     * @return the runningJar
+     */
+    public static boolean isRunningJar() {
+        return runningJar;
+    }
+
+    /**
      * @param level
      */
     public static void setDebugTimeStamp(final int level) {
@@ -1288,6 +1372,39 @@ public class GrasppeKit {
         };
 
         new Timer(delay, taskPerformer).start();
+    }
+
+    /**
+     * 	@param window
+     * 	@param opactiy
+     */
+    public static void setFrameOpacity(Window window, float opactiy) {
+        if (windowOpactiyNotSupported) return;
+
+        try {
+            Class<?>					awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+            java.lang.reflect.Method	mSetWindowOpacity =
+                awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
+
+            mSetWindowOpacity.invoke(null, window, Float.valueOf(opactiy));
+            windowOpactiyNotSupported = false;
+
+            return;
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        windowOpactiyNotSupported = true;
     }
 
     /**

@@ -34,7 +34,7 @@ import java.util.Arrays;
  */
 public class ImageFile extends CaseFile {
 	
-	int dbg = 3;
+	int dbg = 0;
 
     protected static FileFilter	fileFilter = new CaseFileFilter(Arrays.asList(new String[] {
                                                  "*i.tif", "*i.tiff", "*i.png", "*i.jpg" }));
@@ -226,7 +226,7 @@ public class ImageFile extends CaseFile {
      */
     public int getImageID() {
     	
-    	int dbg = 2;
+    	int dbg = 0;
         File	dir       = this.getParentFile();
         String	name      = this.getName();
         String	baseName  = FilenameUtils.getBaseName(name);

@@ -17,6 +17,7 @@ import com.grasppe.conres.framework.cases.view.CaseManagerView;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.io.model.TargetDefinitionFile;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractModel;
@@ -40,7 +41,7 @@ public class CaseManager extends AbstractController implements ActionListener {
     /** Field description */
     public ConResAnalyzer	analyzer;
     
-    int dbg = 3;
+    int dbg = 0;
 
     /**
      * @param listener
@@ -100,8 +101,9 @@ public class CaseManager extends AbstractController implements ActionListener {
         CaseFolder	caseFolder = new CaseFolder(newCase.path);
 
         try {
-            getTargetManager().loadTargetDefinitionFile(caseFolder.getTargetDefinitionFile());
-
+        	TargetDefinitionFile targetDefinitionFile = caseFolder.getTargetDefinitionFile();
+//        	if (targetDefinitionFile==null)
+            getTargetManager().loadTargetDefinitionFile(targetDefinitionFile);
             ImageFile[]	imageFiles = caseFolder.getImageFiles();
         } catch (IOException exception) {
             newCase = null;

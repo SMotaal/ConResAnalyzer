@@ -37,7 +37,7 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     FileSelectionMode	fileSelectionMode = FileSelectionMode.FILES_AND_DIRECTORIES;
     TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
     
-    int dbg = 3;
+    int dbg = 0;
 
     /**
      * @param name

@@ -22,11 +22,4 @@
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>gestures-wrapper</name>
-			<type>2</type>
-			<location>/Users/daflair/Documents/workspace/examples/gestures-wrapper/src/main/java</location>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -29,7 +29,15 @@ import java.util.List;
  */
 public class AnalysisStepperModel extends AbstractModel {
 
-    /** Field description */
+    /**
+	 * @return the patchPreviewSize
+	 */
+	public int getPatchPreviewSize() {
+		patchPreviewSize = getController().getTargetManager().patchPreviewSize;
+		return patchPreviewSize;
+	}
+
+	/** Field description */
     private BlockState	blockState = null;		// new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /** Field description */
@@ -41,6 +49,8 @@ public class AnalysisStepperModel extends AbstractModel {
 		patchImage                      = null;
 
 	private boolean	scratchEnabled = false;
+	
+	private int patchPreviewSize = 550;
 
     /**
      * Constructs a new model object with no predefined controller.
@@ -55,6 +65,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public AnalysisStepperModel(AnalysisStepper controller) {
         super(controller);
+//        this.patchPreviewSize =getController().getTargetManager().patchPreviewSize;
     }
 
     /**
@@ -143,9 +154,8 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setBlockState(BlockState blockState) {
         try {
-            if (this.blockState == blockState) return;
+            if (blockState!=null && this.blockState!=null && this.blockState == blockState) return;
             this.blockState = blockState;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

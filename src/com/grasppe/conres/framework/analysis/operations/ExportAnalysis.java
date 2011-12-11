@@ -34,6 +34,8 @@ public class ExportAnalysis extends AnalysisCommand {
 
     protected static final String	name        = "ExportAnalysis";
     protected static final int		mnemonicKey = KeyEvent.VK_X;
+    protected static final String description = "Export the current analysis grid data to a CSV file with the same name as the block image file.";
+
 
     /**
      */
@@ -48,6 +50,7 @@ public class ExportAnalysis extends AnalysisCommand {
         super(listener, name);
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
+        super.description = description;
         update();
     }
 

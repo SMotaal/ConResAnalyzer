@@ -25,19 +25,23 @@ public class ConResAnalyzerMain {
      * @param args
      */
     public static void main(String[] args) {
+    	
+
 
     	// Thread	runningThread = 
     	new Thread() {
 			
 			public void run() {
                 GrasppeKit.setupHooks();
+                
+
 
 //              new ConResBootCamp().run("");
                 ConResAnalyzer		analyzer      = new ConResAnalyzer();
                 ConResAnalyzerModel	analyzerModel = analyzer.getModel();
                 ConResAnalyzerView	analyzerView  = (ConResAnalyzerView)analyzer.getView();		// new ConResAnalyzerView(analyzer);
                 
-                initializeTest(analyzer);
+                if(!GrasppeKit.isRunningJar()) initializeTest(analyzer);
 				
 			}
 		}.start();

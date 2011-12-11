@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 /**
  * @author daflair
  */
+@Deprecated
 public interface GrasppeEventHandler extends GrasppeKit.Observer {
 
     /**

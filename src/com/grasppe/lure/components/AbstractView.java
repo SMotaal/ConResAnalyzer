@@ -17,6 +17,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,16 +42,16 @@ public abstract class AbstractView extends ObservableObject implements Observer 
     static JFrame						debugViewFrame;
     static HashSet<JPanel>				debugViewPanels = new HashSet<JPanel>();
     static String						debugViewString = "Debug";
-    static float						debugFontSize   = 12F;
+    static float						debugFontSize   = 10F;
     static int							debugPadding    = 5;
     protected static String				debugSeparator  = ": ";
     protected AbstractController		controller;
-    protected HashMap<String, JLabel>	debugLabels     = new HashMap<String, JLabel>();
-    protected JPanel					debugPanel      = null;
-    JLabel								debugTitleLabel = new JLabel("<html><b>" + getClass().getSimpleName() + "</b></html>");
+    protected HashMap<String, JLabel>	debugLabels         = new HashMap<String, JLabel>();
+    protected JPanel					debugPanel          = null;
+    JLabel								debugTitleLabel     = new JLabel("<html><b>" + getClass().getSimpleName() + "</b></html>");
+    int									dbg                 = 0;
+    boolean								debugViewFrameFaded = false;
 
-    int dbg = 3;
-    
     /**
      * @param controller
      */
@@ -132,10 +136,27 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         if (debugViewFrame != null) return;
         debugViewFrame = new JFrame(debugViewString);
 
-//      debugViewFrame.setResizable(false);
+      debugViewFrame.setResizable(false);
         debugViewFrame.setFocusable(false);
-        debugViewFrame.setEnabled(false);
+//        debugViewFrame.setEnabled(false);
         debugViewFrame.setUndecorated(true);
+
+        MouseAdapter	mouseAdapter = new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (debugViewFrameFaded) GrasppeKit.setFrameOpacity(debugViewFrame, 1.0F);	// debugViewFrame.hasFocus()
+                else GrasppeKit.setFrameOpacity(debugViewFrame, 0.5F);
+                debugViewFrameFaded = !debugViewFrameFaded;
+            }
+        };
+
+//        debugViewFrame.addWindowListener(focusAdapter);
+        debugViewFrame.addMouseListener(mouseAdapter);
+        GrasppeKit.setFrameOpacity(debugViewFrame, 0.5F);
+        debugViewFrameFaded = true;
+
+        GrasppeKit.setFrameOpacity(debugViewFrame, 0.5F);
 
         Container	pane   = debugViewFrame.getContentPane();
 
@@ -186,7 +207,7 @@ public abstract class AbstractView extends ObservableObject implements Observer 
      */
     private void updateDebugFrame() {
 
-//      updateDebugLabels();
+        if (GrasppeKit.isRunningJar()) return;
 
         debugViewFrame.pack();
 
@@ -198,10 +219,10 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         int	frameWidth    = debugViewFrame.getWidth();
         int	frameHeight   = debugViewFrame.getHeight();
 
-        debugViewFrame.setLocation(25, displayHeight - frameHeight - 55);
-        
-        if (!debugViewFrame.isVisible())
-        	debugViewFrame.setVisible(true);
+//      debugViewFrame.setLocation(displayWidth - frameWidth - 25, 55);
+        debugViewFrame.setLocation(25, displayHeight - frameHeight - 75);
+
+        if (!debugViewFrame.isVisible()) debugViewFrame.setVisible(true);
     }
 
     /**
@@ -248,6 +269,8 @@ public abstract class AbstractView extends ObservableObject implements Observer 
     /**
      */
     protected void updateDebugLabels() {
+        if (GrasppeKit.isRunningJar()) return;
+
         if (debugPanel == null)		// return;
             createDebugView();
 
@@ -270,6 +293,8 @@ public abstract class AbstractView extends ObservableObject implements Observer 
     /**
      */
     protected void updateDebugView() {
+        if (GrasppeKit.isRunningJar()) return;
+
         try {
             updateDebugLabels();
         } catch (Exception exception) {

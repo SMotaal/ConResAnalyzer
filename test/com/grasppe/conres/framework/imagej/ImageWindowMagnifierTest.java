@@ -16,7 +16,6 @@ import ij.io.Opener;
 
 import java.awt.event.KeyEvent;
 
-import com.grasppe.conres.alpha.ConResBootCamp.Testing;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -27,8 +26,8 @@ import com.grasppe.lure.framework.GrasppeKit;
 public class ImageWindowMagnifierTest implements GrasppeEventHandler {
 
     String	imageName = (new String[] { "CirRe27U_50t.png", "CirRe27U_50i.tif" })[0];
-    String	imagePath = (Testing.getRootFolder() + "/" + Testing.getCaseFolder() + "/"
-                        + imageName).replaceAll("//", "/");
+    String	imagePath = "";
+//    (Testing.getRootFolder() + "/" + Testing.getCaseFolder() + "/" + imageName).replaceAll("//", "/");
     Opener					opener    = new Opener();
     ImagePlus				imagePlus = opener.openImage(imagePath);
     ImageWindow				imageWindow;	// = .getImageWindow();

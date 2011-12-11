@@ -34,33 +34,24 @@ import java.util.TreeMap;
  */
 public class ImageFileReader implements IGrasppeFileReader {
 
-    TreeMap<Integer, SanselanImageTag>	tagMap = new TreeMap<Integer, SanselanImageTag>();
+    /**
+	 * @return the file
+	 */
+	public ImageFile getFile() {
+		return file;
+	}
+
+	TreeMap<Integer, SanselanImageTag>	tagMap = new TreeMap<Integer, SanselanImageTag>();
     protected ImageFile					file;
-    int									dbg = 2;
+    int									dbg = 0;
 
     /**
      * @param file
      * @throws Exception
      */
-    public ImageFileReader(File file) throws Exception {
-        this.file = (ImageFile)file;
+    public ImageFileReader(ImageFile file) throws Exception {
+        this.file = file;
         readInformation();
-    }
-
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        String	path =
-            "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U_10i.tif";
-
-//      "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U_10t.png";
-
-        ImageFile		file   = new ImageFile(path);
-        ImageFileReader	reader = new ImageFileReader(file);
-
-        System.out.println(file);
     }
 
     /**
@@ -78,9 +69,9 @@ public class ImageFileReader implements IGrasppeFileReader {
         boolean	isPng         = fileExtension.matches(pngEx);
         boolean	isJpg         = fileExtension.matches(jpgEx);
 
-        if (isTiff) readPngInformation(); //readTiffInformation();
-        else if (isPng) readPngInformation();
-        else if (isJpg) readPngInformation();
+        if (isTiff) readImageInformation();
+        else if (isPng) readImageInformation();
+        else if (isJpg) readImageInformation();
         else throw new IOException("Could not read " + file.getName() + ". File extension " + fileExtension
                                    + " is not a supported image type.");
     }
@@ -89,7 +80,7 @@ public class ImageFileReader implements IGrasppeFileReader {
      *  @throws IOException
      *  @throws ImageReadException
      */
-    public void readPngInformation() throws IOException, ImageReadException {
+    public void readImageInformation() throws IOException, ImageReadException {
     	
     	ImageInfo	imageInfo = null;
 
@@ -155,7 +146,7 @@ public class ImageFileReader implements IGrasppeFileReader {
      *  @throws IOException
      *  @throws ImageReadException
      */
-    public void readTiffInformation() throws IOException, ImageReadException {
+    public void readTiffMetadata() throws IOException, ImageReadException {
 
         // Ref: http://commons.apache.org/sanselan/xref-test/org/apache/sanselan/sampleUsage/MetadataExample.html
 

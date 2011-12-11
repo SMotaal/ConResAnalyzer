@@ -47,7 +47,7 @@ import javax.swing.JFrame;
  * @author daflair
  */
 public class ImageWindowMagnifier extends ImageCanvas
-        implements GrasppeEventHandler, MouseMotionListener, MouseListener, WindowFocusListener {		// , MouseListener {
+        implements MouseMotionListener, MouseListener, WindowFocusListener, GrasppeEventHandler {		// , MouseListener {
 
 //  /** Field description */
 //  public static MouseMotionListener mouseMotionListener = new MouseMotionListener() {
@@ -201,7 +201,7 @@ public class ImageWindowMagnifier extends ImageCanvas
 
         return true;
     }
-    int dbg = 3;
+    int dbg = 0;
 
     /**
      * @param source

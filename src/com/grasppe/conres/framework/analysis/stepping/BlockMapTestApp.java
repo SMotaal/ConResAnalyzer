@@ -69,7 +69,7 @@ public class BlockMapTestApp extends Canvas {
         SmartBlockState		smartState = new SmartBlockState(this.blockState);
         SteppingStrategy	thisStep   = new StepNext(smartState);
 
-        System.out.println("Modifier " + keyModifiers);
+//        System.out.println("Modifier " + keyModifiers);
 
         boolean	snapState = true;
 

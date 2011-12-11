@@ -16,15 +16,9 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
-import javax.swing.JFrame;
 
 /**
  *     Class description
@@ -34,7 +28,6 @@ import javax.swing.JFrame;
 public class ConResAnalyzerView extends AbstractView {
 
     /** Field description */
-    JFrame				frame;
     ConResAnalyzerMenu	menu;
     String				name        = "ConResAnalyzer";
     boolean				finalizable = true;
@@ -46,15 +39,6 @@ public class ConResAnalyzerView extends AbstractView {
      */
     public ConResAnalyzerView(ConResAnalyzer controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
-     * @param listener
-     */
-    public void addWindowListener(WindowListener listener) {
-        frame.addWindowListener(listener);
     }
 
     /**
@@ -62,17 +46,9 @@ public class ConResAnalyzerView extends AbstractView {
      */
     public boolean canFinalize() {
         finalizable = (activeCalls == 0);
-
-        // IJ.showMessage(name + " activeCalls: " + activeCalls);
         GrasppeKit.debugText("Finalize / Active Calls", activeCalls + " remaining.");
 
         return finalizable;
-    }
-
-    /**
-     */
-    public void close() {
-        if (finalizeView()) frame.dispose();
     }
 
     /**
@@ -83,28 +59,6 @@ public class ConResAnalyzerView extends AbstractView {
         if (!canFinalize()) return false;
 
         return true;
-    }
-
-    /**
-     * Hides the graphical frame
-     */
-    public void hide() {
-        frame.setVisible(false);	// frame.toBack();
-    }
-
-    /**
-     * Builds the graphical user interface window.
-     */
-    public void prepareFrame() {
-        frame = new JFrame(name);
-        frame.addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                close();
-            }
-
-        });
     }
 
     /**
@@ -124,9 +78,6 @@ public class ConResAnalyzerView extends AbstractView {
             GrasppeKit.debugText("Command Button Creation",
                                  GrasppeKit.lastSplit(command.toString()));
 
-//          IJ.showMessage(this.getClass().getSimpleName(),
-//                         this.getClass().getSimpleName() + " Command Added: "
-//                         + command.toString());
             menu.createButton(command);
         }
     }
@@ -136,30 +87,7 @@ public class ConResAnalyzerView extends AbstractView {
      */
     public void prepareView() {
         this.prepareMenu();
-        this.prepareFrame();
     }
-
-    /**
-     * Builds the graphical user interface window and elements and adds the specified WindowListener to the frame.
-     * @param listener
-     */
-    public void prepareView(WindowListener listener) {
-        this.prepareView();
-        this.addWindowListener(listener);
-    }
-
-    /**
-     * Shows the graphical frame
-     */
-    public void show() {
-        frame.setVisible(true);		// frame.toFront();
-    }
-
-    /**
-     * Method called by observable object during notifyObserver calls.
-     */
-    @Override
-    public void update() {}
 
     /**
      *  @return
@@ -174,19 +102,5 @@ public class ConResAnalyzerView extends AbstractView {
     @Override
     protected ConResAnalyzerModel getModel() {
         return (ConResAnalyzerModel)super.getControllerModel();
-    }
-
-    /**
-     * @return the title
-     */
-    protected String getTitle() {
-        return frame.getTitle();
-    }
-
-    /**
-     * @param title the title to set
-     */
-    protected void setTitle(String title) {
-        frame.setTitle(title);
     }
 }

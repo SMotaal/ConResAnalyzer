@@ -20,8 +20,10 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 /**
  *     Class description
@@ -39,9 +41,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     protected AbstractController	commandHandler;
     protected Observers				observers = new Observers(this);
     protected KeyEvent				keyEvent;
-    
-    
-    int dbg = 3;
+    protected String				description = "";
+    int								dbg         = 0;
 
 //  protected GrasppeKit        grasppeKit     = GrasppeKit.getInstance();
 
@@ -58,6 +59,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      */
     public AbstractCommand(ActionListener listener, String text) {
         super(text);	// , icon);
+
+        initializeActionFields();
 
 //      attachObserver(this);
 
@@ -138,7 +141,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     public boolean completed() {
         if (!executed) {
             executed = true;
-            GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()), dbg);
+            GrasppeKit.debugText("Command Execution Succeeded", GrasppeKit.lastSplit(toString()),
+                                 dbg);
 
             return true;
         }
@@ -178,36 +182,42 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     /**
      * Called by the actionListener, following a call to actionPerformed(). Returns false if performCommand() or complete() return false.
      * @return  true if actions completed successfully!
+     * @throws ExecutionException 
      */
-    public final boolean execute() {
-        if (executing) return false;
-        if (hasExecuted()) return false;
-        if (!canExecute()) update();
-        if (!canExecute())
-            throw new IllegalStateException(getName() + " could not execute in its current state.");
-        GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()),dbg);
+    public final boolean execute() throws ExecutionException {
+            if (executing) return false;
+            if (hasExecuted()) return false;
+            if (!canExecute()) update();
+            if (!canExecute())
+                throw new IllegalStateException(getName()
+                    + " could not execute in its current state.");
+            GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()),
+                                 dbg);
 
-        try {
-            executing = true;
+            try {
+                executing = true;
 
-            if (!perfomCommand() ||!completed()) {
-                update();
-                throw new InternalError(
-                    this.getName() + " failed to complete successfully due to an internal error.");
+                if (!perfomCommand() ||!completed()) {
+                    update();
+                    throw new InternalError(
+                        this.getName()
+                        + " failed to complete successfully due to an internal error.");
+                }
+
+                executing = false;
+                executed  = true;
+                GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()),
+                                     dbg);
+
+            } catch (Exception exception) {
+            	executing = false;
+            	executed  = false;
+            	String	name = GrasppeKit.humanCase(getName(), true);
+//            	ExecutionException executionException = new ExecutionException(exception.getClass().getSimpleName() + " - " + exception.getMessage() + " - " + GrasppeKit.lastSplit(toString()), exception);
+//            	GrasppeKit.debugError("Executing " + name, executionException, 2);
+            	GrasppeKit.debugError("Executing " + name, exception, 4);
+            	return false;
             }
-
-            executing = false;
-            executed  = true;
-            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()), dbg);
-
-        } catch (Exception exception) {
-            GrasppeKit.debugText("Command Execution Failed", GrasppeKit.lastSplit(toString()), 2);
-            exception.printStackTrace();
-            executing = false;
-            executed  = false;
-
-            return false;
-        }
 
         return executed;
     }
@@ -218,29 +228,15 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      */
     public final boolean execute(KeyEvent e) {
         setKeyEvent(e);
-        execute();
+        try {
+        	execute();
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Executing " + GrasppeKit.lastSplit(toString()), exception, 4);
+        }
         setKeyEvent();
 
         return executed;
     }
-
-//
-//  /**
-//   * Method description
-//   *
-//   *
-//   * @param forcedAction
-//   * @param e
-//   *
-//   * @return
-//   */
-//  public final boolean execute(boolean forcedAction, KeyEvent e) {
-//      setKeyEvent(e);
-//      execute(forcedAction);
-//      setKeyEvent();
-//
-//      return executed;
-//  }
 
     /**
      * Detaches from the model when being finalize through garbage collection.
@@ -252,7 +248,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
             model.detachObserver(this);
             GrasppeKit.debugText("Command Finalize/Detatch Succeeded",
                                  model.getClass().getSimpleName() + " is no longer attached to "
-                                 + GrasppeKit.lastSplit(toString()),dbg);
+                                 + GrasppeKit.lastSplit(toString()), dbg);
         } catch (Exception e) {
 
             // Command has no model and can finalize immediately
@@ -264,35 +260,22 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         super.finalize();
     }
 
-//  /**
-//   * Method description
-//   *
-//   * @param forcedAction
-//   *
-//   * @return
-//   */
-//  public final boolean execute(boolean forcedAction) {
-//
-//      // update();
-//      // if (forcedAction)
-//      executed = false;
-//
-//      // if (forcedAction)
-//      canExecute(forcedAction);
-//
-//      return execute();
-//  }
-
     /**
      *  @return
      */
     public final boolean forceExecute() {
-        GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()),dbg);
+        GrasppeKit.debugText("Command Execution Forced", GrasppeKit.lastSplit(toString()), dbg);
 
         executed = false;
         canExecute(true);
 
-        return execute();
+        try {
+        	execute();
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Executing " + GrasppeKit.lastSplit(toString()), exception, 4);
+        }
+        
+        return executed;
     }
 
     /**
@@ -305,6 +288,51 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         setKeyEvent();
 
         return executed;
+    }
+
+    /**
+     */
+    protected void initializeActionFields() {
+
+        /*
+         * Action Properties (http://docs.oracle.com/javase/tutorial/uiswing/misc/action.html)
+         *
+         * This table defines the properties that can be set on an action. The second column lists which components automatically use the properties (and what method is specifically called). For example, setting the ACCELERATOR_KEY on an action that is then attached to a menu item, means that JMenuItem.setAccelerator(KeyStroke) is called automatically.
+         *
+         * ACCELERATOR_KEY - (setAccelerator): JMenuItem
+         * The KeyStroke to be used as the accelerator for the action. For a discussion of accelerators versus mnemonics, see Enabling Keyboard Operation. Introduced in 1.3.
+         *
+         * ACTION_COMMAND_KEY - (setActionCommand): AbstractButton, JCheckBox, JRadioButton
+         * The command string associated with the ActionEvent.
+         *
+         * LONG_DESCRIPTION - : none
+         * The longer description for the action. Can be used for context-sensitive help.
+         *
+         * MNEMONIC_KEY - (setMnemonic): AbstractButton, JMenuItem, JCheckBox, JRadioButton
+         * The mnemonic for the action. For a discussion of accelerators versus mnemonics, see Enabling Keyboard Operation. Introduced in 1.3.
+         *
+         * NAME - (setText): AbstractButton, JMenuItem, JCheckBox, JRadioButton
+         * The name of the action. You can set this property when creating the action using the AbstractAction(String) or AbstractAction(String, Icon) constructors.
+         *
+         * SHORT_DESCRIPTION - (setToolTipText): AbstractButton, JCheckBox, JRadioButton
+         * The short description of the action.
+         */
+        try {
+            String	name = GrasppeKit.humanCase(getName(), true);
+
+            if (!name.isEmpty()) putValue(Action.NAME, name);
+
+            String	description = getDescription();
+
+            if (!description.trim().isEmpty()) putValue(Action.SHORT_DESCRIPTION, description);
+
+            int	mnemonicKey = getMnemonicKey();
+
+            if (mnemonicKey > 0) putValue(Action.MNEMONIC_KEY, mnemonicKey);
+        } catch (Exception exception) {
+            GrasppeKit.debugText("Initialize Action Fields Error",
+                                 "The key '" + this.mnemonicKey + "' is assigned to " + name, 2);
+        }
     }
 
     /**
@@ -354,13 +382,21 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
 
 //      notifyObservers();
         // canExecute(!useModel || (model != null));     // either not using model or model is not empty!
+        initializeActionFields();
 
         if (canExecute()) {
             GrasppeKit.debugText("Abstract Command Update", getName() + " can execute.", dbg);
         } else {
-            GrasppeKit.debugText("Abstract Command Update", getName() + " cannot execute.",dbg);
+            GrasppeKit.debugText("Abstract Command Update", getName() + " cannot execute.", dbg);
         }
 
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -420,7 +456,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     public void setMnemonicKey(int mnemonicKey) {
         this.mnemonicKey = mnemonicKey;
         GrasppeKit.debugText("Setting Action Mnemonic",
-                             "The key '" + this.mnemonicKey + "' is assigned to " + getName(),dbg);
+                             "The key '" + this.mnemonicKey + "' is assigned to " + getName(), dbg);
 
         // super.putValue(Action.MNEMONIC_KEY, mnemonicKey);
     }

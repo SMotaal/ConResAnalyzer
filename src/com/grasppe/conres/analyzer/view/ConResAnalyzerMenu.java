@@ -23,7 +23,9 @@ import ij.plugin.frame.PlugInFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.ActionEvent;
@@ -71,9 +73,9 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
     public ConResAnalyzerMenu() {
         super("ConResAnalyzerMenu");
         pluginBar.add(caseLabel);
-        setAlwaysOnTop(true);
+        pluginBar.setFloatable(false);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
-        setSize(450, 350);
 
         WindowListener	wndCloser = new WindowAdapter() {
 
@@ -91,8 +93,21 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 
         super.add(pluginBar, BorderLayout.NORTH);
 
-        pack();
+        updateSize();  
+        
         setVisible(true);
+    }
+    
+    public void updateSize() {
+        pack();
+
+        DisplayMode	displayMode =
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+                    .getDisplayMode();
+            int	displayWidth  = displayMode.getWidth();
+            int	displayHeight = displayMode.getHeight();
+        
+        setSize(displayWidth, getHeight());
     }
 
     /**
@@ -173,7 +188,7 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
          * actionMap.put(action, thisAction);
          * IJ.showMessage("ConResAnalyzerPlugInA0Menu Action Created: " + thisAction.toString());
          */
-        PluginMenuItem	thisButton   = new PluginMenuItem(command);
+        PluginMenuItem	thisButton   = new PluginMenuItem((AbstractAction)command);
         int				thisMnemonic = thisButton.getMnemonic();
 
         GrasppeKit.debugText("Menu Button Created",
@@ -186,7 +201,8 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
 //      IJ.showMessage(this.getClass().getSimpleName() + " Menu Button Created: "
 //                     + thisButton.toString());
         pluginBar.add(thisButton);
-        pack();
+        updateSize();
+//        pack();
     }
 
     /**
@@ -430,7 +446,10 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
         /** Field description */
         protected Border	m_inactive;
         protected Font		m_font        = this.getFont().deriveFont((float)14.0);
-        protected Dimension	m_minimumSize = new Dimension(100, 20);
+        protected int minimumWidth = 100;
+        protected int maximumWidth = 125;
+        protected int minimumHeight = 25;
+        protected Dimension	m_minimumSize = new Dimension(minimumWidth, minimumHeight);
 
         /**
          * @param action
@@ -445,9 +464,6 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
             super.setFont(m_font);
             setBorder(m_inactive);
             setMargin(new Insets(1, 1, 1, 1));
-            super.setMinimumSize(m_minimumSize);
-            super.setMaximumSize(m_minimumSize);
-            super.setPreferredSize(m_minimumSize);
             addMouseListener(this);
             setRequestFocusEnabled(false);
 
@@ -499,6 +515,11 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
             }
 
             setMnemonic(actionMnemonic);
+            
+            super.setMinimumSize(new Dimension(minimumWidth, minimumHeight));
+            super.setMaximumSize(new Dimension(maximumWidth, minimumHeight));
+//            super.setPreferredSize(m_minimumSize);
+            pack();            
 
             update();
         }
@@ -522,9 +543,9 @@ public class ConResAnalyzerMenu extends PlugInFrame implements ActionListener, G
                 ((AbstractCommand)getAction()).setKeyEvent();
                 GrasppeKit.debugText("Command Menu KeyEvent Handled", GrasppeKit.keyEventString(e));
             } catch (Exception exception) {
-                GrasppeKit.debugText("Command Menu KeyEvent Exception",
+                GrasppeKit.debugError("Handling Key Event", new Exception(exception.getClass().getSimpleName() + " - " +
                                      GrasppeKit.keyEventString(e) + " ==> Exception thrown\n\n"
-                                     + exception.getMessage(), 3);
+                                     + exception.getMessage()), 3);
             }
         }
 

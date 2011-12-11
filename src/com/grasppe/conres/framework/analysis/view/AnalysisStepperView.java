@@ -16,6 +16,7 @@ import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
+import com.grasppe.conres.io.ImageFileReader;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -33,10 +34,14 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 /**
  * Class description
@@ -47,10 +52,11 @@ public class AnalysisStepperView extends AbstractView {
 
     protected JFrame				frame              = null;
 //    protected SteppingPreview		canvas             = null;
-    protected PatchImagePanel		patchImagePanel    = null;
+    protected PatchBoundView		patchImagePanel    = null;
     protected BlockMapImagePanel	blockMapImagePanel = null;
+    protected PatchInformationPanel patchInformationPanel = null;
     protected JLabel				label              = null;
-    int								dbg                = 3;
+    int								dbg                = 0;
 
     /**
      * @param controller
@@ -78,7 +84,7 @@ public class AnalysisStepperView extends AbstractView {
         if (frame!=null)
         	setVisible(false);
 
-//      int dbg = 2;
+//      int dbg = 0;
 
         // SteppingPreview canvas
 //        canvas = new SteppingPreview(getBlockState());
@@ -110,23 +116,45 @@ public class AnalysisStepperView extends AbstractView {
         JPanel		panel     = new JPanel();
         BoxLayout	layout    = new BoxLayout(panel, BoxLayout.LINE_AXIS);
 
-        JPanel		subPanel  = new JPanel();
-        BoxLayout	subLayout = new BoxLayout(subPanel, BoxLayout.PAGE_AXIS);
+        JPanel		informationPanel  = new JPanel();
+        JPanel previewPanel = new JPanel();
+        
+        BoxLayout	subLayout = new BoxLayout(informationPanel, BoxLayout.PAGE_AXIS);
+        
+        int borderPadding = 10;
+        Border paddingBorder = BorderFactory.createEmptyBorder(borderPadding, borderPadding, borderPadding, borderPadding);
 
-        blockMapImagePanel = new BlockMapImagePanel(getModel());
+        blockMapImagePanel = new BlockMapImagePanel(getModel());        
         patchImagePanel    = new PatchImagePanel(getModel());
+        patchInformationPanel = new PatchInformationPanel(getModel());
 
-        subPanel.add(label);
-        subPanel.add(blockMapImagePanel);
-        subPanel.setLayout(subLayout);
+        //subPanel.add(label);
+        informationPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+        informationPanel.add(blockMapImagePanel);
+        informationPanel.add(patchInformationPanel);
+        informationPanel.setLayout(subLayout);
 
-        panel.add(patchImagePanel);
+        previewPanel.add(patchImagePanel);
+        
+        int patchPreviewSize =  getModel().getPatchPreviewSize();
+        Dimension previewDimension = new Dimension(patchPreviewSize,patchPreviewSize);
+        
+//        previewPanel.setMaximumSize(new Dimension(patchPreviewSize,patchPreviewSize));
+        previewPanel.setPreferredSize(previewDimension);
+        previewPanel.setSize(previewDimension);
 
-        panel.add(subPanel);
+        panel.add(previewPanel);
+        panel.add(informationPanel);
 
         panel.setLayout(layout);
+        
+//        blockMapImagePanel.setBorder(paddingBorder);
+//        patchImagePanel.setBorder(paddingBorder);
+//        patchInformationPanel.setBorder(paddingBorder);
+        informationPanel.setBorder(paddingBorder);
+        previewPanel.setBorder(paddingBorder);
+//        panel.setBorder(paddingBorder);        
 
-        // createRigidArea(new Dimension(10, 0)));
 
         // Assemble Frame
         
@@ -136,7 +164,7 @@ public class AnalysisStepperView extends AbstractView {
 
         frame.add(panel, BorderLayout.CENTER);
 
-//      frame.setResizable(false);
+        frame.setResizable(false);
         frame.pack();
 
         GraphicsEnvironment	graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -175,6 +203,7 @@ public class AnalysisStepperView extends AbstractView {
 //        if (canvas != null) canvas.updateStep();	// getModel().getBlockState())
         if (patchImagePanel != null) patchImagePanel.update();
         if (blockMapImagePanel != null) blockMapImagePanel.update();
+        if(patchInformationPanel!=null) patchInformationPanel.update();
     }
 
     /**
@@ -280,7 +309,7 @@ public class AnalysisStepperView extends AbstractView {
         public void updateStep() {
 
             // blockState = thisStep.getFinalState();
-            int	dbg = 4;
+            int	dbg = 0;
 
 //
 //          BlockState    blockState = getBlockState();

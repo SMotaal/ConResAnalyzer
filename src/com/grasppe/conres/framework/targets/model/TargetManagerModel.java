@@ -107,11 +107,16 @@ public class TargetManagerModel extends AbstractModel {
      */
     public void setActiveBlock(GridBlock activeBlock) {
         try {
-
-            getActiveTarget().setActiveBlock(activeBlock);
-            if (activeBlock!=null) getController().loadImage();
+        	if (activeBlock==null) {
+        		if (getActiveTarget()!=null) getActiveTarget().setActiveBlock(null);
+        	}
+        	getActiveTarget().setActiveBlock(activeBlock);        		
+//        	if (activeBlock!=null && getActiveTarget()!=null) {
+//        		if (activeBlock != getActiveTarget())
+//        	}
+//            if (activeBlock!=null) getController().loadImage();
         } catch (Exception exception) {
-        	GrasppeKit.debugText("Active Block Update Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Updating Active Block", exception, 2);
         }
 
         notifyObservers();
@@ -144,7 +149,7 @@ public class TargetManagerModel extends AbstractModel {
                 }
             }
         } catch (Exception exception) {
-        	GrasppeKit.debugText("Active Target Update Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Updating Active Target", exception, 2);
         }
 
         if (updated) notifyObservers();

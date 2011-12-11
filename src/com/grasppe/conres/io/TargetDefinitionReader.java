@@ -79,19 +79,19 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         reader = in;
     }
 
-    /**
-     * @param args
-     * @throws Exception
-     * @throws FileNotFoundException
-     */
-    public static void main(String[] args) throws FileNotFoundException, Exception {
-        String	path =
-            "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U.log";
-        TargetDefinitionFile	file   = new TargetDefinitionFile(path);
-        TargetDefinitionReader	reader = new TargetDefinitionReader(file);
-
-        System.out.println(file);
-    }
+//    /**
+//     * @param args
+//     * @throws Exception
+//     * @throws FileNotFoundException
+//     */
+//    public static void main(String[] args) throws FileNotFoundException, Exception {
+//        String	path =
+//            "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U.log";
+//        TargetDefinitionFile	file   = new TargetDefinitionFile(path);
+//        TargetDefinitionReader	reader = new TargetDefinitionReader(file);
+//
+//        System.out.println(file);
+//    }
 
     /**
      * @param lines
@@ -125,7 +125,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         file.setFiducials(fiducials);
 
-        System.out.println("Fiducials:\t" + fiducials.toString());
+//        System.out.println("Fiducials:\t" + fiducials.toString());
     }
 
     /**
@@ -240,7 +240,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         file.setMeasurements(measurements);
 
-        System.out.println("Measurements:\t" + measurements);
+//        System.out.println("Measurements:\t" + measurements);
 
     }
 
@@ -267,7 +267,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             exception.printStackTrace();
         }
 
-        System.out.println("Nlevels:\t" + nLevels.toString());
+//        System.out.println("Nlevels:\t" + nLevels.toString());
     }
 
     /**
@@ -290,7 +290,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         String	name = lines.get(1).trim();
 
         file.setName(name);
-        System.out.println("Target Name:\t" + lines.get(1).trim());
+//        System.out.println("Target Name:\t" + lines.get(1).trim());
     }
 
     /**

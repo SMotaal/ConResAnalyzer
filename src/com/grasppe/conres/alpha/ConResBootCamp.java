@@ -19,7 +19,7 @@ import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
-import com.grasppe.lure.framework.StopWatch;
+import com.sun.snippets.StopWatch;
 
 import ij.IJ;
 
@@ -479,20 +479,6 @@ public class ConResBootCamp implements PlugIn, GrasppeEventHandler {
      */
     public void createAnalyzerMenu() {
         if (analyzer == null) analyzer = new ConResAnalyzer();
-
-        /* Static Variables */
-
-        /* Static Members */
-        WindowListener	windowListener = TestingListeners.WindowEventListener;
-
-        /* Local Variables */
-        ConResAnalyzerModel	analyzerModel = analyzer.getModel();
-        ConResAnalyzerView	analyzerView  = new ConResAnalyzerView(analyzer);
-
-        /* Test Statements */
-        analyzerView.prepareView(windowListener);
-
-        /* Static Updates */
 
     }
 

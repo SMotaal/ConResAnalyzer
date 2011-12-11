@@ -106,9 +106,15 @@ public class CornerSelector extends AbstractController {
             getSelectorView().clearBlockPoints();
             getTargetManager().loadPatchCenterROIs(this);
         }  catch (Exception exception) {
-        	GrasppeKit.debugText("Show Corner Selector Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Displaying Corner Selector", exception, 5);
         }
     }
+    
+//    /**
+//     */
+//    public void refereshSelectorView() {
+//    	
+//    }
 
     /**
      *  @param xCoordinates
@@ -183,6 +189,10 @@ public class CornerSelector extends AbstractController {
      *  (non-Javadoc)
      * @see com.grasppe.lure.components.AbstractController#update()
      */
+    
+    public void hideSelectorView() {
+    	getSelectorView().setVisible(false);
+    }
 
     /**
      */
@@ -191,25 +201,21 @@ public class CornerSelector extends AbstractController {
 
         ConResBlock activeBlock =  getTargetManager().getModel().getActiveBlock();
         
-        if (activeBlock==null)
-			getSelectorView().setVisible(false);
         
         try {
-        	
-        	if (getModel().getImagePlus()==null)
-        		getSelectorView().setVisible(false);
-        	
-        	if (getSelectorView().getImageWindow().getImagePlus() != getModel().getImagePlus())
+        	if (activeBlock==null  || getModel().getImagePlus()==null)
+        		hideSelectorView();
+        } catch (Exception exception) {}
+        
+        if (getModel().getTargetImageFile()!=getBlockImage())
+        	if (getSelectorView().getImageWindow()!=null && getSelectorView().getImageWindow().isVisible())
         		showSelectorView();
-        		        	
-        } catch (Exception exception) {
-        	
-        }
 
     	if (getBlockImage()!=null)
     		getModel().setTargetImageFile(getBlockImage());
     	else
     		getModel().setTargetImageFile(null);
+    	
     	
         super.update();
     }
@@ -267,8 +273,10 @@ public class CornerSelector extends AbstractController {
     public PatchSetROI getPatchSetROI() {
         try {
             if (!isSelectionValid()) getTargetManager().loadPatchCenterROIs(this);
+        } catch (FileNotFoundException exception) {
+        	GrasppeKit.debugError("Loading ROI File", exception, 5);
         } catch (Exception exception) {
-        	GrasppeKit.debugText("Load ROI Error", exception.getMessage(), 2);
+        	GrasppeKit.debugError("Loading ROI File", exception, 2);
         }
 
         if (isSelectionValid()) return getModel().getPatchSetROI();
