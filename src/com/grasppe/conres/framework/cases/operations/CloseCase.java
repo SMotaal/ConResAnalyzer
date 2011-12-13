@@ -9,6 +9,7 @@
 package com.grasppe.conres.framework.cases.operations;
 
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
+import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.GrasppeKit;
 
 import ij.IJ;
@@ -32,6 +33,13 @@ public class CloseCase extends CaseManagerCommand {
     protected boolean				isCaseClosed   = true;
     protected boolean				backgroundMode = false;
     protected static final String description = "Close the current case.";
+    protected static final String type = Types.FILE;
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
     /**
      * Constructs a realization of AbstractCommand.

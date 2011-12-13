@@ -20,6 +20,7 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
@@ -32,7 +33,19 @@ import javax.swing.Action;
  */
 public class AbstractCommand extends AbstractAction implements Observer, Observable {
 
-    protected ActionListener		actionListener;
+    /**
+	 * @return the commandGrouping
+	 */
+	public String getMenuGrouping() {
+		if (commandGrouping==null && model!=null) return model.getClass().getSimpleName(); //.toLowerCase();
+		if (commandGrouping==null && actionListener!=null) return actionListener.getClass().getSimpleName(); //.toLowerCase();
+		if (commandGrouping==null) return "";
+		return commandGrouping;
+	}
+	
+	
+
+	protected ActionListener		actionListener;
     protected boolean				executable = false;
     protected boolean				executed   = false;
     protected boolean				executing  = false;
@@ -42,6 +55,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     protected Observers				observers = new Observers(this);
     protected KeyEvent				keyEvent;
     protected String				description = "";
+    protected String				commandMenu        = null;
+    protected String	commandGrouping = null;
     int								dbg         = 0;
 
 //  protected GrasppeKit        grasppeKit     = GrasppeKit.getInstance();
@@ -182,42 +197,41 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     /**
      * Called by the actionListener, following a call to actionPerformed(). Returns false if performCommand() or complete() return false.
      * @return  true if actions completed successfully!
-     * @throws ExecutionException 
+     * @throws ExecutionException
      */
     public final boolean execute() throws ExecutionException {
-            if (executing) return false;
-            if (hasExecuted()) return false;
-            if (!canExecute()) update();
-            if (!canExecute())
-                throw new IllegalStateException(getName()
-                    + " could not execute in its current state.");
-            GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()),
-                                 dbg);
+        if (executing) return false;
+        if (hasExecuted()) return false;
+        if (!canExecute()) update();
+        if (!canExecute())
+            throw new IllegalStateException(getName() + " could not execute in its current state.");
+        GrasppeKit.debugText("Command Execution Started", GrasppeKit.lastSplit(toString()), dbg);
 
-            try {
-                executing = true;
+        try {
+            executing = true;
 
-                if (!perfomCommand() ||!completed()) {
-                    update();
-                    throw new InternalError(
-                        this.getName()
-                        + " failed to complete successfully due to an internal error.");
-                }
-
-                executing = false;
-                executed  = true;
-                GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()),
-                                     dbg);
-
-            } catch (Exception exception) {
-            	executing = false;
-            	executed  = false;
-            	String	name = GrasppeKit.humanCase(getName(), true);
-//            	ExecutionException executionException = new ExecutionException(exception.getClass().getSimpleName() + " - " + exception.getMessage() + " - " + GrasppeKit.lastSplit(toString()), exception);
-//            	GrasppeKit.debugError("Executing " + name, executionException, 2);
-            	GrasppeKit.debugError("Executing " + name, exception, 4);
-            	return false;
+            if (!perfomCommand() ||!completed()) {
+                update();
+                throw new InternalError(
+                    this.getName() + " failed to complete successfully due to an internal error.");
             }
+
+            executing = false;
+            executed  = true;
+            GrasppeKit.debugText("Command Execution Ends", GrasppeKit.lastSplit(toString()), dbg);
+
+        } catch (Exception exception) {
+            executing = false;
+            executed  = false;
+
+            String	name = GrasppeKit.humanCase(getName(), true);
+
+//          ExecutionException executionException = new ExecutionException(exception.getClass().getSimpleName() + " - " + exception.getMessage() + " - " + GrasppeKit.lastSplit(toString()), exception);
+//          GrasppeKit.debugError("Executing " + name, executionException, 2);
+            GrasppeKit.debugError("Executing " + name, exception, 4);
+
+            return false;
+        }
 
         return executed;
     }
@@ -228,11 +242,13 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      */
     public final boolean execute(KeyEvent e) {
         setKeyEvent(e);
+
         try {
-        	execute();
+            execute();
         } catch (Exception exception) {
             GrasppeKit.debugError("Executing " + GrasppeKit.lastSplit(toString()), exception, 4);
         }
+
         setKeyEvent();
 
         return executed;
@@ -246,6 +262,8 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     protected void finalize() throws Throwable {
         try {
             model.detachObserver(this);
+            observers.detachObservers();
+            
             GrasppeKit.debugText("Command Finalize/Detatch Succeeded",
                                  model.getClass().getSimpleName() + " is no longer attached to "
                                  + GrasppeKit.lastSplit(toString()), dbg);
@@ -270,11 +288,11 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         canExecute(true);
 
         try {
-        	execute();
+            execute();
         } catch (Exception exception) {
             GrasppeKit.debugError("Executing " + GrasppeKit.lastSplit(toString()), exception, 4);
         }
-        
+
         return executed;
     }
 
@@ -414,7 +432,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     }
 
     /**
-     * Returns the current model. Override this method with a specific model type.
+     * Returns the current model. Override this method with a specific model commandMenu.
      * @return
      */
     public AbstractModel getModel() {
@@ -427,6 +445,13 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the commandMenu
+     */
+    public String getMenuKey() {
+        return null;
     }
 
     /**
@@ -470,5 +495,31 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         this.model = model;
         useModel   = true;
         update();
+    }
+
+    /**
+     * Class description
+     *  @version        $Revision: 1.0, 11/12/11
+     *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public static class Types {
+
+        /** Field description */
+        public static final String	FILE = "file";
+
+        /** Field description */
+        public static final String	EDIT = "edit";
+
+        /** Field description */
+        public static final String	VIEW = "view";
+
+        /** Field description */
+        public static final String	TOOLS = "tools";
+
+        /** Field description */
+        public static final String	WINDOW = "window";
+
+        /** Field description */
+        public static final String	HELP = "help";
     }
 }

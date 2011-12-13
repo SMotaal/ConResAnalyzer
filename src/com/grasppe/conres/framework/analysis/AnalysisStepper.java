@@ -11,6 +11,7 @@
 package com.grasppe.conres.framework.analysis;
 
 import com.grasppe.conres.analyzer.ConResAnalyzer;
+import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.analysis.stepping.BlockMap;
@@ -80,7 +81,7 @@ public class AnalysisStepper extends AbstractController {
      * @param keyCode
      * @param keyModifiers
      */
-    public void BlockStepKey(int keyCode, int keyModifiers) {		// SteppingStrategy thisStep) {
+    public boolean BlockStepKey(int keyCode, int keyModifiers) {		// SteppingStrategy thisStep) {
 
         SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
         SteppingStrategy	thisStep   = new StepNext(smartState);
@@ -126,7 +127,7 @@ public class AnalysisStepper extends AbstractController {
 
             break;
 
-        case KeyEvent.VK_A :
+        case KeyEvent.VK_W :
             if (keyModifiers == 0) thisStep = new SetAndStep(smartState, 1);
 
             break;
@@ -137,17 +138,15 @@ public class AnalysisStepper extends AbstractController {
             break;
 
         default :
-            return;
+            return false;
         }
 
         if (goBack) {
             if (!getModel().getHistory().isEmpty()) {
                 thisStep = new StepBack(smartState, getModel().getHistory());
                 getModel().getHistory().remove(getModel().getHistory().size() - 1);
-            } else
-                return;
-
-            snapState = false;
+                snapState = false;
+            }
         }
 
         if (snapState) {
@@ -161,6 +160,8 @@ public class AnalysisStepper extends AbstractController {
         thisStep.execute();
 
         setNewBlockState(thisStep.getFinalState());
+        
+        return true;
     }
 
     /**
@@ -319,7 +320,7 @@ public class AnalysisStepper extends AbstractController {
 
         try {
 
-            // Determine the type of transparency of the new buffered image
+            // Determine the commandMenu of transparency of the new buffered image
             int	transparency = Transparency.OPAQUE;
 
             if (hasAlpha) {
@@ -384,12 +385,27 @@ public class AnalysisStepper extends AbstractController {
 
             return;
         }
+        
+        ConResBlock modelBlock = getModel().getActiveBlock();
 
-        if (getModel().getActiveBlock() == activeBlock) return;
+        if (modelBlock!=null && modelBlock == activeBlock) return;
+//        if (modelBlock!=null && modelBlock != activeBlock) {
 
         setScratchEnabled(false);
 
-        getStepperView().setVisible(false);
+//        getStepperView().setVisible(false);
+        try {
+        	getStepperView().setVisible(false);
+            detachView(stepperView);
+			getStepperView().finalize();
+		} catch (Throwable exception) {
+			if (exception instanceof Exception) {
+				GrasppeKit.debugError("Finalizing Stepper View", (Exception)exception, 2);
+			}
+		}
+        
+        stepperView          = new AnalysisStepperView(this);
+        attachView(stepperView);
 
         getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
 
@@ -399,6 +415,8 @@ public class AnalysisStepper extends AbstractController {
         int			firstColumn  = getTargetManager().getFirstColumnIndex();
 
         BlockState	blockState   = new BlockState(blockRows, blockColumns, firstColumn);	// , BlockState.fudgeMap1());
+        blockState.setColumn(0);
+        blockState.setRow(0);
 
         loadBlockFiles(blockState);
         setNewBlockState(blockState);
@@ -409,9 +427,24 @@ public class AnalysisStepper extends AbstractController {
         }
 
         setScratchEnabled(true);
+//        }
+        
+        //AnalysisStepperModel model = getModel();
+        getStepperView().update();
+        updatePatchPreviews(); //getModel().getActivePatch().getPatchRow(),getModel().getActivePatch().getPatchColumn());
+//        getStepperView().update();
 
     }
 
+    /**
+     *  @param row
+     *  @param column
+     */
+    public void updatePatchPreviews() {
+    	try {
+    		updatePatchPreviews(getModel().getActivePatch().getPatchRow(), getModel().getActivePatch().getPatchColumn());
+    	} catch (Exception exception) {}
+    }
     /**
      *  @param row
      *  @param column
@@ -426,10 +459,12 @@ public class AnalysisStepper extends AbstractController {
             }
 
             Image		patchImage = getTargetManager().getPatchImage(row, column);
-            BlockMap	blockMap   = new BlockMap(getModel().getBlockState());
-
             getModel().setPatchImage(patchImage);
+            
+            BlockMap	blockMap   = new BlockMap(getModel().getBlockState());
             getModel().setImage(blockMap.getImage());
+            
+            pushUpdates();
         } catch (Exception exception) {
             GrasppeKit.debugError("Updating Patch Preview", exception, 2);
         }
@@ -459,7 +494,7 @@ public class AnalysisStepper extends AbstractController {
     /**
      * @return the analyzer
      */
-    protected ConResAnalyzer getAnalyzer() {
+    public ConResAnalyzer getAnalyzer() {
         return getAnalysisManager().getAnalyzer();
     }
 
@@ -501,8 +536,8 @@ public class AnalysisStepper extends AbstractController {
             if (newState == null) {
                 getModel().setActivePatch(null);
                 getModel().setBlockState(null);
-                updatePatchPreviews(-1, -1);
-                pushUpdates();
+//                updatePatchPreviews(-1, -1);
+//                pushUpdates();
             } else {
                 getModel().setBlockState(newState);
 
@@ -515,7 +550,7 @@ public class AnalysisStepper extends AbstractController {
                 ConResPatch	patchModel = getTargetManager().getPatch(row, column);
 
                 getModel().setActivePatch(patchModel);
-                updatePatchPreviews(row, column);
+                updatePatchPreviews(patchModel.getPatchRow(), patchModel.getPatchColumn()); //row, column);
 
                 pushUpdates();
             }

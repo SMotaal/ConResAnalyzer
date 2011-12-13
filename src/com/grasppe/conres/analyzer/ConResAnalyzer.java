@@ -33,7 +33,16 @@ import java.util.LinkedHashMap;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-    /* (non-Javadoc)
+    /**
+	 * @return the managers
+	 */
+	public AbstractController[] getManagers() {
+		return managers;
+	}
+
+
+
+	/* (non-Javadoc)
 	 * @see com.grasppe.lure.components.AbstractController#getView()
 	 */
 	@Override
@@ -97,7 +106,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     @Override
     public void createCommands() {
-        putCommand(new Quit(this));
+        //putCommand(new Quit(this));
     }
 
     /**

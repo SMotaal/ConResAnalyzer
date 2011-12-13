@@ -9,6 +9,7 @@
 package com.grasppe.conres.framework.cases.operations;
 
 import com.grasppe.conres.framework.cases.CaseManager;
+import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -26,6 +27,13 @@ public class NewCase extends CaseManagerCommand {
     protected static final String	name        = "NewCase";
     protected static final int		mnemonicKey = KeyEvent.VK_N;
     protected static final String description = "Open a new case from a folder with a scanned images and a target definition file.";
+    protected static final String type = Types.FILE;
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
     int dbg = 0;
 
     /**

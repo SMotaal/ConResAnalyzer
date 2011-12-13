@@ -10,6 +10,7 @@ package com.grasppe.conres.framework.targets.operations;
 
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
+import com.grasppe.lure.components.AbstractCommand.Types;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -26,7 +27,14 @@ public class SelectBlock extends TargetManagerCommand {
     protected static final String	name        = "SelectBlock";
     protected static final int		mnemonicKey = KeyEvent.VK_B;
     protected static final String description = "Select a target block to work with.";
-
+    protected static final String type = "block";
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
+	
     /**
      */
     private TargetManager	controller;

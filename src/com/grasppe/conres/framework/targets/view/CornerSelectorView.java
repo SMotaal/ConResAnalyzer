@@ -8,6 +8,8 @@
 
 package com.grasppe.conres.framework.targets.view;
 
+import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
+import com.grasppe.conres.framework.imagej.ImageJPanel;
 import com.grasppe.conres.framework.imagej.MagnifierCanvas;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.TargetManager;
@@ -35,6 +37,7 @@ import ij.plugin.PlugIn;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -56,6 +59,7 @@ import javax.media.jai.WarpPolynomial;
 import javax.naming.directory.InvalidAttributesException;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -68,10 +72,26 @@ public class CornerSelectorView extends AbstractView
         implements PlugIn, GrasppeEventHandler, MouseListener, MouseWheelListener,
                    MouseMotionListener {
 
-    protected static String	name = CornerSelectorView.class.getSimpleName();
+    /**
+	 * @return the imagePanel
+	 */
+	public ImageJPanel getImagePanel() {
+		return imagePanel;
+	}
+
+	/**
+	 * @param imagePanel the imagePanel to set
+	 */
+	public void setImagePanel(ImageJPanel imagePanel) {
+		this.imagePanel = imagePanel;
+	}
+
+	protected static String	name = CornerSelectorView.class.getSimpleName();
 
     /** ImageWindow with scaled down image */
-    public ImageWindow	imageWindow;
+    public JPanel	imageWindow;
+       
+    public ImageJPanel imagePanel;
 
     /** ZoomWindow with enlarged image at center relative ImageWindow position */
     public MagnifierCanvas	zoomCanvas;
@@ -120,11 +140,24 @@ public class CornerSelectorView extends AbstractView
      *  @param pointY
      */
     private void addBlockVertex(int pointX, int pointY) {
-        if (blockPointCount() == 0)
-            getModel().setBlockROI(new BlockROI(getImageCanvas().screenX(pointX),
-                getImageCanvas().screenY(pointY), getImageWindow().getImagePlus()));
-        else if (blockPointCount() < 3)
-                 getModel().setBlockROI(getModel().getBlockROI().addPoint(pointX, pointY));
+    	int dbg = 2;
+    	try {
+//    		ImageCanvas imageCanvas = getImageCanvas();
+//    		ImagePlus imagePlus = getImagePlus();
+//    		int roiX = imageCanvas.screenX(pointX);
+//    		int roiY = imageCanvas.screenY(pointY);
+//        if (blockPointCount() == 0)
+//            getModel().setBlockROI(new BlockROI(roiX,
+//            		roiY, imagePlus));
+//        else
+    		if (blockPointCount() == 0) {
+//    			pointX = imageCanvas.screenX(pointX);
+//    			pointY = imageCanvas.screenY(pointY);
+//    			ImagePlus imagePlus = getImagePlus();
+    			BlockROI blockROI = new BlockROI(pointX,pointY);
+    			getModel().setBlockROI(blockROI);
+    		} else if (blockPointCount() < 3)
+                getModel().setBlockROI(getModel().getBlockROI().addPoint(pointX, pointY));
         else return;
 
         GrasppeKit.debugText("CornerSelector - Add Point", pointString(getModel().getBlockROI()),
@@ -133,6 +166,10 @@ public class CornerSelectorView extends AbstractView
         setOverlayROI(getModel().getBlockROI());
 
         notifyObservers();
+    	} catch (Exception exception) {
+    		GrasppeKit.debugError("Adding Block Vertex", new Exception("Could not add block vertex at " + pointX +", " + pointY + ". ", exception),3);
+    		GrasppeKit.debugError("Adding Block Vertex", exception, 3);
+    	}
     }
 
     /**
@@ -149,10 +186,7 @@ public class CornerSelectorView extends AbstractView
     /**
      */
     public void attachMouseListeners() {
-        ImageWindow	imageWindow = getImageWindow();
-
-//      imageWindow.getCanvas().addMouseListener(this);
-        imageWindow.getCanvas().addMouseListener(new MouseAdapter() {
+        getImageCanvas().addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -163,8 +197,8 @@ public class CornerSelectorView extends AbstractView
             }
 
         });
-        imageWindow.getCanvas().addMouseMotionListener(this);
-        imageWindow.getCanvas().addMouseWheelListener(this);
+        getImageCanvas().addMouseMotionListener(this);
+        getImageCanvas().addMouseWheelListener(this);
 
     }
 
@@ -172,8 +206,9 @@ public class CornerSelectorView extends AbstractView
      *  @return
      */
     private int blockPointCount() {
-        if (getModel().getBlockROI() == null) return 0;
-        else return getModel().getBlockROI().getNCoordinates();
+    	BlockROI blockROI = getModel().getBlockROI();
+        if (blockROI == null) return 0;
+        else return blockROI.getNCoordinates();
     }
 
     /**
@@ -449,51 +484,51 @@ public class CornerSelectorView extends AbstractView
      * @param y
      */
     public void moveFrame(int x, int y) {
-
-        if (zoomLock) return;
-
-        if (canMagnifyPatch()) {
-            if (getZoomWindow() == null) return;
-
-            JFrame		zoomWindow  = getZoomWindow();
-            ImageWindow	imageWindow = getImageWindow();
-            PointRoi	pointROI    = getModel().getOverlayROI();
-
-            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
-                    y - imageWindow.getY());
-
-            int	mX = 100;		// imageWindow.getCanvas().
-            int	mY = 100;
-
-            // zoomWindow.setLocation(xCenter, yCoordinates);
-
-            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
-
-            zoomLock = true;
-
-            redrawFrame();
-
-            return;
-        } else {
-
-            updateMagnifier();
-
-            if (getZoomWindow() == null) return;
-
-            JFrame		zoomWindow  = getZoomWindow();
-            ImageWindow	imageWindow = getImageWindow();
-
-            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
-                    y - imageWindow.getY());
-
-            // Sets visible and returns updated zoomWindow.isVisible()
-
-            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
-
-            if (!isShowZoom()) return;
-
-            redrawFrame();
-        }
+//
+//        if (zoomLock) return;
+//
+//        if (canMagnifyPatch()) {
+//            if (getZoomWindow() == null) return;
+//
+//            JFrame		zoomWindow  = getZoomWindow();
+//            ImageWindow	imageWindow = getImageWindow();
+//            PointRoi	pointROI    = getModel().getOverlayROI();
+//
+//            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
+//                    y - imageWindow.getY());
+//
+//            int	mX = 100;		// imageWindow.getCanvas().
+//            int	mY = 100;
+//
+//            // zoomWindow.setLocation(xCenter, yCoordinates);
+//
+//            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+//
+//            zoomLock = true;
+//
+//            redrawFrame();
+//
+//            return;
+//        } else {
+//
+//            updateMagnifier();
+//
+//            if (getZoomWindow() == null) return;
+//
+//            JFrame		zoomWindow  = getZoomWindow();
+//            ImageWindow	imageWindow = getImageWindow();
+//
+//            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
+//                    y - imageWindow.getY());
+//
+//            // Sets visible and returns updated zoomWindow.isVisible()
+//
+//            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+//
+//            if (!isShowZoom()) return;
+//
+//            redrawFrame();
+//        }
     }
 
     /**
@@ -538,35 +573,51 @@ public class CornerSelectorView extends AbstractView
      */
     public void prepareImageWindow(ImageFile imageFile) {
 
-        try {
-//        	getController().LoadImage();
-        	
+        try {      	
         	ImagePlus imagePlus = getModel().getImagePlus();
         	
-            setImageWindow(new ImageWindow(imagePlus));
-            getImageWindow().getCanvas().fitToWindow();
-            getImageWindow().setExtendedState(Frame.MAXIMIZED_BOTH);
-//            clearBlockPoints();
+        	imageWindow = new JPanel(new BorderLayout());
+        	        	
+        	imagePanel = new ImageJPanel(imagePlus);
+        	
+        	imageWindow.add(imagePanel, BorderLayout.CENTER);
+        	
+        	imageWindow.addComponentListener(imagePanel);
+        	
+        	imagePanel.setFitImage(true);
+        	
+        	imagePanel.setBounds(0, 0, 120, 120);
+        	
+        	getParentView().setContainer(imageWindow);
+        	
+        	imagePanel.updateSize();
+
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
     }
+    
+    public ConResAnalyzerView getParentView() {
+    	if (getController()==null) return null;
+    	if (getController().getAnalyzer()==null) return null;
+    	return getController().getAnalyzer().getView();
+    }
 
     /**
      */
     public void prepareMagnifier() {
-        prepareMagnifierFrame();
-
-        JFrame				frame          = getZoomWindow();
-        ImageWindow			imageWindow    = getImageWindow();
-        MouseMotionListener	motionListener = this;		// CornerSelectorListeners.IJMotionListener;
-
-        frame.addMouseMotionListener(motionListener);
-        frame.addMouseListener(this);
-        imageWindow.getCanvas().addMouseMotionListener(motionListener);
-
-        /* Static Updates */
+//        prepareMagnifierFrame();
+//
+//        JFrame				frame          = getZoomWindow();
+//        ImageWindow			imageWindow    = getImageWindow();
+//        MouseMotionListener	motionListener = this;		// CornerSelectorListeners.IJMotionListener;
+//
+//        frame.addMouseMotionListener(motionListener);
+//        frame.addMouseListener(this);
+//        imageWindow.getCanvas().addMouseMotionListener(motionListener);
+//
+//        /* Static Updates */
     }
 
     /**
@@ -583,7 +634,7 @@ public class CornerSelectorView extends AbstractView
 
         getZoomWindow().setBackground(Color.black);
 
-        MagnifierCanvas	zoomCanvas = new MagnifierCanvas(getImageWindow().getImagePlus());
+        MagnifierCanvas	zoomCanvas = new MagnifierCanvas(getImagePlus());
 
         zoomCanvas.addMouseListener(this);			// CornerSelectorListeners.IJMouseListener);
         zoomCanvas.addMouseMotionListener(this);	// CornerSelectorListeners.IJMotionListener);
@@ -613,7 +664,7 @@ public class CornerSelectorView extends AbstractView
         GrasppeKit.debugText("Zoom Frame", "Frame " + getZoomWindow().getBounds().toString(), dbg);
         GrasppeKit.debugText("Zoom Frame", "Zoom Canvas " + zoomCanvas.getBounds().toString(), dbg);
 
-        double	windowZoom = getImageWindow().getCanvas().getMagnification();
+        double	windowZoom = getImageCanvas().getMagnification();
 
         zoomCanvas.setMagnification(windowZoom * 2.0);
 
@@ -629,113 +680,113 @@ public class CornerSelectorView extends AbstractView
     /**
      */
     public void redrawFrame() {
-        if (getZoomWindow() == null) return;
-
-        if (!getZoomWindow().isVisible()) return;		// {Testing.zoomWindow.setVisible(false); return;}
-
-        ImageWindow	imageWindow  = getImageWindow();
-        ImageCanvas	imageCanvas  = imageWindow.getCanvas();
-        JFrame		zoomWindow   = getZoomWindow();
-
-        Point		zoomWindowLocation,
-					zoomLocation = null;
-
-        if (zoomWindow.isVisible()) {
-            zoomWindowLocation = zoomWindow.getLocationOnScreen();		// Location
-            zoomLocation       = zoomCanvas.getLocationOnScreen();		// Location on
-        }
-
-        Point	zoomPosition = zoomCanvas.getLocation();	// Position within
-
-        // component
-        Dimension	zoomSize            = zoomCanvas.getSize();
-        Double		zoomScale           = zoomCanvas.getMagnification();
-
-        Point		imageWindowLocation = imageWindow.getLocationOnScreen();
-        Point		imageLocation       = imageCanvas.getLocationOnScreen();
-        Point		imagePosition       = imageCanvas.getLocation();
-        Dimension	imageSize           = imageCanvas.getSize();
-        Double		imageScale          = imageCanvas.getMagnification();
-
-        Point		pointerCenter       = null,
-					sourceCenter        = null;
-
-        try {
-            if (canMagnifyPatch()) {
-                int			pI        = getModel().getMagnifyPatchIndex();
-
-                PointRoi	pointROI  = getModel().getOverlayROI();
-
-                int			pX        = pointROI.getXCoordinates()[pI];
-                int			pY        = pointROI.getYCoordinates()[pI];
-
-                Rectangle	roiBounds = pointROI.getBounds();
-
-                double		rX        = roiBounds.getX();
-                double		rY        = roiBounds.getY();
-
-                int			fX        = round(rX + pX);
-                int			fY        = round(rY + pY);
-
-                pointerCenter = new Point(fX, fY);
-
-                sourceCenter  = pointerCenter;
-
-                String	debugString = "Patch #" + pI + "-"
-                                     + GrasppeKit.lastSplit(pointerCenter.toString());
-
-                GrasppeKit.debugText("Magnifier", debugString, dbg);
-
-            } else {
-
-                /* Pointer Center: pointer location in image canvas in screen units */
-                if (zoomWindow.isVisible()) {
-                    pointerCenter = zoomCanvas.getMousePosition();
-                    pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
-                                              zoomLocation.y - imageLocation.y + pointerCenter.y);
-                } else
-                    pointerCenter = imageCanvas.getMousePosition();
-
-                sourceCenter = new Point(round(pointerCenter.x / imageScale),
-                                         round(pointerCenter.y / imageScale));
-
-            }
-        } catch (Exception exception) {
-            zoomWindow.setVisible(false);
-            pointerCenter = null;
-        }
-
-        if (pointerCenter == null) return;
-
-        // if (!zoomWindow.isVisible()) zoomWindow.setVisible(true);
-
-        /*
-         * Source Center: pointer location in source coordinate space in source
-         * units
-         */
-
-        /* Source Size: source rectangle size in source units */
-        Dimension	sourceSize = new Dimension(round(zoomSize.width / zoomScale),
-                                   round(zoomSize.height / zoomScale));
-
-        /* Source Corner: source rectangle top-left in source units */
-        Point	sourceCorner = new Point((sourceCenter.x - sourceSize.width / 2),
-                                       (sourceCenter.y - sourceSize.height / 2));
-
-        /* Source Rectangle: source rectangle in source units */
-        Rectangle	sourceRectangle = new Rectangle(sourceCorner, sourceSize);
-
-        String		debugString     = "";
-
-        debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
-        debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
-        debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
-
-        GrasppeKit.debugText("Magnifier", debugString, dbg);
-
-        zoomCanvas.setSourceRect(sourceRectangle);
-
-        zoomCanvas.repaint(0, 0, zoomSize.width, zoomSize.height);
+//        if (getZoomWindow() == null) return;
+//
+//        if (!getZoomWindow().isVisible()) return;		// {Testing.zoomWindow.setVisible(false); return;}
+//
+//        ImageWindow	imageWindow  = getImageWindow();
+//        ImageCanvas	imageCanvas  = imageWindow.getCanvas();
+//        JFrame		zoomWindow   = getZoomWindow();
+//
+//        Point		zoomWindowLocation,
+//					zoomLocation = null;
+//
+//        if (zoomWindow.isVisible()) {
+//            zoomWindowLocation = zoomWindow.getLocationOnScreen();		// Location
+//            zoomLocation       = zoomCanvas.getLocationOnScreen();		// Location on
+//        }
+//
+//        Point	zoomPosition = zoomCanvas.getLocation();	// Position within
+//
+//        // component
+//        Dimension	zoomSize            = zoomCanvas.getSize();
+//        Double		zoomScale           = zoomCanvas.getMagnification();
+//
+//        Point		imageWindowLocation = imageWindow.getLocationOnScreen();
+//        Point		imageLocation       = imageCanvas.getLocationOnScreen();
+//        Point		imagePosition       = imageCanvas.getLocation();
+//        Dimension	imageSize           = imageCanvas.getSize();
+//        Double		imageScale          = imageCanvas.getMagnification();
+//
+//        Point		pointerCenter       = null,
+//					sourceCenter        = null;
+//
+//        try {
+//            if (canMagnifyPatch()) {
+//                int			pI        = getModel().getMagnifyPatchIndex();
+//
+//                PointRoi	pointROI  = getModel().getOverlayROI();
+//
+//                int			pX        = pointROI.getXCoordinates()[pI];
+//                int			pY        = pointROI.getYCoordinates()[pI];
+//
+//                Rectangle	roiBounds = pointROI.getBounds();
+//
+//                double		rX        = roiBounds.getX();
+//                double		rY        = roiBounds.getY();
+//
+//                int			fX        = round(rX + pX);
+//                int			fY        = round(rY + pY);
+//
+//                pointerCenter = new Point(fX, fY);
+//
+//                sourceCenter  = pointerCenter;
+//
+//                String	debugString = "Patch #" + pI + "-"
+//                                     + GrasppeKit.lastSplit(pointerCenter.toString());
+//
+//                GrasppeKit.debugText("Magnifier", debugString, dbg);
+//
+//            } else {
+//
+//                /* Pointer Center: pointer location in image canvas in screen units */
+//                if (zoomWindow.isVisible()) {
+//                    pointerCenter = zoomCanvas.getMousePosition();
+//                    pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
+//                                              zoomLocation.y - imageLocation.y + pointerCenter.y);
+//                } else
+//                    pointerCenter = imageCanvas.getMousePosition();
+//
+//                sourceCenter = new Point(round(pointerCenter.x / imageScale),
+//                                         round(pointerCenter.y / imageScale));
+//
+//            }
+//        } catch (Exception exception) {
+//            zoomWindow.setVisible(false);
+//            pointerCenter = null;
+//        }
+//
+//        if (pointerCenter == null) return;
+//
+//        // if (!zoomWindow.isVisible()) zoomWindow.setVisible(true);
+//
+//        /*
+//         * Source Center: pointer location in source coordinate space in source
+//         * units
+//         */
+//
+//        /* Source Size: source rectangle size in source units */
+//        Dimension	sourceSize = new Dimension(round(zoomSize.width / zoomScale),
+//                                   round(zoomSize.height / zoomScale));
+//
+//        /* Source Corner: source rectangle top-left in source units */
+//        Point	sourceCorner = new Point((sourceCenter.x - sourceSize.width / 2),
+//                                       (sourceCenter.y - sourceSize.height / 2));
+//
+//        /* Source Rectangle: source rectangle in source units */
+//        Rectangle	sourceRectangle = new Rectangle(sourceCorner, sourceSize);
+//
+//        String		debugString     = "";
+//
+//        debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
+//        debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
+//        debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
+//
+//        GrasppeKit.debugText("Magnifier", debugString, dbg);
+//
+//        zoomCanvas.setSourceRect(sourceRectangle);
+//
+//        zoomCanvas.repaint(0, 0, zoomSize.width, zoomSize.height);
 
     }
 
@@ -771,14 +822,13 @@ public class CornerSelectorView extends AbstractView
 
         if (getController().getBlockImage() == null) return;
 
-        ImageWindow	imageWindow = getImageWindow();
+//        ImageWindow	imageWindow = getImageWindow();
 
         if (imageWindow != null) {//&& imageWindow.isVisible()) {
             imageWindow.setVisible(false);
-            imageWindow.dispose();
+//            imageWindow.dispose();
         } else {
             GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
-
             eventDispatcher.attachEventHandler(this);
         }
         
@@ -788,10 +838,10 @@ public class CornerSelectorView extends AbstractView
 
         prepareImageWindow(blockImageFile);
 
-        imageWindow = getImageWindow();
+        //imageWindow = getImageWindow();
 
         attachMouseListeners();
-        imageWindow.setVisible(true);
+        setVisible(true);
 
 //      prepareMagnifier();
 
@@ -879,10 +929,10 @@ public class CornerSelectorView extends AbstractView
      */
     private void terminate() throws Throwable {
         JFrame		zoomWindow  = getZoomWindow();
-        ImageWindow	imageWindow = getImageWindow();
+//        ImageWindow	imageWindow = getImageWindow();
 
         if ((zoomWindow != null) && zoomWindow.isDisplayable()) zoomWindow.dispose();
-        if ((imageWindow != null) && imageWindow.isDisplayable()) imageWindow.dispose();
+//        if ((imageWindow != null) && imageWindow.isDisplayable()) imageWindow.dispose();
         super.notifyObservers();
         super.finalize();
     }
@@ -928,7 +978,7 @@ public class CornerSelectorView extends AbstractView
 
             double	currentScale = zoomCanvas.getMagnification();
             double	maxScale     = 1.0;
-            double	minScale     = getImageWindow().getCanvas().getMagnification();
+            double	minScale     = getImageCanvas().getMagnification();
 
             if (plusKey) {
                 zoomCanvas.setMagnification(Math.min(currentScale * 1.25, maxScale));
@@ -984,8 +1034,8 @@ public class CornerSelectorView extends AbstractView
             int			fX        = round(rX + pX);
             int			fY        = round(rY + pY);
 
-            int			gX        = getImageWindow().getCanvas().screenX(fX);
-            int			gY        = getImageWindow().getCanvas().screenX(fY);
+            int			gX        = getImageCanvas().screenX(fX);
+            int			gY        = getImageCanvas().screenX(fY);
 
             GrasppeKit.debugText("ROI Bounds:\tr: (" + roiBounds.getX() + ", " + roiBounds.getY()
                                  + ")\tp: (" + pX + ", " + pY + ")\tf: (" + fX + ", " + fY
@@ -1036,7 +1086,7 @@ public class CornerSelectorView extends AbstractView
 
             case 1 :	// TODO: Add points 1, 2, or 3 and when possible calculate 4 and then the grid
                 if (blockPointCount() < 3) {
-                    addBlockVertex(getMouseCoordinates());
+                    addBlockVertex(getImageCoordinates());
                     if (blockPointCount() == 3) calculateFourthVertex();
                     if (blockPointCount() == 4) calculateAffineGrid();
                 }
@@ -1181,25 +1231,29 @@ public class CornerSelectorView extends AbstractView
     /**
      *  @return
      */
-    private ImageCanvas getImageCanvas() {
-        if (getImageWindow() == null) return null;
+    public ImageCanvas getImageCanvas() {
+        if (getImagePanel() == null) return null;
 
-        return getImageWindow().getCanvas();
+        return getImagePanel().getImageCanvas();
     }
+    
+    
 
     /**
      *  @return
      */
     private ImagePlus getImagePlus() {
-        if (getImageWindow() == null) return null;
+        if (getImageCanvas() == null) return null;
 
-        return getImageWindow().getImagePlus();
+        return getImageCanvas().getImage();
     }
 
     /**
      * @return the image window
      */
-    public ImageWindow getImageWindow() {
+    public JPanel getImageWindow() {
+    	if (imageWindow==null)
+    		run(null); //prepareImageWindow(getController().getBlockImage());
         return imageWindow;
     }
 
@@ -1214,7 +1268,7 @@ public class CornerSelectorView extends AbstractView
     /**
      *  @return
      */
-    private Point getMouseCoordinates() {
+    private Point getImageCoordinates() {
         if ((getImageWindow() == null) ||!getImageWindow().isVisible()) return null;
 
         Point	mousePosition = null;
@@ -1280,13 +1334,6 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * @param imageWindow
-     */
-    public void setImageWindow(ImageWindow imageWindow) {
-        this.imageWindow = imageWindow;
-    }
-
-    /**
      *  @param pointROI
      */
     public void setOverlayROI(PointRoi pointROI) {
@@ -1297,14 +1344,40 @@ public class CornerSelectorView extends AbstractView
         try {
 
             if (getModel().getOverlayROI() != null) {
-                Overlay	overlay = new Overlay(getModel().getOverlayROI());
-
+            	
+            	Polygon roiPolygon = getModel().getOverlayROI().getPolygon();
+            	
+            	Polygon overlayPolygon = new Polygon();
+            	
+            	for (int i = 0; i < roiPolygon.npoints; i ++)
+            		overlayPolygon.addPoint(getImageCanvas().screenX(roiPolygon.xpoints[i]), getImageCanvas().screenY(roiPolygon.ypoints[i]));
+            	
+            	//roiPolygon.
+            	
+                Overlay	overlay = new Overlay(new PointRoi(overlayPolygon)); //getModel().getOverlayROI());
+                
                 overlay.drawNames(true);
                 overlay.drawLabels(true);
-                getImagePlus().setOverlay(overlay);
                 getImagePlus().setHideOverlay(false);		// getImageWindow().repaint();
-            } else
-                getImagePlus().setHideOverlay(true);
+                
+                getImageCanvas().setOverlay(overlay); //getModel().getOverlayROI(), Color.RED, 2, Color.WHITE); //overlay);
+                
+//                new PointRoi overlayROI = new PointRoi(poly);
+//                getImagePlus()
+//                overlay.
+//                getImageCanvas().setOverlay(getImagePlus().getOverlay());
+//                getImageCanvas().setShowAllROIs(true);
+            } else {
+            	getImageCanvas().setOverlay(null);
+//                getImageCanvas().setOverlay(overlay);
+//            	getImageCanvas().setOverlay(null);
+            	
+            }
+//                getImagePlus().setHideOverlay(true);
+            
+            
+            getImageCanvas().setImageUpdated();
+            getImageCanvas().repaint();
 
             GrasppeKit.debugText("CornerSelector - Draw Overlay",
                                  pointString(getModel().getOverlayROI()), dbg);

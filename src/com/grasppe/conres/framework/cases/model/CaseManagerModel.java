@@ -14,6 +14,8 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.io.File;
+import java.io.IOException;
 import java.rmi.UnexpectedException;
 
 /**
@@ -46,7 +48,11 @@ public class CaseManagerModel extends AbstractModel {
         super(controller);
         
         if(GrasppeKit.isRunningJar())  {
-        	defaultChooserPath = getClass().getResource(getClass().getSimpleName()+".class").getPath();
+        	try {
+				defaultChooserPath = new File(".").getCanonicalPath();
+			} catch (IOException e) {
+				defaultChooserPath = ".";
+			}
         }
     }
 

@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.targets.operations;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.lure.components.AbstractCommand.Types;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -27,7 +28,13 @@ public class MarkBlock extends TargetManagerCommand {
     protected static final String	name        = "MarkBlock";
     protected static final int		mnemonicKey = KeyEvent.VK_M;
     protected static final String description = "Visually identify the corner points of a target image.";
-
+    protected static final String type = "block";
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
     /**
      */

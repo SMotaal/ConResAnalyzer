@@ -42,24 +42,6 @@ public class CaseManagerView extends AbstractView implements Observer {
         super(controller);
     }
 
-//  /**
-//   */
-//  @Override
-//  protected void prepareDebugView() {
-//
-//      if (debugPanel != null) return;
-//
-//      createDebugView();
-//
-//      createDebugLabel("currentCase");
-//      createDebugLabel("newCase");
-//      createDebugLabel("backgroundCase");
-//      createDebugLabel("Observers");
-//
-//      super.prepareDebugView();
-//
-//  }
-
     /**
      */
     @Override

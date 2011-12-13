@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.analysis.operations;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.lure.components.AbstractCommand.Types;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -25,9 +26,15 @@ import java.awt.event.KeyEvent;
 public class AnalyzeBlock extends AnalysisCommand {
 
     protected static final String	name        = "AnalyzeBlock";
-    protected static final int		mnemonicKey = KeyEvent.VK_M;
+    protected static final int		mnemonicKey = KeyEvent.VK_A;
     protected static final String description = "Visually evaluate the patches of the current target block.";
-
+    protected static final String type = "block";
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
     /**
      */

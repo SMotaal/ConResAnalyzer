@@ -73,7 +73,7 @@ public class ImageFileReader implements IGrasppeFileReader {
         else if (isPng) readImageInformation();
         else if (isJpg) readImageInformation();
         else throw new IOException("Could not read " + file.getName() + ". File extension " + fileExtension
-                                   + " is not a supported image type.");
+                                   + " is not a supported image commandMenu.");
     }
 
     /**
@@ -234,7 +234,7 @@ public class ImageFileReader implements IGrasppeFileReader {
          *  @param index
          * @param name
          * @param value
-         * @param type
+         * @param commandMenu
          * @param length
          */
         public SanselanImageTag(int index, String name, Object value, String type, int length) {

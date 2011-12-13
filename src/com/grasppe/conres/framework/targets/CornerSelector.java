@@ -8,6 +8,7 @@
 
 package com.grasppe.conres.framework.targets;
 
+import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
@@ -23,6 +24,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Container;
 import java.io.FileNotFoundException;
 
 import java.util.Arrays;
@@ -42,6 +44,8 @@ public class CornerSelector extends AbstractController {
 
     /** Field description */
     public TargetManager	targetManager = null;
+    
+    private ConResAnalyzer analyzer = null;
 
     /**
      * Constructs and attaches a new controller and a new model.
@@ -50,10 +54,18 @@ public class CornerSelector extends AbstractController {
     public CornerSelector(TargetManager targetManager) {
         this(targetManager, new CornerSelectorModel());
         selectorView = new CornerSelectorView(this);
+        analyzer = targetManager.getAnalyzer();
         getManagerModel().attachObserver(targetManager);
 
 //      getManagerModel().attachObserver(this);
         attachView(selectorView);
+    }
+    
+    /**
+     * @return the analyzer
+     */
+    public ConResAnalyzer getAnalyzer() {
+        return analyzer;
     }
 
     /**
@@ -207,10 +219,11 @@ public class CornerSelector extends AbstractController {
         		hideSelectorView();
         } catch (Exception exception) {}
         
-        if (getModel().getTargetImageFile()!=getBlockImage())
-        	if (getSelectorView().getImageWindow()!=null && getSelectorView().getImageWindow().isVisible())
+        ImageFile blockImage =  getBlockImage();
+        ImageFile modelImage = getModel().getTargetImageFile(); 
+        CornerSelectorView view = getSelectorView();
+        if (blockImage!=modelImage && view!=null && view.getImageWindow()!=null) // && view.getImageWindow().isVisible())
         		showSelectorView();
-
     	if (getBlockImage()!=null)
     		getModel().setTargetImageFile(getBlockImage());
     	else

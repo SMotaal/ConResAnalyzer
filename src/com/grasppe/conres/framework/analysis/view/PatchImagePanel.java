@@ -16,16 +16,23 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+
+import javax.swing.Timer;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 11/12/08
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class PatchImagePanel extends PatchBoundView {
+public class PatchImagePanel extends PatchBoundView implements ComponentListener {
 
     int	patchWidth  = 550,
 		patchHeight = 550;
@@ -38,6 +45,11 @@ public class PatchImagePanel extends PatchBoundView {
         super(model);
         patchWidth = getModel().getPatchPreviewSize();
         patchHeight = getModel().getPatchPreviewSize();
+        
+        this.addComponentListener(this);
+        
+        setBackground(Color.GRAY);
+        update();
     }
 
     /**
@@ -47,9 +59,25 @@ public class PatchImagePanel extends PatchBoundView {
         super.paint(g);
 
         try {
+        	g.setColor(getBackground());
+        	g.drawRect(0, 0, getWidth(), getHeight());
+        	g.fillRect(0, 0, getWidth(), getHeight());
+        } catch (Exception exception) {
+        	return;
+        }
+        try {
+        	AnalysisStepperModel model = getModel();
             g.drawImage(getModel().getPatchImage(), 0, 0, patchWidth, patchHeight, this);
         } catch (Exception exception) {
-            return;
+//        	getModel().getController().updatePatchPreviews();
+//	    	  int delay = 1000; //milliseconds
+//	    	  ActionListener taskPerformer = new ActionListener() {
+//	    	      public void actionPerformed(ActionEvent evt) {
+//	    	          repaint();
+//	    	      }
+//	    	  };
+//        	  new Timer(delay, taskPerformer).start();
+//            return;
         }
     }
 
@@ -81,4 +109,23 @@ public class PatchImagePanel extends PatchBoundView {
         setMinimumSize(new Dimension(this.patchWidth, this.patchHeight));
         setSize(new Dimension(this.patchWidth, this.patchHeight));
     }
+
+	public void componentHidden(ComponentEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentMoved(ComponentEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentResized(ComponentEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentShown(ComponentEvent arg0) {
+		update();
+	}
 }

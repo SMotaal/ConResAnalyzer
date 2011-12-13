@@ -44,14 +44,16 @@ public class BlockState implements ISteppingBlockState {
      * @param sourceState
      */
     protected BlockState(ISteppingBlockState sourceState) {
-        this.rows        = sourceState.getRows();
-        this.columns     = sourceState.getColumns();
-        this.row         = sourceState.getRow();
-        this.firstColumn = sourceState.getFirstColumn();
-
-        // this.column   = sourceState.getColumn();
-        setColumn(sourceState.getColumn());
-        this.blockMap = sourceState.getBlockMap();
+    	if (sourceState!=null) {
+	        this.rows        = sourceState.getRows();
+	        this.columns     = sourceState.getColumns();
+	        this.row         = sourceState.getRow();
+	        this.firstColumn = sourceState.getFirstColumn();
+	
+	        // this.column   = sourceState.getColumn();
+	        setColumn(sourceState.getColumn());
+	        this.blockMap = sourceState.getBlockMap();
+    	}
     }
 
     /**

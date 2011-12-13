@@ -211,7 +211,14 @@ public class AnalysisStepperModel extends AbstractModel {
      * @param patchImage the patchImage to set
      */
     public void setPatchImage(Image patchImage) {
-        setPatchImage(getController().toBufferedImage(patchImage));
+        try {
+        	if (patchImage==null)
+        		this.patchImage = null;
+        	else
+        		setPatchImage(getController().toBufferedImage(patchImage));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
 	public boolean isScratchEnabled() {

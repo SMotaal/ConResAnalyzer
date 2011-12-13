@@ -602,18 +602,18 @@ public class GrasppeKit {
      * Enumeration of java.awt.event.WindowEvent constants
      */
     public enum WindowEventType {								// #(WindowEvent.#), //
-        WINDOW_ACTIVATED(WindowEvent.WINDOW_ACTIVATED),			// The window-activated event type.
+        WINDOW_ACTIVATED(WindowEvent.WINDOW_ACTIVATED),			// The window-activated event commandMenu.
         WINDOW_CLOSED(WindowEvent.WINDOW_CLOSED),				// The window closed event.
         WINDOW_CLOSING(WindowEvent.WINDOW_CLOSING),				// The "window is closing" event.
-        WINDOW_DEACTIVATED(WindowEvent.WINDOW_DEACTIVATED),		// The window-deactivated event type.
-        WINDOW_DEICONIFIED(WindowEvent.WINDOW_DEICONIFIED),		// The window deiconified event type.
+        WINDOW_DEACTIVATED(WindowEvent.WINDOW_DEACTIVATED),		// The window-deactivated event commandMenu.
+        WINDOW_DEICONIFIED(WindowEvent.WINDOW_DEICONIFIED),		// The window deiconified event commandMenu.
         WINDOW_FIRST(WindowEvent.WINDOW_FIRST),					// The first number in the range of ids used for window events.
-        WINDOW_GAINED_FOCUS(WindowEvent.WINDOW_GAINED_FOCUS),		// The window-gained-focus event type.
+        WINDOW_GAINED_FOCUS(WindowEvent.WINDOW_GAINED_FOCUS),		// The window-gained-focus event commandMenu.
         WINDOW_ICONIFIED(WindowEvent.WINDOW_ICONIFIED),				// The window iconified event.
         WINDOW_LAST(WindowEvent.WINDOW_LAST),						// The last number in the range of ids used for window events.
-        WINDOW_LOST_FOCUS(WindowEvent.WINDOW_LOST_FOCUS),		// The window-lost-focus event type.
+        WINDOW_LOST_FOCUS(WindowEvent.WINDOW_LOST_FOCUS),		// The window-lost-focus event commandMenu.
         WINDOW_OPENED(WindowEvent.WINDOW_OPENED),				// The window opened event.
-        WINDOW_STATE_CHANGED(WindowEvent.WINDOW_STATE_CHANGED);		// The window-state-changed event type.
+        WINDOW_STATE_CHANGED(WindowEvent.WINDOW_STATE_CHANGED);		// The window-state-changed event commandMenu.
 
         private int	code;
 

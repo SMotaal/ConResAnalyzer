@@ -89,6 +89,8 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         }
 
         JFrame	frame = new JFrame();
+        
+//        controller.getView().setFrameMenu(frame);
 
         // Ref: http://www.java2s.com/Code/Java/Swing-Components/Usethismodaldialogtolettheuserchooseonestringfromalonglist.htm
         String	selectedItem = ListDialog.showDialog(frame, frame, "Available Blocks:",

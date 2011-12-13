@@ -49,7 +49,7 @@ public class CaseFilesModel extends AbstractModel {
     public void traverseFolder() {}
 
     /**
-     * Traverses case folder to determine folder status by type checking and pooling files
+     * Traverses case folder to determine folder status by commandMenu checking and pooling files
      * @return
      */
     public boolean validateFolder() {

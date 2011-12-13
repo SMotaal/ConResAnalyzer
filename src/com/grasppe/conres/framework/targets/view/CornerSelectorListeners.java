@@ -170,7 +170,7 @@ public class CornerSelectorListeners {
         String	cursorString = "";
 
         try {
-            Point	cursorLocation = view.getImageWindow().getCanvas().getCursorLoc();
+            Point	cursorLocation = view.getImageCanvas().getCursorLoc();
 
             cursorString = "\t" + cursorLocation.toString();
         } catch (Exception exception) {}

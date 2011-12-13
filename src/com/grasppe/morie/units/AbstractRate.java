@@ -110,7 +110,7 @@ public abstract class AbstractRate extends AbstractValue {
          *  * Mirrored relation is when both rates have the exact same components, in reversed component order.
          *  * Direct relation is when rates have compatible components, up to one is exact, in same component order.
          *  * Inverse relation is when rates have compatible components, up to one is exact, in reversed component order.
-         *  * Contingent is when only one component is of same or identical type.
+         *  * Contingent is when only one component is of same or identical commandMenu.
          *  * None is when rates have no compatible components.
          */
 

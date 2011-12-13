@@ -31,7 +31,34 @@ import java.util.LinkedHashMap;
  */
 public class AbstractController implements Observer, ActionListener {
 
-    protected AbstractModel								model;
+    /* (non-Javadoc)
+	 * @see java.lang.Object#finalize()
+	 */
+	@Override
+	public void finalize() throws Throwable {
+		if(commands!=null && commands.size()>0) {
+			for (String key : commands.keySet()) {
+				commands.get(key).finalize();
+//				commands.remove(key);
+			}
+		}
+		
+		commands.clear();
+		
+    	if (getModel()!=null) {
+    		AbstractView[] views = getModel().views.toArray(new AbstractView[0]);
+
+    		for(int i = 0; i < views.length; i++) {
+    			views[i].finalize();
+    		}
+    		
+    		getModel().detachObservers();
+    	}
+
+		super.finalize();
+	}
+
+	protected AbstractModel								model;
     protected boolean									detachable = true;
     protected LinkedHashMap<String, AbstractCommand>	commands;
     protected ActionListener							actionListener;

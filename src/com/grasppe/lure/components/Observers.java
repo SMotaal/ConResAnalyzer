@@ -59,6 +59,21 @@ public class Observers implements Observable {
 
         // TODO Implement throwing exceptions for attach of existing element
     }
+    
+    public void detachObservers() {
+		Iterator<Observer> observerIterator = observerSet.iterator();
+
+		while (observerIterator.hasNext()) {
+			try {
+				Observer observer = observerIterator.next();
+				if (observer!=null)
+					detachObserver(observer);
+			} catch (Exception exception) {
+				GrasppeKit.debugError("Detaching Observers", exception, 2);
+			}
+		}
+
+    }
 
     /**
      * @param observer

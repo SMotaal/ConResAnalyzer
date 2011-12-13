@@ -13,15 +13,15 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,12 +45,15 @@ public abstract class AbstractView extends ObservableObject implements Observer 
     static float						debugFontSize   = 10F;
     static int							debugPadding    = 5;
     protected static String				debugSeparator  = ": ";
+    protected ArrayList<Component>		viewComponents  = new ArrayList<Component>();
     protected AbstractController		controller;
     protected HashMap<String, JLabel>	debugLabels         = new HashMap<String, JLabel>();
     protected JPanel					debugPanel          = null;
     JLabel								debugTitleLabel     = new JLabel("<html><b>" + getClass().getSimpleName() + "</b></html>");
     int									dbg                 = 0;
     boolean								debugViewFrameFaded = false;
+
+//  private static JMenuBar                           menuBar             = null;
 
     /**
      * @param controller
@@ -129,6 +132,50 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         }
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see java.lang.Object#finalize()
+     */
+
+    /**
+     * 	@throws Throwable
+     */
+    @Override
+    public void finalize() throws Throwable {
+        for (Component component : viewComponents) {
+            try {
+                if (component instanceof JFrame) {
+                    ((JFrame)component).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    component.setVisible(false);
+                }
+
+                Container	parent = component.getParent();
+
+                if (parent != null) {
+                    component.getParent().remove(component);
+                }
+            } catch (Exception exception) {
+                GrasppeKit.debugError("Terminating View Components", exception, 2);
+            }
+        }
+
+        getModel().detachView(this);
+
+//      notifyObservers();
+        detachObservers();
+
+//      Iterator<Observer> observerIterator = observers.getIterator();
+//
+//      while (observerIterator.hasNext()) {
+//          try {
+//              detachObserver(observerIterator.next());
+//          } catch (Exception exception) {
+//              GrasppeKit.debugError("Detaching View Observers", exception, 2);
+//          }
+//      }
+        super.finalize();
+    }
+
     /**
      */
     protected void prepareDebugView() {
@@ -136,22 +183,21 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         if (debugViewFrame != null) return;
         debugViewFrame = new JFrame(debugViewString);
 
-      debugViewFrame.setResizable(false);
+        debugViewFrame.setResizable(false);
         debugViewFrame.setFocusable(false);
-//        debugViewFrame.setEnabled(false);
+
         debugViewFrame.setUndecorated(true);
 
         MouseAdapter	mouseAdapter = new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (debugViewFrameFaded) GrasppeKit.setFrameOpacity(debugViewFrame, 1.0F);	// debugViewFrame.hasFocus()
+                if (debugViewFrameFaded) GrasppeKit.setFrameOpacity(debugViewFrame, 1.0F);		// debugViewFrame.hasFocus()
                 else GrasppeKit.setFrameOpacity(debugViewFrame, 0.5F);
                 debugViewFrameFaded = !debugViewFrameFaded;
             }
         };
 
-//        debugViewFrame.addWindowListener(focusAdapter);
         debugViewFrame.addMouseListener(mouseAdapter);
         GrasppeKit.setFrameOpacity(debugViewFrame, 0.5F);
         debugViewFrameFaded = true;
@@ -210,6 +256,8 @@ public abstract class AbstractView extends ObservableObject implements Observer 
         if (GrasppeKit.isRunningJar()) return;
 
         debugViewFrame.pack();
+
+//      setFrameMenu(debugViewFrame);
 
         DisplayMode	displayMode =
             GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
@@ -331,4 +379,45 @@ public abstract class AbstractView extends ObservableObject implements Observer 
 
         return objectString;
     }
+
+//  /**
+//   *    @param frame
+//   */
+//  public void setFrameMenu(JFrame frame) {
+//    if (!frame.isFocused()) return;
+//    if (frame == null || (getMenuBar() == null && menuBar==null)) return;
+////      if (frame.getJMenuBar()!=getMenuBar())
+//    JMenuBar thisBar = null;
+//    if (getMenuBar() == null && menuBar!=null)
+//        thisBar = menuBar; // frame.setJMenuBar(menuBar);
+//    else if (getMenuBar() != null && menuBar==null)
+//        thisBar = getMenuBar(); // frame.setJMenuBar(getMenuBar());
+//    else if (getMenuBar() != null && menuBar!=null)
+//        thisBar = getMenuBar();
+////      else
+////          return;
+////      Container container = thisBar.getTopLevelAncestor();
+////      if (container!=null)
+////          container.remove(thisBar);
+//    
+//    JMenuBar frameBar = new JMenuBar();
+//    for(int i = 0; i < thisBar.getMenuCount(); i ++) {
+//        JMenu thisMenu = thisBar.getMenu(i);
+//        JMenu frameMenu = new JMenu(frameBar.add(thisBar.getMenu(i)).getText());
+//        for (int c = 0; c < thisMenu.getMenuComponentCount(); c++) {
+//            frameMenu.add(thisMenu.getMenuComponent(c));
+//            
+//        }
+//        frameBar.add(frameMenu);
+//    }
+//    
+//    frame.setJMenuBar(frameBar);
+//  }
+//
+//  /**
+//   * @param menuBar the menuBar to set
+//   */
+//  public void setMenuBar(JMenuBar menuBar) {
+//      this.menuBar = menuBar;
+//  }
 }

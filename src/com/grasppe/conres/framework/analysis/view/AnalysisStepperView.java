@@ -8,6 +8,7 @@
 
 package com.grasppe.conres.framework.analysis.view;
 
+import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
@@ -48,9 +49,19 @@ import javax.swing.border.EmptyBorder;
  * @version $Revision: 0.1, 11/11/08
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class AnalysisStepperView extends AbstractView {
+public class AnalysisStepperView extends AbstractView implements IChildView {
 
-    protected JFrame				frame              = null;
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractView#finalize()
+	 */
+	@Override
+	public void finalize() throws Throwable {
+		if (getParentView()!=null && viewContainer!=null)
+			getParentView().removeContainer(viewContainer);
+		super.finalize();
+	}
+
+	protected JPanel				viewContainer              = null;
 //    protected SteppingPreview		canvas             = null;
     protected PatchBoundView		patchImagePanel    = null;
     protected BlockMapImagePanel	blockMapImagePanel = null;
@@ -67,22 +78,23 @@ public class AnalysisStepperView extends AbstractView {
     }
 
     public void setVisible(boolean visible) {
-    	if (frame!=null && !visible)
-    		frame.setVisible(false);
+    	if (viewContainer!=null && !visible) {
+    		if(patchImagePanel!=null) patchImagePanel.setVisible(false);
+//    		if(patchImagePanel!=null) patchImagePanel.setVisible(false);
+    		viewContainer.setVisible(false);
+    		getParentView().removeContainer(viewContainer);
+    		return;
+    	}
     	
-    	if (!visible) return;
-    	
-    	if (frame!=null && !frame.isVisible()) // && visible) // visible==true;
-    		frame.dispose();
-    	
-    	createView();
+    	if (visible)
+    		createView();
     }
     /**
      */
     private void createView() {
     	
-        if (frame!=null)
-        	setVisible(false);
+//        if (viewContainer!=null)
+//        	setVisible(false);
 
 //      int dbg = 0;
 
@@ -158,32 +170,53 @@ public class AnalysisStepperView extends AbstractView {
 
         // Assemble Frame
         
-        frame = new JFrame("Analyze Block");
+        
+        viewContainer = new JPanel(new BorderLayout());
+        
+        super.viewComponents.add(viewContainer);
+        
+        viewContainer.setFocusable(false);
+        
+        // setFrameMenu(viewContainer);
 
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+//        viewContainer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        frame.add(panel, BorderLayout.CENTER);
+        viewContainer.add(panel, BorderLayout.CENTER);
 
-        frame.setResizable(false);
-        frame.pack();
+//        viewContainer.setResizable(false);
+//        viewContainer.pack();
+        
+        
 
-        GraphicsEnvironment	graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        int					frameLeft           = graphicsEnvironment.getCenterPoint().x - frame.getWidth() / 2;
-        int					frameTop            = graphicsEnvironment.getCenterPoint().y - frame.getHeight() / 2;
-
-        frame.setLocation(frameLeft, frameTop);
+//        GraphicsEnvironment	graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//        int					frameLeft           = graphicsEnvironment.getCenterPoint().x - viewContainer.getWidth() / 2;
+//        int					frameTop            = graphicsEnvironment.getCenterPoint().y - viewContainer.getHeight() / 2;
+//
+//        viewContainer.setLocation(frameLeft, frameTop);
 
         KeyListener	keyListener = new KeyAdapter() {
 
             public void keyPressed(KeyEvent ke) {
-                getController().BlockStepKey(ke.getKeyCode(), ke.getModifiers());
+            	if (ke.isConsumed()) return;
+            	if (getController().BlockStepKey(ke.getKeyCode(), ke.getModifiers()))
+            		ke.consume();
             }
         };
 
-        frame.addKeyListener(keyListener);
+        //viewContainer.addKeyListener(keyListener);
+        try {
+        	getParentView().getFrame().removeKeyListener(keyListener);
+        } catch (Exception exception) {
+        	// nothing to do!
+        }
+        getParentView().getFrame().setFocusTraversalKeysEnabled(false);
+        getParentView().getFrame().addKeyListener(keyListener);
+        getParentView().getFrame().setVisible(true);
 
         // Show Frame
-        frame.setVisible(true);
+        viewContainer.setVisible(true);
+        
+    	getParentView().setContainer(viewContainer);
 
         update();
     }
@@ -204,6 +237,10 @@ public class AnalysisStepperView extends AbstractView {
         if (patchImagePanel != null) patchImagePanel.update();
         if (blockMapImagePanel != null) blockMapImagePanel.update();
         if(patchInformationPanel!=null) patchInformationPanel.update();
+        try {
+        	viewContainer.repaint();
+        viewContainer.validate();
+        } catch (Exception exception) {}
     }
 
     /**
@@ -219,6 +256,16 @@ public class AnalysisStepperView extends AbstractView {
     public AnalysisManagerModel getAnalysisManagerModel() {
         return getController().getAnalysisManagerModel();
     }
+    
+
+    /* (non-Javadoc)
+	 * @see com.grasppe.conres.framework.analysis.view.IChildView#getParentView()
+	 */
+    public ConResAnalyzerView getParentView() {
+    	if (getController()==null) return null;
+    	if (getController().getAnalyzer()==null) return null;
+    	return getController().getAnalyzer().getView();
+    }        
 
     /**
      *  @return

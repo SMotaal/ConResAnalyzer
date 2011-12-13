@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.cases.operations;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
+import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.GrasppeKit;
 
 import ij.IJ;
@@ -38,6 +39,13 @@ public class OpenCase extends CaseManagerCommand {
     protected static final int		mnemonicKey        = KeyEvent.VK_O;
     protected static final String description = "Open an existing case or create a new case from a folder with scanned images and a target definition file.";
     String							defaultChooserPath = CaseManagerModel.defaultChooserPath;
+    protected static final String type = Types.FILE;
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
     /**
      */

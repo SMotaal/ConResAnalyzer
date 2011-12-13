@@ -32,9 +32,18 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class ExportAnalysis extends AnalysisCommand {
 
-    protected static final String	name        = "ExportAnalysis";
+
+
+	protected static final String	name        = "ExportAnalysis";
     protected static final int		mnemonicKey = KeyEvent.VK_X;
     protected static final String description = "Export the current analysis grid data to a CSV file with the same name as the block image file.";
+    protected static final String type = "file";
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
 
     /**
