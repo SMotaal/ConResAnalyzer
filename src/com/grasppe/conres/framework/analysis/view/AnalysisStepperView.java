@@ -25,6 +25,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
@@ -79,8 +80,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 
     public void setVisible(boolean visible) {
     	if (viewContainer!=null && !visible) {
-    		if(patchImagePanel!=null) patchImagePanel.setVisible(false);
 //    		if(patchImagePanel!=null) patchImagePanel.setVisible(false);
+////    		if(patchImagePanel!=null) patchImagePanel.setVisible(false);
     		viewContainer.setVisible(false);
     		getParentView().removeContainer(viewContainer);
     		return;
@@ -92,61 +93,70 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
     /**
      */
     private void createView() {
-    	
-//        if (viewContainer!=null)
-//        	setVisible(false);
-
-//      int dbg = 0;
-
-        // SteppingPreview canvas
-//        canvas = new SteppingPreview(getBlockState());
-
-//        canvas.setSize(100, 100);
-
-        // Instructions Label
-        String	labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
-                           + "<pre>Marking patches: (and step over)</pre>"
-                           + "<pre>    <b>  G     </b>" + "Good</pre>" + "<pre>    <b>  A     </b>"
-                           + "Accept</pre>" + "<pre>    <b>  R     </b>" + "Reject</pre>"
-                           + "<pre></pre>" + "<pre>Moving around:</pre>"
-                           + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
-                           + "<pre>    <b>  \u2193     </b>" + "Down</pre>"
-                           + "<pre>    <b>  \u2190    </b>" + "Left</pre>"
-                           + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
-                           + "<pre>    <b>  SP    </b>" + "Step Over</pre>"
-                           + "<pre>    <b>\u21E7 SP   </b>" + "Step Back</pre>" + "</html>";
-
-        label = new JLabel(labelText, JLabel.LEFT);
-        label.setVerticalTextPosition(JLabel.TOP);
-        label.setVerticalAlignment(JLabel.TOP);
-        label.setPreferredSize(new Dimension(100, 100));
-        label.setMaximumSize(label.getPreferredSize());
-        label.setMinimumSize(label.getPreferredSize());
-        label.setFont(label.getFont().deriveFont(11.0F));
+//    	
+////        if (viewContainer!=null)
+////        	setVisible(false);
+//
+////      int dbg = 0;
+//
+//        // SteppingPreview canvas
+////        canvas = new SteppingPreview(getBlockState());
+//
+////        canvas.setSize(100, 100);
+//
+//        // Instructions Label
+//        String	labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
+//                           + "<pre>Marking patches: (and step over)</pre>"
+//                           + "<pre>    <b>  G     </b>" + "Good</pre>" + "<pre>    <b>  A     </b>"
+//                           + "Accept</pre>" + "<pre>    <b>  R     </b>" + "Reject</pre>"
+//                           + "<pre></pre>" + "<pre>Moving around:</pre>"
+//                           + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
+//                           + "<pre>    <b>  \u2193     </b>" + "Down</pre>"
+//                           + "<pre>    <b>  \u2190    </b>" + "Left</pre>"
+//                           + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
+//                           + "<pre>    <b>  SP    </b>" + "Step Over</pre>"
+//                           + "<pre>    <b>\u21E7 SP   </b>" + "Step Back</pre>" + "</html>";
+//
+//        label = new JLabel(labelText, JLabel.LEFT);
+//        label.setVerticalTextPosition(JLabel.TOP);
+//        label.setVerticalAlignment(JLabel.TOP);
+//        label.setPreferredSize(new Dimension(100, 100));
+//        label.setMaximumSize(label.getPreferredSize());
+//        label.setMinimumSize(label.getPreferredSize());
+//        label.setFont(label.getFont().deriveFont(11.0F));
 
         // Assemble Panel
         JPanel		panel     = new JPanel();
         BoxLayout	layout    = new BoxLayout(panel, BoxLayout.LINE_AXIS);
+        
+        panel.setBackground(Color.DARK_GRAY);
 
         JPanel		informationPanel  = new JPanel();
-        JPanel previewPanel = new JPanel();
+        JPanel previewPanel = new JPanel(new BorderLayout());
         
         BoxLayout	subLayout = new BoxLayout(informationPanel, BoxLayout.PAGE_AXIS);
         
         int borderPadding = 10;
         Border paddingBorder = BorderFactory.createEmptyBorder(borderPadding, borderPadding, borderPadding, borderPadding);
 
-        blockMapImagePanel = new BlockMapImagePanel(getModel());        
+        blockMapImagePanel = new BlockMapImagePanel(getModel());
+//        blockMapImagePanel.setBackground(Color.DARK_GRAY);
         patchImagePanel    = new PatchImagePanel(getModel());
+        patchImagePanel.setBackground(Color.DARK_GRAY);
         patchInformationPanel = new PatchInformationPanel(getModel());
+//        patchInformationPanel.setBackground(Color.DARK_GRAY);
 
         //subPanel.add(label);
+        informationPanel.setPreferredSize(new Dimension(200,800));
         informationPanel.add(Box.createRigidArea(new Dimension(0, 25)));
         informationPanel.add(blockMapImagePanel);
         informationPanel.add(patchInformationPanel);
+        informationPanel.add(Box.createRigidArea(new Dimension(0, 300)));
         informationPanel.setLayout(subLayout);
+//        informationPanel.setBackground(Color.DARK_GRAY);
 
-        previewPanel.add(patchImagePanel);
+        previewPanel.add(patchImagePanel,BorderLayout.CENTER);
+        previewPanel.setBackground(Color.DARK_GRAY);
         
         int patchPreviewSize =  getModel().getPatchPreviewSize();
         Dimension previewDimension = new Dimension(patchPreviewSize,patchPreviewSize);
@@ -164,7 +174,7 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 //        patchImagePanel.setBorder(paddingBorder);
 //        patchInformationPanel.setBorder(paddingBorder);
         informationPanel.setBorder(paddingBorder);
-        previewPanel.setBorder(paddingBorder);
+//        previewPanel.setBorder(paddingBorder);
 //        panel.setBorder(paddingBorder);        
 
 
@@ -175,7 +185,7 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
         
         super.viewComponents.add(viewContainer);
         
-        viewContainer.setFocusable(false);
+        viewContainer.setFocusable(true);
         
         // setFrameMenu(viewContainer);
 
@@ -202,6 +212,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
             		ke.consume();
             }
         };
+        
+        viewContainer.addKeyListener(keyListener);
 
         //viewContainer.addKeyListener(keyListener);
         try {
@@ -290,7 +302,7 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
      *  @return
      */
     @Override
-    protected AnalysisStepperModel getModel() {
+    public AnalysisStepperModel getModel() {
         return (AnalysisStepperModel)super.getControllerModel();
     }
 
@@ -390,4 +402,10 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
             return;
         }
     }
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		update();
+	}
 }

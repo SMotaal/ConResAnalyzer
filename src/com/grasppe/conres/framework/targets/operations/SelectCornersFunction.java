@@ -11,8 +11,8 @@ package com.grasppe.conres.framework.targets.operations;
 import com.grasppe.conres.framework.targets.CornerSelector;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
 import com.grasppe.conres.framework.targets.view.CornerSelectorView;
+import com.grasppe.lure.components.AbstractComponent;
 import com.grasppe.lure.components.AbstractModel;
-import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
@@ -162,7 +162,7 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
      * Attaches the command to the specified model and calls update() to reflect the state of the model.
      *  @param view
      */
-    public void setView(AbstractView view) {
+    public void setView(AbstractComponent view) {
         model.attachObserver(this);
         if (!(view instanceof CornerSelectorView)) throw new InvalidOpenTypeException();
 

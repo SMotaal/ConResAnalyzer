@@ -577,6 +577,7 @@ public class CornerSelectorView extends AbstractView
         	ImagePlus imagePlus = getModel().getImagePlus();
         	
         	imageWindow = new JPanel(new BorderLayout());
+        	imageWindow.setBackground(Color.DARK_GRAY);
         	        	
         	imagePanel = new ImageJPanel(imagePlus);
         	
@@ -587,6 +588,8 @@ public class CornerSelectorView extends AbstractView
         	imagePanel.setFitImage(true);
         	
         	imagePanel.setBounds(0, 0, 120, 120);
+        
+        	imagePanel.setBackground(Color.DARK_GRAY);
         	
         	getParentView().setContainer(imageWindow);
         	
@@ -1419,5 +1422,11 @@ public class CornerSelectorView extends AbstractView
 	public void setVisible(boolean visible) {
 		if (imageWindow!=null)
 			imageWindow.setVisible(visible);
+	}
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
 	}
 }

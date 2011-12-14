@@ -128,9 +128,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setActiveBlock(ConResBlock activeBlock) {
         try {
-            if (this.activeBlock == activeBlock) return;
             this.activeBlock = activeBlock;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -141,9 +139,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setActivePatch(ConResPatch activePatch) {
         try {
-            if (this.activePatch == activePatch) return;
             this.activePatch = activePatch;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -154,7 +150,6 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setBlockState(BlockState blockState) {
         try {
-            if (blockState!=null && this.blockState!=null && this.blockState == blockState) return;
             this.blockState = blockState;
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -166,9 +161,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setHistory(List<int[]> history) {
         try {
-            if (this.history == history) return;
             this.history = history;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -179,9 +172,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setImage(BufferedImage image) {
         try {
-        	if (this.image ==image) return;
             this.image = image;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -191,7 +182,10 @@ public class AnalysisStepperModel extends AbstractModel {
      * @param image the image to set
      */
     public void setImage(Image image) {
-        setImage(getController().toBufferedImage(image));
+    	if (image==null)
+    		this.image=null;
+    	else
+    		setImage(getController().toBufferedImage(image));
     }
 
     /**
@@ -199,9 +193,7 @@ public class AnalysisStepperModel extends AbstractModel {
      */
     public void setPatchImage(BufferedImage patchImage) {
         try {
-        	if (this.patchImage==patchImage);
             this.patchImage = patchImage;
-            // notifyObservers();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

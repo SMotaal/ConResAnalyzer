@@ -223,6 +223,8 @@ public class ListDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if ("Set".equals(e.getActionCommand())) {
             ListDialog.value = (String)(list.getSelectedValue());
+        } else {
+        	ListDialog.value = "";
         }
 
         ListDialog.dialog.setVisible(false);

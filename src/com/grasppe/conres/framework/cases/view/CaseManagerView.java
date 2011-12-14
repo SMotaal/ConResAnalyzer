@@ -60,7 +60,13 @@ public class CaseManagerView extends AbstractView implements Observer {
     /**
      *  @return
      */
-    protected CaseManagerModel getModel() {
+    public CaseManagerModel getModel() {
         return (CaseManagerModel)super.getControllerModel();
     }
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
+	}
 }

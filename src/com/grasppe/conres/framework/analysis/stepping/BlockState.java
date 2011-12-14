@@ -22,19 +22,106 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author daflair
  */
 public class BlockState implements ISteppingBlockState {
 
-    /** Field description */
+    /**
+	 * Enumeration of java.awt.event.KeyEvent event id constants
+	 */
+	public enum PatchDesignation {
+	    PASS(BlockState.PASS), MARGINAL(BlockState.MARGINAL), FAIL(BlockState.FAIL), CLEAR(BlockState.CLEAR),
+	    ASSUMED_PASS(BlockState.ASSUMED_PASS), ASSUMED_MARGINAL(BlockState.ASSUMED_MARGINAL), ASSUMED_FAIL(BlockState.ASSUMED_FAIL),
+	    CLEARED_GOOD(BlockState.CLEARED_PASS), CLEARED_MARGINAL(BlockState.CLEARED_MARGINAL), CLEARED_FAIL(BlockState.CLEARED_FAIL);
+	
+	    private static final Map<Integer, PatchDesignation>	lookup = new HashMap<Integer, PatchDesignation>();
+	
+	    static {
+	        for (PatchDesignation s : EnumSet.allOf(PatchDesignation.class))
+	            lookup.put(s.value(), s);
+	    }
+	
+	    private int	code;
+	
+	    /**
+	     * Private constructor
+	     * @param code   integer or constant variable for the specific enumeration
+	     */
+	    private PatchDesignation(int code) {
+	        this.code = code;
+	    }
+	
+	    /**
+	     * @return the integer value for a specific enumeration
+	     */
+	    public int value() {
+	        return code;
+	    }
+	    
+	    public static PatchDesignation designation(int code) {
+	    	return get(code).designation();
+	    }
+	    
+	    public PatchDesignation designation() {
+	    	switch (lookup.get(code)) {
+	    	case MARGINAL :
+	    	case ASSUMED_MARGINAL :
+	    		return MARGINAL;
+	    	case PASS :
+	    	case ASSUMED_PASS :
+	    		return PASS;
+	    	case FAIL :
+	    	case ASSUMED_FAIL :
+	    		return FAIL;
+	    	case CLEAR :
+	    	case CLEARED_MARGINAL:
+	    	case CLEARED_GOOD :
+	    	case CLEARED_FAIL :
+			default :
+	    		return CLEAR;
+	    	}
+	    }
+	
+	    /**
+	     * @param code   integer or constant variable for the specific enumeration
+	     * @return enumeration object
+	     */
+	    public static PatchDesignation get(int code) {
+	        return lookup.get(code);
+	    }
+	}
+
+	/** Field description */
     protected int	blockMap[][];
 
     /** Field description */
     protected int	rows, columns, row,	column,	firstColumn;
     int				dbg = 0;
+
+    public static int JUDGED = 1;
+	public static int ASSUMED = 10;
+	public static int CLEARED = 100;
+
+	public static int FAIL = -1;
+	public static int MARGINAL = 1;
+	public static int PASS = 2;
+
+	public static int CLEAR = 0;
+	public static int CLEARED_FAIL = FAIL*CLEARED;
+	public static int CLEARED_MARGINAL = MARGINAL*CLEARED;
+	public static int CLEARED_PASS = PASS*CLEARED;
+
+	public static int ASSUMED_FAIL = FAIL*ASSUMED;
+	public static int ASSUMED_MARGINAL = MARGINAL*ASSUMED;
+	public static int ASSUMED_PASS = PASS*ASSUMED;
+	
+
 
     /**
      */
@@ -424,6 +511,14 @@ public class BlockState implements ISteppingBlockState {
 //      GrasppeKit.debugText("BlockState", "Get Value: " + row + ", " + column + " [" + blockMap[0].length + "x" + blockMap.length + "]", dbg);
         return this.blockMap[column][row];
     }
+    
+    public PatchDesignation getPatchDesignation(int row, int column) {
+    	return PatchDesignation.get(getValue(row,column));
+    }
+    
+    public PatchDesignation getDesignation(int row, int column) {
+    	return getPatchDesignation(row, column).designation();
+    }
 
     /**
      * @param blockMap the blockMap to set
@@ -469,4 +564,8 @@ public class BlockState implements ISteppingBlockState {
     public void setValue(int value, int row, int column) {
         this.blockMap[column][row] = value;
     }
+
+	public void setValue(PatchDesignation designation, int row, int column) {
+		setValue(designation.value(), row, column);
+	}
 }

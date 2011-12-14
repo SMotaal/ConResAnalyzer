@@ -96,9 +96,10 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         String	selectedItem = ListDialog.showDialog(frame, frame, "Available Blocks:",
                                   "Block Chooser", listItems, activeItem, "   " + listItems[0]);
 
-        ConResBlock	selectedBlock = targetBlockMap.get(selectedItem);
-
-        getController().setActiveBlock(selectedBlock);
+        if (!selectedItem.isEmpty()) {
+        	ConResBlock	selectedBlock = targetBlockMap.get(selectedItem);
+        	getController().setActiveBlock(selectedBlock);
+        }
 
         return true;
     }

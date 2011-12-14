@@ -22,7 +22,7 @@ import java.util.TreeSet;
  *     @version        $Revision: 0.1, 11/11/08
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class AbstractModel extends ObservableObject {
+public class AbstractModel extends ObservableComponent {
 
     /**
 	 * @return the controller
@@ -68,9 +68,9 @@ public class AbstractModel extends ObservableObject {
      * @param view
      */
     protected void attachView(AbstractView view) {
-    	if (!(view instanceof AbstractView)) return;
+    	if (!(view instanceof AbstractComponent)) return;
     	try {
-	    	AbstractView castView = (AbstractView) view;
+	    	AbstractComponent castView = (AbstractComponent) view;
 	        if (views.contains(view)) return;
 	        super.attachObserver(view);
 	        views.add(view);

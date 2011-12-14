@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
  *     @version        $Revision: 0.1, 11/11/08
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class AbstractController implements Observer, ActionListener {
+public class AbstractController extends AbstractComponent implements Observer, ActionListener {
 
     /* (non-Javadoc)
 	 * @see java.lang.Object#finalize()
@@ -59,7 +59,7 @@ public class AbstractController implements Observer, ActionListener {
 	}
 
 	protected AbstractModel								model;
-    protected boolean									detachable = true;
+//    protected boolean									detachable = true;
     protected LinkedHashMap<String, AbstractCommand>	commands;
     protected ActionListener							actionListener;
     protected AbstractController						commandHandler;
@@ -195,13 +195,13 @@ public class AbstractController implements Observer, ActionListener {
         if (getModel() != null) getModel().attachView(view);
     }
 
-    /**
-     * Returns the state of detachable.
-     * @return
-     */
-    public boolean canDetach() {
-        return detachable;
-    }
+//    /**
+//     * Returns the state of detachable.
+//     * @return
+//     */
+//    public boolean canDetach() {
+//        return detachable;
+//    }
 
     /**
      * Needs to be overridden to populate commands with subclasses of the AbstractCommand using putCommand(new SomeCommand(this)).
@@ -394,15 +394,21 @@ public class AbstractController implements Observer, ActionListener {
         this.commands = commands;
     }
 
-    /**
-     * Attaches a new model after safely detaching an existing one.
-     * @param newModel
-     * @throws IllegalAccessException
-     */
-    public void setModel(AbstractModel newModel) throws IllegalAccessException {
-        if (this.model != null & !this.canDetach())
-            throw new IllegalAccessException("Cannot detach from current model.");
-        if (this.model != null) detachModel();
-        attachModel(newModel);
-    }
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
+	}
+
+//    /**
+//     * Attaches a new model after safely detaching an existing one.
+//     * @param newModel
+//     * @throws IllegalAccessException
+//     */
+//    public void setModel(AbstractModel newModel) throws IllegalAccessException {
+//        if (this.model != null & !this.canDetach())
+//            throw new IllegalAccessException("Cannot detach from current model.");
+//        if (this.model != null) detachModel();
+//        attachModel(newModel);
+//    }
 }

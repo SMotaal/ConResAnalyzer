@@ -56,7 +56,13 @@ public class TargetManagerView extends AbstractView {
      *  @return
      */
     @Override
-    protected TargetManagerModel getModel() {
+	public TargetManagerModel getModel() {
         return (TargetManagerModel)getControllerModel();
     }
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
+	}
 }

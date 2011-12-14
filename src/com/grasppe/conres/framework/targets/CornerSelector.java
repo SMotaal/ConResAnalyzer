@@ -59,6 +59,8 @@ public class CornerSelector extends AbstractController {
 
 //      getManagerModel().attachObserver(this);
         attachView(selectorView);
+        
+        getAnalyzer().getCaseManager().getModel().attachObserver(this);
     }
     
     /**
@@ -210,6 +212,7 @@ public class CornerSelector extends AbstractController {
      */
     @Override
     public void update() {
+    	
 
         ConResBlock activeBlock =  getTargetManager().getModel().getActiveBlock();
         

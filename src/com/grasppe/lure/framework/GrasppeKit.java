@@ -54,7 +54,7 @@ import javax.swing.Timer;
 public class GrasppeKit {
 
     /** Field description */
-    private static int	debugLevel   = 3;		// default level is 3
+    private static int	debugLevel   = 2;		// default level is 3
     private static int	debugDefault = 4;		// default level is 3
 
     /** Field description */
@@ -757,8 +757,8 @@ public class GrasppeKit {
     /**
      *  @return
      */
-    private static boolean debugDefaultChecks() {
-        return debugLevelChecks(debugDefault);
+    private static boolean debugCheckDefault() {
+        return debugCheckLevel(debugDefault);
     }
 
     /**
@@ -789,8 +789,8 @@ public class GrasppeKit {
      *  @param level
      *  @return
      */
-    private static boolean debugLevelChecks(int level) {
-        return (level < debugLevel);
+    private static boolean debugCheckLevel(int level) {
+        return (level <= debugLevel);
     }
 
     /**
@@ -858,8 +858,8 @@ public class GrasppeKit {
      *  @param level
      */
     private static void debugTextOut(String text, int level) {
-        if ((level == 0) &&!debugDefaultChecks()) return;
-        else if ((level > 0) &&!debugLevelChecks(level)) return;
+        if ((level == 0) &&!debugCheckDefault()) return;
+        else if ((level > 0) &&!debugCheckLevel(level)) return;
         debugOutput(text, "L", level);
     }
 
@@ -1119,7 +1119,7 @@ public class GrasppeKit {
             public void checkPermission(Permission perm) {
 
                 /* Allow everything else. */
-                if (debugLevelChecks(5))
+                if (debugCheckLevel(5))
                     System.out.println("Check " + perm.getName() + ": " + perm.getActions().trim()
                                        + "\t" + perm.toString());
             }

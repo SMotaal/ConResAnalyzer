@@ -53,7 +53,7 @@ public class ImageJPanel extends JPanel implements ComponentListener {
 
     /** Field description */
     public static final int	MINIMUM_HEIGHT = 128;
-    int						dbg            = 2;
+    int						dbg            = 0;
     private int				imageWidth     = 0,
 							imageHeight    = 0;
     protected ImageCanvas	imageCanvas;

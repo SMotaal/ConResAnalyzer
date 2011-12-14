@@ -10,9 +10,11 @@ package com.grasppe.conres.analyzer.view;
 
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
+import com.grasppe.conres.framework.cases.view.CaseView;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -42,9 +44,26 @@ import javax.swing.KeyStroke;
  *     @version        $Revision: 0.1, 11/11/08
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ConResAnalyzerView extends AbstractView {
+public class ConResAnalyzerView extends AbstractView implements Observer {
 
-    /** Field description */
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractView#update()
+	 */
+	@Override
+	public void update() {
+		updateSize();
+		if (menuItems==null || menuItems.isEmpty()) return;
+		for (JMenuItem menuItem : menuItems) {
+			Action action = menuItem.getAction();
+			if (action!=null && action instanceof AbstractCommand) {
+				menuItem.setEnabled(((AbstractCommand)action).canExecute());
+			}
+		}
+			
+		super.update();
+	}
+
+	/** Field description */
     ConResAnalyzerMenu				menu;
     String							name        = "ConResAnalyzer";
     boolean							finalizable = true;
@@ -58,6 +77,7 @@ public class ConResAnalyzerView extends AbstractView {
     private Container				activeContainer     = null;
     private Container				backgroundContainer = null;
     private Container				defaultContainer    = null;
+    ArrayList<JMenuItem> menuItems = new ArrayList<JMenuItem>();
 
     /**
      * Constructs a new ConResAnalyzerView with a predefined controller.
@@ -108,10 +128,15 @@ public class ConResAnalyzerView extends AbstractView {
                 if (!previousGrouping.equals(grouping)) menu.addSeparator();
             }
         }
+        
+        command.attachObserver(this);
 
+        this.menuItems.add(menuItem);
         menu.add(menuItem);
         GrasppeKit.debugText("Command Menu Created", GrasppeKit.lastSplit(command.toString()));
     }
+    
+    
 
     /**
      * Completes graphical user interface operations before closing.
@@ -230,30 +255,42 @@ public class ConResAnalyzerView extends AbstractView {
 
         if (mainFrame != null) return;
 
-        DisplayMode	displayMode =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-                .getDisplayMode();
-        int	displayWidth  = displayMode.getWidth();
-        int	displayHeight = displayMode.getHeight();
-        int frameWidth = displayWidth - 150;
-        int frameHeight = displayHeight - 150;
 
         mainFrame = new JFrame("ConResAnalyzer");
         
         mainFrame.setUndecorated(true);
 
-        mainFrame.setMinimumSize(new Dimension(frameWidth, frameHeight));
-        mainFrame.setLocation((displayWidth - frameWidth) / 2, ((displayHeight - frameHeight) / 2) - 50);
-
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        updateSize();
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         mainFrame.setVisible(true);
         
-        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
+        CaseView caseView = new CaseView(getController().getCaseManager().getModel());
+        
+        mainFrame.add(caseView, BorderLayout.NORTH);
         
         prepareDefaultContainer();
 
         prepareMenu();
+    }
+    
+    public void updateSize() {
+    	if (mainFrame == null) return;
+    	mainFrame.validate();
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//
+//        DisplayMode	displayMode =
+//        		GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+//        				.getDisplayMode();
+//        int	displayWidth  = displayMode.getWidth();
+//        int	displayHeight = displayMode.getHeight();
+//        int frameWidth = displayWidth - 150;
+//        int frameHeight = displayHeight - 150;
+//        mainFrame.setMinimumSize(new Dimension(frameWidth, frameHeight));
+//        mainFrame.setLocation((displayWidth - frameWidth) / 2, ((displayHeight - frameHeight) / 2) - 50);
     }
     
     public void prepareDefaultContainer() {
@@ -276,7 +313,7 @@ public class ConResAnalyzerView extends AbstractView {
     /**
      *  @return
      */
-    protected ConResAnalyzer getController() {
+    public ConResAnalyzer getController() {
         return (ConResAnalyzer)controller;
     }
 
@@ -318,7 +355,7 @@ public class ConResAnalyzerView extends AbstractView {
      *  @return
      */
     @Override
-    protected ConResAnalyzerModel getModel() {
+	public ConResAnalyzerModel getModel() {
         return (ConResAnalyzerModel)super.getControllerModel();
     }
     
@@ -355,6 +392,7 @@ public class ConResAnalyzerView extends AbstractView {
             activeContainer = container;
             getContentPane().add(container, BorderLayout.CENTER);
             container.setVisible(true);
+            container.requestFocus();
             container.validate();
             mainFrame.validate();
         }
@@ -385,4 +423,10 @@ public class ConResAnalyzerView extends AbstractView {
             super.setText(text);
         }
     }
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
+	}
 }

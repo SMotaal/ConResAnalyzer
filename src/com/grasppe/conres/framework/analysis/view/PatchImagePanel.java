@@ -34,7 +34,15 @@ import javax.swing.Timer;
  */
 public class PatchImagePanel extends PatchBoundView implements ComponentListener {
 
-    int	patchWidth  = 550,
+    /* (non-Javadoc)
+	 * @see javax.swing.JComponent#setBackground(java.awt.Color)
+	 */
+	@Override
+	public void setBackground(Color bg) {
+		super.setBackground(bg);
+	}
+
+	int	patchWidth  = 550,
 		patchHeight = 550;
 
     /**
@@ -57,27 +65,19 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
      */
     public void paint(Graphics g) {
         super.paint(g);
-
+        GrasppeKit.debugText("Patch Preview", "Painting Patch Preview...", 0);
         try {
         	g.setColor(getBackground());
         	g.drawRect(0, 0, getWidth(), getHeight());
         	g.fillRect(0, 0, getWidth(), getHeight());
         } catch (Exception exception) {
-        	return;
+        	GrasppeKit.debugError("Painting Patch Preview", exception, 2);
         }
         try {
         	AnalysisStepperModel model = getModel();
-            g.drawImage(getModel().getPatchImage(), 0, 0, patchWidth, patchHeight, this);
+            g.drawImage(getModel().getPatchImage(), (getWidth()-patchWidth)/2, (getHeight()-patchHeight)/2, patchWidth, patchHeight, this);
         } catch (Exception exception) {
-//        	getModel().getController().updatePatchPreviews();
-//	    	  int delay = 1000; //milliseconds
-//	    	  ActionListener taskPerformer = new ActionListener() {
-//	    	      public void actionPerformed(ActionEvent evt) {
-//	    	          repaint();
-//	    	      }
-//	    	  };
-//        	  new Timer(delay, taskPerformer).start();
-//            return;
+        	GrasppeKit.debugError("Painting Patch Preview", exception, 2);
         }
     }
 

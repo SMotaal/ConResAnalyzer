@@ -17,10 +17,12 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 
 /**
@@ -46,15 +48,21 @@ public class PatchInformationPanel extends PatchBoundView {
     }
     
     public void prepareView() {
+    	setLayout(new BorderLayout());
+    	
     	positionLabel = new JLabel();
     	positionLabel.setVerticalTextPosition(JLabel.TOP);
     	positionLabel.setVerticalAlignment(JLabel.TOP);
-        positionLabel.setPreferredSize(new Dimension(200, 200));
-    	positionLabel.setMaximumSize(positionLabel.getPreferredSize());
-    	positionLabel.setMinimumSize(positionLabel.getPreferredSize());
+    	positionLabel.setHorizontalAlignment(JLabel.LEFT);
+    	positionLabel.setHorizontalTextPosition(JLabel.LEFT);
+        positionLabel.setPreferredSize(new Dimension(200, 200)); //getHeight()));
+//    	positionLabel.setMaximumSize(positionLabel.getPreferredSize());
+//    	positionLabel.setMinimumSize(positionLabel.getPreferredSize());
+    	setMaximumSize(new Dimension(200, 200));
     	positionLabel.setFont(positionLabel.getFont().deriveFont(13.0F));
-
-    	add(positionLabel);
+    	
+    	positionLabel.setLocation(0, 0);
+    	add(positionLabel,BorderLayout.NORTH);
     }
 //
 //        try {

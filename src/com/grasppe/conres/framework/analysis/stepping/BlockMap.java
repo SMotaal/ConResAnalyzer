@@ -24,7 +24,8 @@ public class BlockMap {
 
     /** Field description */
     BlockState	blockState;
-
+    
+    
     /**
      * @param blockState
      */

@@ -53,7 +53,13 @@ public class AnalysisManagerView extends AbstractView {
      *  @return
      */
     @Override
-    protected AnalysisManagerModel getModel() {
+    public AnalysisManagerModel getModel() {
         return (AnalysisManagerModel)getControllerModel();
     }
+
+	@Override
+	protected void finalizeUpdates() {
+		// TODO Auto-generated method stub
+		
+	}
 }
