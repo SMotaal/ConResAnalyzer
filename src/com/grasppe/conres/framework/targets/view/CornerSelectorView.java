@@ -526,6 +526,7 @@ public class CornerSelectorView extends AbstractView
     private boolean nudgeROI(KeyEvent keyEvent) { //int keyCode, int keyModifiers) {
     	int dbg = 2;
     	int keyCode = keyEvent.getKeyCode();
+    	int offset = 3;
     	if ((keyCode != KeyEvent.VK_UP) && (keyCode != KeyEvent.VK_DOWN)
     			&& (keyCode != KeyEvent.VK_LEFT) && (keyCode != KeyEvent.VK_RIGHT))
     		return false;
@@ -535,16 +536,16 @@ public class CornerSelectorView extends AbstractView
     		Rectangle bounds = getModel().getPatchSetROI().getBounds();
 	    		switch(keyCode) {
 				case KeyEvent.VK_UP:
-					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y-1);
+					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y-offset);
 					break;
 				case KeyEvent.VK_DOWN:
-					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y+1);
+					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y+offset);
 					break;
 				case KeyEvent.VK_LEFT:
-					getModel().getPatchSetROI().setLocation(bounds.x-1, bounds.y);
+					getModel().getPatchSetROI().setLocation(bounds.x-offset, bounds.y);
 					break;
 				case KeyEvent.VK_RIGHT:
-					getModel().getPatchSetROI().setLocation(bounds.x+1, bounds.y);
+					getModel().getPatchSetROI().setLocation(bounds.x+offset, bounds.y);
 					break;
 			}
     	}

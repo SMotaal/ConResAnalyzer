@@ -64,7 +64,7 @@ public class BlockMapImagePanel extends PatchBoundView implements javax.swing.Sw
         super.paint(g);
 
         try {
-            g.setColor(Color.BLUE);		// getBackground());
+            g.setColor(getBackground());
             g.fillRect(0, 0, getWidth(), getHeight());
         } catch (Exception exception) {
             GrasppeKit.debugError("Painting Block Map", exception, 2);

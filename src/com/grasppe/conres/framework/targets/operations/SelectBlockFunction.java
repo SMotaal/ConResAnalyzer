@@ -82,7 +82,10 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         for (int i = 0; i < blocks.length; i++) {		// ConResBlock block : blocks) {
             ConResBlock	block = blocks[i];
 
-            listItems[i] = "RTV " + block.getZValue().getValue() + "%";//"Block " + (i + 1);
+            String prefix = ""+(int)block.getZValue().getValue() + "%"; //Integer.toHexString(i+1).toUpperCase();
+            if (block.getZValue().getValue()<10) prefix = "0" + (int)block.getZValue().getValue() + "%";
+            
+            listItems[i] = prefix +  "\t\t\t\tReference Tone"; // + block.getZValue().getValue() + "%";//"Block " + (i + 1);
             targetBlockMap.put(listItems[i], block);
             if ((activeBlock != null) && (activeBlock == block)) activeItem = listItems[i];
             else activeItem = listItems[0];

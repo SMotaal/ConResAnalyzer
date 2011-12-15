@@ -28,12 +28,21 @@ import java.rmi.UnexpectedException;
  */
 public class CloseCase extends CaseManagerCommand {
 
-    protected static final String	name           = "CloseCase";
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractCommand#isIgnoreMenu()
+	 */
+	@Override
+	public boolean isIgnoreMenu() {
+		return ignoreMenu;
+	}
+
+	protected static final String	name           = "CloseCase";
     protected static final int		mnemonicKey    = KeyEvent.VK_C;
     protected boolean				isCaseClosed   = true;
     protected boolean				backgroundMode = false;
     protected static final String description = "Close the current case.";
     protected static final String type = Types.FILE;
+    protected boolean ignoreMenu = true;
     /**
 	 * @return the commandMenu
 	 */

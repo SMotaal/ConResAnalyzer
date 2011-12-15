@@ -34,6 +34,13 @@ import javax.swing.Action;
 public class AbstractCommand extends AbstractAction implements Observer, Observable {
 
     /**
+	 * @return the ignoreMenu
+	 */
+	public boolean isIgnoreMenu() {
+		return ignoreMenu;
+	}
+
+	/**
 	 * @return the commandGrouping
 	 */
 	public String getMenuGrouping() {
@@ -57,6 +64,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
     protected String				description = "";
     protected String				commandMenu        = null;
     protected String	commandGrouping = null;
+    protected boolean ignoreMenu = false;
     int								dbg         = 0;
 
 //  protected GrasppeKit        grasppeKit     = GrasppeKit.getInstance();

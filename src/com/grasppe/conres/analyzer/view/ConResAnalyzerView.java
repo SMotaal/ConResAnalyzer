@@ -109,6 +109,8 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
      *  @param command
      */
     public void createMenuItem(JMenu menu, AbstractCommand command) {		// AbstractCommand[] commands) {
+    	
+    	if (command.isIgnoreMenu()) return;
         JMenuItem	menuItem = new JMenuItem(command);
 
         int			mnemonic = command.getMnemonicKey();

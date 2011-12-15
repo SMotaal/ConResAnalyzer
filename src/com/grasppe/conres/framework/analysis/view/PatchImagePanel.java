@@ -128,7 +128,10 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
             PatchDimensions	patchDimensions  = model.getPatchDimensions();
 //            int				patchPreviewSize = model.getPatchPreviewSize();		// model.getImageDPI();  //        model.getDisplayDPI();
             double	resolutionRatio = model.getResolutionRatio();
+            if (getModel().getScaleRatio()<1)
+            	getModel().setScaleRatio(1);
             double	scaleRatio      = model.getScaleRatio();
+            
             double	windowRatio     = model.getWindowRatio();
 
             double	previewRatio    = scaleRatio / resolutionRatio;
@@ -137,6 +140,12 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
 					sourceHeight    = (int)Math.round(patchDimensions.getYSpan() * windowRatio);
             int		previewWidth    = (int)Math.round(sourceWidth * previewRatio),
 					previewHeight   = (int)Math.round(sourceHeight * previewRatio);
+            
+            if (previewWidth > sourceWidth || previewHeight > sourceHeight){
+            	previewWidth=sourceWidth;
+            	previewHeight=sourceHeight;
+            	getModel().setScaleRatio(resolutionRatio);
+            }
 
             int		hintMode        = Image.SCALE_SMOOTH;
             
@@ -210,14 +219,7 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
             }
             
             this.repaint();
-            
-            //g.
 
-//          g.drawRect()
-
-            // previewImage = patchImage.getScaledInstance(previewWidth,previewHeight,hintMode);
-//          return patchImage.getScaledInstance((int)Math.round(cW / dpiRatio * scaleRatio),
-//              (int)Math.round(cH / dpiRatio * scaleRatio), Image.SCALE_SMOOTH);     // patchImage;
         } catch (Exception exception) {
             previewImage = null;
             GrasppeKit.debugError("Painting Patch Preview", exception, 2);

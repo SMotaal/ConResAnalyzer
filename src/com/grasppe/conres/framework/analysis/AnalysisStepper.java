@@ -99,8 +99,46 @@ public class AnalysisStepper extends AbstractController {
         boolean				snapState  = true;
         boolean				goBack     = false;
         
+        double scaleMultiplier = 1.15;
 
         switch (keyCode) {
+        
+        case KeyEvent.VK_EQUALS :
+        	getModel().setScaleRatio(getModel().getScaleRatio()*scaleMultiplier);
+        	break;
+        case KeyEvent.VK_MINUS :
+        	getModel().setScaleRatio(getModel().getScaleRatio()/scaleMultiplier);
+        	break;
+        case KeyEvent.VK_0 :
+        	getModel().setScaleRatio(2.5);
+        	break;
+        case KeyEvent.VK_1 :
+        	getModel().setScaleRatio(1);
+        	break;
+        case KeyEvent.VK_2 :
+        	getModel().setScaleRatio(1.5);
+        	break;
+        case KeyEvent.VK_3 :
+        	getModel().setScaleRatio(2);
+        	break;
+        case KeyEvent.VK_4 :
+        	getModel().setScaleRatio(2.5);
+        	break;
+        case KeyEvent.VK_5 :
+        	getModel().setScaleRatio(3);
+        	break;
+        case KeyEvent.VK_6 :
+        	getModel().setScaleRatio(3.5);
+        	break;
+        case KeyEvent.VK_7 :
+        	getModel().setScaleRatio(4);
+        	break;
+        case KeyEvent.VK_8 :
+        	getModel().setScaleRatio(4.5);
+        	break;
+        case KeyEvent.VK_9 :
+        	getModel().setScaleRatio(5);
+        	break;
 
         case KeyEvent.VK_SPACE :
             if (keyModifiers == 1) {

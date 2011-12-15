@@ -87,7 +87,17 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     /**
      */
     public void prepareFileChooser() {
-        fileChooser = new JFileChooser();
+//        fileChooser = new JFileChooser();
+      fileChooser = new JFileChooser(new File(".")) {
+
+          public void approveSelection() {
+              if (getSelectedFile().isDirectory()) {
+            	  setCurrentDirectory(getSelectedFile());
+            	  return;
+              }
+              else super.approveSelection();
+          }
+      };    	
         fileChooser.setFileSelectionMode(fileSelectionMode.value());
 
         // Add filters
