@@ -77,7 +77,12 @@ public class CaseFolder extends CaseFile {
      *  @throws FileNotFoundException
      */
     public void enumerateImageFiles() throws FileNotFoundException {
-        File[]	fileList  = listFiles(ImageFile.getFilenameFilter());
+    	
+    	File folder = new File(getAbsolutePath()+File.separator+"Images");
+    	
+    	if (!folder.exists()) folder = this;
+    	
+        File[]	fileList  = folder.listFiles(ImageFile.getFilenameFilter());
         int		fileCount = fileList.length;
 
         setImageFiles(new ImageFile[fileCount]);

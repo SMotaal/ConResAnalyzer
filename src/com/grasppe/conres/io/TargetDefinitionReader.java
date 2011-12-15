@@ -234,8 +234,17 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         // TODO: Change to handle multiple xSpan / ySpan if needed later
         float	dXF = dX.get(0).floatValue();
         float	dYF = dY.get(0).floatValue();
+        
+        float[][] bXY = file.getFiducials();
+        float[] bX = new float[4];
+        float[] bY = new float[4];
+        
+        for (int i = 0; i<4; i++) {
+        	bX[i] = bXY[i][0];
+			bY[i] = bXY[i][1];
+        }
 
-        measurements.setDimensions(mX, mY, dXF, dYF, new float[] {}, new float[] {});
+        measurements.setDimensions(mX, mY, dXF, dYF, new float[] {bX[0],bX[2]}, new float[] {bY[0],bY[2]});
         measurements.setValues(aX, aY);
 
         file.setMeasurements(measurements);

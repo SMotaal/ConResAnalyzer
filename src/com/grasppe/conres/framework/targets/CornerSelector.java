@@ -280,7 +280,7 @@
 	     *  @return
 	     */
 	    public String getPatchCenterROIFilePath() {
-	        return getTargetManager().generateFilename("i.roi.zip");
+	        return getTargetManager().generateFilename("i.roi.zip","Resources");
 	    }
 	
 	    /**

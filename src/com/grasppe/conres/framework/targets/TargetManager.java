@@ -12,11 +12,12 @@ import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.framework.targets.model.CornerSelectorModel;
+import com.grasppe.conres.framework.targets.model.PatchDimensions;
+import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
-import com.grasppe.conres.framework.targets.model.grid.GridBlock;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.framework.targets.operations.MarkBlock;
 import com.grasppe.conres.framework.targets.operations.SelectBlock;
@@ -37,6 +38,7 @@ import ij.ImagePlus;
 
 import ij.gui.PointRoi;
 import ij.gui.Roi;
+
 import ij.io.Opener;
 
 import ij.plugin.frame.RoiManager;
@@ -56,7 +58,6 @@ import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InvalidClassException;
 
 import java.util.LinkedHashMap;
 
@@ -78,8 +79,19 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     /** Field description */
     public CornerSelector	cornerSelector = null;
     int						dbg            = 0;
-    
-    public int	patchPreviewSize = 2400;
+
+    /** Field description */
+    public int			patchPreviewSize = 2400;
+    protected String	loadedImagePath  = "";
+
+    /** Field description */
+    public double	imageDPI,
+					displayDPI = 128.0;
+
+    /** Field description */
+    public double	dpiRatio,
+					scaleRatio  = 2.5,
+					windowRatio = 6.0;
 
     /**
      * @param listener
@@ -139,61 +151,98 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public String generateFilename(String suffix) {
+    	
+    	return generateFilename(suffix, null);    	
+    }
+    /**
+     *  @param suffix
+     *  @return
+     */
+    public String generateFilename(String suffix, String subFolder) {
 
         if (getBlockImage() == null) return null;
 
         String	imageName = FilenameUtils.getBaseName(getBlockImage().getName());
         String	fileName  = imageName.substring(0, imageName.length() - 1) + suffix;
+        String folderName = (subFolder!=null) ? subFolder + File.separator : "" ;
+        
+        File parentFolder = getCaseManager().getModel().getCurrentCase().caseFolder;//getBlockImage().getParentFile();
+        if (subFolder!=null) {
+        	File folder = new File (parentFolder.getAbsolutePath() + File.separator + subFolder);
+        	if (parentFolder.exists() && !folder.exists())
+        		if (!folder.mkdir()) folderName="";
+        }
 
-        return getBlockImage().getParentFile() + File.separator + fileName;
+        return parentFolder + File.separator + folderName + fileName;
 
     }
-    
-    protected String loadedImagePath = "";
 
     /**
      */
     public void loadImage() {
-    	
-    	if (getBlockImage()!=null && getBlockImage().getAbsolutePath()!=loadedImagePath) {
-	        try {
-	            loadPatchCenterROIs(getCornerSelector());
-	        } catch (FileNotFoundException exception) {
-	        	GrasppeKit.debugError("Loading ROI File", exception, 5);	            
-	        } catch (Exception exception) {
-	        	GrasppeKit.debugError("Loading ROI File", exception, 2);
-	        }
-	
-	        Opener		opener    = new Opener();
-	        ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
-	
-	        getCornerSelectorModel().setImagePlus(imagePlus);
-	        loadedImagePath = getBlockImage().getAbsolutePath();
-	        
-	        getModel().notifyObservers();
-    	}
 
-    }
-    
-    /**
-     * @param activeBlock the activeBlock to set
-     */
-    public void setActiveBlock(ConResBlock activeBlock) {
-        try {
-        	if (getModel().getActiveBlock()!=null && getModel().getActiveBlock()==activeBlock)
-        		return;
-        	
-        	getModel().setActiveBlock(activeBlock);
-            if (activeBlock!=null)
-            	loadImage();
-            
-        	getCornerSelector().update(); //hideSelectorView();
-        } catch (Exception exception) {
-        	GrasppeKit.debugError("Setting Active Block", exception, 2);
+        if ((getBlockImage() != null) && (getBlockImage().getAbsolutePath() != loadedImagePath)) {
+            try {
+                loadPatchCenterROIs(getCornerSelector());
+            } catch (FileNotFoundException exception) {
+                GrasppeKit.debugError("Loading ROI File", exception, 5);
+            } catch (Exception exception) {
+                GrasppeKit.debugError("Loading ROI File", exception, 2);
+            }
+
+            Opener		opener    = new Opener();
+            ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
+
+            getModel().setActiveImagePlus(imagePlus);
+            getCornerSelectorModel().setImagePlus(imagePlus);
+            loadedImagePath = getBlockImage().getAbsolutePath();
+
+            getModel().notifyObservers();
+//            getCornerSelectorModel().notifyObservers();
         }
-        getModel().notifyObservers();
+
     }
 
+    /**
+     * @throws FileNotFoundException
+     *  @param cornerSelector TODO
+     * @throws InvalidActivityException
+     */
+    public void loadPatchCenterROIs(CornerSelector cornerSelector)
+            throws FileNotFoundException, InvalidActivityException {
+
+        String	roiFilePath = cornerSelector.getPatchCenterROIFilePath();
+
+        // TODO: Check if can get a file path
+        if ((roiFilePath == null) || roiFilePath.trim().isEmpty())
+            throw new InvalidActivityException("Could not determine valid path for ROI file.");
+
+        File	roiFile = new File(roiFilePath);
+
+        // TODO: Check that file exists
+        if (!roiFile.exists()) throw new FileNotFoundException(roiFilePath + " was not found.");
+
+        // TODO: now load ROIs
+
+        RoiManager	roiManager = new RoiManager(true);
+
+        roiManager.runCommand("Open", roiFilePath);
+
+        Roi[]	fileROIs = roiManager.getRoisAsArray();
+
+        if ((fileROIs.length > 0) && (fileROIs[0] instanceof PointRoi)) {
+            cornerSelector.getModel().setPatchSetROI((PointRoi)fileROIs[0]);
+            if (fileROIs.length == 2) cornerSelector.getModel().setBlockROI((PointRoi)fileROIs[1]);
+
+            // getModel().setOverlayROI(getModel().getPatchSetROI());
+            PatchSetROI	patchSetROI = cornerSelector.getModel().getPatchSetROI();
+
+            cornerSelector.getSelectorView().setOverlayROI(patchSetROI);
+        }
+
+        return;
+
+    }
 
     /**
      *  @param targetDefinitionFile
@@ -204,13 +253,15 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
         // TODO: Create reader and read target from Case Manager current case
         // TargetDefinitionFile file = targetDefinitionFile.getTargetDefinitionFile();
-    	try {
-        TargetDefinitionReader	reader = new TargetDefinitionReader(targetDefinitionFile);
-    	} catch (NullPointerException exception) {
-    		IOException ioException = new IOException("Could not load a target definition file.", exception);
-    		GrasppeKit.debugError("Loading Target Definition File",ioException,5);
-    		throw ioException;
-    	}
+        try {
+            TargetDefinitionReader	reader = new TargetDefinitionReader(targetDefinitionFile);
+        } catch (NullPointerException exception) {
+            IOException	ioException = new IOException("Could not load a target definition file.",
+                                          exception);
+
+            GrasppeKit.debugError("Loading Target Definition File", ioException, 5);
+            throw ioException;
+        }
 
     }
 
@@ -253,7 +304,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public ImageFile getBlockImage() {
-    	if (getModel().getActiveBlock()==null) return null;
+        if (getModel().getActiveBlock() == null) return null;
+
         return getBlockImage(getModel().getActiveBlock());
     }
 
@@ -262,7 +314,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public ImageFile getBlockImage(ConResBlock block) {
-    	if (block==null) return null;
+        if (block == null) return null;
+
         return getBlockImage(new Double(block.getZValue().value).intValue());
     }
 
@@ -288,9 +341,10 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public CornerSelector getCornerSelector() {
         if (cornerSelector == null) {
-        	cornerSelector = new CornerSelector(this);
-        	getModel().attachObserver(cornerSelector);
+            cornerSelector = new CornerSelector(this);
+            getModel().attachObserver(cornerSelector);
         }
+
         return cornerSelector;
     }
 
@@ -328,7 +382,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     /**
      *  @return
      */
-    private ImagePlus getImagePlus() {
+    public ImagePlus getImagePlus() {
         CornerSelectorModel	model = getCornerSelectorModel();
 
 //      if (model==null) model = getCornerSelector().getModel();
@@ -336,7 +390,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         try {
             if (model.getImagePlus() == null) loadImage();
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Getting Block ImagePlus", exception, 2);
+            GrasppeKit.debugError("Getting Block ImagePlus", exception, 2);
+
             return null;
         }
 
@@ -381,29 +436,53 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             return null;
         }
     }
-    
-    
+
     /**
-     * @return the maximum scale factor (below 1.0) used to render patch image previews
+     * 	@param row
+     * 	@param column
+     * 	@return
      */
-    public double getScaleFactor(double maximumDPIValue) {
-    	double scaleFactor = 1.0;
-    	ImageFile blockImage=null;
-    	String blockImageString = "";
-    	if (getBlockImage()!=null) {
-    		try {
-    			blockImage = getBlockImage();
-    			blockImageString = "" + blockImage.getWidth() + "x" + blockImage.getHeight() ;
-    			SpatialFrequency imageResolution = blockImage.getResolution();
-				DotsPerInch imageDPI = new DotsPerInch(imageResolution.getValue());
-				scaleFactor = maximumDPIValue/imageDPI.getValue();
-			} catch (Exception exception) {
-				exception.printStackTrace();
-				GrasppeKit.debugError("Getting Maximum Scale", exception, 2);
-			}
-    	}
-    	GrasppeKit.debugText("Maximum Scale Factor", blockImageString + " @ " + scaleFactor, dbg);
-    	return Math.min(scaleFactor, 1.0);
+    public PatchDimensions getPatchDimensions(int row, int column) {
+        float		xCenter, yCenter;
+        float		xSpan, ySpan;
+        float		xRepeat, yRepeat;
+        float		imageXRepeat, imageYRepeat;
+        float[]		xCorners, yCorners;
+        
+        TargetDimensions targetDimensions = getModel().getActiveTarget().getDimensions();//getCornerSelectorModel().getTargetDimensions();
+
+        int			stepsY      = targetDimensions.getYCenters().length;
+        int			cI          = (column * stepsY) + row;
+
+        PatchSetROI	patchSetROI = getPatchSetROI();
+        Polygon		polygon     = patchSetROI.getPolygon();
+
+        xCenter  = polygon.xpoints[cI];
+        yCenter  = polygon.ypoints[cI];
+        
+        imageXRepeat = polygon.xpoints[stepsY]- polygon.xpoints[0];
+        imageYRepeat = polygon.ypoints[1]- polygon.ypoints[0];
+
+        xRepeat  = targetDimensions.getXCenters()[1]-targetDimensions.getXCenters()[0];//polygon.xpoints[2] - polygon.xpoints[1];
+        yRepeat  = targetDimensions.getYCenters()[1]-targetDimensions.getYCenters()[0];//targetDimensions.getYRepeat();//polygon.ypoints[2] - polygon.ypoints[1];
+        
+        float xFactor = Math.round(imageXRepeat/xRepeat),
+        		yFactor = Math.round(imageYRepeat/yRepeat);
+        
+        float sFactor = Math.round((xFactor + yFactor)/2.0F);
+        
+        xRepeat  = xRepeat*sFactor;
+        yRepeat  = yRepeat*sFactor;
+
+        xSpan    = targetDimensions.getXSpan()*sFactor;
+        ySpan    = targetDimensions.getYSpan()*sFactor;
+
+        xCorners = new float[] { xCenter - xSpan / 2.0F, xCenter + xSpan / 2.0F };
+        yCorners = new float[] { yCenter - ySpan / 2.0F, yCenter + ySpan / 2.0F };
+
+        return new PatchDimensions(xCenter, yCenter, xSpan, ySpan, xRepeat, yRepeat, xCorners,
+                                   yCorners);
+
     }
 
     /**
@@ -412,23 +491,25 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public Image getPatchImage(int row, int column) {
-    	
-    	if (getModel().getActiveBlock()==null) return null;
+
+        if (getModel().getActiveBlock() == null) return null;
 
         int	dbg = 0;
 
         try {
-        	ImagePlus	imagePlus = getImagePlus();
-        	if (imagePlus == null) return null;
-        	
-        	ImageFile imageFile = getBlockImage();
-        	double imageDPI = imageFile.getResolution().value;
-        	double displayDPI = 128.0;
-            double dpiRatio = imageDPI/displayDPI;
-            double scaleRatio  = 2.5;
-            double windowRatio = 6.0;
-//        	double scalingFactor =  displayDPI/imageDPI;
-        	
+            ImagePlus	imagePlus = getImagePlus();
+
+            if (imagePlus == null) return null;
+
+            ImageFile	imageFile = getBlockImage();
+
+            imageDPI    = imageFile.getResolution().value;
+            displayDPI  = 128.0;
+            dpiRatio    = imageDPI / displayDPI;
+            scaleRatio  = 2.5;
+            windowRatio = 6.0;
+
+//          double scalingFactor =  displayDPI/imageDPI;
 
             int			stepsY      = getCornerSelectorModel().getTargetDimensions().getYCenters().length;
             int			cI          = (column * stepsY) + row;
@@ -437,12 +518,12 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             Polygon		polygon     = patchSetROI.getPolygon();
             int			cX          = polygon.xpoints[cI];
             int			cY          = polygon.ypoints[cI];
-            
+
 //          int           cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
             int	cH = (int)((polygon.ypoints[1] - polygon.ypoints[0]) * windowRatio);
 
-            //cH = (int)Math.max(cH/getScaleFactor(128),patchPreviewSize);
-//            cH = (int) Math.round(patchPreviewSize*dpiRatio);
+            // cH = (int)Math.max(cH/getScaleFactor(128),patchPreviewSize);
+//          cH = (int) Math.round(patchPreviewSize*dpiRatio);
 
             int	cW = cH;
 
@@ -453,8 +534,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
             GrasppeKit.debugText("Get Patch Image",
                                  "Patch: " + row + ", " + column + "\tCenter:" + cX + ", " + cY
-                                 + "\tCorner: " + x1 + ", " + y1 + "\tdpiRatio: " + imageDPI + "/" + displayDPI + dpiRatio, 2);
-
+                                 + "\tCorner: " + x1 + ", " + y1 + "\tdpiRatio: " + imageDPI + "/"
+                                 + displayDPI + dpiRatio, dbg);
 
             Image	image = imagePlus.getImage();
 
@@ -466,8 +547,11 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             Toolkit	toolkit    = Toolkit.getDefaultToolkit();
 
             Image	patchImage = toolkit.createImage(patchImageProducer);
+            
+            return patchImage;
 
-            return patchImage.getScaledInstance((int)Math.round(cW/dpiRatio*scaleRatio), (int)Math.round(cH/dpiRatio*scaleRatio), Image.SCALE_SMOOTH);	// patchImage;
+//            return patchImage.getScaledInstance((int)Math.round(cW / dpiRatio * scaleRatio),
+//                    (int)Math.round(cH / dpiRatio * scaleRatio), Image.SCALE_SMOOTH);		// patchImage;
 
         } catch (Exception exception) {
             GrasppeKit.debugError("Getting Patch Image", exception, 2);
@@ -487,6 +571,55 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
+     * 	@param maximumDPIValue
+     * @return the maximum scale factor (below 1.0) used to render patch image previews
+     */
+    public double getScaleFactor(double maximumDPIValue) {
+        double		scaleFactor      = 1.0;
+        ImageFile	blockImage       = null;
+        String		blockImageString = "";
+
+        if (getBlockImage() != null) {
+            try {
+                blockImage       = getBlockImage();
+                blockImageString = "" + blockImage.getWidth() + "x" + blockImage.getHeight();
+
+                SpatialFrequency	imageResolution = blockImage.getResolution();
+                DotsPerInch			imageDPI        = new DotsPerInch(imageResolution.getValue());
+
+                scaleFactor = maximumDPIValue / imageDPI.getValue();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                GrasppeKit.debugError("Getting Maximum Scale", exception, 2);
+            }
+        }
+
+        GrasppeKit.debugText("Maximum Scale Factor", blockImageString + " @ " + scaleFactor, dbg);
+
+        return Math.min(scaleFactor, 1.0);
+    }
+
+    /**
+     * @param activeBlock the activeBlock to set
+     */
+    public void setActiveBlock(ConResBlock activeBlock) {
+        try {
+            if ((getModel().getActiveBlock() != null)
+                    && (getModel().getActiveBlock() == activeBlock))
+                return;
+
+            getModel().setActiveBlock(activeBlock);
+            if (activeBlock != null) loadImage();
+
+            getCornerSelector().update();		// hideSelectorView();
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Setting Active Block", exception, 2);
+        }
+
+        getModel().notifyObservers();
+    }
+
+    /**
      * @param analyzer the analyzer to set
      */
     public void setAnalyzer(ConResAnalyzer analyzer) {
@@ -499,44 +632,4 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
     }
-
-	/**
-	 * @throws FileNotFoundException
-	 *  @param cornerSelector TODO
-	 * @throws InvalidActivityException
-	 */
-	public void loadPatchCenterROIs(CornerSelector cornerSelector) throws FileNotFoundException, InvalidActivityException {
-	
-	    String	roiFilePath = cornerSelector.getPatchCenterROIFilePath();
-	
-	    // TODO: Check if can get a file path
-	    if ((roiFilePath == null) || roiFilePath.trim().isEmpty())
-	        throw new InvalidActivityException("Could not determine valid path for ROI file.");
-	
-	    File	roiFile = new File(roiFilePath);
-	
-	    // TODO: Check that file exists
-	    if (!roiFile.exists()) throw new FileNotFoundException(roiFilePath + " was not found.");
-	
-	    // TODO: now load ROIs
-	
-	    RoiManager	roiManager = new RoiManager(true);
-	
-	    roiManager.runCommand("Open", roiFilePath);
-	
-	    Roi[]	fileROIs = roiManager.getRoisAsArray();
-	
-	    if ((fileROIs.length > 0) && (fileROIs[0] instanceof PointRoi)) {
-	        cornerSelector.getModel().setPatchSetROI((PointRoi)fileROIs[0]);
-	        if (fileROIs.length == 2) cornerSelector.getModel().setBlockROI((PointRoi)fileROIs[1]);
-	
-	        // getModel().setOverlayROI(getModel().getPatchSetROI());
-	        PatchSetROI	patchSetROI = cornerSelector.getModel().getPatchSetROI();
-	
-	        cornerSelector.getSelectorView().setOverlayROI(patchSetROI);
-	    }
-	
-	    return;
-	
-	}
 }

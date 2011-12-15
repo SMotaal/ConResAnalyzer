@@ -8,6 +8,8 @@
 
 package com.grasppe.conres.framework.targets.model;
 
+import ij.ImagePlus;
+
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
@@ -22,8 +24,24 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class TargetManagerModel extends AbstractModel {
 
-    ConResTarget	activeTarget     = null;
+    /**
+	 * @return the activeImagePlus
+	 */
+	public ImagePlus getActiveImagePlus() {
+		return activeImagePlus;
+	}
+
+	/**
+	 * @param activeImagePlus the activeImagePlus to set
+	 */
+	public void setActiveImagePlus(ImagePlus activeImagePlus) {
+		this.activeImagePlus = activeImagePlus;
+	}
+
+	ConResTarget	activeTarget     = null;
     ConResTarget	backgroundTarget = null;
+    
+    ImagePlus activeImagePlus = null;
 
     /**
      * Constructs a new model object with no predefined controller.

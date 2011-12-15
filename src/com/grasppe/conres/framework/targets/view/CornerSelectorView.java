@@ -27,11 +27,8 @@ import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 import ij.ImagePlus;
 
 import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
 import ij.gui.Overlay;
 import ij.gui.PointRoi;
-
-import ij.io.Opener;
 
 import ij.plugin.PlugIn;
 
@@ -40,13 +37,12 @@ import ij.plugin.PlugIn;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -72,26 +68,13 @@ public class CornerSelectorView extends AbstractView
         implements PlugIn, GrasppeEventHandler, MouseListener, MouseWheelListener,
                    MouseMotionListener {
 
-    /**
-	 * @return the imagePanel
-	 */
-	public ImageJPanel getImagePanel() {
-		return imagePanel;
-	}
-
-	/**
-	 * @param imagePanel the imagePanel to set
-	 */
-	public void setImagePanel(ImageJPanel imagePanel) {
-		this.imagePanel = imagePanel;
-	}
-
-	protected static String	name = CornerSelectorView.class.getSimpleName();
+    protected static String	name = CornerSelectorView.class.getSimpleName();
 
     /** ImageWindow with scaled down image */
-    public JPanel	imageWindow;
-       
-    public ImageJPanel imagePanel;
+    public JPanel	viewContainer;
+
+    /** Field description */
+    public ImageJPanel	imagePanel;
 
     /** ZoomWindow with enlarged image at center relative ImageWindow position */
     public MagnifierCanvas	zoomCanvas;
@@ -140,36 +123,29 @@ public class CornerSelectorView extends AbstractView
      *  @param pointY
      */
     private void addBlockVertex(int pointX, int pointY) {
-    	int dbg = 2;
-    	try {
-//    		ImageCanvas imageCanvas = getImageCanvas();
-//    		ImagePlus imagePlus = getImagePlus();
-//    		int roiX = imageCanvas.screenX(pointX);
-//    		int roiY = imageCanvas.screenY(pointY);
-//        if (blockPointCount() == 0)
-//            getModel().setBlockROI(new BlockROI(roiX,
-//            		roiY, imagePlus));
-//        else
-    		if (blockPointCount() == 0) {
-//    			pointX = imageCanvas.screenX(pointX);
-//    			pointY = imageCanvas.screenY(pointY);
-//    			ImagePlus imagePlus = getImagePlus();
-    			BlockROI blockROI = new BlockROI(pointX,pointY);
-    			getModel().setBlockROI(blockROI);
-    		} else if (blockPointCount() < 3)
-                getModel().setBlockROI(getModel().getBlockROI().addPoint(pointX, pointY));
-        else return;
+        int	dbg = 2;
 
-        GrasppeKit.debugText("CornerSelector - Add Point", pointString(getModel().getBlockROI()),
-                             dbg);
+        try {
+            if (blockPointCount() == 0) {
+                BlockROI	blockROI = new BlockROI(pointX, pointY);
 
-        setOverlayROI(getModel().getBlockROI());
+                getModel().setBlockROI(blockROI);
+            } else if (blockPointCount() < 3)
+                       getModel().setBlockROI(getModel().getBlockROI().addPoint(pointX, pointY));
+            else return;
 
-        notifyObservers();
-    	} catch (Exception exception) {
-    		GrasppeKit.debugError("Adding Block Vertex", new Exception("Could not add block vertex at " + pointX +", " + pointY + ". ", exception),3);
-    		GrasppeKit.debugError("Adding Block Vertex", exception, 3);
-    	}
+            GrasppeKit.debugText("CornerSelector - Add Point",
+                                 pointString(getModel().getBlockROI()), dbg);
+
+            setOverlayROI(getModel().getBlockROI());
+
+            notifyObservers();
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Adding Block Vertex",
+                                  new Exception("Could not add block vertex at " + pointX + ", "
+                                      + pointY + ". ", exception), 3);
+            GrasppeKit.debugError("Adding Block Vertex", exception, 3);
+        }
     }
 
     /**
@@ -186,27 +162,17 @@ public class CornerSelectorView extends AbstractView
     /**
      */
     public void attachMouseListeners() {
-        getImageCanvas().addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-                // TODO Auto-generated method stub
-//              super.mouseClicked(e);
-                updateROI(e);
-            }
-
-        });
+        getImageCanvas().addMouseListener(this);
         getImageCanvas().addMouseMotionListener(this);
         getImageCanvas().addMouseWheelListener(this);
-
     }
 
     /**
      *  @return
      */
     private int blockPointCount() {
-    	BlockROI blockROI = getModel().getBlockROI();
+        BlockROI	blockROI = getModel().getBlockROI();
+
         if (blockROI == null) return 0;
         else return blockROI.getNCoordinates();
     }
@@ -229,14 +195,6 @@ public class CornerSelectorView extends AbstractView
 
         if (getModel().isValidSelection()) getTargetManager().savePatchCenterROIs(getController());
 
-    }
-    
-    
-    /**
-     *  @return
-     */
-    public TargetManager getTargetManager() {
-        return getController().getTargetManager();
     }
 
     /**
@@ -344,6 +302,15 @@ public class CornerSelectorView extends AbstractView
 
     /**
      */
+    @Override
+    protected void finalizeUpdates() {
+
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     */
     public void magnifyLastPatch() {
         try {
             if (!canMagnifyPatch()) {
@@ -395,31 +362,56 @@ public class CornerSelectorView extends AbstractView
 
     }
 
-//  /**
-//   * @param args
-//   */
-//  public static void main(String[] args) {
-//
-//      new CornerSelectorView(null).run("");
-//
-//  }
-
     /**
-     *  @param e
+     * @param e
      */
     public void mouseClicked(MouseEvent e) {
 
-//      CornerSelectorListeners.debugEvent(this, "IJMouseListener", e);
-        updateROI(e);
+        if (e.isConsumed()) return;
+        if (getImageWindow() == null) return;
+        if (!getImageWindow().isVisible()) return;
+
+        GrasppeKit.debugText("CornerSelector - Click Source",
+                             e.getSource().getClass().getSimpleName(), dbg);
+        CornerSelectorListeners.debugEvent(this, "CornerSelectorView", "Click", e, dbg);
+
+        int	clickCount = e.getClickCount();
+
+        if (!(e.getSource() == getImageCanvas())) return;		// (e.getSource() == getZoomCanvas())
+
+        // TODO: Add points and calculate grid when possible
+        try {
+            switch (clickCount) {
+
+            case 2 :	// TODO: Clear points
+                clearBlockPoints();
+                break;
+
+            case 1 :	// TODO: Add points 1, 2, or 3 and when possible calculate 4 and then the grid
+
+//              PatchSetROI patchSetROI =  getModel().getPatchSetROI();
+                if ((getModel().getPatchSetROI() != null)
+                        && (getModel().getPatchSetROI().getNCoordinates() > 0))
+                    break;
+                if (blockPointCount() < 3) addBlockVertex(getImageCoordinates());
+                if (blockPointCount() == 3) calculateFourthVertex();
+                if (blockPointCount() == 4) calculateAffineGrid();
+            }
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            GrasppeKit.debugText("CornerSelector - Add Point", exception.getMessage(), dbg);
+        }
+
         e.consume();
+        update();
+
     }
 
     /**
      *  @param e
      */
     public void mouseDragged(MouseEvent e) {
-
-//      CornerSelectorListeners.debugEvent(this, "IJMotionListener", e);
         e.consume();
     }
 
@@ -427,8 +419,6 @@ public class CornerSelectorView extends AbstractView
      *  @param e
      */
     public void mouseEntered(MouseEvent e) {
-
-//      CornerSelectorListeners.debugEvent(this, "IJMouseListener", e);
         e.consume();
     }
 
@@ -436,8 +426,6 @@ public class CornerSelectorView extends AbstractView
      *  @param e
      */
     public void mouseExited(MouseEvent e) {
-
-//      CornerSelectorListeners.debugEvent(this, "IJMouseListener", e);
         redrawFrame();
         e.consume();
     }
@@ -447,8 +435,6 @@ public class CornerSelectorView extends AbstractView
      */
     public void mouseMoved(MouseEvent e) {
         moveFrame(e.getXOnScreen(), e.getYOnScreen());
-
-//      CornerSelectorListeners.debugEvent(this, "IJMotionListener", e);
         e.consume();
     }
 
@@ -484,51 +470,89 @@ public class CornerSelectorView extends AbstractView
      * @param y
      */
     public void moveFrame(int x, int y) {
+
 //
-//        if (zoomLock) return;
+//      if (zoomLock) return;
 //
-//        if (canMagnifyPatch()) {
-//            if (getZoomWindow() == null) return;
+//      if (canMagnifyPatch()) {
+//          if (getZoomWindow() == null) return;
 //
-//            JFrame		zoomWindow  = getZoomWindow();
-//            ImageWindow	imageWindow = getImageWindow();
-//            PointRoi	pointROI    = getModel().getOverlayROI();
+//          JFrame        zoomWindow  = getZoomWindow();
+//          ImageWindow   viewContainer = getImageWindow();
+//          PointRoi  pointROI    = getModel().getOverlayROI();
 //
-//            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
-//                    y - imageWindow.getY());
+//          isMouseOverImage = viewContainer.getCanvas().getBounds().contains(x - viewContainer.getX(),
+//                  y - viewContainer.getY());
 //
-//            int	mX = 100;		// imageWindow.getCanvas().
-//            int	mY = 100;
+//          int   mX = 100;       // viewContainer.getCanvas().
+//          int   mY = 100;
 //
-//            // zoomWindow.setLocation(xCenter, yCoordinates);
+//          // zoomWindow.setLocation(xCenter, yCoordinates);
 //
-//            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+//          zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
 //
-//            zoomLock = true;
+//          zoomLock = true;
 //
-//            redrawFrame();
+//          redrawFrame();
 //
-//            return;
-//        } else {
+//          return;
+//      } else {
 //
-//            updateMagnifier();
+//          updateMagnifier();
 //
-//            if (getZoomWindow() == null) return;
+//          if (getZoomWindow() == null) return;
 //
-//            JFrame		zoomWindow  = getZoomWindow();
-//            ImageWindow	imageWindow = getImageWindow();
+//          JFrame        zoomWindow  = getZoomWindow();
+//          ImageWindow   viewContainer = getImageWindow();
 //
-//            isMouseOverImage = imageWindow.getCanvas().getBounds().contains(x - imageWindow.getX(),
-//                    y - imageWindow.getY());
+//          isMouseOverImage = viewContainer.getCanvas().getBounds().contains(x - viewContainer.getX(),
+//                  y - viewContainer.getY());
 //
-//            // Sets visible and returns updated zoomWindow.isVisible()
+//          // Sets visible and returns updated zoomWindow.isVisible()
 //
-//            zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
+//          zoomWindow.setLocation(x - zoomWindow.getWidth() / 2, y - zoomWindow.getHeight() / 2);
 //
-//            if (!isShowZoom()) return;
+//          if (!isShowZoom()) return;
 //
-//            redrawFrame();
-//        }
+//          redrawFrame();
+//      }
+    }
+
+    /**
+     * 	@param keyCode
+     * 	@param keyModifiers
+     * 	@return
+     */
+    private boolean nudgeROI(KeyEvent keyEvent) { //int keyCode, int keyModifiers) {
+    	int dbg = 2;
+    	int keyCode = keyEvent.getKeyCode();
+    	if ((keyCode != KeyEvent.VK_UP) && (keyCode != KeyEvent.VK_DOWN)
+    			&& (keyCode != KeyEvent.VK_LEFT) && (keyCode != KeyEvent.VK_RIGHT))
+    		return false;
+    	if (keyEvent.isAltDown()) { //return false;
+            getModel().getPatchSetROI().nudgeCorner(keyCode);
+    	} else if (keyEvent.isShiftDown()) {
+    		Rectangle bounds = getModel().getPatchSetROI().getBounds();
+	    		switch(keyCode) {
+				case KeyEvent.VK_UP:
+					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y-1);
+					break;
+				case KeyEvent.VK_DOWN:
+					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y+1);
+					break;
+				case KeyEvent.VK_LEFT:
+					getModel().getPatchSetROI().setLocation(bounds.x-1, bounds.y);
+					break;
+				case KeyEvent.VK_RIGHT:
+					getModel().getPatchSetROI().setLocation(bounds.x+1, bounds.y);
+					break;
+			}
+    	}
+		else return false;
+        setOverlayROI(getModel().getPatchSetROI());
+        notifyObservers();
+        if (getModel().isValidSelection()) getTargetManager().savePatchCenterROIs(getController());
+        return true;
     }
 
     /**
@@ -573,54 +597,55 @@ public class CornerSelectorView extends AbstractView
      */
     public void prepareImageWindow(ImageFile imageFile) {
 
-        try {      	
-        	ImagePlus imagePlus = getModel().getImagePlus();
-        	
-        	imageWindow = new JPanel(new BorderLayout());
-        	imageWindow.setBackground(Color.DARK_GRAY);
-        	        	
-        	imagePanel = new ImageJPanel(imagePlus);
-        	
-        	imageWindow.add(imagePanel, BorderLayout.CENTER);
-        	
-        	imageWindow.addComponentListener(imagePanel);
-        	
-        	imagePanel.setFitImage(true);
-        	
-        	imagePanel.setBounds(0, 0, 120, 120);
-        
-        	imagePanel.setBackground(Color.DARK_GRAY);
-        	
-        	getParentView().setContainer(imageWindow);
-        	
-        	imagePanel.updateSize();
+        try {
+            ImagePlus	imagePlus = getModel().getImagePlus();
+
+
+            imagePanel = new ImageJPanel(imagePlus);
+            imagePanel.setFitImage(true);
+            imagePanel.setBounds(0, 0, 120, 120);
+            imagePanel.setBackground(Color.DARK_GRAY);
+
+            viewContainer = new JPanel(new BorderLayout());
+            viewContainer.setBackground(Color.DARK_GRAY);
+            viewContainer.add(imagePanel, BorderLayout.CENTER);
+            viewContainer.addComponentListener(imagePanel);
+
+            getParentView().setContainer(viewContainer);
+
+            imagePanel.updateSize();
+
+            KeyListener	keyListener = new KeyAdapter() {
+
+                public void keyPressed(KeyEvent ke) {
+                    if (ke.isConsumed()) return;
+                    if (nudgeROI(ke))ke.consume(); //.getKeyCode(), ke.getModifiers())) 
+                }
+            };
+
+            viewContainer.addKeyListener(keyListener);
 
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
     }
-    
-    public ConResAnalyzerView getParentView() {
-    	if (getController()==null) return null;
-    	if (getController().getAnalyzer()==null) return null;
-    	return getController().getAnalyzer().getView();
-    }
 
     /**
      */
     public void prepareMagnifier() {
-//        prepareMagnifierFrame();
+
+//      prepareMagnifierFrame();
 //
-//        JFrame				frame          = getZoomWindow();
-//        ImageWindow			imageWindow    = getImageWindow();
-//        MouseMotionListener	motionListener = this;		// CornerSelectorListeners.IJMotionListener;
+//      JFrame                frame          = getZoomWindow();
+//      ImageWindow           viewContainer    = getImageWindow();
+//      MouseMotionListener   motionListener = this;      // CornerSelectorListeners.IJMotionListener;
 //
-//        frame.addMouseMotionListener(motionListener);
-//        frame.addMouseListener(this);
-//        imageWindow.getCanvas().addMouseMotionListener(motionListener);
+//      frame.addMouseMotionListener(motionListener);
+//      frame.addMouseListener(this);
+//      viewContainer.getCanvas().addMouseMotionListener(motionListener);
 //
-//        /* Static Updates */
+//      /* Static Updates */
     }
 
     /**
@@ -683,113 +708,114 @@ public class CornerSelectorView extends AbstractView
     /**
      */
     public void redrawFrame() {
-//        if (getZoomWindow() == null) return;
+
+//      if (getZoomWindow() == null) return;
 //
-//        if (!getZoomWindow().isVisible()) return;		// {Testing.zoomWindow.setVisible(false); return;}
+//      if (!getZoomWindow().isVisible()) return;     // {Testing.zoomWindow.setVisible(false); return;}
 //
-//        ImageWindow	imageWindow  = getImageWindow();
-//        ImageCanvas	imageCanvas  = imageWindow.getCanvas();
-//        JFrame		zoomWindow   = getZoomWindow();
+//      ImageWindow   viewContainer  = getImageWindow();
+//      ImageCanvas   imageCanvas  = viewContainer.getCanvas();
+//      JFrame        zoomWindow   = getZoomWindow();
 //
-//        Point		zoomWindowLocation,
-//					zoomLocation = null;
+//      Point     zoomWindowLocation,
+//                zoomLocation = null;
 //
-//        if (zoomWindow.isVisible()) {
-//            zoomWindowLocation = zoomWindow.getLocationOnScreen();		// Location
-//            zoomLocation       = zoomCanvas.getLocationOnScreen();		// Location on
-//        }
+//      if (zoomWindow.isVisible()) {
+//          zoomWindowLocation = zoomWindow.getLocationOnScreen();        // Location
+//          zoomLocation       = zoomCanvas.getLocationOnScreen();        // Location on
+//      }
 //
-//        Point	zoomPosition = zoomCanvas.getLocation();	// Position within
+//      Point zoomPosition = zoomCanvas.getLocation();    // Position within
 //
-//        // component
-//        Dimension	zoomSize            = zoomCanvas.getSize();
-//        Double		zoomScale           = zoomCanvas.getMagnification();
+//      // component
+//      Dimension zoomSize            = zoomCanvas.getSize();
+//      Double        zoomScale           = zoomCanvas.getMagnification();
 //
-//        Point		imageWindowLocation = imageWindow.getLocationOnScreen();
-//        Point		imageLocation       = imageCanvas.getLocationOnScreen();
-//        Point		imagePosition       = imageCanvas.getLocation();
-//        Dimension	imageSize           = imageCanvas.getSize();
-//        Double		imageScale          = imageCanvas.getMagnification();
+//      Point     imageWindowLocation = viewContainer.getLocationOnScreen();
+//      Point     imageLocation       = imageCanvas.getLocationOnScreen();
+//      Point     imagePosition       = imageCanvas.getLocation();
+//      Dimension imageSize           = imageCanvas.getSize();
+//      Double        imageScale          = imageCanvas.getMagnification();
 //
-//        Point		pointerCenter       = null,
-//					sourceCenter        = null;
+//      Point     pointerCenter       = null,
+//                sourceCenter        = null;
 //
-//        try {
-//            if (canMagnifyPatch()) {
-//                int			pI        = getModel().getMagnifyPatchIndex();
+//      try {
+//          if (canMagnifyPatch()) {
+//              int           pI        = getModel().getMagnifyPatchIndex();
 //
-//                PointRoi	pointROI  = getModel().getOverlayROI();
+//              PointRoi  pointROI  = getModel().getOverlayROI();
 //
-//                int			pX        = pointROI.getXCoordinates()[pI];
-//                int			pY        = pointROI.getYCoordinates()[pI];
+//              int           pX        = pointROI.getXCoordinates()[pI];
+//              int           pY        = pointROI.getYCoordinates()[pI];
 //
-//                Rectangle	roiBounds = pointROI.getBounds();
+//              Rectangle roiBounds = pointROI.getBounds();
 //
-//                double		rX        = roiBounds.getX();
-//                double		rY        = roiBounds.getY();
+//              double        rX        = roiBounds.getX();
+//              double        rY        = roiBounds.getY();
 //
-//                int			fX        = round(rX + pX);
-//                int			fY        = round(rY + pY);
+//              int           fX        = round(rX + pX);
+//              int           fY        = round(rY + pY);
 //
-//                pointerCenter = new Point(fX, fY);
+//              pointerCenter = new Point(fX, fY);
 //
-//                sourceCenter  = pointerCenter;
+//              sourceCenter  = pointerCenter;
 //
-//                String	debugString = "Patch #" + pI + "-"
-//                                     + GrasppeKit.lastSplit(pointerCenter.toString());
+//              String    debugString = "Patch #" + pI + "-"
+//                                   + GrasppeKit.lastSplit(pointerCenter.toString());
 //
-//                GrasppeKit.debugText("Magnifier", debugString, dbg);
+//              GrasppeKit.debugText("Magnifier", debugString, dbg);
 //
-//            } else {
+//          } else {
 //
-//                /* Pointer Center: pointer location in image canvas in screen units */
-//                if (zoomWindow.isVisible()) {
-//                    pointerCenter = zoomCanvas.getMousePosition();
-//                    pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
-//                                              zoomLocation.y - imageLocation.y + pointerCenter.y);
-//                } else
-//                    pointerCenter = imageCanvas.getMousePosition();
+//              /* Pointer Center: pointer location in image canvas in screen units */
+//              if (zoomWindow.isVisible()) {
+//                  pointerCenter = zoomCanvas.getMousePosition();
+//                  pointerCenter = new Point(zoomLocation.x - imageLocation.x + pointerCenter.x,
+//                                            zoomLocation.y - imageLocation.y + pointerCenter.y);
+//              } else
+//                  pointerCenter = imageCanvas.getMousePosition();
 //
-//                sourceCenter = new Point(round(pointerCenter.x / imageScale),
-//                                         round(pointerCenter.y / imageScale));
+//              sourceCenter = new Point(round(pointerCenter.x / imageScale),
+//                                       round(pointerCenter.y / imageScale));
 //
-//            }
-//        } catch (Exception exception) {
-//            zoomWindow.setVisible(false);
-//            pointerCenter = null;
-//        }
+//          }
+//      } catch (Exception exception) {
+//          zoomWindow.setVisible(false);
+//          pointerCenter = null;
+//      }
 //
-//        if (pointerCenter == null) return;
+//      if (pointerCenter == null) return;
 //
-//        // if (!zoomWindow.isVisible()) zoomWindow.setVisible(true);
+//      // if (!zoomWindow.isVisible()) zoomWindow.setVisible(true);
 //
-//        /*
-//         * Source Center: pointer location in source coordinate space in source
-//         * units
-//         */
+//      /*
+//       * Source Center: pointer location in source coordinate space in source
+//       * units
+//       */
 //
-//        /* Source Size: source rectangle size in source units */
-//        Dimension	sourceSize = new Dimension(round(zoomSize.width / zoomScale),
-//                                   round(zoomSize.height / zoomScale));
+//      /* Source Size: source rectangle size in source units */
+//      Dimension sourceSize = new Dimension(round(zoomSize.width / zoomScale),
+//                                 round(zoomSize.height / zoomScale));
 //
-//        /* Source Corner: source rectangle top-left in source units */
-//        Point	sourceCorner = new Point((sourceCenter.x - sourceSize.width / 2),
-//                                       (sourceCenter.y - sourceSize.height / 2));
+//      /* Source Corner: source rectangle top-left in source units */
+//      Point sourceCorner = new Point((sourceCenter.x - sourceSize.width / 2),
+//                                     (sourceCenter.y - sourceSize.height / 2));
 //
-//        /* Source Rectangle: source rectangle in source units */
-//        Rectangle	sourceRectangle = new Rectangle(sourceCorner, sourceSize);
+//      /* Source Rectangle: source rectangle in source units */
+//      Rectangle sourceRectangle = new Rectangle(sourceCorner, sourceSize);
 //
-//        String		debugString     = "";
+//      String        debugString     = "";
 //
-//        debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
-//        debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
-//        debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
+//      debugString += "\t" + GrasppeKit.lastSplit(pointerCenter.toString());
+//      debugString += "\t" + GrasppeKit.lastSplit(zoomSize.toString());
+//      debugString += "\t" + GrasppeKit.lastSplit(sourceRectangle.toString());
 //
-//        GrasppeKit.debugText("Magnifier", debugString, dbg);
+//      GrasppeKit.debugText("Magnifier", debugString, dbg);
 //
-//        zoomCanvas.setSourceRect(sourceRectangle);
+//      zoomCanvas.setSourceRect(sourceRectangle);
 //
-//        zoomCanvas.repaint(0, 0, zoomSize.width, zoomSize.height);
+//      zoomCanvas.repaint(0, 0, zoomSize.width, zoomSize.height);
 
     }
 
@@ -825,23 +851,25 @@ public class CornerSelectorView extends AbstractView
 
         if (getController().getBlockImage() == null) return;
 
-//        ImageWindow	imageWindow = getImageWindow();
+//      ImageWindow   viewContainer = getImageWindow();
 
-        if (imageWindow != null) {//&& imageWindow.isVisible()) {
-            imageWindow.setVisible(false);
-//            imageWindow.dispose();
+        if (viewContainer != null) {		// && viewContainer.isVisible()) {
+            viewContainer.setVisible(false);
+
+//          viewContainer.dispose();
         } else {
             GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
+
             eventDispatcher.attachEventHandler(this);
         }
-        
+
         getTargetManager().loadImage();
 
         ImageFile	blockImageFile = getController().getBlockImage();
 
         prepareImageWindow(blockImageFile);
 
-        //imageWindow = getImageWindow();
+        // viewContainer = getImageWindow();
 
         attachMouseListeners();
         setVisible(true);
@@ -884,19 +912,20 @@ public class CornerSelectorView extends AbstractView
         if (pointROI == null) return;
 
         // TODO: get the convex boundary of the four pointROI
-        Polygon		roiPolygon = pointROI.getConvexHull();
+        Polygon	roiPolygon = pointROI.getConvexHull();
 
-//        PointRoi	newROI     = new PointRoi(roiPolygon);
+//      PointRoi  newROI     = new PointRoi(roiPolygon);
 
-        int[]		roiXs      = roiPolygon.xpoints,
-					roiYs      = roiPolygon.ypoints;
+        int[]	roiXs    = roiPolygon.xpoints,
+				roiYs    = roiPolygon.ypoints;
 
-        int[]	sortedIs = getController().sortRectangleROIIndex(roiXs, roiYs); //new int[4];
+        int[]	sortedIs = getController().sortRectangleROIIndex(roiXs, roiYs);		// new int[4];
         int[]	sortedXs = new int[4];
         int[]	sortedYs = new int[4];
 
         for (int p = 0; p < 4; p++) {
-            int i       = sortedIs[p];
+            int	i = sortedIs[p];
+
             sortedXs[p] = roiXs[i];
             sortedYs[p] = roiYs[i];
         }
@@ -931,11 +960,13 @@ public class CornerSelectorView extends AbstractView
      *  @throws Throwable
      */
     private void terminate() throws Throwable {
-        JFrame		zoomWindow  = getZoomWindow();
-//        ImageWindow	imageWindow = getImageWindow();
+        JFrame	zoomWindow = getZoomWindow();
+
+//      ImageWindow   viewContainer = getImageWindow();
 
         if ((zoomWindow != null) && zoomWindow.isDisplayable()) zoomWindow.dispose();
-//        if ((imageWindow != null) && imageWindow.isDisplayable()) imageWindow.dispose();
+
+//      if ((viewContainer != null) && viewContainer.isDisplayable()) viewContainer.dispose();
         super.notifyObservers();
         super.finalize();
     }
@@ -1057,53 +1088,6 @@ public class CornerSelectorView extends AbstractView
         }
     }
 
-//  protected void setOverlay(PointRoi pointROI) {
-//    if (pointROI==null)
-//  }
-
-    /**
-     * @param e
-     */
-    public void updateROI(MouseEvent e) {
-
-//      int dbg = 0;
-        if (e.isConsumed()) return;
-        if (getImageWindow() == null) return;
-        if (!getImageWindow().isVisible()) return;
-
-        GrasppeKit.debugText("CornerSelector - Click Source",
-                             e.getSource().getClass().getSimpleName(), dbg);
-        CornerSelectorListeners.debugEvent(this, "CornerSelectorView", "Click", e, dbg);
-
-        int	clickCount = e.getClickCount();
-
-        if (!(e.getSource() == getImageCanvas())) return;		// (e.getSource() == getZoomCanvas())
-
-        // TODO: Add points and calculate grid when possible
-        try {
-            switch (clickCount) {
-
-            case 2 :	// TODO: Clear points
-                clearBlockPoints();
-                break;
-
-            case 1 :	// TODO: Add points 1, 2, or 3 and when possible calculate 4 and then the grid
-                if (blockPointCount() < 3) {
-                    addBlockVertex(getImageCoordinates());
-                    if (blockPointCount() == 3) calculateFourthVertex();
-                    if (blockPointCount() == 4) calculateAffineGrid();
-                }
-            }
-
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            GrasppeKit.debugText("CornerSelector - Add Point", exception.getMessage(), dbg);
-        }
-
-        update();
-
-    }
-
     /**
      */
     @SuppressWarnings("restriction")
@@ -1136,13 +1120,21 @@ public class CornerSelectorView extends AbstractView
          * Based on
          * {@link http://java.sun.com/developer/onlineTraining/javaai/jai/src/JAIWarpDemo.java}
          */
+        
+        TargetDimensions	targetDimensions;
 
-        TargetDimensions	targetDimensions = getModel().getTargetDimensions();
+        try {
+        	targetDimensions = getTargetManager().getModel().getActiveTarget().getDimensions();
+        	getModel().setTargetDimensions(targetDimensions);
+        } catch (Exception exception) {
+        	GrasppeKit.debugError("Reading Target Dimensions", exception,2);
+        	return;
+        }
         WarpPolynomial		warp;
 
         // Determine the points needed
         int	warpDegree = 1;		// degree - The desired degree of the warp polynomials.
-        int	warpPoints = 3;		// pointsNeeded = (degree + 1) * (degree + 2) / 2;
+        int	warpPoints = (warpDegree + 1) * (warpDegree + 2) / 2;		// 3; // pointsNeeded = (degree + 1) * (degree + 2) / 2;
 
 //      float spanX      = targetDimensions.getXSpan();
         float[]	centerXs = targetDimensions.getXCenters();
@@ -1183,8 +1175,11 @@ public class CornerSelectorView extends AbstractView
             sortedYs[s[2]], sortedXs[s[3]], sortedYs[s[3]]
         };
 
+        float	preScale  = 1.0F;		// 2.0F
+        float	postScale = 1.0F / preScale;
+
         warp = WarpPolynomial.createWarp(imageCoords, sourceOffset, targetCoords, destOffset,
-                                         2 * warpPoints, 2.0F, 2.0F, 0.5F, 0.5F,	// 1.0F / sizeX, 1.0F / sizeY, sizeX, sizeY,
+                                         2 * warpPoints, preScale, preScale, postScale, postScale,		// 1.0F / sizeX, 1.0F / sizeY, sizeX, sizeY,
                                          warpDegree);
 
         int[]	cXs = new int[stepsXY];
@@ -1239,34 +1234,6 @@ public class CornerSelectorView extends AbstractView
 
         return getImagePanel().getImageCanvas();
     }
-    
-    
-
-    /**
-     *  @return
-     */
-    private ImagePlus getImagePlus() {
-        if (getImageCanvas() == null) return null;
-
-        return getImageCanvas().getImage();
-    }
-
-    /**
-     * @return the image window
-     */
-    public JPanel getImageWindow() {
-    	if (imageWindow==null)
-    		run(null); //prepareImageWindow(getController().getBlockImage());
-        return imageWindow;
-    }
-
-    /**
-     * Returns a correctly-cast model.
-     * @return
-     */
-    public CornerSelectorModel getModel() {
-        return (CornerSelectorModel)super.getControllerModel();
-    }
 
     /**
      *  @return
@@ -1295,10 +1262,60 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
+     * @return the imagePanel
+     */
+    public ImageJPanel getImagePanel() {
+        return imagePanel;
+    }
+
+    /**
+     *  @return
+     */
+    private ImagePlus getImagePlus() {
+        if (getImageCanvas() == null) return null;
+
+        return getImageCanvas().getImage();
+    }
+
+    /**
+     * @return the image window
+     */
+    public JPanel getImageWindow() {
+        if (viewContainer == null) run(null);		// prepareImageWindow(getController().getBlockImage());
+
+        return viewContainer;
+    }
+
+    /**
+     * Returns a correctly-cast model.
+     * @return
+     */
+    public CornerSelectorModel getModel() {
+        return (CornerSelectorModel)super.getControllerModel();
+    }
+
+    /**
+     * 	@return
+     */
+    public ConResAnalyzerView getParentView() {
+        if (getController() == null) return null;
+        if (getController().getAnalyzer() == null) return null;
+
+        return getController().getAnalyzer().getView();
+    }
+
+    /**
      * @return the patchSetROI
      */
     protected PatchSetROI getPatchSetROI() {
         return getModel().getPatchSetROI();
+    }
+
+    /**
+     *  @return
+     */
+    public TargetManager getTargetManager() {
+        return getController().getTargetManager();
     }
 
     /**
@@ -1337,48 +1354,54 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
+     * @param imagePanel the imagePanel to set
+     */
+    public void setImagePanel(ImageJPanel imagePanel) {
+        this.imagePanel = imagePanel;
+    }
+
+    /**
      *  @param pointROI
      */
     public void setOverlayROI(PointRoi pointROI) {
         getModel().setOverlayROI(pointROI);
-        if (getImagePlus()==null) return;
+        if (getImagePlus() == null) return;
 
         // TODO: Update overlay with defined points
         try {
 
             if (getModel().getOverlayROI() != null) {
-            	
-            	Polygon roiPolygon = getModel().getOverlayROI().getPolygon();
-            	
-            	Polygon overlayPolygon = new Polygon();
-            	
-            	for (int i = 0; i < roiPolygon.npoints; i ++)
-            		overlayPolygon.addPoint(getImageCanvas().screenX(roiPolygon.xpoints[i]), getImageCanvas().screenY(roiPolygon.ypoints[i]));
-            	
-            	//roiPolygon.
-            	
-                Overlay	overlay = new Overlay(new PointRoi(overlayPolygon)); //getModel().getOverlayROI());
-                
+
+                Polygon	roiPolygon     = getModel().getOverlayROI().getPolygon();
+
+                Polygon	overlayPolygon = new Polygon();
+
+                for (int i = 0; i < roiPolygon.npoints; i++)
+                    overlayPolygon.addPoint(getImageCanvas().screenX(roiPolygon.xpoints[i]),
+                                            getImageCanvas().screenY(roiPolygon.ypoints[i]));
+
+                // roiPolygon.
+                PointRoi	overlayROI = new PointRoi(overlayPolygon);
+
+                overlayROI.setStrokeWidth(2);
+                overlayROI.setFillColor(Color.DARK_GRAY);
+                overlayROI.setStrokeColor(Color.GREEN);
+                overlayROI.setColor(Color.WHITE);
+
+                Overlay	overlay = new Overlay(overlayROI);		// getModel().getOverlayROI());
+
+//              overlay.setLabelFont(new Font("SansSerif", Font.BOLD, 32)); //overlay.getLabelFont().deriveFont(14.0F));
                 overlay.drawNames(true);
                 overlay.drawLabels(true);
                 getImagePlus().setHideOverlay(false);		// getImageWindow().repaint();
-                
-                getImageCanvas().setOverlay(overlay); //getModel().getOverlayROI(), Color.RED, 2, Color.WHITE); //overlay);
-                
-//                new PointRoi overlayROI = new PointRoi(poly);
-//                getImagePlus()
-//                overlay.
-//                getImageCanvas().setOverlay(getImagePlus().getOverlay());
-//                getImageCanvas().setShowAllROIs(true);
+
+                getImageCanvas().setOverlay(overlay);		// getModel().getOverlayROI(), Color.RED, 2, Color.WHITE); //overlay);
+
             } else {
-            	getImageCanvas().setOverlay(null);
-//                getImageCanvas().setOverlay(overlay);
-//            	getImageCanvas().setOverlay(null);
-            	
+                getImageCanvas().setOverlay(null);
+
             }
-//                getImagePlus().setHideOverlay(true);
-            
-            
+
             getImageCanvas().setImageUpdated();
             getImageCanvas().repaint();
 
@@ -1406,6 +1429,13 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
+     * 	@param visible
+     */
+    public void setVisible(boolean visible) {
+        if (viewContainer != null) viewContainer.setVisible(visible);
+    }
+
+    /**
      * @param zoomPatch the zoomPatch to set
      */
     public void setZoomPatch(boolean zoomPatch) {
@@ -1418,15 +1448,4 @@ public class CornerSelectorView extends AbstractView
     public void setZoomWindow(JFrame zoomWindow) {
         this.zoomWindow = zoomWindow;
     }
-
-	public void setVisible(boolean visible) {
-		if (imageWindow!=null)
-			imageWindow.setVisible(visible);
-	}
-
-	@Override
-	protected void finalizeUpdates() {
-		// TODO Auto-generated method stub
-		
-	}
 }

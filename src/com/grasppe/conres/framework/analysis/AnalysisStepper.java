@@ -27,8 +27,10 @@ import com.grasppe.conres.framework.analysis.stepping.StepUp;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.targets.TargetManager;
+import com.grasppe.conres.framework.targets.model.PatchDimensions;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
+import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -61,6 +63,8 @@ public class AnalysisStepper extends AbstractController {
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
+        
+        getModel().setPatchPreviewSize(getTargetManager().patchPreviewSize);
 
         return;
     }
@@ -87,10 +91,14 @@ public class AnalysisStepper extends AbstractController {
     public boolean BlockStepKey(int keyCode, int keyModifiers) {	// SteppingStrategy thisStep) {
 
         SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
-        SteppingStrategy	thisStep   = new StepNext(smartState);
+        
+        if (smartState==null || smartState.getBlockMap()==null) return false;
+        
+        SteppingStrategy	thisStep = new StepNext(smartState); 
 
         boolean				snapState  = true;
         boolean				goBack     = false;
+        
 
         switch (keyCode) {
 
@@ -139,6 +147,10 @@ public class AnalysisStepper extends AbstractController {
             if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.FAIL);
 
             break;
+            
+        case KeyEvent.VK_C :
+        	if (keyModifiers == 0) thisStep = new SetAndStep(smartState,BlockState.CLEAR); 
+        		break;
 
         default :
             return false;
@@ -161,6 +173,7 @@ public class AnalysisStepper extends AbstractController {
             getModel().getHistory().add(currentState);
         }
 
+        if(thisStep==null) thisStep = new StepNext(smartState);
         thisStep.execute();
 
         setNewBlockState(thisStep.getFinalState());
@@ -177,6 +190,7 @@ public class AnalysisStepper extends AbstractController {
      *  @param blockState
      */
     public void loadBlockFiles(BlockState blockState) {
+    	getTargetManager().loadImage();
         setScratchEnabled(false);
 
         try {
@@ -201,7 +215,7 @@ public class AnalysisStepper extends AbstractController {
      *      @throws Exception
      */
     public void loadCSVFile(BlockState blockState) throws Exception {
-        String	filename = getTargetManager().generateFilename("a.csv");
+        String	filename = getTargetManager().generateFilename("a.csv","Data");
 
         blockState.readFile(filename);
     }
@@ -211,7 +225,7 @@ public class AnalysisStepper extends AbstractController {
      *      @throws Exception
      */
     public void loadScratchFile(BlockState blockState) throws Exception {
-        String	filename = getTargetManager().generateFilename("s.csv");
+        String	filename = getTargetManager().generateFilename("s.csv","Resources");
 
         blockState.readFile(filename);
         setScratchEnabled(true);
@@ -282,7 +296,7 @@ public class AnalysisStepper extends AbstractController {
         if (!isScratchEnabled()) return;
 
         try {
-            String	filename = getTargetManager().generateFilename("s.csv");
+            String	filename = getTargetManager().generateFilename("s.csv","Resources");
 
             getModel().getBlockState().writeFile(filename);
         } catch (Exception exception) {
@@ -294,8 +308,8 @@ public class AnalysisStepper extends AbstractController {
      */
     public void showView() {
         getTargetManager().loadImage();
-        update();
         updateActiveBlock();
+        update();
         getStepperView().setVisible(true);
     }
 
@@ -385,7 +399,9 @@ public class AnalysisStepper extends AbstractController {
         ConResBlock	activeBlock = getTargetManager().getModel().getActiveBlock();
 
         if (activeBlock == null) {
+        	getModel().setBlockImage(null);
             getModel().setActiveBlock(null);
+            getModel().setBlockImagePlus(null);
             setNewBlockState(null);
             setScratchEnabled(false);
             return;
@@ -399,7 +415,19 @@ public class AnalysisStepper extends AbstractController {
         
         setScratchEnabled(false);
 
+        if (getTargetManager().getBlockImage()==null) return;
+        
+        ImageFile	imageFile = getTargetManager().getBlockImage();
+
+        double imageDPI    = imageFile.getResolution().value;
+        
+        double	resolutionRatio = imageDPI / getTargetManager().displayDPI;
+        
+        getModel().setResolutionRatio(resolutionRatio);
+        getModel().setBlockImage(getTargetManager().getBlockImage());
+        getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus()); // .getImagePlus());
         getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
+        
 
         int			blockColumns = getActiveBlock().getXAxis().getValues().length;
         int			blockRows    = getActiveBlock().getYAxis().getValues().length;
@@ -414,9 +442,13 @@ public class AnalysisStepper extends AbstractController {
         loadBlockFiles(blockState);
         setNewBlockState(blockState);
 
+
         setScratchEnabled(true);
 
         lastBlock = activeBlock;
+        
+//        updatePatchPreviews();
+        getModel().notifyObservers();
 //      }
 
         // AnalysisStepperModel model = getModel();
@@ -430,6 +462,7 @@ public class AnalysisStepper extends AbstractController {
      */
     public void updatePatchPreviews() {
         try {
+        	getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus()); // .getImagePlus());        	
             updatePatchPreviews(getModel().getActivePatch().getPatchRow(),
                                 getModel().getActivePatch().getPatchColumn());
         } catch (Exception exception) {
@@ -450,9 +483,9 @@ public class AnalysisStepper extends AbstractController {
 //                return;
 //            }
 
-            Image	patchImage = getTargetManager().getPatchImage(row, column);
-
-            getModel().setPatchImage(patchImage);
+//            Image	patchImage = getTargetManager().getPatchImage(row, column);
+//
+//            getModel().setPatchImage(patchImage);
 
             BlockGrid	blockGrid = new BlockGrid(getModel().getBlockState());
 
@@ -542,12 +575,18 @@ public class AnalysisStepper extends AbstractController {
 
                     saveScratchFile();
 
-                    ConResPatch	patchModel = getTargetManager().getPatch(row, column);
-
-                    getModel().setActivePatch(patchModel);
+                    getModel().setBlockImage(getTargetManager().getBlockImage());
+                    getModel().setActivePatch(getTargetManager().getPatch(row, column));
+                    getModel().setPatchDimensions(getTargetManager().getPatchDimensions(row, column));
+                    getModel().setPatchPreviewSize(getTargetManager().patchPreviewSize);
+//                    getModel().setImageDPI(getTargetManager().imageDPI);
+//                    getModel().setDisplayDPI(getTargetManager().displayDPI);
+//                    getModel().setResolutionRatio(getTargetManager().dpiRatio);
+//                    getModel().setScaleRatio(getTargetManager().scaleRatio);
+//                    getModel().setWindowRatio(getTargetManager().windowRatio);
 //                }
 
-                updatePatchPreviews();
+                updatePatchPreviews(row, column);
 
                 pushUpdates();
             }

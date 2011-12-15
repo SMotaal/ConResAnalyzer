@@ -12,20 +12,25 @@
 package com.grasppe.conres.framework.analysis.view;
 
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
+import com.grasppe.conres.framework.targets.model.PatchDimensions;
+import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import ij.ImagePlus;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
-
-import javax.swing.Timer;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageProducer;
 
 /**
  * Class description
@@ -34,16 +39,9 @@ import javax.swing.Timer;
  */
 public class PatchImagePanel extends PatchBoundView implements ComponentListener {
 
-    /* (non-Javadoc)
-	 * @see javax.swing.JComponent#setBackground(java.awt.Color)
-	 */
-	@Override
-	public void setBackground(Color bg) {
-		super.setBackground(bg);
-	}
-
-	int	patchWidth  = 550,
-		patchHeight = 550;
+    int						patchWidth   = 550,
+							patchHeight  = 550;
+    private BufferedImage	previewImage = null;
 
     /**
      * Create the panel with a model.
@@ -51,13 +49,48 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
      */
     public PatchImagePanel(AnalysisStepperModel model) {
         super(model);
-        patchWidth = getModel().getPatchPreviewSize();
+        patchWidth  = getModel().getPatchPreviewSize();
         patchHeight = getModel().getPatchPreviewSize();
-        
+
         this.addComponentListener(this);
-        
+
         setBackground(Color.GRAY);
         update();
+    }
+
+    /**
+     *  @param arg0
+     */
+    public void componentHidden(ComponentEvent arg0) {
+
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     *  @param arg0
+     */
+    public void componentMoved(ComponentEvent arg0) {
+
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     *  @param arg0
+     */
+    public void componentResized(ComponentEvent arg0) {
+
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     *  @param arg0
+     */
+    public void componentShown(ComponentEvent arg0) {
+        update();
+//        updatePreviewImage();
     }
 
     /**
@@ -66,21 +99,130 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
     public void paint(Graphics g) {
         super.paint(g);
         GrasppeKit.debugText("Patch Preview", "Painting Patch Preview...", 0);
+
         try {
-        	g.setColor(getBackground());
-        	g.drawRect(0, 0, getWidth(), getHeight());
-        	g.fillRect(0, 0, getWidth(), getHeight());
+            g.setColor(getBackground());
+            g.drawRect(0, 0, getWidth(), getHeight());
+            g.fillRect(0, 0, getWidth(), getHeight());
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Painting Patch Preview", exception, 2);
+            GrasppeKit.debugError("Painting Patch Preview", exception, 2);
         }
+
         try {
-        	AnalysisStepperModel model = getModel();
-//            g.drawImage(getModel().getPatchImage(), (getWidth()-getModel().getPatchImage().getW)/2, (getHeight()-patchHeight)/2, patchWidth, patchHeight, this);
-        	
-            g.drawImage(getModel().getPatchImage(), (getWidth()-patchWidth)/2, (getHeight()-patchHeight)/2, this);
+            if (previewImage != null)
+                g.drawImage(previewImage, (getWidth() - previewImage.getWidth()) / 2,
+                            (getHeight() - previewImage.getHeight()) / 2, this);
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Painting Patch Preview", exception, 2);
+            GrasppeKit.debugError("Painting Patch Preview", exception, 2);
         }
+    }
+
+    /**
+     */
+    private void updatePreviewImage() {
+        try {
+
+            AnalysisStepperModel	model = getModel();
+
+//          BufferedImage         patchImage       = model.getPatchImage();
+            PatchDimensions	patchDimensions  = model.getPatchDimensions();
+//            int				patchPreviewSize = model.getPatchPreviewSize();		// model.getImageDPI();  //        model.getDisplayDPI();
+            double	resolutionRatio = model.getResolutionRatio();
+            double	scaleRatio      = model.getScaleRatio();
+            double	windowRatio     = model.getWindowRatio();
+
+            double	previewRatio    = scaleRatio / resolutionRatio;
+
+            int		sourceWidth     = (int)Math.round(patchDimensions.getXSpan() * windowRatio),
+					sourceHeight    = (int)Math.round(patchDimensions.getYSpan() * windowRatio);
+            int		previewWidth    = (int)Math.round(sourceWidth * previewRatio),
+					previewHeight   = (int)Math.round(sourceHeight * previewRatio);
+
+            int		hintMode        = Image.SCALE_SMOOTH;
+            
+            ImagePlus imagePlus = getModel().getBlockImagePlus();
+
+            Image	image           = imagePlus.getImage();
+
+            if (image == null) return;
+
+            int				sourceLeft         = (int)patchDimensions.getXCenter() - sourceWidth/2,
+							sourceTop          = (int)patchDimensions.getYCenter() - sourceHeight/2;
+
+            ImageProducer	patchImageProducer = new FilteredImageSource(image.getSource(),
+                                                   new CropImageFilter(sourceLeft, sourceTop,
+                                                       sourceWidth, sourceWidth));
+
+            Image	patchImage = Toolkit.getDefaultToolkit().createImage(patchImageProducer);
+            
+            if (previewImage!=null) previewImage.flush();
+
+            previewImage = new BufferedImage(previewWidth, previewHeight,
+                                             BufferedImage.TYPE_INT_RGB);
+
+            Graphics	g = previewImage.getGraphics();
+
+            g.setColor(Color.BLACK);
+
+            g.fillRect(0, 0, previewWidth, previewHeight);
+
+            g.drawImage(patchImage, 0, 0, previewWidth, previewHeight, Color.BLACK, null);
+
+            int	xCenter = (int)Math.round(sourceWidth * previewRatio / 2.0),
+				yCenter = (int)Math.round(sourceHeight * previewRatio / 2.0);
+
+            int	xSpan   = (int)Math.round(patchDimensions.getXSpan() * previewRatio),
+				ySpan   = (int)Math.round(patchDimensions.getYSpan() * previewRatio);
+
+            int	xRepeat = (int)Math.round(patchDimensions.getXRepeat() * previewRatio),
+				yRepeat = (int)Math.round(patchDimensions.getYRepeat() * previewRatio);
+
+            int	pLeft   = xCenter - xSpan / 2,
+				pRight  = xCenter + xSpan / 2,
+				pWidth  = pRight - pLeft;
+            int	rLeft   = pLeft,
+				rRight  = pLeft + xRepeat,
+				rWidth  = rRight - rLeft;
+
+            int	pTop    = yCenter - ySpan / 2,
+				pBottom = yCenter + ySpan / 2,
+				pHeight = pBottom - pTop;
+            int	rTop    = pTop,
+				rBottom = pTop + yRepeat,
+				rHeight = rBottom - rTop;
+
+            
+            g.setColor(Color.GREEN);
+//            int i = 1;
+            g.drawOval(xCenter - xSpan / 2, yCenter - ySpan / 2, xSpan,	ySpan);
+            
+            
+            int gap = 35;
+            int o = (int)Math.round(gap*previewRatio);
+            g.setColor(Color.RED);
+            g.drawRect(rLeft+xSpan, rTop, rWidth-xSpan, rHeight);
+
+            for (int i : new int[] { gap, gap++, gap++, gap++, gap++}) { // , , 6 }) {		// 9, 10, 11 })     // = 5; i < 10; i++)
+            	o = (int)Math.round(i*previewRatio);
+//                g.drawOval(xCenter - (xSpan + i) / 2, yCenter - (ySpan + i) / 2, xSpan + i,	ySpan + i);
+                g.setColor(Color.GREEN);
+                g.drawRect(pLeft - o, pTop - o, pWidth + o * 2, pHeight + o * 2);
+            }
+            
+            this.repaint();
+            
+            //g.
+
+//          g.drawRect()
+
+            // previewImage = patchImage.getScaledInstance(previewWidth,previewHeight,hintMode);
+//          return patchImage.getScaledInstance((int)Math.round(cW / dpiRatio * scaleRatio),
+//              (int)Math.round(cH / dpiRatio * scaleRatio), Image.SCALE_SMOOTH);     // patchImage;
+        } catch (Exception exception) {
+            previewImage = null;
+            GrasppeKit.debugError("Painting Patch Preview", exception, 2);
+        }
+
     }
 
     /*
@@ -95,14 +237,17 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
         super.updateSize();
 
         try {
-            BufferedImage	patchImage  = getModel().getPatchImage();
-            int				patchWidth  = patchImage.getWidth(),
-							patchHeight = patchImage.getHeight();
+
+//          BufferedImage patchImage  = getModel().getPatchImage();
+//          int               patchWidth  = patchImage.getWidth(),
+//                        patchHeight = patchImage.getHeight();
 //
-//            if (!((this.patchWidth != patchWidth) || (this.patchHeight != patchHeight))) return;
+//          if (!((this.patchWidth != patchWidth) || (this.patchHeight != patchHeight))) return;
+            AnalysisStepperModel	model = getModel();
+
 //
-            this.patchWidth  = patchWidth;
-            this.patchHeight = patchHeight;
+            this.patchWidth  = 550;		// model.getPatchPreviewSize();
+            this.patchHeight = 550;		// model.getPatchPreviewSize();
         } catch (NullPointerException exception) {
             GrasppeKit.debugError("Updating Patch Preview Size", exception, 5);
         }
@@ -112,22 +257,29 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
         setSize(new Dimension(this.patchWidth, this.patchHeight));
     }
 
-	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.conres.framework.analysis.view.PatchBoundView#updateView()
+     */
 
-	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     */
+    @Override
+    public void updateView() {
+        updatePreviewImage();
+        super.updateView();
+    }
 
-	public void componentResized(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    /*
+     *  (non-Javadoc)
+     * @see javax.swing.JComponent#setBackground(java.awt.Color)
+     */
 
-	public void componentShown(ComponentEvent arg0) {
-		update();
-	}
+    /**
+     *  @param bg
+     */
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+    }
 }

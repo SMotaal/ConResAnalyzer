@@ -72,7 +72,7 @@ public class ExportAnalysis extends AnalysisCommand {
         boolean			canProceed      = canExecute();
 
         try {
-	        String filename = controller.getTargetManager().generateFilename("a.csv");
+	        String filename = controller.getTargetManager().generateFilename("a.csv","Data");
 	        controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
 	        IJ.showMessage("Analysis grid exported to " + FilenameUtils.getName(filename) + ".");
         } catch (Exception exception) {
