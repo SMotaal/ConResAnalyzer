@@ -262,7 +262,7 @@ public abstract class DebuggableComponent extends AbstractComponent {
 	    try {
 	        updateDebugLabels();
 	    } catch (Exception exception) {
-	        GrasppeKit.debugError("DebugView", exception, dbg);
+	        GrasppeKit.debugError("DebugView", exception, 10);
 	        prepareDebugView();
 	    }
 	

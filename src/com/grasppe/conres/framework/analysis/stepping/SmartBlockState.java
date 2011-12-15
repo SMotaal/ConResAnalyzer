@@ -13,29 +13,21 @@ package com.grasppe.conres.framework.analysis.stepping;
 /**
  * @author daflair
  */
-public class SmartBlockState extends BlockState {
+public class SmartBlockState extends BlockState implements Cloneable {
 
     /**
      * @param sourceState
      */
     public SmartBlockState(ISteppingBlockState sourceState) {
         super(sourceState);
-
-//      
-//      this.rows = sourceState.rows;
-//      this.columns = sourceState.columns;
-//      this.row = sourceState.row;
-//      this.column = sourceState.column;
-//      this.blockMap=sourceState.blockMap;
-//      //this.blockMap = sourceState.blockMap;
     }
 
     /**
-     * @param rows
-     * @param columns
-     * @param row
-     * @param column
-     * @param blockMap
+     * @param rows	number of rows
+     * @param columns	number of columns
+     * @param row	current row
+     * @param column	current column 
+     * @param blockMap	current block values
      */
     protected SmartBlockState(int rows, int columns, int row, int column, int blockMap[][]) {
         super(rows, columns, row, column, blockMap);
@@ -45,30 +37,16 @@ public class SmartBlockState extends BlockState {
      * @return
      */
     public boolean checkBlockBoundries() {
-
-        // TODO
-        // boolean boundaryMissing = false;
-//      for (column = 0; column > this.columns; column++) {
-//          if (getColumnBoundary(column) == -1) {
-//              //boundaryMissing = true;
-//              return false;
-//          }
-//      }
-        return this.firstMissingBoundary() == -1;		// !boundaryMissing;
+        return firstMissingBoundary() == -1;		// !boundaryMissing;
     }
 
     /**
      * (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.ISteppingBlockState#copy()
-     * @return
+     * @return copy this state
      */
     @Override
-    public SmartBlockState copy() {
-
-        // TODO Auto-generated method stub
-        SmartBlockState	stateCopy = new SmartBlockState(this);
-
-        return stateCopy;
+    public SmartBlockState clone() {
+        return new SmartBlockState(this);
     }
 
     /**
@@ -147,8 +125,7 @@ public class SmartBlockState extends BlockState {
         int	acceptBoundary = this.getColumnAcceptBoundary(column);
         int	rejectBoundary = this.getColumnRejectBoundary(column);
 
-        // printBlock(this.blockMap[column]);
-//      System.out.println(">> Column" + column + " Accept " + acceptBoundary + " Reject " + rejectBoundary);
+        
         if ((acceptBoundary <= this.getRows()) && (acceptBoundary + 1 == rejectBoundary))
             return acceptBoundary;
 

@@ -18,7 +18,7 @@ public interface ISteppingBlockState {
     /**
      * @return
      */
-    ISteppingBlockState copy();
+    ISteppingBlockState clone();
 
     /**
      * @param otherState

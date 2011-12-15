@@ -103,7 +103,7 @@ public class PatchBoundView extends JPanel implements Observer {
     /**
      */
     public void updateView() {
-    	repaint();
+    	repaint(100);
     }
 
     /**

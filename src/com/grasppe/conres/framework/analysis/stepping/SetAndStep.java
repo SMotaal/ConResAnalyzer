@@ -6,19 +6,17 @@
 
 
 
-/**
- */
 package com.grasppe.conres.framework.analysis.stepping;
 
 import com.grasppe.conres.framework.analysis.stepping.BlockState.PatchDesignation;
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * @author daflair
  */
 public class SetAndStep extends SteppingStrategy {
 
-    /** Field description */
-    protected int	value;
+    protected int	finalValue;
 
     /**
      * @param blockState
@@ -26,109 +24,90 @@ public class SetAndStep extends SteppingStrategy {
      */
     public SetAndStep(BlockState blockState, int value) {
         super(blockState);
-        this.value = value;
-
-        // TODO Auto-generated constructor stub
+        finalValue = value;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.SteppingStrategy#execute()
+    /**
      */
+    public void assumeClear() {
+        if (!(row < getMaxRow())) return;
+
+        BlockState	before = finalState.clone();
+        BlockState	after  = fillValues(before.clone(), getMaxRow(), row + 1, column, MARGINAL,
+                                      CLEAR);
+
+        setFinalState(after);
+    }
 
     /**
-     * @return
+     */
+    public void assumeFail() {
+        if (!(row < getMaxRow())) return;
+
+        BlockState	before = finalState.clone();
+        BlockState	after  = fillValues(before.clone(), getMaxRow(), row + 1, column, null,
+                                      ASSUMED_FAIL);
+
+        setFinalState(after);
+    }
+
+    /**
+     */
+    public void assumePass() {
+        if (!(row > getMinRow())) return;
+
+        BlockState	before = finalState.clone();
+        BlockState	after  = fillValues(before.clone(), getMinRow(), row - 1, column, null,
+                                      ASSUMED_PASS);
+
+        setFinalState(after);
+    }
+
+    /**
+     * 	@return
+     */
+    public boolean checkColumn() {
+        int	firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
+        int firstPass = findNextIs(finalState, getMinRow(), column, MARGINAL);
+
+        if (firstMarginal>0) return checkAbove(firstMarginal) && checkBelow(firstMarginal);
+        else return checkBelow(Math.max(0,firstPass));        
+        
+    }
+
+    /**
+     * @return  true when executed successfully
      */
     @Override
     public boolean execute() {
 
-        // TODO Auto-generated method stub
-    	BlockState newState = this.getFinalState();
-        int	column = this.getFinalState().getColumn();
-        int	row    = this.getFinalState().getRow();
-        int	value  = this.value;
-               
-        switch(PatchDesignation.designation(value)) {
-        case PASS :
-            newState.setValue(PatchDesignation.PASS, row, column);
-        	assumePass(newState, row, column);
-        	// move down
-        	break;
-        case MARGINAL :
-        	newState.setValue(PatchDesignation.MARGINAL, row, column);
-        	// if next is judged 
-        case FAIL :
-        	newState.setValue(PatchDesignation.FAIL, row, column);
-        	assumeFail(newState, row, column);
-        	// move up
-        	break;        	
+        PatchDesignation	intended = PatchDesignation.designation(finalValue);
+
+        try {
+            if (intended == PASS) {
+                finalState.setValue(PASS, row, column);		// Judged Pass
+                assumePass();
+            } else if (intended == FAIL) {
+                finalState.setValue(FAIL, row, column);		// Judged Fail
+                assumeFail();
+            } else if (intended == MARGINAL) {
+                if (finalState.getPatchValue(row, column) != MARGINAL) assumeClear();
+                finalState.setValue(MARGINAL, row, column);
+            } else
+                return false;
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Setting Values", exception, 2);
         }
-        
-        // TODO: Move to next position
-        
-        
-        setFinalState(newState);
+
+        try {
+            if (checkColumn())
+            	setFinalState(new StepOver(finalState).executedState());
+            else
+            	setFinalState(new StepNext(finalState).executedState());
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Stepping Next", exception, 2);
+        }
 
         return true;
-    }
-    
-    public static void assumePass (BlockState blockState, int row, int column) {
-    	int maxRow = blockState.rows-1;
-    	int minRow = 0;
-    	fillValues(blockState, minRow, row+1, column, PatchDesignation.PASS, PatchDesignation.ASSUMED_PASS);
-
-    }
-    
-    public static void assumeFail (BlockState blockState, int row, int column) {
-    	int maxRow = blockState.rows-1;
-    	int minRow = 0;
-    	
-    	fillValues(blockState, row+1, maxRow, column, PatchDesignation.FAIL, PatchDesignation.ASSUMED_FAIL);
-    }
-    
-    public static void fillValues (BlockState blockState, int startRow, int endRow, int column, PatchDesignation newValue) {
-    	fillValues(blockState,startRow, endRow, column, null, newValue);
-    }
-    
-    public static void fillValues (BlockState blockState, int startRow, int endRow, int column, PatchDesignation testValue, PatchDesignation newValue) {
-    	if (startRow>endRow)
-    		for (int r = endRow; r>=startRow; r--) {
-    			if (testValue==null || blockState.getDesignation(r, column)!=testValue)
-    				blockState.setValue(newValue, r, column);
-    		}
-		else if (startRow<endRow)
-    		for (int r = endRow; r<=startRow; r++) {
-    			if (testValue==null || blockState.getDesignation(r, column)!=testValue)
-    				blockState.setValue(newValue, r, column);    			
-    		}
-    }    
-    
-    public static void assumeMarginal (BlockState blockState, int row, int column) {
-    	int maxRow = blockState.rows-1;
-    	int minRow = 0;
-    	int lastPass = findLast(blockState, row, column, PatchDesignation.PASS);
-    	int nextFail = findNext(blockState, row, column, PatchDesignation.FAIL);
-    	int lastMarginal = findLast(blockState, row, column, PatchDesignation.MARGINAL);
-    	int nextMarginal = findNext(blockState, row, column, PatchDesignation.MARGINAL);
-    	
-//    	 Nothing to assume!
-//    	
-//    	if (lastPass < row && lastMarginal<minRow) {
-//    		// TODO: nothing to assume and move up
-//    	} else if (lastPass < row && lastMarginal>lastPass) {
-//    		// TODO: assume marginal
-//    	}
-    }
-    
-    public static int findLast(BlockState blockState, int row, int column, PatchDesignation designation) {
-    	while ((row>-1) &&  (blockState.getDesignation(row-1, column)!=designation))
-    		row--;
-    	return row;    	
-    }
-    
-    public static int findNext(BlockState blockState, int row, int column, PatchDesignation designation) {
-    	while ((row<blockState.rows) &&  (blockState.getDesignation(row+1, column)!=designation))
-    		row++;
-    	return row;
     }
 }

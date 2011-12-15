@@ -13,7 +13,7 @@ package com.grasppe.conres.framework.analysis;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
-import com.grasppe.conres.framework.analysis.stepping.BlockMap;
+import com.grasppe.conres.framework.analysis.stepping.BlockGrid;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SetAndStep;
 import com.grasppe.conres.framework.analysis.stepping.SmartBlockState;
@@ -21,6 +21,7 @@ import com.grasppe.conres.framework.analysis.stepping.StepBack;
 import com.grasppe.conres.framework.analysis.stepping.StepDown;
 import com.grasppe.conres.framework.analysis.stepping.StepLeft;
 import com.grasppe.conres.framework.analysis.stepping.StepNext;
+import com.grasppe.conres.framework.analysis.stepping.StepOver;
 import com.grasppe.conres.framework.analysis.stepping.StepRight;
 import com.grasppe.conres.framework.analysis.stepping.StepUp;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
@@ -97,7 +98,7 @@ public class AnalysisStepper extends AbstractController {
             if (keyModifiers == 1) {
                 goBack = true;
             } else
-                thisStep = new StepNext(smartState);
+                thisStep = new StepOver(smartState);
 
             break;
 
@@ -221,7 +222,7 @@ public class AnalysisStepper extends AbstractController {
      */
     public static void oldMain(String argv[]) {
 
-//      Frame                 frame  = new Frame("BlockMap");
+//      Frame                 frame  = new Frame("BlockGrid");
 //      final AnalysisStepper canvas = new AnalysisStepper();
 //
 //      canvas.setSize(500, 500);
@@ -453,9 +454,9 @@ public class AnalysisStepper extends AbstractController {
 
             getModel().setPatchImage(patchImage);
 
-            BlockMap	blockMap = new BlockMap(getModel().getBlockState());
+            BlockGrid	blockGrid = new BlockGrid(getModel().getBlockState());
 
-            getModel().setImage(blockMap.getImage());
+            getModel().setImage(blockGrid.getImage());
 
         } catch (Exception exception) {
             GrasppeKit.debugError("Updating Patch Preview (using selected position)", exception, 2);

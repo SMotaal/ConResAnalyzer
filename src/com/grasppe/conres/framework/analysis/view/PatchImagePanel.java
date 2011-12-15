@@ -75,7 +75,9 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
         }
         try {
         	AnalysisStepperModel model = getModel();
-            g.drawImage(getModel().getPatchImage(), (getWidth()-patchWidth)/2, (getHeight()-patchHeight)/2, patchWidth, patchHeight, this);
+//            g.drawImage(getModel().getPatchImage(), (getWidth()-getModel().getPatchImage().getW)/2, (getHeight()-patchHeight)/2, patchWidth, patchHeight, this);
+        	
+            g.drawImage(getModel().getPatchImage(), (getWidth()-patchWidth)/2, (getHeight()-patchHeight)/2, this);
         } catch (Exception exception) {
         	GrasppeKit.debugError("Painting Patch Preview", exception, 2);
         }
@@ -93,14 +95,14 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
         super.updateSize();
 
         try {
-//            BufferedImage	patchImage  = getModel().getPatchImage();
-//            int				patchWidth  = patchImage.getWidth(),
-//							patchHeight = patchImage.getHeight();
+            BufferedImage	patchImage  = getModel().getPatchImage();
+            int				patchWidth  = patchImage.getWidth(),
+							patchHeight = patchImage.getHeight();
 //
 //            if (!((this.patchWidth != patchWidth) || (this.patchHeight != patchHeight))) return;
 //
-//            this.patchWidth  = patchWidth;
-//            this.patchHeight = patchHeight;
+            this.patchWidth  = patchWidth;
+            this.patchHeight = patchHeight;
         } catch (NullPointerException exception) {
             GrasppeKit.debugError("Updating Patch Preview Size", exception, 5);
         }

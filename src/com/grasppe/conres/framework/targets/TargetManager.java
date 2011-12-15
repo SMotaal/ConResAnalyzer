@@ -79,7 +79,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     public CornerSelector	cornerSelector = null;
     int						dbg            = 0;
     
-    public int	patchPreviewSize = 750;
+    public int	patchPreviewSize = 2400;
 
     /**
      * @param listener
@@ -386,9 +386,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     /**
      * @return the maximum scale factor (below 1.0) used to render patch image previews
      */
-    public double getMaximumScaleFactor() {
+    public double getScaleFactor(double maximumDPIValue) {
     	double scaleFactor = 1.0;
-    	double maximumDPIValue = 1200.0;
     	ImageFile blockImage=null;
     	String blockImageString = "";
     	if (getBlockImage()!=null) {
@@ -419,6 +418,17 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         int	dbg = 0;
 
         try {
+        	ImagePlus	imagePlus = getImagePlus();
+        	if (imagePlus == null) return null;
+        	
+        	ImageFile imageFile = getBlockImage();
+        	double imageDPI = imageFile.getResolution().value;
+        	double displayDPI = 128.0;
+            double dpiRatio = imageDPI/displayDPI;
+            double scaleRatio  = 2.5;
+            double windowRatio = 6.0;
+//        	double scalingFactor =  displayDPI/imageDPI;
+        	
 
             int			stepsY      = getCornerSelectorModel().getTargetDimensions().getYCenters().length;
             int			cI          = (column * stepsY) + row;
@@ -427,11 +437,12 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             Polygon		polygon     = patchSetROI.getPolygon();
             int			cX          = polygon.xpoints[cI];
             int			cY          = polygon.ypoints[cI];
-
+            
 //          int           cW          = (int)(polygon.xpoints[1] - polygon.xpoints[0]);//getCornerSelectorModel().getTargetDimensions().getXSpan() * 1.15);
-            int	cH = (int)((polygon.ypoints[1] - polygon.ypoints[0]) * 1.5);
+            int	cH = (int)((polygon.ypoints[1] - polygon.ypoints[0]) * windowRatio);
 
-            cH = (int)Math.round(Math.max(cH, patchPreviewSize)/getMaximumScaleFactor());
+            //cH = (int)Math.max(cH/getScaleFactor(128),patchPreviewSize);
+//            cH = (int) Math.round(patchPreviewSize*dpiRatio);
 
             int	cW = cH;
 
@@ -442,11 +453,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
             GrasppeKit.debugText("Get Patch Image",
                                  "Patch: " + row + ", " + column + "\tCenter:" + cX + ", " + cY
-                                 + "\tCorner:" + x1 + ", " + y1);
+                                 + "\tCorner: " + x1 + ", " + y1 + "\tdpiRatio: " + imageDPI + "/" + displayDPI + dpiRatio, 2);
 
-            ImagePlus	imagePlus = getImagePlus();
-
-            if (imagePlus == null) return null;
 
             Image	image = imagePlus.getImage();
 
@@ -459,7 +467,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
             Image	patchImage = toolkit.createImage(patchImageProducer);
 
-            return patchImage;
+            return patchImage.getScaledInstance((int)Math.round(cW/dpiRatio*scaleRatio), (int)Math.round(cH/dpiRatio*scaleRatio), Image.SCALE_SMOOTH);	// patchImage;
 
         } catch (Exception exception) {
             GrasppeKit.debugError("Getting Patch Image", exception, 2);
