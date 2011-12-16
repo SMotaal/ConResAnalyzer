@@ -8,6 +8,10 @@
 
 package com.grasppe.conres.analyzer;
 
+import java.awt.FileDialog;
+
+import javax.swing.JFrame;
+
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.cases.operations.OpenCase;
@@ -26,7 +30,12 @@ public class ConResAnalyzerMain {
      */
     public static void main(String[] args) {
     	
-
+////    	public static void main(String[] args) throws UnsupportedLookAndFeelException {
+//    	    JFrame frame = new JFrame();
+//    	    System.setProperty("apple.awt.fileDialogForDirectories", "true");
+//    	    FileDialog d = new FileDialog(frame);
+//    	    d.setVisible(true);
+////    	}
 
     	// Thread	runningThread = 
     	new Thread() {

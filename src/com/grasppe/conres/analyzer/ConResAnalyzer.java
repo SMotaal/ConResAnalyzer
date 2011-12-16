@@ -18,6 +18,7 @@ import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.components.IAuxiliaryCaseManager;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -70,7 +71,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
         setTargetManager(new TargetManager(this));
         setAnalysisManager(new AnalysisManager(this));
         managers = new AbstractController[] { caseManager, targetManager, analysisManager };
-        analyzerView.prepareView();
+        analyzerView.createView();
     }
     
     
@@ -92,12 +93,12 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                     try {
                         ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
                     } catch (Exception exception) {
-                        exception.printStackTrace();
+                    	GrasppeKit.debugError("Backgrounding Case", exception, 8);
                     }
                 }
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugError("Backgrounding Case", exception, 8);
         }
     }
 
@@ -118,12 +119,12 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                     try {
                         ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
                     } catch (Exception exception) {
-                        exception.printStackTrace();
+                    	GrasppeKit.debugError("Discarding Case", exception, 8);
                     }
                 }
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugError("Discarding Case", exception, 8);
         }
     }
 
@@ -145,12 +146,12 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                     try {
                         ((IAuxiliaryCaseManager)manager).restoreBackgroundCase();
                     } catch (Exception exception) {
-                        exception.printStackTrace();
+                        GrasppeKit.debugError("Restoring Case", exception, 8);
                     }
                 }
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	GrasppeKit.debugError("Restoring Case", exception, 8);
         }
     }
 

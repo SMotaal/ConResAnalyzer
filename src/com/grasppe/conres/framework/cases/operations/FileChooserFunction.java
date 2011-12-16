@@ -9,6 +9,10 @@
 package com.grasppe.conres.framework.cases.operations;
 
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
+import com.grasppe.conres.io.TargetDefinitionReader;
+import com.grasppe.conres.io.model.CaseFolder;
+import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.io.model.TargetDefinitionFile;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
@@ -36,8 +40,7 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     JFileChooser		fileChooser;
     FileSelectionMode	fileSelectionMode = FileSelectionMode.FILES_AND_DIRECTORIES;
     TreeSet<FileFilter>	filters           = new TreeSet<FileFilter>();
-    
-    int dbg = 0;
+    int					dbg               = 0;
 
     /**
      * @param name
@@ -87,17 +90,38 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
     /**
      */
     public void prepareFileChooser() {
-//        fileChooser = new JFileChooser();
-      fileChooser = new JFileChooser(new File(".")) {
 
-          public void approveSelection() {
-              if (getSelectedFile().isDirectory()) {
-            	  setCurrentDirectory(getSelectedFile());
-            	  return;
-              }
-              else super.approveSelection();
-          }
-      };    	
+//      
+//      System.setProperty("apple.awt.fileDialogForDirectories", "true");
+//      FileDialog d = new FileDialog(frame) {
+//          
+//      };
+
+//      fileChooser = new JFileChooser();
+//      if (!GrasppeKit.isRunningJar()) {
+        fileChooser = new JFileChooser() {		// new File(".")) {
+
+            public void approveSelection() {
+                if (getSelectedFile().isDirectory()) {
+                    try {
+                        String					folderPath           = getSelectedFile().getAbsolutePath();
+                        CaseFolder				caseFolder           = new CaseFolder(folderPath);
+                        TargetDefinitionFile	targetDefinitionFile =
+                            caseFolder.getTargetDefinitionFile();
+                        TargetDefinitionReader	reader =
+                            new TargetDefinitionReader(targetDefinitionFile);
+                        ImageFile[]	imageFiles = caseFolder.getImageFiles();
+
+                        super.approveSelection();
+                    } catch (Exception exception) {
+                        setCurrentDirectory(getSelectedFile());
+                    }
+
+                    return;
+                } else
+                    super.approveSelection();
+            }
+        };
         fileChooser.setFileSelectionMode(fileSelectionMode.value());
 
         // Add filters
@@ -106,14 +130,12 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
 
         // Setting initial chooser selection
         try {
-            File	defaultPath = new File(getDefaultChooserPath());
+            if (!GrasppeKit.isRunningJar()) {
+                File	defaultPath = new File(getDefaultChooserPath());
 
-            fileChooser.setSelectedFile(defaultPath);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-
-            // Not setting initial chooser selection
-        }
+                fileChooser.setSelectedFile(defaultPath);
+            }
+        } catch (NullPointerException exception) {}
     }
 
     /**
@@ -125,11 +147,8 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
 
         try {
             canProceed = execute(true);
-        } catch (Exception e) {
-            GrasppeKit.debugText(finalName + " Failed",
-                                 finalName + " threw a " + e.getClass().getSimpleName() + "\n\n"
-                                 + e.toString(), dbg);
-            e.printStackTrace();
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Selecing Case Folder", exception, 3);
         }
 
         return canProceed;

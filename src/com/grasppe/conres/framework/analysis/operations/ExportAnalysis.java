@@ -12,6 +12,7 @@ import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.AnalysisStepper;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
+import com.grasppe.lure.framework.FloatingAlert;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -74,9 +75,10 @@ public class ExportAnalysis extends AnalysisCommand {
         try {
 	        String filename = controller.getTargetManager().generateFilename("a.csv","Data");
 	        controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
-	        IJ.showMessage("Analysis grid exported to " + FilenameUtils.getName(filename) + ".");
+//	        IJ.showMessage("Analysis grid exported to " + FilenameUtils.getName(filename) + ".");
+	        new FloatingAlert("Export Complete!").flashView(500);
         } catch (Exception exception) {
-        	exception.printStackTrace();
+//        	exception.printStackTrace();
         	Toolkit.getDefaultToolkit().beep();
         }
 

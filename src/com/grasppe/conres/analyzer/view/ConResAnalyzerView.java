@@ -21,9 +21,6 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.DisplayMode;
-import java.awt.GraphicsEnvironment;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,24 +43,7 @@ import javax.swing.KeyStroke;
  */
 public class ConResAnalyzerView extends AbstractView implements Observer {
 
-    /* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractView#update()
-	 */
-	@Override
-	public void update() {
-		updateSize();
-		if (menuItems==null || menuItems.isEmpty()) return;
-		for (JMenuItem menuItem : menuItems) {
-			Action action = menuItem.getAction();
-			if (action!=null && action instanceof AbstractCommand) {
-				menuItem.setEnabled(((AbstractCommand)action).canExecute());
-			}
-		}
-			
-		super.update();
-	}
-
-	/** Field description */
+    /** Field description */
     ConResAnalyzerMenu				menu;
     String							name        = "ConResAnalyzer";
     boolean							finalizable = true;
@@ -77,7 +57,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     private Container				activeContainer     = null;
     private Container				backgroundContainer = null;
     private Container				defaultContainer    = null;
-    ArrayList<JMenuItem> menuItems = new ArrayList<JMenuItem>();
+    ArrayList<JMenuItem>			menuItems           = new ArrayList<JMenuItem>();
 
     /**
      * Constructs a new ConResAnalyzerView with a predefined controller.
@@ -109,8 +89,9 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
      *  @param command
      */
     public void createMenuItem(JMenu menu, AbstractCommand command) {		// AbstractCommand[] commands) {
-    	
-    	if (command.isIgnoreMenu()) return;
+
+        if (command.isIgnoreMenu()) return;
+
         JMenuItem	menuItem = new JMenuItem(command);
 
         int			mnemonic = command.getMnemonicKey();
@@ -130,15 +111,49 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
                 if (!previousGrouping.equals(grouping)) menu.addSeparator();
             }
         }
-        
+
         command.attachObserver(this);
 
         this.menuItems.add(menuItem);
         menu.add(menuItem);
         GrasppeKit.debugText("Command Menu Created", GrasppeKit.lastSplit(command.toString()));
     }
-    
-    
+
+    /**
+     * Builds the graphical user interface window and elements.
+     */
+    public void createView() {
+
+        if (mainFrame != null) return;
+
+        mainFrame = new JFrame("ConResAnalyzer");
+
+        mainFrame.setUndecorated(true);
+
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        updateSize();
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        mainFrame.setVisible(true);
+
+        CaseView	caseView = new CaseView(getController().getCaseManager()); //.getModel());
+
+        mainFrame.add(caseView, BorderLayout.NORTH);
+
+        setContainer(getDefaultContainer());
+
+        prepareMenu();
+    }
+
+    /**
+     */
+    @Override
+    protected void finalizeUpdates() {
+
+        // TODO Auto-generated method stub
+
+    }
 
     /**
      * Completes graphical user interface operations before closing.
@@ -251,61 +266,65 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     }
 
     /**
-     * Builds the graphical user interface window and elements.
+     *  @param container
      */
-    public void prepareView() {
+    public void removeContainer(Container container) {
+        if (container == null) return;
 
-        if (mainFrame != null) return;
+        if (!containers.contains(container)) return;
 
+        if ((activeContainer != null) && (activeContainer == container))
+            setContainer(getDefaultContainer());
 
-        mainFrame = new JFrame("ConResAnalyzer");
-        
-        mainFrame.setUndecorated(true);
+    }
 
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractView#update()
+     */
+
+    /**
+     */
+    @Override
+    public void update() {
         updateSize();
-        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        if ((menuItems == null) || menuItems.isEmpty()) return;
 
-        mainFrame.setVisible(true);
-        
-        
-        CaseView caseView = new CaseView(getController().getCaseManager().getModel());
-        
-        mainFrame.add(caseView, BorderLayout.NORTH);
-        
-        prepareDefaultContainer();
+        for (JMenuItem menuItem : menuItems) {
+            Action	action = menuItem.getAction();
 
-        prepareMenu();
-    }
-    
-    public void updateSize() {
-    	if (mainFrame == null) return;
-    	mainFrame.validate();
-        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-//
-//        DisplayMode	displayMode =
-//        		GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-//        				.getDisplayMode();
-//        int	displayWidth  = displayMode.getWidth();
-//        int	displayHeight = displayMode.getHeight();
-//        int frameWidth = displayWidth - 150;
-//        int frameHeight = displayHeight - 150;
-//        mainFrame.setMinimumSize(new Dimension(frameWidth, frameHeight));
-//        mainFrame.setLocation((displayWidth - frameWidth) / 2, ((displayHeight - frameHeight) / 2) - 50);
-    }
-    
-    public void prepareDefaultContainer() {
-    	if (defaultContainer!=null) return;
-    	defaultContainer = new JPanel(new BorderLayout());
-    	
-    	defaultContainer.setBackground(Color.DARK_GRAY);
-    	
-    	setContainer(defaultContainer);
+            if ((action != null) && (action instanceof AbstractCommand)) {
+                menuItem.setEnabled(((AbstractCommand)action).canExecute());
+            }
+        }
+        
+        if (activeContainer==null || !activeContainer.isValid() || !activeContainer.isVisible())
+        	setContainer(getDefaultContainer());
+
+        super.update();
     }
 
     /**
-     * 	@return
+     */
+    public void updateSize() {
+        if (mainFrame == null) return;
+        mainFrame.validate();
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+//
+//      DisplayMode   displayMode =
+//            GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+//                    .getDisplayMode();
+//      int   displayWidth  = displayMode.getWidth();
+//      int   displayHeight = displayMode.getHeight();
+//      int frameWidth = displayWidth - 150;
+//      int frameHeight = displayHeight - 150;
+//      mainFrame.setMinimumSize(new Dimension(frameWidth, frameHeight));
+//      mainFrame.setLocation((displayWidth - frameWidth) / 2, ((displayHeight - frameHeight) / 2) - 50);
+    }
+
+    /**
+     *  @return
      */
     public Container getContentPane() {
         if (mainFrame != null) return mainFrame.getContentPane();
@@ -322,8 +341,22 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     /**
      *  @return
      */
+    public Container getDefaultContainer() {
+        if (defaultContainer != null) return defaultContainer;
+
+        defaultContainer = new JPanel(new BorderLayout());
+        defaultContainer.setBackground(Color.DARK_GRAY);
+
+//      setContainer(defaultContainer);
+        return (defaultContainer);
+
+    }
+
+    /**
+     *  @return
+     */
     public JFrame getFrame() {
-        if (mainFrame == null) prepareView();
+        if (mainFrame == null) createView();
 
         return mainFrame;
     }
@@ -357,25 +390,19 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
      *  @return
      */
     @Override
-	public ConResAnalyzerModel getModel() {
+    public ConResAnalyzerModel getModel() {
         return (ConResAnalyzerModel)super.getControllerModel();
-    }
-    
-    public void removeContainer(Container container) {
-    	if (container == null) return;
-    	
-    	if (!containers.contains(container)) return;
-    	
-    	if (activeContainer!=null && activeContainer==container)
-    		setContainer(defaultContainer);
-    		
     }
 
     /**
      *  @param container
      */
     public void setContainer(Container container) {
-        if (container == null) return;
+        if (container == null) {
+            setContainer(getDefaultContainer());
+
+            return;
+        }
 
         if ((activeContainer != null) && (activeContainer == container)) return;
 
@@ -383,16 +410,27 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
         if ((activeContainer != null) && (getContentPane() != null)
                 && (activeContainer.getParent() == getContentPane())) {
-        	activeContainer.setVisible(false);
+            activeContainer.setVisible(false);
             getContentPane().remove(activeContainer);
             backgroundContainer = activeContainer;
         }
 
-        prepareView();
+        createView();
 
         if (activeContainer != container) {
             activeContainer = container;
             getContentPane().add(container, BorderLayout.CENTER);
+
+//          KeyListener   keyListener = new KeyAdapter() {
+//
+//              public void keyPressed(KeyEvent ke) {
+//                  if (ke.isConsumed()) return;
+//                  if (nudgeROI(ke))ke.consume(); //.getKeyCode(), ke.getModifiers())) 
+//              }
+//          };
+//          viewContainer.addKeyListener(keyListener);
+            container.setFocusable(true);
+            setComponentFocus(container);
             container.setVisible(true);
             container.requestFocus();
             container.validate();
@@ -425,10 +463,4 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
             super.setText(text);
         }
     }
-
-	@Override
-	protected void finalizeUpdates() {
-		// TODO Auto-generated method stub
-		
-	}
 }

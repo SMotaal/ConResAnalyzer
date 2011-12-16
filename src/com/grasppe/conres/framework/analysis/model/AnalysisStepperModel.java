@@ -206,7 +206,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.activeBlock = activeBlock;
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	this.activeBlock = null;
         }
     }
 
@@ -217,7 +217,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.activePatch = activePatch;
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	this.activePatch = null;
         }
     }
 
@@ -242,7 +242,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.blockState = blockState;
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	this.blockState = null;
         }
     }
 
@@ -260,7 +260,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.history = history;
         } catch (Exception exception) {
-            exception.printStackTrace();
+        	this.history = null;
         }
     }
 
@@ -271,7 +271,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.image = image;
         } catch (Exception exception) {
-            exception.printStackTrace();
+            this.image = null;
         }
     }
 
@@ -304,7 +304,7 @@ public class AnalysisStepperModel extends AbstractModel {
         try {
             this.patchImage = patchImage;
         } catch (Exception exception) {
-            exception.printStackTrace();
+            this.patchImage = null;
         }
     }
 
@@ -316,7 +316,7 @@ public class AnalysisStepperModel extends AbstractModel {
             if (patchImage == null) this.patchImage = null;
             else setPatchImage(getController().toBufferedImage(patchImage));
         } catch (Exception exception) {
-            exception.printStackTrace();
+            this.patchImage = null;
         }
     }
 

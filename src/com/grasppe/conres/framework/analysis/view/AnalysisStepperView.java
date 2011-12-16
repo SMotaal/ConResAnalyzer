@@ -25,6 +25,8 @@ import com.grasppe.lure.framework.GrasppeKit;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
@@ -39,6 +41,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 /**
@@ -68,38 +71,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
     /**
      */
     private void createView() {
-
-//      
-//      //        if (viewContainer!=null)
-//      //            setVisible(false);
-//      
-//      //      int dbg = 0;
-//      
-//              // SteppingPreview canvas
-//      //        canvas = new SteppingPreview(getBlockState());
-//      
-//      //        canvas.setSize(100, 100);
-//      
-//              // Instructions Label
-//              String    labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
-//                                 + "<pre>Marking patches: (and step over)</pre>"
-//                                 + "<pre>    <b>  G     </b>" + "Good</pre>" + "<pre>    <b>  A     </b>"
-//                                 + "Accept</pre>" + "<pre>    <b>  R     </b>" + "Reject</pre>"
-//                                 + "<pre></pre>" + "<pre>Moving around:</pre>"
-//                                 + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
-//                                 + "<pre>    <b>  \u2193     </b>" + "Down</pre>"
-//                                 + "<pre>    <b>  \u2190    </b>" + "Left</pre>"
-//                                 + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
-//                                 + "<pre>    <b>  SP    </b>" + "Step Over</pre>"
-//                                 + "<pre>    <b>\u21E7 SP   </b>" + "Step Back</pre>" + "</html>";
-//      
-//              label = new JLabel(labelText, JLabel.LEFT);
-//              label.setVerticalTextPosition(JLabel.TOP);
-//              label.setVerticalAlignment(JLabel.TOP);
-//              label.setPreferredSize(new Dimension(100, 100));
-//              label.setMaximumSize(label.getPreferredSize());
-//              label.setMinimumSize(label.getPreferredSize());
-//              label.setFont(label.getFont().deriveFont(11.0F));
+    	
+//    	SwingUtilities.invokeLater( new Runnable() {	public void run() {
 
         // Assemble Panel
         JPanel	panel = new JPanel();		// panel.setBackground(Color.DARK_GRAY);
@@ -150,9 +123,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 
         viewContainer = new JPanel(new BorderLayout());
 
-        super.viewComponents.add(viewContainer);
+        viewComponents.add(viewContainer);
 
-        viewContainer.setFocusable(true);
 
         // setFrameMenu(viewContainer);
 
@@ -176,8 +148,14 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
                 if (getController().BlockStepKey(ke.getKeyCode(), ke.getModifiers())) ke.consume();
             }
         };
-
         viewContainer.addKeyListener(keyListener);
+        viewContainer.setFocusable(true);
+        setComponentFocus(viewContainer);
+        
+//        
+//        for (Component component : viewContainer.getComponents()) {
+//        	component.setFocusable(false);
+//        }
 
         // viewContainer.addKeyListener(keyListener);
         try {
@@ -197,6 +175,7 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
         getParentView().setContainer(viewContainer);
 
         update();
+//    }});
     }
 
     /*

@@ -93,6 +93,14 @@ public abstract class AbstractView extends DebuggableComponent implements Observ
 //      }
         super.finalize();
     }
+    
+    protected void setComponentFocus(Container container) {
+        for (Component component : container.getComponents()) {
+        	if (component instanceof Container)
+        		setComponentFocus((Container)component);
+        	component.setFocusable(false);
+        }
+    }
 
     /**
      * Method called by observable object during notifyObserver calls.

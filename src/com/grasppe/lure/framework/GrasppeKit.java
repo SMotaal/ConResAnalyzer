@@ -497,7 +497,7 @@ public class GrasppeKit {
     /**
      */
     public enum OperatingSystem implements IIntegerValue {
-        UNKNOWN(0, "Unknown"), LINUX(1, "Linux"), UNIX(2, "Unix"), MAC(3, "Mac currentOSString"),
+        UNKNOWN(0, "Unknown"), LINUX(1, "Linux"), UNIX(2, "Unix"), MAC(3, "Mac"),
         WINDOWS(4, "Windows");
 
         private static String			currentOSString = null;
@@ -566,14 +566,14 @@ public class GrasppeKit {
          *  @return
          */
         public static boolean isLinux() {
-            return getOsName().contains("Linux");
+            return getOsName().toLowerCase().contains("linux");
         }
 
         /**
          *  @return
          */
         public static boolean isMac() {
-            return getOsName().startsWith("Mac");
+            return getOsName().toLowerCase().startsWith("mac");
         }
 
         /**
@@ -594,7 +594,7 @@ public class GrasppeKit {
          *  @return
          */
         public static boolean isWindows() {
-            return getOsName().startsWith("Windows");
+            return getOsName().toLowerCase().startsWith("windows");
         }
     }
 
@@ -1302,8 +1302,18 @@ public class GrasppeKit {
      * @param keyCode
      * @return
      */
+    public static String getControlSymbol() {
+    	String osName = System.getProperty("os.name").toLowerCase();
+        boolean	isMac = (osName.indexOf("mac") > -1);
+        return (isMac) ? "\u2318" : "Ctrl";
+    }
+    /**
+     * @param keyCode
+     * @return
+     */
     public static String getModifierSymbol(KeyCode keyCode) {
-        boolean	isMac = (System.getProperty("os.name").toLowerCase().indexOf("mac") > 0);
+    	String osName = System.getProperty("os.name").toLowerCase();
+        boolean	isMac = (osName.indexOf("mac") > -1);
 
         switch (keyCode) {
 

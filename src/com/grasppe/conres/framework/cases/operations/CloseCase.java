@@ -42,7 +42,7 @@ public class CloseCase extends CaseManagerCommand {
     protected boolean				backgroundMode = false;
     protected static final String description = "Close the current case.";
     protected static final String type = Types.FILE;
-    protected boolean ignoreMenu = true;
+//    protected boolean ignoreMenu = true;
     /**
 	 * @return the commandMenu
 	 */

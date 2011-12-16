@@ -56,6 +56,7 @@ import javax.naming.directory.InvalidAttributesException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -597,6 +598,8 @@ public class CornerSelectorView extends AbstractView
      *  @param imageFile
      */
     public void prepareImageWindow(ImageFile imageFile) {
+    	
+//    	SwingUtilities.invokeLater( new Runnable() {	public void run() {
 
         try {
             ImagePlus	imagePlus = getModel().getImagePlus();
@@ -623,12 +626,14 @@ public class CornerSelectorView extends AbstractView
                     if (nudgeROI(ke))ke.consume(); //.getKeyCode(), ke.getModifiers())) 
                 }
             };
-
             viewContainer.addKeyListener(keyListener);
+            viewContainer.setFocusable(true);
+            setComponentFocus(viewContainer);
 
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+//    	}});
 
     }
 

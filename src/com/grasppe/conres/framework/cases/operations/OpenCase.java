@@ -192,7 +192,7 @@ public class OpenCase extends CaseManagerCommand {
                     "CloseCase")).quickClose(getKeyEvent());
             } catch (Exception exception) {
                 canProceed = true;
-                exception.printStackTrace();
+//                exception.printStackTrace();
             }
 
             if (!canProceed) break;		// Alternative scenario succeeded

@@ -29,6 +29,7 @@ import com.grasppe.conres.io.model.TargetDefinitionFile;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.IAuxiliaryCaseManager;
+import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.morie.units.AbstractValue;
 import com.grasppe.morie.units.spatial.SpatialFrequency;
@@ -62,6 +63,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import javax.activity.InvalidActivityException;
+import javax.swing.SwingUtilities;
 
 /**
  * Class description
@@ -151,26 +153,30 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @return
      */
     public String generateFilename(String suffix) {
-    	
-    	return generateFilename(suffix, null);    	
+
+        return generateFilename(suffix, null);
     }
+
     /**
      *  @param suffix
+     * 	@param subFolder
      *  @return
      */
     public String generateFilename(String suffix, String subFolder) {
 
         if (getBlockImage() == null) return null;
 
-        String	imageName = FilenameUtils.getBaseName(getBlockImage().getName());
-        String	fileName  = imageName.substring(0, imageName.length() - 1) + suffix;
-        String folderName = (subFolder!=null) ? subFolder + File.separator : "" ;
-        
-        File parentFolder = getCaseManager().getModel().getCurrentCase().caseFolder;//getBlockImage().getParentFile();
-        if (subFolder!=null) {
-        	File folder = new File (parentFolder.getAbsolutePath() + File.separator + subFolder);
-        	if (parentFolder.exists() && !folder.exists())
-        		if (!folder.mkdir()) folderName="";
+        String	imageName    = FilenameUtils.getBaseName(getBlockImage().getName());
+        String	fileName     = imageName.substring(0, imageName.length() - 1) + suffix;
+        String	folderName   = (subFolder != null) ? subFolder + File.separator
+                : "";
+
+        File	parentFolder = getCaseManager().getModel().getCurrentCase().caseFolder;		// getBlockImage().getParentFile();
+
+        if (subFolder != null) {
+            File	folder = new File(parentFolder.getAbsolutePath() + File.separator + subFolder);
+
+            if (parentFolder.exists() &&!folder.exists()) if (!folder.mkdir()) folderName = "";
         }
 
         return parentFolder + File.separator + folderName + fileName;
@@ -181,7 +187,11 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public void loadImage() {
 
+
         if ((getBlockImage() != null) && (getBlockImage().getAbsolutePath() != loadedImagePath)) {
+        	
+        	FloatingAlert	loadImageAlert = new FloatingAlert("Loading Block!", true);
+
             try {
                 loadPatchCenterROIs(getCornerSelector());
             } catch (FileNotFoundException exception) {
@@ -190,16 +200,28 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
                 GrasppeKit.debugError("Loading ROI File", exception, 2);
             }
 
-            Opener		opener    = new Opener();
-            ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
+//            Thread	openerThread = new Thread() {
+//
+//                public void run() {
+                    Opener		opener    = new Opener();
+                    ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
 
-            getModel().setActiveImagePlus(imagePlus);
-            getCornerSelectorModel().setImagePlus(imagePlus);
-            loadedImagePath = getBlockImage().getAbsolutePath();
+                    getModel().setActiveImagePlus(imagePlus);
+                    getCornerSelectorModel().setImagePlus(imagePlus);
+                    loadedImagePath = getBlockImage().getAbsolutePath();
 
-            getModel().notifyObservers();
-//            getCornerSelectorModel().notifyObservers();
-        }
+                    getModel().notifyObservers();
+                    loadImageAlert.flashView();
+//                }
+//            };
+            
+//            SwingUtilities.invokeLater(openerThread);
+//            openerThread.setPriority(Thread.)
+
+            // getCornerSelectorModel().notifyObservers();
+        } 
+//        else
+//            loadImageAlert.flashView(1);
 
     }
 
@@ -438,18 +460,18 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
-     * 	@param row
-     * 	@param column
-     * 	@return
+     *  @param row
+     *  @param column
+     *  @return
      */
     public PatchDimensions getPatchDimensions(int row, int column) {
-        float		xCenter, yCenter;
-        float		xSpan, ySpan;
-        float		xRepeat, yRepeat;
-        float		imageXRepeat, imageYRepeat;
-        float[]		xCorners, yCorners;
-        
-        TargetDimensions targetDimensions = getModel().getActiveTarget().getDimensions();//getCornerSelectorModel().getTargetDimensions();
+        float				xCenter, yCenter;
+        float				xSpan, ySpan;
+        float				xRepeat, yRepeat;
+        float				imageXRepeat, imageYRepeat;
+        float[]				xCorners, yCorners;
+
+        TargetDimensions	targetDimensions = getModel().getActiveTarget().getDimensions();	// getCornerSelectorModel().getTargetDimensions();
 
         int			stepsY      = targetDimensions.getYCenters().length;
         int			cI          = (column * stepsY) + row;
@@ -457,25 +479,25 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         PatchSetROI	patchSetROI = getPatchSetROI();
         Polygon		polygon     = patchSetROI.getPolygon();
 
-        xCenter  = polygon.xpoints[cI];
-        yCenter  = polygon.ypoints[cI];
-        
-        imageXRepeat = polygon.xpoints[stepsY]- polygon.xpoints[0];
-        imageYRepeat = polygon.ypoints[1]- polygon.ypoints[0];
+        xCenter      = polygon.xpoints[cI];
+        yCenter      = polygon.ypoints[cI];
 
-        xRepeat  = targetDimensions.getXCenters()[1]-targetDimensions.getXCenters()[0];//polygon.xpoints[2] - polygon.xpoints[1];
-        yRepeat  = targetDimensions.getYCenters()[1]-targetDimensions.getYCenters()[0];//targetDimensions.getYRepeat();//polygon.ypoints[2] - polygon.ypoints[1];
-        
-        float xFactor = Math.round(imageXRepeat/xRepeat),
-        		yFactor = Math.round(imageYRepeat/yRepeat);
-        
-        float sFactor = Math.round((xFactor + yFactor)/2.0F);
-        
-        xRepeat  = xRepeat*sFactor;
-        yRepeat  = yRepeat*sFactor;
+        imageXRepeat = polygon.xpoints[stepsY] - polygon.xpoints[0];
+        imageYRepeat = polygon.ypoints[1] - polygon.ypoints[0];
 
-        xSpan    = targetDimensions.getXSpan()*sFactor;
-        ySpan    = targetDimensions.getYSpan()*sFactor;
+        xRepeat      = targetDimensions.getXCenters()[1] - targetDimensions.getXCenters()[0];		// polygon.xpoints[2] - polygon.xpoints[1];
+        yRepeat = targetDimensions.getYCenters()[1] - targetDimensions.getYCenters()[0];	// targetDimensions.getYRepeat();//polygon.ypoints[2] - polygon.ypoints[1];
+
+        float	xFactor = Math.round(imageXRepeat / xRepeat),
+				yFactor = Math.round(imageYRepeat / yRepeat);
+
+        float	sFactor = Math.round((xFactor + yFactor) / 2.0F);
+
+        xRepeat  = xRepeat * sFactor;
+        yRepeat  = yRepeat * sFactor;
+
+        xSpan    = targetDimensions.getXSpan() * sFactor;
+        ySpan    = targetDimensions.getYSpan() * sFactor;
 
         xCorners = new float[] { xCenter - xSpan / 2.0F, xCenter + xSpan / 2.0F };
         yCorners = new float[] { yCenter - ySpan / 2.0F, yCenter + ySpan / 2.0F };
@@ -547,11 +569,11 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
             Toolkit	toolkit    = Toolkit.getDefaultToolkit();
 
             Image	patchImage = toolkit.createImage(patchImageProducer);
-            
+
             return patchImage;
 
-//            return patchImage.getScaledInstance((int)Math.round(cW / dpiRatio * scaleRatio),
-//                    (int)Math.round(cH / dpiRatio * scaleRatio), Image.SCALE_SMOOTH);		// patchImage;
+//          return patchImage.getScaledInstance((int)Math.round(cW / dpiRatio * scaleRatio),
+//                  (int)Math.round(cH / dpiRatio * scaleRatio), Image.SCALE_SMOOTH);     // patchImage;
 
         } catch (Exception exception) {
             GrasppeKit.debugError("Getting Patch Image", exception, 2);
@@ -571,7 +593,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
-     * 	@param maximumDPIValue
+     *  @param maximumDPIValue
      * @return the maximum scale factor (below 1.0) used to render patch image previews
      */
     public double getScaleFactor(double maximumDPIValue) {

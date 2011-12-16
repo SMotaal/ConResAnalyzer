@@ -201,21 +201,38 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
 				rHeight = rBottom - rTop;
 
             
-            g.setColor(Color.GREEN);
-//            int i = 1;
-            g.drawOval(xCenter - xSpan / 2, yCenter - ySpan / 2, xSpan,	ySpan);
+            boolean fullOverlay = false;
             
-            
-            int gap = 35;
-            int o = (int)Math.round(gap*previewRatio);
-            g.setColor(Color.RED);
-            g.drawRect(rLeft+xSpan, rTop, rWidth-xSpan, rHeight);
-
-            for (int i : new int[] { gap, gap++, gap++, gap++, gap++}) { // , , 6 }) {		// 9, 10, 11 })     // = 5; i < 10; i++)
-            	o = (int)Math.round(i*previewRatio);
-//                g.drawOval(xCenter - (xSpan + i) / 2, yCenter - (ySpan + i) / 2, xSpan + i,	ySpan + i);
-                g.setColor(Color.GREEN);
-                g.drawRect(pLeft - o, pTop - o, pWidth + o * 2, pHeight + o * 2);
+            if (!fullOverlay) {
+            	
+            	int[] cX = new int[]{pLeft, pLeft+pWidth, pLeft+pWidth, pLeft},
+            			cY = new int[]{pTop, pTop, pTop+pHeight, pTop+pHeight};
+            	
+            	int cS = (int) Math.min(4.0, Math.max(2.0,(2.0*(scaleRatio/2.0)))); //*previewRatio);
+            	
+            	for (int i : new int[]{0,1,2,3}) {
+            		int x = cX[i],
+            				y = cY[i];
+            		g.setColor(Color.GREEN);
+            		g.fillRect(x-cS, y-cS, cS*2, cS*2);         		
+            		g.setColor(Color.BLACK);
+            		g.drawRect(x-cS, y-cS, cS*2, cS*2);         		
+            	}
+            	
+            } else{ 
+	            g.setColor(Color.GREEN);
+	            g.drawOval(xCenter - xSpan / 2, yCenter - ySpan / 2, xSpan,	ySpan);
+	            
+	            int gap = 35;
+	            int o = (int)Math.round(gap*previewRatio);
+	            g.setColor(Color.RED);
+	            g.drawRect(rLeft+xSpan, rTop, rWidth-xSpan, rHeight);
+	
+	            for (int i : new int[] { gap, gap++, gap++, gap++, gap++}) { // , , 6 }) {		// 9, 10, 11 })     // = 5; i < 10; i++)
+	            	o = (int)Math.round(i*previewRatio);
+	                g.setColor(Color.GREEN);
+	                g.drawRect(pLeft - o, pTop - o, pWidth + o * 2, pHeight + o * 2);
+	            }
             }
             
             this.repaint();
