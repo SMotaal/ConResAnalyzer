@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.cases.operations;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
+import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.preferences.ConResAnalyzerPreferencesAdapter;
 import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -102,7 +103,13 @@ public class OpenCase extends CaseManagerCommand {
      *  @param caseFolder
      *  @return
      *  @throws CancellationException
+     * @throws IOException 
      */
+    public boolean verifyCaseFolder(CaseFolder caseFolder) throws IOException {
+    	
+    	return getCaseManager().verifyCaseFolder(caseFolder);
+    	
+    }
     public boolean openCase(File caseFolder) throws CancellationException {
 
         boolean		canProceed    = true;
@@ -208,10 +215,12 @@ public class OpenCase extends CaseManagerCommand {
     
     public boolean confirmCaseClose() {
         try {
-            return ((CloseCase)this.controller.getCommandHandler().getCommand(
+            ((CloseCase)this.controller.getCommandHandler().getCommand(
                 "CloseCase")).quickClose(getKeyEvent());
+            boolean isCaseClosed = !getCaseManager().getModel().hasCurrentCase();
+            return isCaseClosed;
         } catch (Exception exception) {
-            return true;
+            return false;
         }
     }
 

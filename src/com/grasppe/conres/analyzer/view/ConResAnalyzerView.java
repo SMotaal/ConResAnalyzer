@@ -12,6 +12,7 @@ import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.cases.view.CaseView;
+import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -280,10 +281,10 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     
     public void openCaseFolder(String casePath) {
     	OpenCase openCaseCommand =  new OpenCase(getController().getCaseManager(), getController().getCaseManager());
-    	
+    	CaseFolder caseFolder = new CaseFolder(casePath);
     	try {
-    		if (openCaseCommand.confirmCaseClose())
-    			openCaseCommand.openCase(new File(casePath));
+    		if (openCaseCommand.verifyCaseFolder(caseFolder) && openCaseCommand.confirmCaseClose())
+    			openCaseCommand.openCase(caseFolder);
     	} catch (Exception exception) {
     		GrasppeKit.debugError("Opening Dropped Case", exception, 2);
     	}

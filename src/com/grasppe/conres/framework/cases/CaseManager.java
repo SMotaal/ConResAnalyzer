@@ -27,6 +27,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 import java.awt.event.ActionListener;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.util.LinkedHashMap;
@@ -96,19 +97,40 @@ public class CaseManager extends AbstractController implements ActionListener {
      *  @param newCase
      *  @throws IOException
      */
+    public boolean verifyCaseFolder(CaseFolder caseFolder) throws IOException {
+    	
+//    	CaseFolder	caseFolder = new CaseFolder(folder.getAbsolutePath());
+    	
+    	try {
+    		TargetDefinitionFile targetDefinitionFile = caseFolder.getTargetDefinitionFile();
+    		getTargetManager().loadTargetDefinitionFile(targetDefinitionFile);
+    		ImageFile[]	imageFiles = caseFolder.getImageFiles();
+    	} catch (IOException exception) {
+    		throw exception;
+//    		return false;
+    	}
+    	return true;
+    }
+    /**
+     *  @param newCase
+     *  @throws IOException
+     */
     public void loadCase(CaseModel newCase) throws IOException {
 
         CaseFolder	caseFolder = new CaseFolder(newCase.path);
 
         try {
-        	TargetDefinitionFile targetDefinitionFile = caseFolder.getTargetDefinitionFile();
-//        	if (targetDefinitionFile==null)
-            getTargetManager().loadTargetDefinitionFile(targetDefinitionFile);
-            ImageFile[]	imageFiles = caseFolder.getImageFiles();
+        	verifyCaseFolder(caseFolder);
+//        	TargetDefinitionFile targetDefinitionFile = caseFolder.getTargetDefinitionFile();
+////        	if (targetDefinitionFile==null)
+//            getTargetManager().loadTargetDefinitionFile(targetDefinitionFile);
+//            ImageFile[]	imageFiles = caseFolder.getImageFiles();
         } catch (IOException exception) {
             newCase = null;
             throw exception;
         }
+        
+        if (newCase == null) return;
 
         try {
             newCase.caseFolder           = caseFolder;
