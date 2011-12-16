@@ -68,6 +68,8 @@ public class GrasppeKit {
     private static boolean	isHooked                  = false;
     private static boolean	runningJar                = checkRunningJar();
     private static boolean	windowOpactiyNotSupported = false;
+    
+    public static final String FIELD_SEPARATOR = "\\s+";
 
     /**
      * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.

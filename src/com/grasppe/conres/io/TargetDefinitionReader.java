@@ -13,6 +13,7 @@ package com.grasppe.conres.io;
 import com.grasppe.conres.framework.targets.model.TargetMeasurements;
 import com.grasppe.conres.io.model.IConResTargetDefinition;
 import com.grasppe.conres.io.model.TargetDefinitionFile;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -43,6 +44,8 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     protected ArrayList<String>			sectionLines   = new ArrayList<String>();
     protected IConResTargetDefinition	file;
     protected Reader					reader;
+    
+    public static final String FIELD_SEPARATOR = GrasppeKit.FIELD_SEPARATOR;
 
     /**
      * @param file
@@ -79,20 +82,6 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         reader = in;
     }
 
-//    /**
-//     * @param args
-//     * @throws Exception
-//     * @throws FileNotFoundException
-//     */
-//    public static void main(String[] args) throws FileNotFoundException, Exception {
-//        String	path =
-//            "/Users/daflair/Documents/data/conres/Approval_Scans_ConRes26_FS/CirRe27U.log";
-//        TargetDefinitionFile	file   = new TargetDefinitionFile(path);
-//        TargetDefinitionReader	reader = new TargetDefinitionReader(file);
-//
-//        System.out.println(file);
-//    }
-
     /**
      * @param lines
      */
@@ -107,7 +96,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         while (iterator.hasNext() && (readCount < 4)) {
             String	line     = iterator.next();
 
-            String	fields[] = line.split("\t");
+            String	fields[] = line.split(FIELD_SEPARATOR);
 
             try {
                 int	i = fiducialIDs.indexOf(fields[1].trim().toUpperCase());
@@ -137,7 +126,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         while ((line = super.readLine()) != null) {
             parseLine(line);
 
-            String	fields[] = line.split("\t");
+            String	fields[] = line.split(FIELD_SEPARATOR);
 
 //          for (String field : fields)
 //              System.out.print(field + "\t");
@@ -149,7 +138,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
      * @param line
      */
     protected void parseLine(String line) {
-        String	fields[] = line.split("\t");
+        String	fields[] = line.split(FIELD_SEPARATOR);
         String	head     = fields[0].trim().toLowerCase();
 
         if ((head.length() > 2)) currentSection = head;
@@ -189,7 +178,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         while (iterator.hasNext()) {
             String	line     = iterator.next();
-            String	fields[] = line.split("\t");
+            String	fields[] = line.split(FIELD_SEPARATOR);
 
             try {
                 int	head = new Integer(fields[0]).intValue();
@@ -263,7 +252,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
         try {
             if (!lines.get(0).startsWith("Options")) return;
 
-            String	fields[] = lines.get(1).split("\t");
+            String	fields[] = lines.get(1).split(FIELD_SEPARATOR); //"\t");
             int		nFields  = fields.length;
 
             nLevels = new int[nFields - nStart];
@@ -271,12 +260,10 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             for (int i = nStart; i < nFields; i++)
                 nLevels[i - nStart] = new Float(fields[i]).intValue();
             file.setBlockToneValues(nLevels);
-        } catch (NumberFormatException exception) {}
-        catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception exception) {	// expecting NumberFormatException exception
+            GrasppeKit.debugError("Parsing TDF NLevels", exception, 2);
         }
 
-//        System.out.println("Nlevels:\t" + nLevels.toString());
     }
 
     /**
@@ -287,7 +274,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         while (iterator.hasNext()) {
             String	line     = iterator.next();
-            String	fields[] = line.split("\t");
+            String	fields[] = line.split(FIELD_SEPARATOR);
 
         }
     }

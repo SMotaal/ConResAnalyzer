@@ -26,17 +26,18 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
     /** Field description */
     protected BlockState	startState,	undoState;
     protected BlockState	finalState;
-    protected int			row         = -1,
-							column      = -1;
-    protected int			rows        = -1,
-							columns     = -1;
-    private int				maxRow      = -1;
-    private int				minRow      = -1;
-    private int				maxColumn   = -1;
-    private int				minColumn   = -1;
-    protected int			startValue  = -1;
-    protected int			finalRow    = -1;
-    protected int			finalColumn = -1;
+    protected int			row     = -1,
+							column  = -1;
+    protected int			rows    = -1,
+							columns = -1;
+
+//  private int               maxRow      = -1;
+//  private int               minRow      = -1;
+//  private int               maxColumn   = -1;
+//  private int               minColumn   = -1;
+    protected int	startValue  = -1;
+    protected int	finalRow    = -1;
+    protected int	finalColumn = -1;
 
     /**
      * @param blockState
@@ -47,17 +48,13 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         column     = startState.column;
         rows       = startState.rows;
         columns    = startState.columns;
-        setMaxRow(rows - 1);
-        setMinRow(0);
-        setMaxRow(columns - 1);
-        setMinRow(0);
         startValue = startState.getValue(row, column);
 
         setFinalState(startState.clone());
     }
 
     /**
-     * 	@param row
+     *  @param row
      *  @return
      */
     protected boolean checkAbove(int row) {
@@ -78,7 +75,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
     }
 
     /**
-     * 	@param row
+     *  @param row
      *  @return
      */
     protected boolean checkBelow(int row) {
@@ -106,10 +103,13 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
 
         return true;
     }
-    
+
+    /**
+     * 	@return
+     */
     public BlockState executedState() {
-    	if (execute()) return getFinalState(); 
-    	else return startState;
+        if (execute()) return getFinalState();
+        else return startState;
     }
 
     /**
@@ -138,7 +138,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      *  @param endRow
      *  @param column
      *  @param newValue
-     * 	@return
+     *  @return
      */
     public static BlockState fillValues(BlockState blockState, int startRow, int endRow,
             int column, PatchDesignation newValue) {
@@ -154,7 +154,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      *  @param column
      *  @param testValue
      *  @param newValue
-     * 	@return
+     *  @return
      */
     public static BlockState fillValues(BlockState blockState, int startRow, int endRow,
             int column, PatchDesignation testValue, PatchDesignation newValue) {
@@ -178,13 +178,50 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      *  @param row
      *  @param column
      *  @param designation
+     *  @return last row below row with designation or -1 if not found
+     */
+    public static int findNextIs(BlockState blockState, int row, int column,
+                                 PatchDesignation designation) {
+        int	maxRow = blockState.rows - 1;
+
+        while ((row <= maxRow) && (blockState.getDesignation(row, column) != designation))
+            row++;
+
+        return (row > maxRow) ? -1
+                              : row;
+    }
+
+    /**
+     *  @param blockState
+     *  @param row
+     *  @param column
+     *  @param designation
+     *  @return last row below row with designation or -1 if not found
+     */
+    public static int findNextNot(BlockState blockState, int row, int column,
+                                  PatchDesignation designation) {
+        int	maxRow = blockState.rows - 1;
+
+        while ((row <= maxRow) && (blockState.getDesignation(row, column) == designation))
+            row++;
+
+        return (row > maxRow) ? -1
+                              : row;
+    }
+
+    /**
+     *  @param blockState
+     *  @param row
+     *  @param column
+     *  @param designation
      *  @return first row above row with designation or -1 if not found
      */
     public static int findPastIs(BlockState blockState, int row, int column,
                                  PatchDesignation designation) {
-    	int minRow = 0;
-        while (row > minRow && blockState.getDesignation(row, column) != designation)
-        	row--;
+        int	minRow = 0;
+
+        while ((row > minRow) && (blockState.getDesignation(row, column) != designation))
+            row--;
 
         return row;
     }
@@ -198,43 +235,13 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      */
     public static int findPastNot(BlockState blockState, int row, int column,
                                   PatchDesignation designation) {
-    	int minRow = 0;
-        while (row > minRow && blockState.getDesignation(row, column) == designation)
-        	row--;
+        int	minRow = 0;
+
+        while ((row > minRow) && (blockState.getDesignation(row, column) == designation))
+            row--;
 
         return row;
 
-    }
-
-    /**
-     *  @param blockState
-     *  @param row
-     *  @param column
-     *  @param designation
-     *  @return last row below row with designation or -1 if not found
-     */
-    public static int findNextIs(BlockState blockState, int row, int column,
-                                 PatchDesignation designation) {
-    	int maxRow = blockState.rows-1;
-        while (row <= maxRow && blockState.getDesignation(row, column) != designation)
-        			row++;
-
-        return (row>maxRow) ? -1 : row;
-    }
-
-    /**
-     *  @param blockState
-     *  @param row
-     *  @param column
-     *  @param designation
-     *  @return last row below row with designation or -1 if not found
-     */
-    public static int findNextNot(BlockState blockState, int row, int column,
-                                  PatchDesignation designation) {
-    	int maxRow = blockState.rows-1;
-        while (row <= maxRow && blockState.getDesignation(row, column) == designation)
-			row++;
-        return (row>maxRow) ? -1 : row;
     }
 
     /**
@@ -289,19 +296,20 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
      */
     protected boolean moveOver() {		// after accept
         if (column == getMaxColumn()) return false;
-        	
+
         // Otherwise find Good boundary and move one above
-//        int firstNotPass = findNextNot(finalState, getMinRow(), column, PASS);
-        int	lastPass     = findPastIs(finalState, getMaxRow(), column, PASS);
-//        int	lastMarginal = findPastIs(finalState, getMaxRow(), column, MARGINAL);
-        int firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);       
-        	
-        if (lastPass > 0) return moveTo(lastPass - 1, column + 1);	// else if (lastIsPass == 0) return moveTo(lastIsPass, column + 1);
-        
-        if (lastPass < 0 && firstMarginal > 0) return moveTo(firstMarginal - 1, column + 1);
-        
-        if (row > 0) return moveTo(row-1, column+1);
-        else return moveTo(row, column+1);
+//      int firstNotPass = findNextNot(finalState, getMinRow(), column, PASS);
+        int	lastPass = findPastIs(finalState, getMaxRow(), column, PASS);
+
+//      int   lastMarginal = findPastIs(finalState, getMaxRow(), column, MARGINAL);
+        int	firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
+
+        if (lastPass > 0) return moveTo(lastPass - 1, column + 1);		// else if (lastIsPass == 0) return moveTo(lastIsPass, column + 1);
+
+        if ((lastPass < 0) && (firstMarginal > 0)) return moveTo(firstMarginal - 1, column + 1);
+
+        if (row > 0) return moveTo(row - 1, column + 1);
+        else return moveTo(row, column + 1);
 
     }
 
@@ -367,39 +375,31 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected int getMaxColumn() {
-        if (maxColumn == -1) maxColumn = columns - 1;
-
-        return maxColumn;
+        return columns - 1;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected int getMaxRow() {
-        if (maxRow == -1) maxRow = rows - 1;
-
-        return maxRow;
+        return rows - 1;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected int getMinColumn() {
-        if (minColumn == -1) minColumn = 0;
-
-        return minColumn;
+        return 0;
     }
 
     /**
-     * 	@return
+     *  @return
      */
     protected int getMinRow() {
-        if (minRow == -1) minRow = 0;
-
-        return minRow;
+        return 0;
     }
 
     /**
@@ -426,31 +426,31 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         this.finalState = finalState;
     }
 
-    /**
-     * 	@param maxColumn
-     */
-    protected void setMaxColumn(int maxColumn) {
-        this.maxColumn = maxColumn;
-    }
+//  /**
+//   *    @param maxColumn
+//   */
+//  protected void setMaxColumn(int maxColumn) {
+//      this.maxColumn = maxColumn;
+//  }
+//
+//  /**
+//   *    @param maxRow
+//   */
+//  protected void setMaxRow(int maxRow) {
+//      this.maxRow = maxRow;
+//  }
 
-    /**
-     * 	@param maxRow
-     */
-    protected void setMaxRow(int maxRow) {
-        this.maxRow = maxRow;
-    }
-
-    /**
-     * 	@param minColumn
-     */
-    protected void setMinColumn(int minColumn) {
-        this.minColumn = minColumn;
-    }
-
-    /**
-     * 	@param minRow
-     */
-    protected void setMinRow(int minRow) {
-        this.minRow = minRow;
-    }
+//  /**
+//   *    @param minColumn
+//   */
+//  protected void setMinColumn(int minColumn) {
+//      this.minColumn = minColumn;
+//  }
+//
+//  /**
+//   *    @param minRow
+//   */
+//  protected void setMinRow(int minRow) {
+//      this.minRow = minRow;
+//  }
 }

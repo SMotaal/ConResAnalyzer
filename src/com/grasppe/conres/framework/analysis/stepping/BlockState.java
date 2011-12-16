@@ -32,46 +32,24 @@ import java.util.Map;
  */
 public class BlockState implements ISteppingBlockState, Cloneable {
 
-    /** Field description */
     public static int	JUDGED = 1;
-
-    /** Field description */
     public static int	ASSUMED = 10;
-
-    /** Field description */
     public static int	CLEARED = 100;
 
-    /** Field description */
     public static int	FAIL = -1;
-
-    /** Field description */
     public static int	MARGINAL = 1;
-
-    /** Field description */
     public static int	PASS = 2;
 
-    /** Field description */
     public static int	CLEAR = 0;
 
-    /** Field description */
     public static int	VOID = -999;
 
-    /** Field description */
     public static int	CLEARED_FAIL = FAIL * CLEARED;
-
-    /** Field description */
     public static int	CLEARED_MARGINAL = MARGINAL * CLEARED;
-
-    /** Field description */
     public static int	CLEARED_PASS = PASS * CLEARED;
 
-    /** Field description */
     public static int	ASSUMED_FAIL = FAIL * ASSUMED;
-
-    /** Field description */
     public static int	ASSUMED_MARGINAL = MARGINAL * ASSUMED;
-
-    /** Field description */
     public static int	ASSUMED_PASS = PASS * ASSUMED;
 
     /** Field description */

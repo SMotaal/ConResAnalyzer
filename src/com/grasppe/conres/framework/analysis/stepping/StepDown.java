@@ -36,7 +36,8 @@ public class StepDown extends SteppingStrategy {
     public boolean execute() {
 
         // TODO Auto-generated method stub
-        if (!this.validMove(this.moveBy(1, 0))) return false;
+        if (!this.validMove(this.moveBy(1, 0)))
+        	return false;
 
         return true;
     }
