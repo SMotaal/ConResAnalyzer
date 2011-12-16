@@ -19,6 +19,8 @@ import com.grasppe.lure.framework.GrasppeKit;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -68,16 +70,11 @@ public class ConResAnalyzerPreferencesAdapter {
             if (valueStrings.length < 1)
                 throw new java.util.MissingFormatArgumentException(
                     "Invalid array string value format.");
-        } catch (Exception exception) {
-            GrasppeKit.debugError("Decoding Array Values", exception, 2);
-        }
-
-//      ArrayList<?>  objects; // = new ArrayList<?>();       // = new Class<T>[];
 
         // TODO: Parse the values
-        switch (valueStrings[0].toLowerCase()) {
+        String	typeString = valueStrings[0].toLowerCase();
 
-        case ARRAY_OF_INTEGERS :
+        if (typeString.equals(ARRAY_OF_INTEGERS)) {
             ArrayList<Integer>	integers = new ArrayList<Integer>();
 
             for (int i = 1; i < valueStrings.length; i++) {
@@ -87,8 +84,8 @@ public class ConResAnalyzerPreferencesAdapter {
             }
 
             return integers;
+        } else if (typeString.equals(ARRAY_OF_DOUBLES)) {
 
-        case ARRAY_OF_DOUBLES :
             ArrayList<Double>	doubles = new ArrayList<Double>();
 
             for (int i = 1; i < valueStrings.length; i++) {
@@ -99,7 +96,7 @@ public class ConResAnalyzerPreferencesAdapter {
 
             return doubles;
 
-        case ARRAY_OF_STRINGS :
+        } else if (typeString.equals(ARRAY_OF_STRINGS)) {
             ArrayList<String>	strings = new ArrayList<String>();
 
             for (int i = 1; i < valueStrings.length; i++) {
@@ -110,20 +107,20 @@ public class ConResAnalyzerPreferencesAdapter {
 
             return strings;
 
-        case ARRAY_OF_BOOLEANS :
+        } else if (typeString.equals(ARRAY_OF_BOOLEANS)) {
             ArrayList<Boolean>	booleans = new ArrayList<Boolean>();
 
             for (int i = 1; i < valueStrings.length; i++) {
-                Boolean	value = new Boolean((valueStrings[i].toLowerCase() == "y") ? "true"
-                        : "false");
+            	String valueString = valueStrings[i].toLowerCase();
+            	List<String> trueString = Arrays.asList(new String[]{"y", "yes", "true", "t", "1"});
+                Boolean	value = new Boolean((trueString.contains(valueString)) ? "true" : "false");
 
                 booleans.add(value);
             }
 
             return booleans;
 
-        case ARRAY_OF_OBJECTS :
-        default :
+        } else {	// (typeString.equals(ARRAY_OF_INTEGERS) {
             ArrayList<Object>	objects = new ArrayList<Object>();
 
             for (int i = 1; i < valueStrings.length; i++) {
@@ -134,6 +131,12 @@ public class ConResAnalyzerPreferencesAdapter {
 
             return objects;
         }
+        
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Decoding Array Values", exception, 2);
+        }
+
+        return null;
     }
 
     /**
@@ -161,12 +164,22 @@ public class ConResAnalyzerPreferencesAdapter {
      * @param args
      */
     public static void main(String[] args) {
+    	
+    	String valueString = "";	// ArrayList<?>	valueList = decodeArrayString(valueString);
 
-        ArrayList<?>	values = decodeArrayString(ARRAY_OF_STRINGS + " false 1 two III four");
+    	valueString = ARRAY_OF_STRINGS + " false 1 two III four";
+        GrasppeKit.debugText("Array of Strings", decodeArrayString(valueString).toString() + "\t\t" + valueString + "\t", 2);
 
-        values.isEmpty();
-
-//      ConResAnalyzerPreferencesAdapter.dumpPreferences();
+        valueString = ARRAY_OF_INTEGERS + " 1 2 3 4 5";
+        GrasppeKit.debugText("Array of Integers", decodeArrayString(valueString).toString() + "\t\t" + valueString + "\t", 2);
+        
+        valueString = ARRAY_OF_DOUBLES + " 1 2 3 4 5";
+        GrasppeKit.debugText("Array of Doubles", decodeArrayString(valueString).toString() + "\t\t" + valueString + "\t", 2);
+        
+        valueString = ARRAY_OF_BOOLEANS + " t yes no false true";
+        GrasppeKit.debugText("Array of Strings", decodeArrayString(valueString).toString() + "\t\t" + valueString + "\t", 2);
+        
+      ConResAnalyzerPreferencesAdapter.dumpPreferences();
     }
 
     /**
