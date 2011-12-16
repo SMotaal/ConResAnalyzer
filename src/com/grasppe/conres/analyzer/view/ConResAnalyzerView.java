@@ -10,6 +10,7 @@ package com.grasppe.conres.analyzer.view;
 
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
+import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.cases.view.CaseView;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractView;
@@ -21,14 +22,27 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -71,7 +85,11 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
      *  @param container
      */
     public void addContainer(Container container) {
-        containers.add(container);
+        if (!containers.contains(container)) containers.add(container);
+
+        if (container instanceof JComponent) {
+            setupDropTarget((JComponent)container);
+        }
     }
 
     /**
@@ -137,7 +155,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
         mainFrame.setVisible(true);
 
-        CaseView	caseView = new CaseView(getController().getCaseManager()); //.getModel());
+        CaseView	caseView = new CaseView(getController().getCaseManager());		// .getModel());
 
         mainFrame.add(caseView, BorderLayout.NORTH);
 
@@ -163,6 +181,112 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
         if (!canFinalize()) return false;
 
         return true;
+    }
+
+    /**
+     * 	@param event
+     */
+    public void handleDropEvent(DropTargetDropEvent event) {
+        int	dbg = 2;
+
+        GrasppeKit.debugText("Handling Drop Event", event.toString(), dbg);
+
+        // Ref: http://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-file-path
+//      List<File> dropppedFiles = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
+
+        // Ref : http://stackoverflow.com/questions/1697936/java-drag-and-drop-on-mac-os-x
+
+        try {
+
+            // Get the object to be transferred
+            Transferable	tr      = event.getTransferable();
+            DataFlavor[]	flavors = tr.getTransferDataFlavors();
+
+            // If flavors is empty get flavor list from DropTarget
+            flavors = (flavors.length == 0) ? event.getCurrentDataFlavors()
+                                            : flavors;
+
+            // Select best data flavor
+            DataFlavor	flavor = DataFlavor.selectBestTextFlavor(flavors);
+
+            // Flavor will be null on Windows
+            // In which case use the 1st available flavor
+            flavor = (flavor == null) ? flavors[0]
+                                      : flavor;
+
+            // Flavors to check
+            DataFlavor	Linux   = new DataFlavor("text/uri-list;class=java.io.Reader");
+            DataFlavor	Windows = DataFlavor.javaFileListFlavor;
+
+            // On Linux (and OS X) file DnD is a reader
+            if (flavor.equals(Linux)) {
+                event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+
+                BufferedReader	read = new BufferedReader(flavor.getReaderForText(tr));
+
+                // Remove 'file://' from file name
+                String	fileName = read.readLine().substring(7).replace("%20", " ");
+
+                // Remove 'localhost' from OS X file names
+                if (fileName.substring(0, 9).equals("localhost")) {
+                    fileName = fileName.substring(9);
+                }
+
+                read.close();
+
+                event.dropComplete(true);
+                System.out.println("File Dragged:" + fileName);
+
+//              mainWindow.openFile(fileName);
+                openCaseFolder(fileName);
+            }
+
+            // On Windows file DnD is a file list
+            else if (flavor.equals(Windows)) {
+                event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+
+                @SuppressWarnings("unchecked") List<File>	list =
+                    (List<File>)tr.getTransferData(flavor);
+
+                event.dropComplete(true);
+
+                if (list.size() == 1) {
+                    System.out.println("File Dragged: " + list.get(0));
+                    
+                    String fileName = list.get(0).toString();
+
+//                  mainWindow.openFile(list.get(0).toString());
+                    openCaseFolder(fileName);
+                }
+            } else {
+                System.err.println("DnD Error");
+                event.rejectDrop();
+            }
+        }
+
+        // TODO: OS X Throws ArrayIndexOutOfBoundsException on first DnD
+        catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("DnD not initalized properly, please try again.");
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        } catch (UnsupportedFlavorException e) {
+            System.err.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
+
+//      event.acceptDrop(dropAction)
+    }
+    
+    public void openCaseFolder(String casePath) {
+    	OpenCase openCaseCommand =  new OpenCase(getController().getCaseManager(), getController().getCaseManager());
+    	
+    	try {
+    		if (openCaseCommand.confirmCaseClose())
+    			openCaseCommand.openCase(new File(casePath));
+    	} catch (Exception exception) {
+    		GrasppeKit.debugError("Opening Dropped Case", exception, 2);
+    	}
     }
 
     /**
@@ -278,6 +402,22 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
     }
 
+    /**
+     * 	@param component
+     */
+    public void setupDropTarget(JComponent component) {
+
+        // Ref: http://massapi.com/class/java/awt/dnd/DropTargetAdapter.java.html
+
+        DropTargetAdapter	dropTargetAdapter = new DropTargetAdapter() {
+
+            public void drop(DropTargetDropEvent event) {
+                handleDropEvent(event);
+            }
+        };
+        DropTarget	newDropTarget = new DropTarget(component, dropTargetAdapter);
+    }
+
     /*
      *  (non-Javadoc)
      * @see com.grasppe.lure.components.AbstractView#update()
@@ -297,9 +437,9 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
                 menuItem.setEnabled(((AbstractCommand)action).canExecute());
             }
         }
-        
-        if (activeContainer==null || !activeContainer.isValid() || !activeContainer.isVisible())
-        	setContainer(getDefaultContainer());
+
+        if ((activeContainer == null) ||!activeContainer.isValid() ||!activeContainer.isVisible())
+            setContainer(getDefaultContainer());
 
         super.update();
     }
@@ -406,7 +546,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
         if ((activeContainer != null) && (activeContainer == container)) return;
 
-        if (!containers.contains(container)) containers.add(container);
+        addContainer(container);	// if (!containers.contains(container)) containers.add(container);
 
         if ((activeContainer != null) && (getContentPane() != null)
                 && (activeContainer.getParent() == getContentPane())) {

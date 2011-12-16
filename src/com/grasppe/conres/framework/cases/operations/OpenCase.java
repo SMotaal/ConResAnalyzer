@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.cases.operations;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
+import com.grasppe.conres.preferences.ConResAnalyzerPreferencesAdapter;
 import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -38,7 +39,7 @@ public class OpenCase extends CaseManagerCommand {
     protected static final String	name               = "OpenCase";
     protected static final int		mnemonicKey        = KeyEvent.VK_O;
     protected static final String description = "Open an existing case or create a new case from a folder with scanned images and a target definition file.";
-    String							defaultChooserPath = CaseManagerModel.defaultChooserPath;
+//    String							defaultChooserPath = CaseManagerModel.defaultChooserPath;
     protected static final String type = Types.FILE;
     /**
 	 * @return the commandMenu
@@ -150,6 +151,10 @@ public class OpenCase extends CaseManagerCommand {
             if (userCancelled) throw new CancellationException("User cancelled the open case request.");
             else canProceed = false;
         }
+        
+        String caseFolderPath = new File(newCase.path).getParent(); //.getAbsolutePath();
+        
+        ConResAnalyzerPreferencesAdapter.putDefaultCasePath(caseFolderPath);
 
         return canProceed;
 
@@ -187,13 +192,7 @@ public class OpenCase extends CaseManagerCommand {
 
             // TODO: Verify case folder!
             // TODO: Confirm and close current case before attempting to switching cases
-            try {
-                canProceed = ((CloseCase)this.controller.getCommandHandler().getCommand(
-                    "CloseCase")).quickClose(getKeyEvent());
-            } catch (Exception exception) {
-                canProceed = true;
-//                exception.printStackTrace();
-            }
+            canProceed = confirmCaseClose();
 
             if (!canProceed) break;		// Alternative scenario succeeded
 
@@ -205,6 +204,15 @@ public class OpenCase extends CaseManagerCommand {
         }
 
         return canExecute(true);
+    }
+    
+    public boolean confirmCaseClose() {
+        try {
+            return ((CloseCase)this.controller.getCommandHandler().getCommand(
+                "CloseCase")).quickClose(getKeyEvent());
+        } catch (Exception exception) {
+            return true;
+        }
     }
 
     /**

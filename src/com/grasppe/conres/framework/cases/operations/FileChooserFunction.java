@@ -13,6 +13,8 @@ import com.grasppe.conres.io.TargetDefinitionReader;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.conres.io.model.TargetDefinitionFile;
+import com.grasppe.conres.preferences.ConResAnalyzerPreferencesAdapter;
+import com.grasppe.conres.preferences.ConResPreferencesFactory;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
@@ -34,7 +36,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public abstract class FileChooserFunction extends CaseManagerFunction {
 
-    String				defaultChooserPath = CaseManagerModel.defaultChooserPath;
+    String				defaultChooserPath = ConResAnalyzerPreferencesAdapter.getDefaultCasePath();
     File				selectedFile;
     protected boolean	executable = true;
     JFileChooser		fileChooser;
@@ -130,10 +132,18 @@ public abstract class FileChooserFunction extends CaseManagerFunction {
 
         // Setting initial chooser selection
         try {
-            if (!GrasppeKit.isRunningJar()) {
-                File	defaultPath = new File(getDefaultChooserPath());
+        	String defaultPathString = "";
+        	if (!getDefaultChooserPath().isEmpty())
+        		defaultPathString = getDefaultChooserPath();
+        	else
+        		if (!GrasppeKit.isRunningJar()) defaultPathString = CaseManagerModel.defaultChooserPath;
+        		
+            if (!defaultPathString.isEmpty()) {
+                File	defaultPath = new File(defaultPathString);
+                
+                fileChooser.setCurrentDirectory(defaultPath.getAbsoluteFile());
 
-                fileChooser.setSelectedFile(defaultPath);
+//                fileChooser.setSelectedFile(defaultPath.get);
             }
         } catch (NullPointerException exception) {}
     }
