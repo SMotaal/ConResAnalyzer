@@ -9,14 +9,12 @@
 package com.grasppe.conres.analyzer;
 
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
-import com.grasppe.conres.analyzer.operations.Quit;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
-import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.components.IAuxiliaryCaseManager;
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -27,6 +25,8 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import javax.swing.JFrame;
+
 /**
  * Class description
  * @version        $Revision: 0.1, 11/11/08
@@ -34,24 +34,7 @@ import java.util.LinkedHashMap;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-    /**
-	 * @return the managers
-	 */
-	public AbstractController[] getManagers() {
-		return managers;
-	}
-
-
-
-	/* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractController#getView()
-	 */
-	@Override
-	public ConResAnalyzerView getView() {
-		return analyzerView;
-	}
-
-	protected CaseManager			caseManager;
+    protected CaseManager			caseManager;
     protected TargetManager			targetManager;
     protected AnalysisManager		analysisManager;
     protected AbstractController[]	managers;		// = new AbstractController[]{caseManager, targetManager,analysisManager};
@@ -73,8 +56,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
         managers = new AbstractController[] { caseManager, targetManager, analysisManager };
         analyzerView.createView();
     }
-    
-    
 
     /**
      * Constructs a new controller and attaches it to the unattached model.
@@ -93,12 +74,12 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                     try {
                         ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
                     } catch (Exception exception) {
-                    	GrasppeKit.debugError("Backgrounding Case", exception, 8);
+                        GrasppeKit.debugError("Backgrounding Case", exception, 8);
                     }
                 }
             }
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Backgrounding Case", exception, 8);
+            GrasppeKit.debugError("Backgrounding Case", exception, 8);
         }
     }
 
@@ -107,7 +88,8 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     @Override
     public void createCommands() {
-        //putCommand(new Quit(this));
+
+        // putCommand(new Quit(this));
     }
 
     /**
@@ -119,12 +101,12 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                     try {
                         ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
                     } catch (Exception exception) {
-                    	GrasppeKit.debugError("Discarding Case", exception, 8);
+                        GrasppeKit.debugError("Discarding Case", exception, 8);
                     }
                 }
             }
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Discarding Case", exception, 8);
+            GrasppeKit.debugError("Discarding Case", exception, 8);
         }
     }
 
@@ -151,7 +133,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
                 }
             }
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Restoring Case", exception, 8);
+            GrasppeKit.debugError("Restoring Case", exception, 8);
         }
     }
 
@@ -184,6 +166,20 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     }
 
     /**
+     * 	@return
+     */
+    public JFrame getMainFrame() {
+        return getView().getFrame();
+    }
+
+    /**
+     * @return the managers
+     */
+    public AbstractController[] getManagers() {
+        return managers;
+    }
+
+    /**
      * @return
      */
     @Override
@@ -198,6 +194,19 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     public TargetManager getTargetManager() {
         return targetManager;
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.grasppe.lure.components.AbstractController#getView()
+     */
+
+    /**
+     * 	@return
+     */
+    @Override
+    public ConResAnalyzerView getView() {
+        return analyzerView;
     }
 
     /**

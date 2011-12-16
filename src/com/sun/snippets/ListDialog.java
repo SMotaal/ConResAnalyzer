@@ -172,7 +172,7 @@ public class ListDialog extends JDialog implements ActionListener {
 
         JScrollPane	listScroller = new JScrollPane(list);
 
-        listScroller.setPreferredSize(new Dimension(250, 300));
+        listScroller.setPreferredSize(new Dimension(250, 375));
         listScroller.setAlignmentX(LEFT_ALIGNMENT);
 
         // Create a container so that we can add a title around

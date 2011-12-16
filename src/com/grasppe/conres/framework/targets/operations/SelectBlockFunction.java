@@ -91,7 +91,13 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
             else activeItem = listItems[0];
         }
 
-        JFrame	frame = new JFrame();
+        JFrame	frame = null;
+        		
+        		try {
+        			frame = getController().getAnalyzer().getMainFrame();
+        		} catch (Exception exception) {
+        			frame = new JFrame();
+        		}
         
 //        controller.getView().setFrameMenu(frame);
 
