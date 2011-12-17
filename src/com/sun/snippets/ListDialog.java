@@ -93,6 +93,8 @@ public class ListDialog extends JDialog implements ActionListener {
     private ListDialog(Frame frame, Component locationComp, String labelText, String title,
                        Object[] data, String initialValue, String longValue) {
         super(frame, title, true);
+        
+        setUndecorated(true);
 
         // Create and initialize the buttons.
         final JButton	cancelButton = new JButton("Cancel");
