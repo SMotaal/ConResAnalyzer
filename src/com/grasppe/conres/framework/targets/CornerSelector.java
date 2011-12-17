@@ -114,14 +114,18 @@
 	    /**
 	     */
 	    public void showSelectorView() {
-	        getSelectorView().run("");
-	
+	        getSelectorView().run("");	
+	        showSelectorROIs();
+	    }
+	    
+	    public void showSelectorROIs() {
 	        try {
 	            getSelectorView().clearBlockPoints();
 	            getTargetManager().loadPatchCenterROIs(this);
 	        }  catch (Exception exception) {
 	        	GrasppeKit.debugError("Displaying Corner Selector", exception, 5);
 	        }
+
 	    }
 	    
 	//    /**

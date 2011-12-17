@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<jardesc>
+    <jar path="ConResAnalyzer/dependencies/sanselan.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ConResAnalyzer/Sanselan.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/sanselan/.DS_Store"/>
+        <file path="/sanselan/README.txt"/>
+        <file path="/sanselan/pom.xml"/>
+        <file path="/sanselan/LICENSE"/>
+        <file path="/sanselan/NOTICE"/>
+        <file path="/sanselan/.project"/>
+        <file path="/sanselan/.classpath"/>
+        <file path="/sanselan/RELEASE_NOTES"/>
+        <javaElement handleIdentifier="=sanselan/src\/main\/java"/>
+        <file path="/sanselan/pom.xml.releaseBackup"/>
+        <file path="/sanselan/release.properties"/>
+        <file path="/sanselan/KEYS"/>
+    </selectedElements>
+</jardesc>

@@ -58,8 +58,8 @@ public class PatchInformationPanel extends PatchBoundView {
         positionLabel.setPreferredSize(new Dimension(200, 200)); //getHeight()));
 //    	positionLabel.setMaximumSize(positionLabel.getPreferredSize());
 //    	positionLabel.setMinimumSize(positionLabel.getPreferredSize());
-    	setMaximumSize(new Dimension(200, 200));
-    	positionLabel.setFont(positionLabel.getFont().deriveFont(13.0F));
+//    	setMaximumSize(new Dimension(200, 200));
+    	positionLabel.setFont(positionLabel.getFont().deriveFont(14.0F));
     	
     	positionLabel.setLocation(0, 0);
     	add(positionLabel,BorderLayout.NORTH);

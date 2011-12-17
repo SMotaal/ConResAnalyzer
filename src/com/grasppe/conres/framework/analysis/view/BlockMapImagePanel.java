@@ -32,9 +32,10 @@ import java.awt.image.BufferedImage;
 public class BlockMapImagePanel extends PatchBoundView implements javax.swing.SwingConstants {		// JPanel implements Observer {
 
     AnalysisStepperModel	model               = null;
-    int						minimumScale        = 5;
+    int						minimumScale        = 20;
     int						minimumWidth        = 100,
 							minimumHeight       = 100;
+    int	maximumWidth = 350;
     int						imageScale          = 10;
     int						imageWidth          = 100,
 							imageHeight         = 100;
@@ -142,8 +143,15 @@ public class BlockMapImagePanel extends PatchBoundView implements javax.swing.Sw
                 newScale    = Math.max(minimumScale, newScale);
                 imageWidth  = Math.max(blockMapWidth * newScale, minimumWidth);
                 imageHeight = Math.max(blockMapHeight * newScale, minimumWidth);
+                
+                if (imageWidth>maximumWidth) {
+                	imageHeight = imageHeight/imageWidth*maximumWidth;
+                	imageWidth = maximumWidth;
+                }
 
-                int	imageLength = Math.min(imageWidth, imageHeight);
+                int	imageLength = Math.max(imageWidth, imageHeight);
+                
+//                imageLength = Math.max(imageLength, maximumWidth);
 
                 setMaximumSize(new Dimension(imageLength, imageLength));
                 setPreferredSize(new Dimension(imageLength, imageLength));
@@ -151,6 +159,12 @@ public class BlockMapImagePanel extends PatchBoundView implements javax.swing.Sw
             } else {
                 if (imageWidth < minimumWidth) imageWidth = minimumWidth;
                 if (imageHeight < minimumHeight) imageHeight = minimumHeight;
+                
+                if (imageWidth>maximumWidth) {
+                	imageHeight = imageHeight/imageWidth*maximumWidth;
+                	imageWidth = maximumWidth;
+                }
+                
                 setPreferredSize(new Dimension(imageWidth, imageHeight));
                 setMinimumSize(new Dimension(imageWidth, imageHeight));
                 newScale = Math.max(minimumScale,

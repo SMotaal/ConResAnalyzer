@@ -16,6 +16,7 @@ import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.targets.TargetManager;
+import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -63,9 +64,28 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
     /**
      * @param controller
      */
-    public AnalysisStepperView(AnalysisStepper controller) {
+    private AnalysisStepperView(AnalysisStepper controller) throws Exception {
         super(controller);
+//        if (instance!=null) throw new Exception("What the f***!");
+        instances.add(this);
         getModel().attachObserver(this);
+    }
+    
+    protected static AnalysisStepperView instance = null;
+    
+    protected static ArrayList<AnalysisStepperView> instances = new ArrayList<AnalysisStepperView>();
+    
+    public static AnalysisStepperView getInstance(AnalysisStepper controller)  throws Exception {
+    	if (instance==null || controller!=instance.getController()) {
+    		if (instance!=null)
+				try {
+					instance.finalize();
+				} catch (Throwable exception) {
+					exception.printStackTrace();
+				}
+    		instance = new AnalysisStepperView(controller);
+    	}
+    	return instance;
     }
 
     /**
@@ -86,8 +106,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 
         int		pad = 1;
         Border	padBorder = BorderFactory.createMatteBorder(0, pad, pad, pad, panel.getBackground());
-//        Border	padLeft = BorderFactory.createMatteBorder(pad, pad, pad, 0, panel.getBackground());
-//        Border	padRight = BorderFactory.createMatteBorder(pad, 0, pad, pad, panel.getBackground());
+        Border	padLeft = BorderFactory.createMatteBorder(1, 2, 1, 1, panel.getBackground());
+        Border	padRight = BorderFactory.createMatteBorder(1, 1, 1, 2, panel.getBackground());
 
         blockMapImagePanel = new BlockMapImagePanel(getModel());	// blockMapImagePanel.setBackground(Color.DARK_GRAY);
         patchInformationPanel = new PatchInformationPanel(getModel());		// patchInformationPanel.setBackground(Color.DARK_GRAY);
@@ -116,8 +136,8 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 
 //      panel.setLayout(layout);
 
-        informationPanel.setBorder(padBorder);
-        previewPanel.setBorder(padBorder);
+        informationPanel.setBorder(padLeft);
+        previewPanel.setBorder(padRight);
 
         // Assemble Frame
 
@@ -394,5 +414,39 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
 
             return;
         }
+        
+        
+
+    }
+    
+    /**
+     */
+    @Override
+    protected void updateDebugLabels() {
+        AnalysisStepperModel	model = getModel();
+
+        if (model == null) return;
+
+        try {
+            updateDebugLabel("activeBlock", model.getActiveBlock());
+        } catch (Exception exception) {
+            updateDebugLabel("activeBlock", "");
+        }
+
+        try {
+            updateDebugLabel("activePatch", model.getActivePatch());
+        } catch (Exception exception) {
+            updateDebugLabel("activePatch", "");
+        }
+        try {
+        	updateDebugLabel("instances", instances);
+        } catch (Exception exception) {
+        	updateDebugLabel("instances", "");
+        }
+
+//      updateDebugLabel("newCase", model.getNewCase());
+//      updateDebugLabel("backgroundCase", model.getBackgroundCase());
+
+        super.updateDebugLabels();
     }
 }

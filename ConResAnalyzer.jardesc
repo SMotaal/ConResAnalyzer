@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<jardesc>
+    <jar path="/Users/daflair/Documents/workspace/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ConResAnalyzer/ConResAnalyzer.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/ConResAnalyzer/pmdoc/Manifest.txt" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ConResAnalyzer/src"/>
+    </selectedElements>
+</jardesc>

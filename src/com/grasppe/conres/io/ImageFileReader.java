@@ -85,7 +85,8 @@ public class ImageFileReader implements IGrasppeFileReader {
     	ImageInfo	imageInfo = null;
 
     	try {
-    		imageInfo = Sanselan.getImageInfo(file);
+    		if (file!=null)
+    			imageInfo = Sanselan.getImageInfo(file);
     	} catch (Exception exception) {
     		throw new IOException("Could not read " + file.getName() + ". " + exception.getMessage());
     	}
@@ -132,6 +133,17 @@ public class ImageFileReader implements IGrasppeFileReader {
         
         int widthDPI = imageInfo.getPhysicalWidthDpi();
         int heightDPI = imageInfo.getPhysicalHeightDpi();
+        
+        if (widthDPI<550 || heightDPI < 550) {
+        	String parentName = file.getParentFile().getName();
+        	try {
+        		int folderDPI = new Integer(parentName.substring(parentName.lastIndexOf("-")+1)).intValue();
+        		widthDPI = folderDPI;
+        		heightDPI = folderDPI;
+        	} catch (Exception exception) {
+        		GrasppeKit.debugError("Reading folder DPI", exception, 2);
+        	}
+        }
         
         if (widthDPI!=heightDPI)
         	throw new IOException("Could not read " + file.getName() + ". Images with non-square pixel ratios not supported.");

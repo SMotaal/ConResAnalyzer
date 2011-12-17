@@ -41,17 +41,12 @@ public class SetAndStep extends SteppingStrategy {
         
         int firstPass = findNextIs(finalState, getMinRow(), column, PASS);
         int firstReject = findNextIs(finalState, getMinRow(), column, FAIL);
+        int lastPass = findNextNot(finalState, getMinRow(), column, PASS)-1;
+        int lastMarginal = findNextNot(finalState, firstMarginal, column, MARGINAL)-1;
+                
+        if (firstMarginal>lastPass && firstMarginal<firstReject) return;
         
-//        if (firstPass<row-1 && row>0) fillValues(finalState, )
-        
-        
-//        boolean validReject = (firstReject>-1 && firstMarginal>0);
-        
-//        if (validReject) return;
-//        if (before.getDesignation(row, column)==MARGINAL) {
-//        	if (firstMarginal>0 && nextNotMarginal>0 && nextNotMarginal==firstReject-1)
-//        		return;
-//        }
+        if (checkColumn()) return;
         
         BlockState	after  = fillValues(before.clone(), getMaxRow(), row + 1, column, MARGINAL,
                                       CLEAR);
@@ -62,10 +57,11 @@ public class SetAndStep extends SteppingStrategy {
     /**
      */
     public void assumeFail() {
-        if (!(row < getMaxRow())) return;
+        if (!(row < getMaxRow()))
+        	return;
 
         BlockState	before = finalState.clone();
-        BlockState	after  = fillValues(before.clone(), getMaxRow(), row + 1, column, null,
+        BlockState	after  = fillValues(before.clone(), getMaxRow(), row, column, null,
                                       ASSUMED_FAIL);
         
         // if (row>getMinRow()) after.setValue(CLEAR, row-1, column);
@@ -91,7 +87,14 @@ public class SetAndStep extends SteppingStrategy {
     public boolean checkColumn() {
         int	firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
         int firstPass = findNextIs(finalState, getMinRow(), column, PASS);
+        int lastPass = findNextNot(finalState, getMinRow(), column, PASS)-1;
         int firstFail = findNextIs(finalState, getMinRow(), column, FAIL);
+        
+        if (lastPass == firstFail-1 && firstFail>0) return true;
+        
+        if (lastPass < firstFail && firstFail>0 && lastPass>0)
+        	if (findNextNot(finalState, lastPass, column, MARGINAL)==firstFail)
+        		return true;
         
         if (firstMarginal<0 && firstPass<0 && firstFail>0)
         	return false;
@@ -114,8 +117,8 @@ public class SetAndStep extends SteppingStrategy {
                 finalState.setValue(PASS, row, column);		// Judged Pass
                 assumePass();
             } else if (intended == FAIL) {
+            	assumeFail();
                 finalState.setValue(FAIL, row, column);		// Judged Fail
-                assumeFail();
             } else if (intended == MARGINAL) {
                 if (finalState.getPatchValue(row, column) != MARGINAL) assumeMarginal();
                 finalState.setValue(MARGINAL, row, column);

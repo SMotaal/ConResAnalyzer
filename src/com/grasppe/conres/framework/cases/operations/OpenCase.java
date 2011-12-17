@@ -14,6 +14,7 @@ import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.preferences.ConResAnalyzerPreferencesAdapter;
 import com.grasppe.lure.components.AbstractCommand.Types;
+import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit;
 
 import ij.IJ;
@@ -68,13 +69,13 @@ public class OpenCase extends CaseManagerCommand {
     }
 
     /**
-     *  @param e
+     *  @param exception
      *  @return
      */
-    private boolean confirmSelectOtherCase(IOException e) {
+    private boolean confirmSelectOtherCase(Exception exception) {
         return IJ.showMessageWithCancel(name,
                                         "The selected case folder is missing some files.\n\n"
-                                        + e.getMessage() + "\n\n"
+                                        + exception.getMessage() + "\n\n"
                                         + "Do you want to select another folder?");
 
 //      e.printStackTrace();
@@ -102,10 +103,10 @@ public class OpenCase extends CaseManagerCommand {
     /**
      *  @param caseFolder
      *  @return
+     * @throws Exception 
      *  @throws CancellationException
-     * @throws IOException 
      */
-    public boolean verifyCaseFolder(CaseFolder caseFolder) throws IOException {
+    public boolean verifyCaseFolder(CaseFolder caseFolder) throws Exception {
     	
     	return getCaseManager().verifyCaseFolder(caseFolder);
     	
@@ -128,16 +129,18 @@ public class OpenCase extends CaseManagerCommand {
 
         try {
             getCaseManager().loadCase(newCase);
-        } catch (IOException e) {
-            canProceed    = confirmSelectOtherCase(e);
+        } catch (Exception exception) {
+            canProceed    = confirmSelectOtherCase(exception);
             userCancelled = !canProceed;
-        }
+		}
 
         if (canProceed && (newCase != null) && newCase.filesLoaded) {
             try {
                 getModel().promoteNewCase();
-            } catch (UnexpectedException e) {
-                e.printStackTrace();
+            } catch (UnexpectedException exception) {
+//                e.printStackTrace();
+            	new FloatingAlert("Could not load the case due to a file error.\n\n"+exception.getMessage()).flashView(5000);
+            	GrasppeKit.debugError("Loading Case Files", exception,2);
             }
 
             GrasppeKit.debugText("Open Case Success",

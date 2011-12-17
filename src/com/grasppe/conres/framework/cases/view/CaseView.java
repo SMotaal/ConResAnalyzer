@@ -11,6 +11,7 @@
 
 package com.grasppe.conres.framework.cases.view;
 
+import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.cases.CaseManager;
@@ -65,15 +66,23 @@ public class CaseView extends JPanel implements Observer {
 	CaseManagerModel model = null;
 	
 	JLabel caseLabel = null,
-			blockLabel = null;
+			blockLabel = null,
+			buildLabel = null;
+	
+	static float labelFontSize = 10F;
 	
 //	String defaultCaseText = "<html><b>ConResAnalyzer</b></html>";
-	String defaultCaseText = "<html>Press <i>" + CONTROL_SYMBOL + "+O</i> to open a case</html>";
-	String defaultBlockText = "<html>Press <i>" + CONTROL_SYMBOL + "+B</i> to select target blocks</html>";
+	String defaultCaseText = "<html><<pre style='font-family: Sans-Serif;'>Press <i>" + CONTROL_SYMBOL + "+O</i> to open a case</pre></html>";
+//	String defaultBlockText = "<html>Press <i>" + CONTROL_SYMBOL + "+B</i> to select target blocks</html>";
+//	String defaultCaseText = "<html><b>"
+	String defaultBuildText = "<html><pre style='font-family: Sans-Serif;'><b style='color:black'>Build: </b>" + ConResAnalyzer.BUILD + "   </pre></html>";
 	
-	int sidePadding = 3,
+	static int sidePadding = 3,
 			topPadding = 0,
 			bottomPadding=0;
+	
+	static Color labelTextColor  = Color.DARK_GRAY;
+	static Color labelColor  = Color.DARK_GRAY;
 
 
     /**
@@ -91,20 +100,26 @@ public class CaseView extends JPanel implements Observer {
     	if (caseLabel!=null) return;
         
         caseLabel = new JLabel(defaultCaseText); //getModel().getCurrentCase().title);
-        caseLabel.setForeground(Color.DARK_GRAY);
-        caseLabel.setBorder(new EmptyBorder(topPadding,sidePadding,bottomPadding,sidePadding));	// caseLabel.setBackground(Color.WHITE);
-//        caseLabel.setBackground(Color.LIGHT_GRAY);
-        add(caseLabel,BorderLayout.WEST);
+        formatLabel(caseLabel);
+        add(caseLabel,BorderLayout.CENTER);
         
-        blockLabel = new JLabel(defaultBlockText);
-        blockLabel.setForeground(Color.DARK_GRAY);
-        blockLabel.setBorder(new EmptyBorder(topPadding,sidePadding,bottomPadding,sidePadding));	// caseLabel.setBackground(Color.WHITE);
-//        blockLabel.setBackground(Color.LIGHT_GRAY);
-        add(blockLabel,BorderLayout.EAST);
+//        blockLabel = new JLabel(defaultBlockText);
+//        formatLabel(blockLabel);
+//        add(blockLabel,BorderLayout.EAST);
+
+        buildLabel = new JLabel(defaultBuildText);
+        formatLabel(buildLabel);
+        add(buildLabel,BorderLayout.EAST);
        
         setBackground(Color.WHITE);
         
         super.setBorder(new MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
+    }
+    
+    protected void formatLabel(JLabel label) {
+        label.setForeground(labelTextColor);
+//        label.setFont(label.getFont().deriveFont(labelFontSize));
+        label.setBorder(new EmptyBorder(topPadding,sidePadding,bottomPadding,sidePadding));
     }
 
     /**
@@ -169,18 +184,26 @@ public class CaseView extends JPanel implements Observer {
     /**
      */
     public void updateView() {
+    	
+    	String labelText = "<html><pre style='font-family: Sans-Serif;'>";
     	try {
-    		caseLabel.setText("<html><b style='color:black'>Case:</b> " + getModel().getCurrentCase().title + " (<i>" + getModel().getCurrentCase().targetDefinitionFile.getName() + "</i>)</html>");
+//    		blockLabel.setText("<html><b style='color:black'>Block: </b>" + getTargetModel().getActiveBlock().getZValue().value + "% Reference Tone</html>");
+    		labelText+="<b style='color:black'>Block: </b>" + getTargetModel().getActiveBlock().getZValue().value + "% Reference Tone\t\t";
+    	} catch (Exception exception) {
+//    		blockLabel.setText(defaultBlockText);
+    	}    	
+    	try {
+//    		caseLabel.setText("<html><b style='color:black'>Case:</b> " + getModel().getCurrentCase().title + " (<i>" + getModel().getCurrentCase().targetDefinitionFile.getName() + "</i>)</html>");
+    		labelText+="<b style='color:black'>Case:</b> " + getModel().getCurrentCase().title + " (<i>" + getModel().getCurrentCase().targetDefinitionFile.getName().trim() + "</i>)";
     	} catch (Exception exception) {
     		caseLabel.setText(defaultCaseText);
+    		return;
     	}
-    	try {
-    		blockLabel.setText("<html><b style='color:black'>Block: </b>" + getTargetModel().getActiveBlock().getZValue().value + "% Reference Tone</html>");
-    	} catch (Exception exception) {
-    		blockLabel.setText(defaultBlockText);
-    	}    	
+    	labelText+="</pre></html>";
+    	caseLabel.setText(labelText);
+//    	caseLabel.setFont(caseLabel.getFont().deriveFont(labelFontSize));
     	caseLabel.updateUI();
-    	blockLabel.updateUI();
+//    	blockLabel.updateUI();
     	repaint();
     }
 

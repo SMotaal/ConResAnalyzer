@@ -19,6 +19,7 @@ import com.grasppe.conres.framework.targets.model.roi.BlockROI;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -40,6 +41,8 @@ import java.awt.Container;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -56,7 +59,7 @@ import javax.naming.directory.InvalidAttributesException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  * @author <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
@@ -520,40 +523,48 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param keyCode
-     * 	@param keyModifiers
-     * 	@return
+     *  @param keyEvent
+     *  @return
      */
-    private boolean nudgeROI(KeyEvent keyEvent) { //int keyCode, int keyModifiers) {
-    	int dbg = 2;
-    	int keyCode = keyEvent.getKeyCode();
-    	int offset = 3;
-    	if ((keyCode != KeyEvent.VK_UP) && (keyCode != KeyEvent.VK_DOWN)
-    			&& (keyCode != KeyEvent.VK_LEFT) && (keyCode != KeyEvent.VK_RIGHT))
-    		return false;
-    	if (keyEvent.isAltDown()) { //return false;
+    private boolean nudgeROI(KeyEvent keyEvent) {		// int keyCode, int keyModifiers) {
+        int	dbg     = 2;
+        int	keyCode = keyEvent.getKeyCode();
+        int	offset  = 3;
+
+        if ((keyCode != KeyEvent.VK_UP) && (keyCode != KeyEvent.VK_DOWN)
+                && (keyCode != KeyEvent.VK_LEFT) && (keyCode != KeyEvent.VK_RIGHT))
+            return false;
+
+        if (keyEvent.isAltDown()) {		// return false;
             getModel().getPatchSetROI().nudgeCorner(keyCode);
-    	} else if (keyEvent.isShiftDown()) {
-    		Rectangle bounds = getModel().getPatchSetROI().getBounds();
-	    		switch(keyCode) {
-				case KeyEvent.VK_UP:
-					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y-offset);
-					break;
-				case KeyEvent.VK_DOWN:
-					getModel().getPatchSetROI().setLocation(bounds.x, bounds.y+offset);
-					break;
-				case KeyEvent.VK_LEFT:
-					getModel().getPatchSetROI().setLocation(bounds.x-offset, bounds.y);
-					break;
-				case KeyEvent.VK_RIGHT:
-					getModel().getPatchSetROI().setLocation(bounds.x+offset, bounds.y);
-					break;
-			}
-    	}
-		else return false;
+        } else if (keyEvent.isShiftDown()) {
+            Rectangle	bounds = getModel().getPatchSetROI().getBounds();
+
+            switch (keyCode) {
+
+            case KeyEvent.VK_UP :
+                getModel().getPatchSetROI().setLocation(bounds.x, bounds.y - offset);
+                break;
+
+            case KeyEvent.VK_DOWN :
+                getModel().getPatchSetROI().setLocation(bounds.x, bounds.y + offset);
+                break;
+
+            case KeyEvent.VK_LEFT :
+                getModel().getPatchSetROI().setLocation(bounds.x - offset, bounds.y);
+                break;
+
+            case KeyEvent.VK_RIGHT :
+                getModel().getPatchSetROI().setLocation(bounds.x + offset, bounds.y);
+                break;
+            }
+        } else
+            return false;
+
         setOverlayROI(getModel().getPatchSetROI());
         notifyObservers();
         if (getModel().isValidSelection()) getTargetManager().savePatchCenterROIs(getController());
+
         return true;
     }
 
@@ -592,18 +603,70 @@ public class CornerSelectorView extends AbstractView
         }
     }
 
+//  protected imag imagePlus
+    
+    protected Timer loadingTimer = null; 
+
     /**
      * Opens an ImagePlus image using Opener and creates and displays it in an
      * ImageWindow;
      *  @param imageFile
      */
-    public void prepareImageWindow(ImageFile imageFile) {
+    public synchronized void prepareImageWindow(ImageFile imageFile) {
     	
-//    	SwingUtilities.invokeLater( new Runnable() {	public void run() {
+    	setVisible(false);
+
+        final ImageFile	finalImageFile = imageFile;
 
         try {
+
+            ActionListener actionListener = new ActionListener() {
+
+//                long	endTimeMillis = System.currentTimeMillis() + 1000;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+//                    if (System.currentTimeMillis() > endTimeMillis) {
+//	                    loadingTimer.stop();
+//	                    loadingTimer = null;
+//	                    new FloatingAlert("<html><span style='color:red'>Loading this image was taking way too long!</span><html>", true);
+//	                    prepareImageWindow(finalImageFile, false);
+//                    }
+                    
+                    if (getModel().getImagePlus()!=null ) {
+	                    prepareImageWindow(finalImageFile, true);
+	                    loadingTimer.stop();
+	                    loadingTimer = null;
+                    }
+                }
+
+            };
+            
+            if (loadingTimer==null) {
+	            loadingTimer = new Timer(300,actionListener);
+	        	
+	            loadingTimer.start();
+            }
+        	
+        } catch (Exception exception) {}
+    }
+
+    /**
+     * Opens an ImagePlus image using Opener and creates and displays it in an
+     * ImageWindow;
+     *  @param imageFile
+     * 	@param attempt
+     */
+    public synchronized void prepareImageWindow(ImageFile imageFile, boolean attempt) {
+
+        try {
+        	
+        	setVisible(false);
+        	
+//        		if (!attempt) throw new InterruptedException("Loading image timeout!"); //return;
+
             ImagePlus	imagePlus = getModel().getImagePlus();
 
+            if (imagePlus == null) return;
 
             imagePanel = new ImageJPanel(imagePlus);
             imagePanel.setFitImage(true);
@@ -623,9 +686,17 @@ public class CornerSelectorView extends AbstractView
 
                 public void keyPressed(KeyEvent ke) {
                     if (ke.isConsumed()) return;
-                    if (nudgeROI(ke))ke.consume(); //.getKeyCode(), ke.getModifiers())) 
+                    if (nudgeROI(ke)) ke.consume();		// .getKeyCode(), ke.getModifiers()))
                 }
             };
+            
+            attachMouseListeners();
+            setVisible(true);
+            
+            imagePanel.repaint();
+            
+            getController().showSelectorROIs();
+
             viewContainer.addKeyListener(keyListener);
             viewContainer.setFocusable(true);
             setComponentFocus(viewContainer);
@@ -633,7 +704,8 @@ public class CornerSelectorView extends AbstractView
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-//    	}});
+
+//      }});
 
     }
 
@@ -702,10 +774,10 @@ public class CornerSelectorView extends AbstractView
 
         zoomCanvas.setMagnification(windowZoom * 2.0);
 
-        getZoomWindow().setVisible(isShowZoom());
-
         getZoomWindow().pack();
         getZoomWindow().setSize(300, 300);
+
+        getZoomWindow().setVisible(isShowZoom());
 
         zoomCanvas = zoomCanvas;
 
@@ -859,7 +931,7 @@ public class CornerSelectorView extends AbstractView
 
 //      ImageWindow   viewContainer = getImageWindow();
 
-        if (viewContainer != null) {		// && viewContainer.isVisible()) {
+        if (viewContainer != null) {	// && viewContainer.isVisible()) {
             viewContainer.setVisible(false);
 
 //          viewContainer.dispose();
@@ -877,8 +949,7 @@ public class CornerSelectorView extends AbstractView
 
         // viewContainer = getImageWindow();
 
-        attachMouseListeners();
-        setVisible(true);
+
 
 //      prepareMagnifier();
 
@@ -1126,17 +1197,19 @@ public class CornerSelectorView extends AbstractView
          * Based on
          * {@link http://java.sun.com/developer/onlineTraining/javaai/jai/src/JAIWarpDemo.java}
          */
-        
+
         TargetDimensions	targetDimensions;
 
         try {
-        	targetDimensions = getTargetManager().getModel().getActiveTarget().getDimensions();
-        	getModel().setTargetDimensions(targetDimensions);
+            targetDimensions = getTargetManager().getModel().getActiveTarget().getDimensions();
+            getModel().setTargetDimensions(targetDimensions);
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Reading Target Dimensions", exception,2);
-        	return;
+            GrasppeKit.debugError("Reading Target Dimensions", exception, 2);
+
+            return;
         }
-        WarpPolynomial		warp;
+
+        WarpPolynomial	warp;
 
         // Determine the points needed
         int	warpDegree = 1;		// degree - The desired degree of the warp polynomials.
@@ -1301,7 +1374,7 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@return
+     *  @return
      */
     public ConResAnalyzerView getParentView() {
         if (getController() == null) return null;
@@ -1435,9 +1508,10 @@ public class CornerSelectorView extends AbstractView
     }
 
     /**
-     * 	@param visible
+     *  @param visible
      */
     public void setVisible(boolean visible) {
+    	if (getModel().getImagePlus() == null && visible) return;
         if (viewContainer != null) viewContainer.setVisible(visible);
     }
 

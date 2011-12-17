@@ -21,6 +21,7 @@ import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.framework.targets.operations.MarkBlock;
 import com.grasppe.conres.framework.targets.operations.SelectBlock;
+import com.grasppe.conres.framework.targets.operations.SelectCornersFunction;
 import com.grasppe.conres.framework.targets.view.TargetManagerView;
 import com.grasppe.conres.io.TargetDefinitionReader;
 import com.grasppe.conres.io.model.IConResTargetDefinition;
@@ -182,15 +183,25 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         return parentFolder + File.separator + folderName + fileName;
 
     }
+    
+    
 
     /**
+     * @throws InterruptedException 
      */
     public void loadImage() {
 
 
         if ((getBlockImage() != null) && (getBlockImage().getAbsolutePath() != loadedImagePath)) {
         	
-        	FloatingAlert	loadImageAlert = new FloatingAlert("Loading Block!", true);
+        	getAnalyzer().getView().setContainer(null);
+        	
+        	getAnalyzer().getView().getFrame().repaint();
+        	
+        	final FloatingAlert	loadImageAlert = new FloatingAlert("Loading Block!", true);
+        	
+//        	getModel().setActiveImagePlus(null);
+//            getModel().notifyObservers();
 
             try {
                 loadPatchCenterROIs(getCornerSelector());
@@ -200,9 +211,16 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
                 GrasppeKit.debugError("Loading ROI File", exception, 2);
             }
 
-//            Thread	openerThread = new Thread() {
-//
-//                public void run() {
+            Thread	openerThread = new Thread() {
+
+                public void run() {
+                	
+                    try {
+                        Thread.sleep(100);
+                        } catch (Exception exception) {
+                        	
+                        }
+                    
                     Opener		opener    = new Opener();
                     ImagePlus	imagePlus = opener.openImage(getBlockImage().getAbsolutePath());
 
@@ -211,12 +229,21 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
                     loadedImagePath = getBlockImage().getAbsolutePath();
 
                     getModel().notifyObservers();
+                    
+                    getCornerSelector().showSelectorView();
+                    
+//                    try {
+//                    	getAnalyzer().getAnalysisManager().getAnalysisStepper().finalizeLoading();
+//                    } catch(Exception exception) {
+//                    	GrasppeKit.debugError("Loading block resources", exception, 2);
+//                    }
+                    
                     loadImageAlert.flashView();
-//                }
-//            };
+                }
+            };
             
-//            SwingUtilities.invokeLater(openerThread);
-//            openerThread.setPriority(Thread.)
+            SwingUtilities.invokeLater(openerThread);
+
 
             // getCornerSelectorModel().notifyObservers();
         } 
@@ -277,7 +304,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         // TargetDefinitionFile file = targetDefinitionFile.getTargetDefinitionFile();
         try {
             TargetDefinitionReader	reader = new TargetDefinitionReader(targetDefinitionFile);
-        } catch (NullPointerException exception) {
+        } catch (Exception exception) { //NullPointerException exception) {
             IOException	ioException = new IOException("Could not load a target definition file.",
                                           exception);
 
@@ -520,7 +547,6 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
         try {
             ImagePlus	imagePlus = getImagePlus();
-
             if (imagePlus == null) return null;
 
             ImageFile	imageFile = getBlockImage();

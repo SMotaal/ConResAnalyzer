@@ -14,169 +14,239 @@
  */
 package com.grasppe.lure.framework;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author daflair
  *
  */
-public class FloatingAlert extends JFrame {
-	
-	/**
-	 * @return the pending
-	 */
-	public boolean isPending() {
-		return pending;
-	}
-	/**
-	 * @param messageText
-	 * @throws HeadlessException
-	 */
-	public FloatingAlert(String messageText) throws HeadlessException {
-		super();
-		this.messageText = messageText;
-		createView();
-//		flashView(0);
-	}
-	
-	/**
-	 * @param messageText
-	 * @throws HeadlessException
-	 */
-	public FloatingAlert(String messageText, boolean flashNow) throws HeadlessException {
-		super();
-		this.messageText = messageText;
-		createView();
-		if (flashNow) flashView(0);
-	}	
-	protected String messageText = "Oops!";
-	protected float initialOpacity = 0.75F;
-	protected boolean pending = true;
-	
-	public void flashView() {
-		flashView(1);
-	}
-	public void flashView(int duration) {
-		final int flashDuration = duration; 
-		
-		pending = true;
-		
-		final Runnable doFlash = new Runnable() {
-				public void run() {
-					setVisible(true);
-					repaint();
-					
-					pending = false;
-					
-					if (flashDuration>0) {
-						Timer timer = new Timer(flashDuration, new ActionListener () {
-							public void actionPerformed(ActionEvent e) {
-								fadeView();
-							}
-						});
-						timer.setRepeats(false);
-						timer.start();
-					}
+public class FloatingAlert {// extends JFrame {
 
-				}
-		};
-		Thread flashThread = new Thread() {
-		     public void run() {
-		         try {
-		             SwingUtilities.invokeLater(doFlash);
-		         } catch (Exception e) { }
-		     }
-			
-		};
-		flashThread.setPriority(Thread.MAX_PRIORITY);
-		flashThread.start();
-		
-	}
-	
-	protected int frameRate = Math.round(1000/36);
-	protected int runLength = 300;
-	protected int frames = Math.round(runLength/frameRate);
-	protected int frame = 0;
-	protected Timer fadeTimer = null;
-	
-	public void fadeView() {
-		
-//		SwingUtilities.invokeLater(
+    protected String	messageText    = "Oops!";
+    protected float		initialOpacity = 0.75F;
+    protected boolean	pending        = true;
+    protected int		frameRate      = Math.round(1000 / 36);
+    protected int		runLength      = 300;
+    protected int		frames         = Math.round(runLength / frameRate);
+    protected int		frame          = 0;
+    protected Timer		fadeTimer      = null;
+    
+    protected static JFrame floatingFrame = null;
+
+    /**
+     * @param messageText
+     * @throws HeadlessException
+     */
+    public FloatingAlert(String messageText) throws HeadlessException {
+        this(messageText, false);
+
+//      super();
+//      this.messageText = messageText;
+//      createView();
+////        flashView(0);
+    }
+
+    /**
+     * @param messageText
+     *  @param flashNow
+     * @throws HeadlessException
+     */
+    public FloatingAlert(final String messageText, final boolean flashNow)
+            throws HeadlessException {
+        super();
+
 //
-//		new Thread() {
-//			
-//			public void run() {
-				setVisible(true);
-				fadeTimer = new Timer(frameRate, new ActionListener () {
-					public void actionPerformed(ActionEvent e) {
-						setFadeOpactiy();
-						frame++;
-					}
-				});
-				
-				fadeTimer.setRepeats(true);
-				fadeTimer.start();
+//      final Runnable    doFlash = new Runnable() {
+//
+//          public void run() {
+        setMessageText(messageText);
+        createView();
+        if (flashNow) flashView(0);
 
-//			}
-//		});	
-	}
-	
-	public void setFadeOpactiy() {
-		if (fadeTimer==null) return;
-		float fadeRate = (float) (Math.log(((double)frames-(double)frame))/Math.log((double)frames));
-		float newOpacity = (initialOpacity)*fadeRate;
-		if (newOpacity>0)
-			GrasppeKit.setFrameOpacity(this, newOpacity);
-		if (frame>=frames || newOpacity<=0) {
-			fadeTimer.stop();
-			setVisible(false);
-		}
-	}
-			
+//      }
+//        };
+//        Thread    flashThread = new Thread() {
+//
+//      public void run() {
+//          try {
+//              SwingUtilities.invokeAndWait(doFlash);
+//          } catch (Exception e) {}
+//      }
+//
+//        };
+//
+//        flashThread.setPriority(Thread.MAX_PRIORITY);
+//        flashThread.start();
+    }
 
     /**
      */
     public void createView() {
-        setBackground(Color.BLACK);
-        setUndecorated(true);
-        setAlwaysOnTop(true);
-        setEnabled(false);
-        setFocusable(false);
-        setFocusableWindowState(false);
-        
-        GrasppeKit.setFrameOpacity(this, initialOpacity);
-        
-        JLabel label = new JLabel(messageText);
-        
+    	
+    	if (floatingFrame!=null) {
+    		floatingFrame.setVisible(false);
+    	}
+    	
+    	floatingFrame = new JFrame();
+    	
+    	floatingFrame.setBackground(Color.BLACK);
+    	floatingFrame.setUndecorated(true);
+    	floatingFrame.setAlwaysOnTop(true);
+    	floatingFrame.setEnabled(false);
+    	floatingFrame.setFocusable(false);
+    	floatingFrame.setFocusableWindowState(false);
+
+        GrasppeKit.setFrameOpacity(floatingFrame, initialOpacity);
+
+        JLabel	label = new JLabel(messageText);
+
+        // label.set
+
         label.setForeground(Color.WHITE);
-        label.setFont(label.getFont().deriveFont(16.0F)); //.deriveFont(Font.BOLD)
-//        label.setMinimumSize(new Dimension(250,100));
+        label.setFont(label.getFont().deriveFont(16.0F));		// .deriveFont(Font.BOLD)
+        label.setMinimumSize(new Dimension(250, 100));
         label.setVerticalAlignment(JLabel.CENTER);
         label.setHorizontalAlignment(JLabel.CENTER);
-        
-        Container pane = getContentPane();
-        
-        pane.setLayout(new BorderLayout());
-        
-        pane.add(label,BorderLayout.CENTER);
-        
-        setMinimumSize(new Dimension(250,100));
-        
-        pack();
-        
-        setLocationRelativeTo(null);
 
+        EmptyBorder	marginBorder = new EmptyBorder(30, 30, 30, 30);
+
+        label.setBorder(marginBorder);
+
+        Container	pane = floatingFrame.getContentPane();
+
+        // pane.setLayout(new BorderLayout());
+
+        pane.add(label);	// ,BorderLayout.CENTER);
+
+        floatingFrame.setMinimumSize(new Dimension(250, 100));
+
+        floatingFrame.pack();
+
+        floatingFrame.setLocationRelativeTo(null);
+
+    }
+
+    /**
+     */
+    public void fadeView() {
+
+//      SwingUtilities.invokeLater(
+//
+//      new Thread() {
+//          
+//          public void run() {
+    	floatingFrame.setVisible(true);
+        fadeTimer = new Timer(frameRate, new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                setFadeOpactiy();
+                frame++;
+            }
+
+        });
+
+        fadeTimer.setRepeats(true);
+        fadeTimer.start();
+
+//      }
+//      });
+    }
+
+    /**
+     */
+    public void flashView() {
+        flashView(1);
+    }
+
+    /**
+     *  @param duration
+     */
+    public void flashView(int duration) {
+        final int	flashDuration = duration;
+
+        pending = true;
+
+//      
+//      final Runnable doFlash = new Runnable() {
+//              public void run() {
+        floatingFrame.setVisible(true);
+        floatingFrame.repaint();
+
+        pending = false;
+
+        if (flashDuration > 0) {
+            Timer	timer = new Timer(flashDuration, new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    fadeView();
+                }
+
+            });
+
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+//      }
+//      };
+//      Thread flashThread = new Thread() {
+//           public void run() {
+//       try {
+//           SwingUtilities.invokeAndWait(doFlash);
+//       } catch (Exception e) { }
+//           }
+//          
+//      };
+//      flashThread.setPriority(Thread.MAX_PRIORITY);
+//      flashThread.start();
+
+    }
+
+    /**
+     * @return the messageText
+     */
+    public String getMessageText() {
+        return messageText;
+    }
+
+    /**
+     * @return the pending
+     */
+    public boolean isPending() {
+        return pending;
+    }
+
+    /**
+     */
+    public void setFadeOpactiy() {
+        if (fadeTimer == null) return;
+
+        float	fadeRate = (float)(Math.log(((double)frames - (double)frame))
+                                 / Math.log((double)frames));
+        float	newOpacity = (initialOpacity) * fadeRate;
+
+        if (newOpacity > 0) GrasppeKit.setFrameOpacity(floatingFrame, newOpacity);
+
+        if ((frame >= frames) || (newOpacity <= 0)) {
+            fadeTimer.stop();
+            floatingFrame.setVisible(false);
+        }
+    }
+
+    /**
+     * @param messageText the messageText to set
+     */
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 }

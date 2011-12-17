@@ -77,9 +77,11 @@ public class BlockGrid {
     public BufferedImage getImage() {
         int	columns = this.blockState.getColumns();
         int	rows    = this.blockState.getRows();
-
+       
         return this.getImage(columns, rows);
     }
+    
+    public static boolean blinkValue = false;
 
     /**
      * @param width
@@ -87,18 +89,19 @@ public class BlockGrid {
      * @return
      */
     public BufferedImage getImage(int width, int height) {
+        
         BufferedImage		image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         WritableRaster		raster = image.getRaster();
         int[]				color  = new int[3];
         int[][]				colors = {
             { 63, 63, 63 },			// 0
             { 128, 0, 0 },			// 1
-            { 195, 0, 0 },			// 2
-            { 195, 195, 0 },		// 3
-            { 0, 195, 0 },			// 4
+            { 228, 0, 0 },			// 2
+            { 255, 255, 0 },		// 3
+            { 0, 220, 0 },			// 4
             { 0, 128, 0 },			// 5
             { 128, 128, 128 },		// 6
-            { 195, 195, 195 },		// 7
+            { 32,32, 32 },		// 7
         };
         PatchDesignation	value;
         int					column      = blockState.getColumn(),
@@ -124,7 +127,8 @@ public class BlockGrid {
             }
         }
 
-        raster.setPixel(column, row, (int[])colors[7]);
+        if (blinkValue)
+        	raster.setPixel(column, row, (int[])colors[7]);
 
         return image;
     }

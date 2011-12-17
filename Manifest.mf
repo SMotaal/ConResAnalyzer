@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Class-Path: . ConResAnalyzer_lib/org.hamcrest.core_1.1.0.v200905010710
+ 00.jar ConResAnalyzer_lib/commons-io-1.3.2.jar ConResAnalyzer_lib/ij.
+ jar ConResAnalyzer_lib/sanselan.jar ConResAnalyzer_lib/junit.jar ConR
+ esAnalyzer_lib/junit-3.8.2.jar
+Main-Class: com.grasppe.conres.analyzer.ConResAnalyzerMain
+Specification-Title: ConResAnalyzer
+Specification-Version: 0.1b-11
+Specification-Vendor: Grasppe, Inc.
+Implementation-Title: com.grasppe.conres.analyzer 
+Implementation-Version: 0.1 beta build11
+Implementation-Vendor: Grasppe, Inc.

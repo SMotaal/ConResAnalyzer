@@ -45,13 +45,13 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     protected IConResTargetDefinition	file;
     protected Reader					reader;
     
-    public static final String FIELD_SEPARATOR = GrasppeKit.FIELD_SEPARATOR;
+    public static final String FIELD_SEPARATOR = GrasppeKit.FIELD_SEPARATOR;	// "\\s+"; 
 
     /**
      * @param file
-     *  @throws IOException
+     * @throws Exception 
      */
-    public TargetDefinitionReader(File file) throws IOException {
+    public TargetDefinitionReader(File file) throws Exception {
         this(new FileReader(file));
         this.file = (IConResTargetDefinition)file;
         parseFile();
@@ -118,9 +118,9 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
     }
 
     /**
-     *  @throws IOException
+     *  @throws Exception 
      */
-    public void parseFile() throws IOException {
+    public void parseFile() throws Exception {
         String	line;
 
         while ((line = super.readLine()) != null) {
@@ -136,8 +136,9 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
     /**
      * @param line
+     * @throws Exception 
      */
-    protected void parseLine(String line) {
+    protected void parseLine(String line) throws Exception {
         String	fields[] = line.split(FIELD_SEPARATOR);
         String	head     = fields[0].trim().toLowerCase();
 
@@ -159,8 +160,9 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
     /**
      * @param lines
+     * @throws Exception 
      */
-    protected void parseMeasurementsSection(ArrayList<String> lines) {
+    protected void parseMeasurementsSection(ArrayList<String> lines) throws Exception {
         Iterator<String>	iterator     = lines.iterator();
 
         TargetMeasurements	measurements = new TargetMeasurements();
@@ -178,7 +180,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 
         while (iterator.hasNext()) {
             String	line     = iterator.next();
-            String	fields[] = line.split(FIELD_SEPARATOR);
+            String	fields[] = line.split(FIELD_SEPARATOR); //replace("[ ]+", " ").split("\t");
 
             try {
                 int	head = new Integer(fields[0]).intValue();
@@ -190,6 +192,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             } catch (NumberFormatException exception) {}
             catch (Exception exception) {
                 exception.printStackTrace();
+                throw exception;
             }
 
             try {
@@ -202,6 +205,7 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
             } catch (NumberFormatException exception) {}
             catch (Exception exception) {
                 exception.printStackTrace();
+                throw exception;
             }
         }
 
@@ -284,8 +288,9 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
      */
     protected void parseTargetSection(ArrayList<String> lines) {
         String	name = lines.get(1).trim();
-
-        file.setName(name);
+        
+        if (file.getName()==null || file.getName().isEmpty())
+        	file.setName(name);
 //        System.out.println("Target Name:\t" + lines.get(1).trim());
     }
 

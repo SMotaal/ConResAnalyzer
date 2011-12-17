@@ -95,9 +95,9 @@ public class CaseManager extends AbstractController implements ActionListener {
 
     /**
      *  @param newCase
-     *  @throws IOException
+     * @throws Exception 
      */
-    public boolean verifyCaseFolder(CaseFolder caseFolder) throws IOException {
+    public boolean verifyCaseFolder(CaseFolder caseFolder) throws Exception {
     	
 //    	CaseFolder	caseFolder = new CaseFolder(folder.getAbsolutePath());
     	
@@ -113,9 +113,9 @@ public class CaseManager extends AbstractController implements ActionListener {
     }
     /**
      *  @param newCase
-     *  @throws IOException
+     * @throws Exception 
      */
-    public void loadCase(CaseModel newCase) throws IOException {
+    public void loadCase(CaseModel newCase) throws Exception {
 
         CaseFolder	caseFolder = new CaseFolder(newCase.path);
 

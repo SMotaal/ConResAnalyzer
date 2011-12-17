@@ -27,9 +27,7 @@ import com.grasppe.conres.framework.analysis.stepping.StepUp;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.targets.TargetManager;
-import com.grasppe.conres.framework.targets.model.PatchDimensions;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
-import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -43,10 +41,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Transparency;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
+import javax.swing.Timer;
 
 /**
  * @author daflair
@@ -56,6 +57,8 @@ public class AnalysisStepper extends AbstractController {
     int								dbg             = 0;
     protected AnalysisManager		analysisManager = null;
     protected AnalysisStepperView	stepperView     = null;
+    protected ConResBlock			lastBlock       = null;
+    protected BlockState			loadBlockState  = null;
 
     /**
      * Constructs and attaches a new controller and a new model.
@@ -63,7 +66,7 @@ public class AnalysisStepper extends AbstractController {
      */
     public AnalysisStepper(AnalysisManager analysisManager) {
         this(analysisManager, new AnalysisStepperModel());
-        
+
         getModel().setPatchPreviewSize(getTargetManager().patchPreviewSize);
 
         return;
@@ -74,71 +77,87 @@ public class AnalysisStepper extends AbstractController {
      *  @param analysisManager
      * @param model
      */
-    private AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model) {
+    private AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model)  {
         super(model);
         this.analysisManager = analysisManager;
-        stepperView          = new AnalysisStepperView(this);
+        try {
+			stepperView          = AnalysisStepperView.getInstance(this);
+		} catch (Exception exception) {
+			// TODO Auto-generated catch block
+			exception.printStackTrace();
+		}
         attachView(stepperView);
-        
+
         getAnalyzer().getCaseManager().getModel().attachObserver(this);
     }
 
     /**
      * @param keyCode
      * @param keyModifiers
-     * 	@return
+     *  @return
      */
     public boolean BlockStepKey(int keyCode, int keyModifiers) {	// SteppingStrategy thisStep) {
 
-        SmartBlockState		smartState = new SmartBlockState(getModel().getBlockState());
-        
-        if (smartState==null || smartState.getBlockMap()==null) return false;
-        
-        SteppingStrategy	thisStep = new StepNext(smartState); 
+        SmartBlockState	smartState = new SmartBlockState(getModel().getBlockState());
 
-        boolean				snapState  = true;
-        boolean				goBack     = false;
-        
-        double scaleMultiplier = 1.15;
+        if ((smartState == null) || (smartState.getBlockMap() == null)) return false;
+
+        SteppingStrategy	thisStep        = null; //new StepNext(smartState);
+
+        boolean				snapState       = true;
+        boolean				goBack          = false;
+
+        double				scaleMultiplier = 1.15;
 
         switch (keyCode) {
-        
+
         case KeyEvent.VK_EQUALS :
-        	getModel().setScaleRatio(getModel().getScaleRatio()*scaleMultiplier);
-        	break;
+            getModel().setScaleRatio(getModel().getScaleRatio() * scaleMultiplier);
+            break;
+
         case KeyEvent.VK_MINUS :
-        	getModel().setScaleRatio(getModel().getScaleRatio()/scaleMultiplier);
-        	break;
+            getModel().setScaleRatio(getModel().getScaleRatio() / scaleMultiplier);
+            break;
+
         case KeyEvent.VK_0 :
-        	getModel().setScaleRatio(2.5);
-        	break;
+            getModel().setScaleRatio(2.5);
+            break;
+
         case KeyEvent.VK_1 :
-        	getModel().setScaleRatio(1);
-        	break;
+            getModel().setScaleRatio(1);
+            break;
+
         case KeyEvent.VK_2 :
-        	getModel().setScaleRatio(1.5);
-        	break;
+            getModel().setScaleRatio(1.5);
+            break;
+
         case KeyEvent.VK_3 :
-        	getModel().setScaleRatio(2);
-        	break;
+            getModel().setScaleRatio(2);
+            break;
+
         case KeyEvent.VK_4 :
-        	getModel().setScaleRatio(2.5);
-        	break;
+            getModel().setScaleRatio(2.5);
+            break;
+
         case KeyEvent.VK_5 :
-        	getModel().setScaleRatio(3);
-        	break;
+            getModel().setScaleRatio(3);
+            break;
+
         case KeyEvent.VK_6 :
-        	getModel().setScaleRatio(3.5);
-        	break;
+            getModel().setScaleRatio(3.5);
+            break;
+
         case KeyEvent.VK_7 :
-        	getModel().setScaleRatio(4);
-        	break;
+            getModel().setScaleRatio(4);
+            break;
+
         case KeyEvent.VK_8 :
-        	getModel().setScaleRatio(4.5);
-        	break;
+            getModel().setScaleRatio(4.5);
+            break;
+
         case KeyEvent.VK_9 :
-        	getModel().setScaleRatio(5);
-        	break;
+            getModel().setScaleRatio(5);
+            break;
 
         case KeyEvent.VK_SPACE :
             if (keyModifiers == 1) {
@@ -185,51 +204,65 @@ public class AnalysisStepper extends AbstractController {
             if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.FAIL);
 
             break;
-            
+
         case KeyEvent.VK_C :
-        	if (keyModifiers == 0) thisStep = new SetAndStep(smartState,BlockState.CLEAR); 
-        		break;
+            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.CLEAR);
+            break;
 
         default :
             return false;
         }
 
         try {
-        if (goBack) {
-            if (!getModel().getHistory().isEmpty()) {
-                thisStep = new StepBack(smartState, getModel().getHistory());
-                getModel().getHistory().remove(getModel().getHistory().size() - 1);
-                snapState = false;
+            if (goBack) {
+                if (!getModel().getHistory().isEmpty()) {
+                    thisStep = new StepBack(smartState, getModel().getHistory());
+                    getModel().getHistory().remove(getModel().getHistory().size() - 1);
+                    snapState = false;
+                }
             }
-        }
 
-        if (snapState) {
-            int		row          = getModel().getBlockState().getRow();
-            int		column       = getModel().getBlockState().getColumn();
-            int[]	currentState = { row, column };
+            if (snapState) {
+                int		row          = getModel().getBlockState().getRow();
+                int		column       = getModel().getBlockState().getColumn();
+                int[]	currentState = { row, column };
 
-            getModel().getHistory().add(currentState);
-        }
+                getModel().getHistory().add(currentState);
+            }
 
-        if(thisStep==null) thisStep = new StepNext(smartState);
-        thisStep.execute();
+            if (thisStep != null) //thisStep = new StepNext(smartState);
+            	thisStep.execute();
 
-        setNewBlockState(thisStep.getFinalState());
-        
+            setNewBlockState(thisStep.getFinalState());
+
         } catch (Exception exception) {
-        	GrasppeKit.debugError("Handling Stepper Key Event", exception,2);
-        	update();
+            GrasppeKit.debugError("Handling Stepper Key Event", exception, 2);
+            update();
         }
 
         return true;
     }
 
     /**
+     */
+    public void finalizeLoading() {
+    	if (loadBlockState!=null) {
+	        loadBlockFiles(loadBlockState);
+	        setNewBlockState(loadBlockState);
+	        loadBlockState = null;
+    	}
+        setScratchEnabled(true);
+//      updatePatchPreviews();
+        getModel().notifyObservers();
+    }
+
+    /**
      *  @param blockState
      */
     public void loadBlockFiles(BlockState blockState) {
-    	getTargetManager().loadImage();
-        setScratchEnabled(false);
+        getTargetManager().loadImage();
+
+//      setScratchEnabled(false);
 
         try {
             loadCSVFile(blockState);
@@ -249,11 +282,15 @@ public class AnalysisStepper extends AbstractController {
     }
 
     /**
+     */
+    public void loadBlockResources() {}
+
+    /**
      *  @param blockState
      *      @throws Exception
      */
     public void loadCSVFile(BlockState blockState) throws Exception {
-        String	filename = getTargetManager().generateFilename("a.csv","Data");
+        String	filename = getTargetManager().generateFilename("a.csv", "Data");
 
         blockState.readFile(filename);
     }
@@ -263,9 +300,13 @@ public class AnalysisStepper extends AbstractController {
      *      @throws Exception
      */
     public void loadScratchFile(BlockState blockState) throws Exception {
-        String	filename = getTargetManager().generateFilename("s.csv","Resources");
+        String	filename = getTargetManager().generateFilename("s.csv", "Resources");
 
         blockState.readFile(filename);
+        
+        scratchFile = filename;
+        
+        updatePatchPreviews();
         setScratchEnabled(true);
     }
 
@@ -334,7 +375,7 @@ public class AnalysisStepper extends AbstractController {
         if (!isScratchEnabled()) return;
 
         try {
-            String	filename = getTargetManager().generateFilename("s.csv","Resources");
+            String	filename = getTargetManager().generateFilename("s.csv", "Resources");
 
             getModel().getBlockState().writeFile(filename);
         } catch (Exception exception) {
@@ -349,6 +390,7 @@ public class AnalysisStepper extends AbstractController {
         updateActiveBlock();
         update();
         getStepperView().setVisible(true);
+        finalizeLoading();
     }
 
     // This method returns a buffered image with the contents of an image
@@ -424,48 +466,56 @@ public class AnalysisStepper extends AbstractController {
     @Override
     public void update() {
         super.update();
-        
-        if (getAnalyzer().getCaseManager().getModel().hasCurrentCase()==false)
-        	getStepperView().setVisible(false);
+
+        if (getAnalyzer().getCaseManager().getModel().hasCurrentCase() == false)
+            getStepperView().setVisible(false);
     }
 
-    protected ConResBlock lastBlock = null;
     /**
      */
     public void updateActiveBlock() {
+    	
+    	if (loadBlockState!=null) {
+    		finalizeLoading();
+    		return;
+    	}
+    	
 
         ConResBlock	activeBlock = getTargetManager().getModel().getActiveBlock();
 
         if (activeBlock == null) {
-        	getModel().setBlockImage(null);
+            getModel().setBlockImage(null);
             getModel().setActiveBlock(null);
             getModel().setBlockImagePlus(null);
             setNewBlockState(null);
             setScratchEnabled(false);
+
             return;
         }
 
-        if (activeBlock==lastBlock) {
-//        	forceUpdates();
-        	updatePatchPreviews();
-        	return;
+        if (activeBlock == lastBlock) {
+
+//          forceUpdates();
+            updatePatchPreviews();
+
+            return;
         }
-        
-        setScratchEnabled(false);
 
-        if (getTargetManager().getBlockImage()==null) return;
-        
-        ImageFile	imageFile = getTargetManager().getBlockImage();
+        scratchFile = null;
+//        setScratchEnabled(false);
 
-        double imageDPI    = imageFile.getResolution().value;
-        
-        double	resolutionRatio = imageDPI / getTargetManager().displayDPI;
-        
+        if (getTargetManager().getBlockImage() == null) return;
+
+        ImageFile	imageFile       = getTargetManager().getBlockImage();
+
+        double		imageDPI        = imageFile.getResolution().value;
+
+        double		resolutionRatio = imageDPI / getTargetManager().displayDPI;
+
         getModel().setResolutionRatio(resolutionRatio);
         getModel().setBlockImage(getTargetManager().getBlockImage());
-        getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus()); // .getImagePlus());
+        getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus());		// .getImagePlus());
         getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
-        
 
         int			blockColumns = getActiveBlock().getXAxis().getValues().length;
         int			blockRows    = getActiveBlock().getYAxis().getValues().length;
@@ -477,16 +527,17 @@ public class AnalysisStepper extends AbstractController {
         blockState.setColumn(0);
         blockState.setRow(0);
 
-        loadBlockFiles(blockState);
-        setNewBlockState(blockState);
+        getTargetManager().loadImage();
+        setScratchEnabled(false);
 
+        loadBlockState = blockState;
 
-        setScratchEnabled(true);
+//      finalizeLoading();
 
         lastBlock = activeBlock;
-        
-//        updatePatchPreviews();
-        getModel().notifyObservers();
+
+//      updatePatchPreviews();
+//      getModel().notifyObservers();
 //      }
 
         // AnalysisStepperModel model = getModel();
@@ -500,39 +551,64 @@ public class AnalysisStepper extends AbstractController {
      */
     public void updatePatchPreviews() {
         try {
-        	getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus()); // .getImagePlus());        	
+            getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus());		// .getImagePlus());
             updatePatchPreviews(getModel().getActivePatch().getPatchRow(),
                                 getModel().getActivePatch().getPatchColumn());
         } catch (Exception exception) {
             GrasppeKit.debugError("Updating Patch Preview (using model position)", exception, 2);
         }
     }
+    
+    
+    protected ActionListener blinkListener = new ActionListener() {
 
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			blinkCursor();
+		}
+    	
+    };
+
+    protected Timer blinkTimer = new Timer(350, blinkListener);
+    
+    public synchronized void blinkCursor() {
+		try {
+			BlockGrid.blinkValue=!BlockGrid.blinkValue;
+			getModel().setImage(new BlockGrid(getModel().getBlockState()).getImage());
+			pushUpdates();
+		} catch (Exception exception) {
+			blinkTimer.stop();
+		}    	
+    }
+    
     /**
      *  @param row
      *  @param column
      */
     public void updatePatchPreviews(int row, int column) {
         try {
-//            if ((row < 0) || (column < 0)) {
-//                getModel().setPatchImage(null);
-//                getModel().setImage(null);
-//
-//                return;
-//            }
 
-//            Image	patchImage = getTargetManager().getPatchImage(row, column);
+//          if ((row < 0) || (column < 0)) {
+//              getModel().setPatchImage(null);
+//              getModel().setImage(null);
 //
-//            getModel().setPatchImage(patchImage);
+//              return;
+//          }
+
+//          Image patchImage = getTargetManager().getPatchImage(row, column);
+//
+//          getModel().setPatchImage(patchImage);
 
             BlockGrid	blockGrid = new BlockGrid(getModel().getBlockState());
-
+            
             getModel().setImage(blockGrid.getImage());
+            
+            blinkTimer.start();
 
         } catch (Exception exception) {
             GrasppeKit.debugError("Updating Patch Preview (using selected position)", exception, 2);
         }
-        
+
         pushUpdates();
     }
 
@@ -590,8 +666,13 @@ public class AnalysisStepper extends AbstractController {
      *  @return
      */
     public boolean isScratchEnabled() {
-        return getModel().isScratchEnabled();
+    	
+    	return scratchFile!=null;
+    	
+        //return getModel().isScratchEnabled();
     }
+    
+    protected String scratchFile = null;
 
     /**
      *  @param newState
@@ -605,23 +686,24 @@ public class AnalysisStepper extends AbstractController {
                 pushUpdates();
             } else {
 
-//                if (newState != getModel().getBlockState()) {
-                    getModel().setBlockState(newState);
+//              if (newState != getModel().getBlockState()) {
+                getModel().setBlockState(newState);
 
-                    int			row          = newState.getRow();
-                    int			column       = newState.getColumn();
+                int	row    = newState.getRow();
+                int	column = newState.getColumn();
 
-                    saveScratchFile();
+                saveScratchFile();
 
-                    getModel().setBlockImage(getTargetManager().getBlockImage());
-                    getModel().setActivePatch(getTargetManager().getPatch(row, column));
-                    getModel().setPatchDimensions(getTargetManager().getPatchDimensions(row, column));
-                    getModel().setPatchPreviewSize(getTargetManager().patchPreviewSize);
-//                    getModel().setImageDPI(getTargetManager().imageDPI);
-//                    getModel().setDisplayDPI(getTargetManager().displayDPI);
-//                    getModel().setResolutionRatio(getTargetManager().dpiRatio);
-//                    getModel().setScaleRatio(getTargetManager().scaleRatio);
-//                    getModel().setWindowRatio(getTargetManager().windowRatio);
+                getModel().setBlockImage(getTargetManager().getBlockImage());
+                getModel().setActivePatch(getTargetManager().getPatch(row, column));
+                getModel().setPatchDimensions(getTargetManager().getPatchDimensions(row, column));
+                getModel().setPatchPreviewSize(getTargetManager().patchPreviewSize);
+
+//              getModel().setImageDPI(getTargetManager().imageDPI);
+//              getModel().setDisplayDPI(getTargetManager().displayDPI);
+//              getModel().setResolutionRatio(getTargetManager().dpiRatio);
+//              getModel().setScaleRatio(getTargetManager().scaleRatio);
+//              getModel().setWindowRatio(getTargetManager().windowRatio);
 //                }
 
                 updatePatchPreviews(row, column);

@@ -127,7 +127,12 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
 //          BufferedImage         patchImage       = model.getPatchImage();
             PatchDimensions	patchDimensions  = model.getPatchDimensions();
 //            int				patchPreviewSize = model.getPatchPreviewSize();		// model.getImageDPI();  //        model.getDisplayDPI();
-            double	resolutionRatio = model.getResolutionRatio();
+            
+            model.setImageDPI(model.getBlockImage().getResolution().value);
+            
+            if (model.getImageDPI()<550) return;
+            double	resolutionRatio = model.getImageDPI()/model.getDisplayDPI(); // model.getResolutionRatio();
+            
             if (getModel().getScaleRatio()<1)
             	getModel().setScaleRatio(1);
             double	scaleRatio      = model.getScaleRatio();
@@ -150,6 +155,8 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
             int		hintMode        = Image.SCALE_SMOOTH;
             
             ImagePlus imagePlus = getModel().getBlockImagePlus();
+            
+            if (imagePlus==null) return;
 
             Image	image           = imagePlus.getImage();
 

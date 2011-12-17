@@ -8,6 +8,7 @@
 
 package com.grasppe.conres.analyzer.view;
 
+import com.apple.eawt.Application;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
 import com.grasppe.conres.framework.cases.operations.OpenCase;
@@ -218,6 +219,9 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
             // Flavors to check
             DataFlavor	Linux   = new DataFlavor("text/uri-list;class=java.io.Reader");
             DataFlavor	Windows = DataFlavor.javaFileListFlavor;
+            
+            boolean canOpen = false;
+            String fileName = "";
 
             // On Linux (and OS X) file DnD is a reader
             if (flavor.equals(Linux)) {
@@ -226,7 +230,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
                 BufferedReader	read = new BufferedReader(flavor.getReaderForText(tr));
 
                 // Remove 'file://' from file name
-                String	fileName = read.readLine().substring(7).replace("%20", " ");
+                fileName = read.readLine().substring(7).replace("%20", " ");
 
                 // Remove 'localhost' from OS X file names
                 if (fileName.substring(0, 9).equals("localhost")) {
@@ -239,7 +243,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
                 System.out.println("File Dragged:" + fileName);
 
 //              mainWindow.openFile(fileName);
-                openCaseFolder(fileName);
+                canOpen = true;
             }
 
             // On Windows file DnD is a file list
@@ -254,15 +258,22 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
                 if (list.size() == 1) {
                     System.out.println("File Dragged: " + list.get(0));
                     
-                    String fileName = list.get(0).toString();
+                    fileName = list.get(0).toString();
 
-//                  mainWindow.openFile(list.get(0).toString());
-                    openCaseFolder(fileName);
+                    canOpen = true;
                 }
             } else {
                 System.err.println("DnD Error");
                 event.rejectDrop();
             }
+
+            if (canOpen && fileName!=null && !fileName.isEmpty()) {
+//            	mainFrame.setVisible(true);
+//            	mainFrame.toFront();
+            	Application.getApplication().requestForeground(true);
+            	openCaseFolder(fileName);
+            }
+            
         }
 
         // TODO: OS X Throws ArrayIndexOutOfBoundsException on first DnD
