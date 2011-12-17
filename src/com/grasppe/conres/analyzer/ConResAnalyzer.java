@@ -34,7 +34,7 @@ import javax.swing.JFrame;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-	public static final String	BUILD = "0.1b-12";
+	public static final String	BUILD = "0.1b-13";
     protected CaseManager			caseManager;
     protected TargetManager			targetManager;
     protected AnalysisManager		analysisManager;

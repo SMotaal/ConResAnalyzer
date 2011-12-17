@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>?????</string>
 	<key>CFBundleVersion</key>
-	<string>0.1b-12</string>
+	<string>0.1b-13</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

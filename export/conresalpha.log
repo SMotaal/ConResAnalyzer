@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project ConResAnalyzer with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer.jar">
+            <manifest>
+                <attribute name="Main-Class" value="com.grasppe.conres.analyzer.ConResAnalyzerMain"/>
+                <attribute name="Class-Path" value=". ConResAnalyzer_lib/junit.jar ConResAnalyzer_lib/org.hamcrest.core_1.1.0.v20090501071000.jar ConResAnalyzer_lib/junit-3.8.2.jar ConResAnalyzer_lib/ij.jar ConResAnalyzer_lib/sanselan.jar ConResAnalyzer_lib/commons-io-1.3.2.jar"/>
+            </manifest>
+            <fileset dir="/Users/daflair/Documents/Workspace/ConResAnalyzer/target/classes"/>
+            <fileset dir="/Users/daflair/Documents/workspace/libraries/sanselan-0.97-incubator/target/classes"/>
+        </jar>
+        <delete dir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <mkdir dir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Applications/eclipse/plugins/org.junit_4.8.2.v4_8_2_v20110321-1705/junit.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Applications/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Users/daflair/.m2/repository/junit/junit/3.8.2/junit-3.8.2.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/ij.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/sanselan.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+        <copy file="/Users/daflair/.m2/repository/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2.jar" todir="/Users/daflair/Documents/Workspace/ConResAnalyzer/export/ConResAnalyzer.app/Contents/MacOS/java/ConResAnalyzer_lib"/>
+    </target>
+</project>

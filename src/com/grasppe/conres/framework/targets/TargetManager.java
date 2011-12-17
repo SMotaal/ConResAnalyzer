@@ -21,6 +21,7 @@ import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.framework.targets.operations.MarkBlock;
 import com.grasppe.conres.framework.targets.operations.SelectBlock;
+import com.grasppe.conres.framework.targets.operations.SelectBlockFunction;
 import com.grasppe.conres.framework.targets.operations.SelectCornersFunction;
 import com.grasppe.conres.framework.targets.view.TargetManagerView;
 import com.grasppe.conres.io.TargetDefinitionReader;
@@ -230,7 +231,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
                     getModel().notifyObservers();
                     
-                    getCornerSelector().showSelectorView();
+//                    getCornerSelector().showSelectorView();
                     
 //                    try {
 //                    	getAnalyzer().getAnalysisManager().getAnalysisStepper().finalizeLoading();
@@ -304,6 +305,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
         // TargetDefinitionFile file = targetDefinitionFile.getTargetDefinitionFile();
         try {
             TargetDefinitionReader	reader = new TargetDefinitionReader(targetDefinitionFile);
+            
+//            new SelectBlockFunction(this).execute(true);
         } catch (Exception exception) { //NullPointerException exception) {
             IOException	ioException = new IOException("Could not load a target definition file.",
                                           exception);
@@ -679,5 +682,6 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
+        new SelectBlockFunction(this).execute(true);
     }
 }
