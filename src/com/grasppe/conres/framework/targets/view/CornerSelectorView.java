@@ -121,6 +121,21 @@ public class CornerSelectorView extends AbstractView
     private void addBlockVertex(Point point) {
         addBlockVertex(round(point.getX()), round(point.getY()));
     }
+    
+    private Polygon proximityCheck(int pointX, int pointY, BlockROI roiPoints, int planeWidth, int planeHeight){
+    	Polygon roiPolygon = roiPoints.getPolygon();
+    	Polygon validPolygon = new Polygon();
+    	for (int i = 0; i < roiPolygon.npoints; i++) {
+    		int roiX = roiPolygon.xpoints[i],
+    				roiY = roiPolygon.ypoints[i];
+    		boolean validWidth = Math.abs(roiX-pointX) > (planeWidth / 2);
+    		boolean validHeight = Math.abs(roiY-pointY) > (planeHeight / 2);
+    		if (validWidth || validHeight)
+    			validPolygon.addPoint(roiX, roiY);
+    	}
+    	return validPolygon;
+//    	return -1;
+    }
 
     /**
      *  @param pointX
@@ -128,15 +143,23 @@ public class CornerSelectorView extends AbstractView
      */
     private void addBlockVertex(int pointX, int pointY) {
         int	dbg = 2;
+        
+        BlockROI blockROI = null;
 
         try {
             if (blockPointCount() == 0) {
-                BlockROI	blockROI = new BlockROI(pointX, pointY);
+                blockROI = new BlockROI(pointX, pointY);
 
                 getModel().setBlockROI(blockROI);
-            } else if (blockPointCount() < 3)
-                       getModel().setBlockROI(getModel().getBlockROI().addPoint(pointX, pointY));
-            else return;
+            } else if (blockPointCount() < 3) {
+            			blockROI = getModel().getBlockROI();
+            			Polygon newPolygon = proximityCheck(pointX, pointY, blockROI, getImagePanel().getWidth(), getImagePanel().getHeight());
+            			newPolygon.addPoint(pointX, pointY);
+            			blockROI = new BlockROI(newPolygon);
+//            			blockROI.addPoint(pointX, pointY);
+//            			if (proximityIndex>-1) blockROI.deleteHandle(arg0, arg1)
+                       getModel().setBlockROI(blockROI); //getModel().getBlockROI().addPoint(pointX, pointY));
+            } else return;
 
             GrasppeKit.debugText("CornerSelector - Add Point",
                                  pointString(getModel().getBlockROI()), dbg);
@@ -1171,6 +1194,9 @@ public class CornerSelectorView extends AbstractView
     private void warpPatchGrid() {
 
         int	dbg = 0;
+        
+        int verticalOffset = 0,
+        		horizontalOffset = 0;
 
         // TODO: WarpPolynomial
 
