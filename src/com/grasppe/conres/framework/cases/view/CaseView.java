@@ -97,9 +97,12 @@ public class CaseView extends JPanel implements Observer {
     }
     
     public void createView() {
+
     	if (caseLabel!=null) return;
-        
-        caseLabel = new JLabel(defaultCaseText); //getModel().getCurrentCase().title);
+
+    	setBackground(Color.WHITE);
+
+    	caseLabel = new JLabel(defaultCaseText); //getModel().getCurrentCase().title);
         formatLabel(caseLabel);
         add(caseLabel,BorderLayout.CENTER);
         
@@ -111,13 +114,13 @@ public class CaseView extends JPanel implements Observer {
         formatLabel(buildLabel);
         add(buildLabel,BorderLayout.EAST);
        
-        setBackground(Color.WHITE);
         
         super.setBorder(new MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
     }
     
     protected void formatLabel(JLabel label) {
         label.setForeground(labelTextColor);
+        label.setBackground(getBackground());
 //        label.setFont(label.getFont().deriveFont(labelFontSize));
         label.setBorder(new EmptyBorder(topPadding,sidePadding,bottomPadding,sidePadding));
     }
