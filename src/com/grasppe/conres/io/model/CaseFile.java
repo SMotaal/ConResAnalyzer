@@ -68,8 +68,6 @@ public abstract class CaseFile extends File {
      */
     public CaseFile(File parent, String child) {
         super(parent, child);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**

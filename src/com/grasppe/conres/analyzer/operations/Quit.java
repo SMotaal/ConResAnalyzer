@@ -60,7 +60,6 @@ public class Quit extends ConResAnalyzerCommand {
     @Override
     public void update() {
         super.update();
-
         // TODO: Enable if open case, else disable
         canExecute(true);
     }

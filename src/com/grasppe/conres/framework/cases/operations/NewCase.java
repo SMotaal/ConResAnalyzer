@@ -43,7 +43,7 @@ public class NewCase extends CaseManagerCommand {
     /**
      * Constructs a realization of AbstractCommand.
      * @param listener
-     * @param controller TODO
+     * @param controller 
      */
     public NewCase(CaseManager controller, ActionListener listener) {
         super(listener, name);
@@ -74,9 +74,8 @@ public class NewCase extends CaseManagerCommand {
 
         canProceed = true;
 
-        // TODO: Validate imageFolder structure (if not Show imageFolderChooser)
-
-        // TODO: Confirm and close current case before attempting to switching cases
+        // Validate imageFolder structure (if not Show imageFolderChooser)
+        // Confirm and close current case before attempting to switching cases
         canProceed = ((CloseCase)this.controller.getCommandHandler().getCommand(
             "CloseCase")).quickClose(getKeyEvent());
         if (!canProceed) return canExecute(true);		// Action responded to in alternative scenario

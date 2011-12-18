@@ -90,7 +90,6 @@ public class CaseFolderFilter extends WildcardFileFilter {
         // TODO: Check TargetDefinitionFile
         isAccepted &= tdfFiles.length == 1;
 
-        // TODO:
         isAccepted &= imageFiles.length > 3;
 
         return super.accept(file);

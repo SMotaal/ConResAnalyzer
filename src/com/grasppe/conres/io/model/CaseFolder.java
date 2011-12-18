@@ -282,7 +282,6 @@ public class CaseFolder extends CaseFile {
     @Override
     public boolean isVerified() {
 
-        // TODO Auto-generated method stub
         return super.isVerified();
     }
 

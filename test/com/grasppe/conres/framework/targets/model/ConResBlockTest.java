@@ -104,7 +104,7 @@ public class ConResBlockTest {
 	 */
 	@Test
 	public final void testGetPatch() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented");
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class ConResBlockTest {
 	 */
 	@Test
 	public final void testGetXValue() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented");
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ConResBlockTest {
 	 */
 	@Test
 	public final void testGetYValue() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented");
 	}
 
 }

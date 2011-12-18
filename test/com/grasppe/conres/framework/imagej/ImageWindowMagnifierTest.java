@@ -89,8 +89,5 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
     /**
      */
     public void update() {
-
-        // TODO Auto-generated method stub
-
     }
 }

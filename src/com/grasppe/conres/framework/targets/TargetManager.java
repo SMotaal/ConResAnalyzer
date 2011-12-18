@@ -255,7 +255,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
     /**
      * @throws FileNotFoundException
-     *  @param cornerSelector TODO
+     *  @param cornerSelector
      * @throws InvalidActivityException
      */
     public void loadPatchCenterROIs(CornerSelector cornerSelector)
@@ -325,7 +325,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     }
 
     /**
-     * @param cornerSelector TODO
+     * @param cornerSelector
      */
     public static void savePatchCenterROIs(CornerSelector cornerSelector) {		// if (!cornerSelector.isSelectionValid()) return;
 

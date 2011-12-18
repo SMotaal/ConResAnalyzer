@@ -63,7 +63,6 @@ public class ResolutionAxisTest {
         	System.out.println("step["+i+"] = " + steps[i] + "\t== axis.values["+i+"].value = " + values[i].getValue());
         }
 		
-		//fail("Not yet implemented"); // TODO
 	}
 
 }

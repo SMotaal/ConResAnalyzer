@@ -187,37 +187,18 @@ public class AbstractController extends AbstractComponent implements Observer, A
      * @param view
      */
     public void attachView(AbstractView view) {
-
-        // TODO: update() on attachView()
-        // TODO: handle attach will fail if view is empty
-        // TODO: handle attach will fail if model is empty
-        // this.model.attachView(view);
         if (getModel() != null) getModel().attachView(view);
     }
-
-//    /**
-//     * Returns the state of detachable.
-//     * @return
-//     */
-//    public boolean canDetach() {
-//        return detachable;
-//    }
 
     /**
      * Needs to be overridden to populate commands with subclasses of the AbstractCommand using putCommand(new SomeCommand(this)).
      */
-    public void createCommands() {
-
-        // putCommand(new CloseCase(this));
-        // TODO: Auto populate enclosed AbstractCommands class declarations using getClass().getDeclaredClasses()
-    }
+    public void createCommands() {};
 
     /**
      * Detaches the controller from the current model object.
      */
     public void detachModel() {
-
-        // TODO: update() on detachModel()
         getModel().detachObserver(this);
     }
 
@@ -225,13 +206,9 @@ public class AbstractController extends AbstractComponent implements Observer, A
      * @param view
      */
     public void detachView(AbstractView view) {
-
-        // TODO: update() on detachView()
         try {
             getModel().detachView(view);
         } catch (InvalidObjectException e) {
-
-//          e.printStackTrace();
         }
     }
 
@@ -396,19 +373,6 @@ public class AbstractController extends AbstractComponent implements Observer, A
 
 	@Override
 	protected void finalizeUpdates() {
-		// TODO Auto-generated method stub
 		
 	}
-
-//    /**
-//     * Attaches a new model after safely detaching an existing one.
-//     * @param newModel
-//     * @throws IllegalAccessException
-//     */
-//    public void setModel(AbstractModel newModel) throws IllegalAccessException {
-//        if (this.model != null & !this.canDetach())
-//            throw new IllegalAccessException("Cannot detach from current model.");
-//        if (this.model != null) detachModel();
-//        attachModel(newModel);
-//    }
 }

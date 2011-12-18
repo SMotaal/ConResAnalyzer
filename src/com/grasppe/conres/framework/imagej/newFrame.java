@@ -25,7 +25,6 @@ public class newFrame extends JFrame {
      */
     public newFrame() throws HeadlessException {
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -34,7 +33,6 @@ public class newFrame extends JFrame {
     public newFrame(GraphicsConfiguration arg0) {
         super(arg0);
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -44,7 +42,6 @@ public class newFrame extends JFrame {
     public newFrame(String arg0) throws HeadlessException {
         super(arg0);
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -54,6 +51,5 @@ public class newFrame extends JFrame {
     public newFrame(String arg0, GraphicsConfiguration arg1) {
         super(arg0, arg1);
 
-        // TODO Auto-generated constructor stub
     }
 }

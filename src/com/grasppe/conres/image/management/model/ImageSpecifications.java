@@ -23,8 +23,6 @@ public class ImageSpecifications extends AbstractModel {
     /**
      */
     public ImageSpecifications() {
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -32,7 +30,5 @@ public class ImageSpecifications extends AbstractModel {
      */
     public ImageSpecifications(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 }

@@ -88,38 +88,6 @@ public class ConResPatchTest {
     	Assert.assertEquals(thisValue, yValue.getValue());
     }
 
-//    /**
-//     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#setPatchColumn(int)}.
-//     */
-//    @Test
-//    public final void testSetPatchColumn() {
-//        fail("Not yet implemented");	// TODO
-//    }
-//
-//    /**
-//     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#setPatchRow(int)}.
-//     */
-//    @Test
-//    public final void testSetPatchRow() {
-//        fail("Not yet implemented");	// TODO
-//    }
-//
-//    /**
-//     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#setXValue(com.grasppe.morie.units.AbstractValue)}.
-//     */
-//    @Test
-//    public final void testSetXValue() {
-//        fail("Not yet implemented");	// TODO
-//    }
-//
-//    /**
-//     * Test method for {@link com.grasppe.conres.framework.targets.model.GridPatch#setYValue(com.grasppe.morie.units.AbstractValue)}.
-//     */
-//    @Test
-//    public final void testSetYValue() {
-//        fail("Not yet implemented");	// TODO
-//    }
-
     /**
      * @throws Exception
      */

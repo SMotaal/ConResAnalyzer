@@ -21,8 +21,6 @@ public class SpatialFrequencyModel extends AbstractModel {
     /**
      */
     public SpatialFrequencyModel() {
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -30,7 +28,5 @@ public class SpatialFrequencyModel extends AbstractModel {
      */
     public SpatialFrequencyModel(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 }

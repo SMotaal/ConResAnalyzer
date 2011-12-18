@@ -35,8 +35,6 @@ public abstract class AbstractFrequency extends AbstractRate {
      */
     protected AbstractFrequency(AbstractRate inputValue) throws InvalidClassException {
         super(inputValue);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -44,7 +42,5 @@ public abstract class AbstractFrequency extends AbstractRate {
      */
     protected AbstractFrequency(double value) {
         super(value);
-
-        // TODO Auto-generated constructor stub
     }
 }

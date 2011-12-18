@@ -56,8 +56,6 @@ public class Observers implements Observable {
         GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()),dbg);
         observerSet.add(observer);
         notifyObservers();
-
-        // TODO Implement throwing exceptions for attach of existing element
     }
     
     public void detachObservers() {
@@ -82,8 +80,6 @@ public class Observers implements Observable {
         GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()),dbg);
         observerSet.remove(observer);
         notifyObservers();
-
-        // TODO Implement throwing exceptions for detach of missing element
     }
 
     /**
@@ -103,8 +99,6 @@ public class Observers implements Observable {
 
         updating = true;
 
-//        observerSet.toArray();
-
         try {
 
             for (Object object : observerSet) {
@@ -122,23 +116,6 @@ public class Observers implements Observable {
         } catch (ConcurrentModificationException exception) {}
 
         updating = false;
-
-//      Iterator<Observer>    observerIterator = observerSet.iterator();
-//
-//      if (!observerIterator.hasNext()) GrasppeKit.debugText("Observer Update Failed", toString(),dbg);
-//
-//      while (observerIterator.hasNext()) {
-//          Observer  thisObserver = observerIterator.next();
-//
-//          GrasppeKit.debugText("Observer Update", " ==> " + GrasppeKit.lastSplit(thisObserver.toString()),dbg);
-//          
-//          if (observable==null)
-//            notifyObserver(thisObserver);
-//          else
-//            observable.notifyObserver(thisObserver);
-//      }
-
-        // TODO Implement throwing exceptions for update of missing element
     }
 
     /**

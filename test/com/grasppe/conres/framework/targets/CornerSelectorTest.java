@@ -49,10 +49,7 @@ public class CornerSelectorTest {
     /**
      */
     @Test
-    public final void test() {
-
-//      fail("Not yet implemented"); // TODO
-    }
+    public final void test() {}
 
     /**
      * Test method for {@link com.grasppe.conres.framework.targets.CornerSelector#sortRectangleROIIndex(int[]}.

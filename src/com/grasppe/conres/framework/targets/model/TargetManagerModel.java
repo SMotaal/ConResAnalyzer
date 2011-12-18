@@ -116,7 +116,6 @@ public class TargetManagerModel extends AbstractModel {
     @Override
     public TargetManager getController() {
 
-        // TODO Auto-generated method stub
         return (TargetManager)super.getController();
     }
 

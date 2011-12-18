@@ -32,8 +32,6 @@ public class ConcreteValue extends AbstractValue {
      */
     protected ConcreteValue(AbstractValue inputValue) {
         super(inputValue);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -41,7 +39,5 @@ public class ConcreteValue extends AbstractValue {
      */
     protected ConcreteValue(double value) {
         super(value);
-
-        // TODO Auto-generated constructor stub
     }
 }

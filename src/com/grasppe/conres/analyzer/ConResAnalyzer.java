@@ -185,8 +185,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      */
     @Override
     public ConResAnalyzerModel getModel() {
-
-        // TODO Auto-generated method stub
         return (ConResAnalyzerModel)super.getModel();
     }
 
@@ -229,8 +227,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
      * @throws IllegalAccessException
      */
     public void setModel(ConResAnalyzerModel newModel) throws IllegalAccessException {
-
-        // TODO Auto-generated method stub
         super.setModel(newModel);
     }
 

@@ -94,14 +94,14 @@ public class BlockGrid {
         WritableRaster		raster = image.getRaster();
         int[]				color  = new int[3];
         int[][]				colors = {
-            { 63, 63, 63 },			// 0
-            { 128, 0, 0 },			// 1
-            { 228, 0, 0 },			// 2
-            { 255, 255, 0 },		// 3
-            { 0, 220, 0 },			// 4
-            { 0, 128, 0 },			// 5
-            { 128, 128, 128 },		// 6
-            { 32,32, 32 },		// 7
+            { 63, 63, 63 },			// 0	VOID
+            { 128, 0, 0 },			// 1	ASSUMED_FAIL
+            { 228, 0, 0 },			// 2	FAIL
+            { 255, 255, 0 },		// 3	MARGINAL
+            { 0, 220, 0 },			// 4	PASS
+            { 0, 128, 0 },			// 5	ASSUMED_PASS
+            { 128, 128, 128 },		// 6	CLEAR
+            { 32,32, 32 },			// 7	CURSOR
         };
         PatchDesignation	value;
         int					column      = blockState.getColumn(),

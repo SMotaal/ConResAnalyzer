@@ -217,8 +217,6 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
      */
     @Override
     protected void finalizeUpdates() {
-
-        // TODO Auto-generated method stub
         update();
     }
 

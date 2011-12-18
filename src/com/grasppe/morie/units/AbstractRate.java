@@ -186,8 +186,6 @@ public abstract class AbstractRate extends AbstractValue {
         try {
             newRate.convertFromRate(this);
         } catch (InvalidClassException e) {
-
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -320,11 +318,7 @@ public abstract class AbstractRate extends AbstractValue {
      */
     @Override
     public double getStandardValue() {
-
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
-
-        // return numeratorValue.getStandardValue();
     }
 
     /*
@@ -490,9 +484,6 @@ public abstract class AbstractRate extends AbstractValue {
     @Override
     public void setStandardValue(double inputValue) {
         throw new UnsupportedOperationException();
-
-        // TODO Auto-generated method stub
-        // numeratorValue.setStandardValue(inputValue);
     }
 
     /*

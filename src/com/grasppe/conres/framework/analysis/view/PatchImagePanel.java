@@ -63,16 +63,12 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
      */
     public void componentHidden(ComponentEvent arg0) {
 
-        // TODO Auto-generated method stub
-
     }
 
     /**
      *  @param arg0
      */
     public void componentMoved(ComponentEvent arg0) {
-
-        // TODO Auto-generated method stub
 
     }
 
@@ -81,8 +77,6 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
      */
     public void componentResized(ComponentEvent arg0) {
 
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -90,7 +84,6 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
      */
     public void componentShown(ComponentEvent arg0) {
         update();
-//        updatePreviewImage();
     }
 
     /**
@@ -124,9 +117,7 @@ public class PatchImagePanel extends PatchBoundView implements ComponentListener
 
             AnalysisStepperModel	model = getModel();
 
-//          BufferedImage         patchImage       = model.getPatchImage();
             PatchDimensions	patchDimensions  = model.getPatchDimensions();
-//            int				patchPreviewSize = model.getPatchPreviewSize();		// model.getImageDPI();  //        model.getDisplayDPI();
             
             model.setImageDPI(model.getBlockImage().getResolution().value);
             

@@ -26,7 +26,6 @@ public class TestTargetImageWindow extends ImageWindow {
     public TestTargetImageWindow(ImagePlus imp) {
         super(imp);
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -35,7 +34,6 @@ public class TestTargetImageWindow extends ImageWindow {
     public TestTargetImageWindow(String title) {
         super(title);
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -45,6 +43,5 @@ public class TestTargetImageWindow extends ImageWindow {
     public TestTargetImageWindow(ImagePlus arg0, ImageCanvas arg1) {
         super(arg0, arg1);
 
-        // TODO Auto-generated constructor stub
     }
 }

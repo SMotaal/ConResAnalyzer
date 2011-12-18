@@ -28,7 +28,6 @@ public class StepBack extends SteppingStrategy {
         super(blockState);
         this.pastStep = (int[])history.get(history.size() - 1);
 
-        // TODO Auto-generated constructor stub
     }
 
     /*
@@ -42,9 +41,6 @@ public class StepBack extends SteppingStrategy {
     @Override
     public boolean execute() {
 
-        // TODO Auto-generated method stub
-        // if(!this.validMove(this.moveBy(-1, 0))) return false;
-        // return true;
         return this.moveTo(this.pastStep[0], this.pastStep[1]);
     }
 }

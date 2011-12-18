@@ -60,7 +60,7 @@ import javax.swing.KeyStroke;
 public class ConResAnalyzerView extends AbstractView implements Observer {
 
     /** Field description */
-    ConResAnalyzerMenu				menu;
+//    ConResAnalyzerMenu				menu;
     String							name        = "ConResAnalyzer";
     boolean							finalizable = true;
     int								activeCalls = 0;
@@ -171,7 +171,6 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     @Override
     protected void finalizeUpdates() {
 
-        // TODO Auto-generated method stub
 
     }
 
@@ -359,7 +358,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
         Collection<AbstractCommand>				commandSet      = commands.values();
         Iterator<AbstractCommand>				commandIterator = commandSet.iterator();
 
-        // TODO: Define essential menu items to enforce predefined menu sequence
+        // Define essential menu items to enforce predefined menu sequence
         ArrayList<String>	menus = new ArrayList<String>();
 
         newMenu("file");
@@ -368,8 +367,8 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
         newMenu("window");
         newMenu("help");
 
-        // TODO: Find all the command types (for menu classifications)
-        // TODO: Create all menu items and insert
+        // Find all the command types (for menu classifications)
+        // Create all menu items and insert
         while (commandIterator.hasNext()) {
             AbstractCommand	command     = commandIterator.next();
 

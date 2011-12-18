@@ -20,7 +20,6 @@ import com.grasppe.conres.framework.analysis.stepping.SmartBlockState;
 import com.grasppe.conres.framework.analysis.stepping.StepBack;
 import com.grasppe.conres.framework.analysis.stepping.StepDown;
 import com.grasppe.conres.framework.analysis.stepping.StepLeft;
-import com.grasppe.conres.framework.analysis.stepping.StepNext;
 import com.grasppe.conres.framework.analysis.stepping.StepOver;
 import com.grasppe.conres.framework.analysis.stepping.StepRight;
 import com.grasppe.conres.framework.analysis.stepping.StepUp;
@@ -29,8 +28,11 @@ import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.preferences.PreferencesAdapter;
+import com.grasppe.conres.preferences.PreferencesAdapter.AnalysisPreferences;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -43,7 +45,6 @@ import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -59,6 +60,16 @@ public class AnalysisStepper extends AbstractController {
     protected AnalysisStepperView	stepperView     = null;
     protected ConResBlock			lastBlock       = null;
     protected BlockState			loadBlockState  = null;
+    protected ActionListener		blinkListener   = new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            blinkCursor();
+        }
+
+    };
+    protected Timer		blinkTimer  = new Timer(350, blinkListener);
+    protected String	scratchFile = null;
 
     /**
      * Constructs and attaches a new controller and a new model.
@@ -77,89 +88,92 @@ public class AnalysisStepper extends AbstractController {
      *  @param analysisManager
      * @param model
      */
-    private AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model)  {
+    private AnalysisStepper(AnalysisManager analysisManager, AnalysisStepperModel model) {
         super(model);
         this.analysisManager = analysisManager;
+
         try {
-			stepperView          = AnalysisStepperView.getInstance(this);
-		} catch (Exception exception) {
-			// TODO Auto-generated catch block
-			exception.printStackTrace();
-		}
+            stepperView = AnalysisStepperView.getInstance(this);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
         attachView(stepperView);
 
         getAnalyzer().getCaseManager().getModel().attachObserver(this);
     }
 
     /**
-     * @param keyCode
+     * @param keyCodeValue
      * @param keyModifiers
      *  @return
      */
-    public boolean BlockStepKey(int keyCode, int keyModifiers) {	// SteppingStrategy thisStep) {
+    public boolean BlockStepKey(int keyCodeValue, int keyModifiers) {		// SteppingStrategy thisStep) {
 
         SmartBlockState	smartState = new SmartBlockState(getModel().getBlockState());
 
         if ((smartState == null) || (smartState.getBlockMap() == null)) return false;
 
-        SteppingStrategy	thisStep        = null; //new StepNext(smartState);
+        SteppingStrategy	thisStep        = null;		// new StepNext(smartState);
 
         boolean				snapState       = true;
         boolean				goBack          = false;
 
         double				scaleMultiplier = 1.15;
 
+        KeyCode				keyCode         = KeyCode.get(keyCodeValue);
+
         switch (keyCode) {
 
-        case KeyEvent.VK_EQUALS :
+        case VK_EQUALS :
             getModel().setScaleRatio(getModel().getScaleRatio() * scaleMultiplier);
             break;
 
-        case KeyEvent.VK_MINUS :
+        case VK_MINUS :
             getModel().setScaleRatio(getModel().getScaleRatio() / scaleMultiplier);
             break;
 
-        case KeyEvent.VK_0 :
+        case VK_0 :
             getModel().setScaleRatio(2.5);
             break;
 
-        case KeyEvent.VK_1 :
+        case VK_1 :
             getModel().setScaleRatio(1);
             break;
 
-        case KeyEvent.VK_2 :
+        case VK_2 :
             getModel().setScaleRatio(1.5);
             break;
 
-        case KeyEvent.VK_3 :
+        case VK_3 :
             getModel().setScaleRatio(2);
             break;
 
-        case KeyEvent.VK_4 :
+        case VK_4 :
             getModel().setScaleRatio(2.5);
             break;
 
-        case KeyEvent.VK_5 :
+        case VK_5 :
             getModel().setScaleRatio(3);
             break;
 
-        case KeyEvent.VK_6 :
+        case VK_6 :
             getModel().setScaleRatio(3.5);
             break;
 
-        case KeyEvent.VK_7 :
+        case VK_7 :
             getModel().setScaleRatio(4);
             break;
 
-        case KeyEvent.VK_8 :
+        case VK_8 :
             getModel().setScaleRatio(4.5);
             break;
 
-        case KeyEvent.VK_9 :
+        case VK_9 :
             getModel().setScaleRatio(5);
             break;
 
-        case KeyEvent.VK_SPACE :
+        case VK_SPACE :
             if (keyModifiers == 1) {
                 goBack = true;
             } else
@@ -167,50 +181,60 @@ public class AnalysisStepper extends AbstractController {
 
             break;
 
-        case KeyEvent.VK_BACK_SPACE :
+        case VK_BACK_SPACE :
             goBack = true;
             break;
 
-        case KeyEvent.VK_UP :
+        case VK_UP :
             if (keyModifiers == 0) thisStep = new StepUp(smartState);
             break;
 
-        case KeyEvent.VK_DOWN :
+        case VK_DOWN :
             if (keyModifiers == 0) thisStep = new StepDown(smartState);
 
             break;
 
-        case KeyEvent.VK_LEFT :
+        case VK_LEFT :
             if (keyModifiers == 0) thisStep = new StepLeft(smartState);
 
             break;
 
-        case KeyEvent.VK_RIGHT :
+        case VK_RIGHT :
             if (keyModifiers == 0) thisStep = new StepRight(smartState);
-
+            
             break;
 
-        case KeyEvent.VK_G :
-            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.PASS);
-
-            break;
-
-        case KeyEvent.VK_W :
-            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.MARGINAL);
-
-            break;
-
-        case KeyEvent.VK_R :
-            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.FAIL);
-
-            break;
-
-        case KeyEvent.VK_C :
-            if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.CLEAR);
-            break;
+//
+//          break;
+//
+//        case VK_G :
+//
+//          break;
+//
+//        case VK_W :
+//
+//          break;
+//
+//        case VK_R :
+//
+//          break;
+//
+//        case VK_C :
+//          break;
 
         default :
-            return false;
+            if (keyCode == PreferencesAdapter.getKeyCode(AnalysisPreferences.PASS_KEYCODE)) {
+                if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.PASS);
+            } else if (keyCode == PreferencesAdapter.getKeyCode(AnalysisPreferences.FAIL_KEYCODE)) {
+                if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.FAIL);
+            } else if (keyCode
+                       == PreferencesAdapter.getKeyCode(AnalysisPreferences.MARGINAL_KEYCODE)) {
+                if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.MARGINAL);
+            } else if (keyCode
+                       == PreferencesAdapter.getKeyCode(AnalysisPreferences.CLEAR_COLUMN_KEYCODE)) {
+                if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.CLEAR);
+            } else
+                return false;
         }
 
         try {
@@ -230,8 +254,8 @@ public class AnalysisStepper extends AbstractController {
                 getModel().getHistory().add(currentState);
             }
 
-            if (thisStep != null) //thisStep = new StepNext(smartState);
-            	thisStep.execute();
+            if (thisStep != null)		// thisStep = new StepNext(smartState);
+                thisStep.execute();
 
             setNewBlockState(thisStep.getFinalState());
 
@@ -245,13 +269,27 @@ public class AnalysisStepper extends AbstractController {
 
     /**
      */
+    public synchronized void blinkCursor() {
+        try {
+            BlockGrid.blinkValue = !BlockGrid.blinkValue;
+            getModel().setImage(new BlockGrid(getModel().getBlockState()).getImage());
+            pushUpdates();
+        } catch (Exception exception) {
+            blinkTimer.stop();
+        }
+    }
+
+    /**
+     */
     public void finalizeLoading() {
-    	if (loadBlockState!=null) {
-	        loadBlockFiles(loadBlockState);
-	        setNewBlockState(loadBlockState);
-	        loadBlockState = null;
-    	}
+        if (loadBlockState != null) {
+            loadBlockFiles(loadBlockState);
+            setNewBlockState(loadBlockState);
+            loadBlockState = null;
+        }
+
         setScratchEnabled(true);
+
 //      updatePatchPreviews();
         getModel().notifyObservers();
     }
@@ -303,70 +341,11 @@ public class AnalysisStepper extends AbstractController {
         String	filename = getTargetManager().generateFilename("s.csv", "Resources");
 
         blockState.readFile(filename);
-        
+
         scratchFile = filename;
-        
+
         updatePatchPreviews();
         setScratchEnabled(true);
-    }
-
-    /**
-     * @param argv
-     */
-    public static void oldMain(String argv[]) {
-
-//      Frame                 frame  = new Frame("BlockGrid");
-//      final AnalysisStepper canvas = new AnalysisStepper();
-//
-//      canvas.setSize(500, 500);
-//      canvas.setBackground(Color.blue);
-//
-//      JPanel        panel     = new JPanel();
-//      BoxLayout layout    = new BoxLayout(panel, BoxLayout.X_AXIS);
-//      String        labelText = "<html>" + "<h3>ConRes Stepping Logic Simulator</h3>"
-//                              + "<pre>Marking patches: (and step over)</pre>" + "<pre>    <b>  Q     </b>"
-//                              + "Good</pre>" + "<pre>    <b>  W     </b>" + "Accept</pre>"
-//                              + "<pre>    <b>  E     </b>" + "Reject</pre>" + "<pre></pre>"
-//                              + "<pre>Moving around:</pre>" + "<pre>    <b>  \u2191     </b>" + "Up</pre>"
-//                              + "<pre>    <b>  \u2193     </b>" + "Down</pre>" + "<pre>    <b>  \u2190    </b>"
-//                              + "Left</pre>" + "<pre>    <b>  \u2192    </b>" + "Right</pre>" + "<pre></pre>"
-//      + "<pre>    <b>  SP    </b>" + "Step Over</pre>" + "<pre>    <b>\u21E7 SP   </b>" + "Step Back</pre>"
-//                                   + "</html>";
-//
-//      JLabel    label = new JLabel(labelText, JLabel.LEFT);
-//
-//      label.setVerticalTextPosition(JLabel.TOP);
-//      label.setVerticalAlignment(JLabel.TOP);
-//
-////    JPanel labelPanel = new JPanel(new BorderLayout());
-////    labelPanel.add(label,BorderLayout.NORTH);
-//      // panel.setSize(500,500);
-//      panel.add(canvas);
-//      panel.add(Box.createRigidArea(new Dimension(10, 0)));
-//      panel.add(label);
-//      panel.add(Box.createRigidArea(new Dimension(10, 0)));
-//      frame.add(panel, BorderLayout.CENTER);
-//      frame.setResizable(false);
-//      frame.pack();
-//
-//      // label.setSize(label.getWidth(),500);
-//      GraphicsEnvironment   graphicsEnvironment = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
-//      int                   x                   = graphicsEnvironment.getCenterPoint().x - frame.getWidth() / 2;
-//      int                   y                   = graphicsEnvironment.getCenterPoint().y - frame.getHeight() / 2;
-//      
-//      frame.setLocation(x, y);
-//      frame.setVisible(true);
-
-//      WindowListener    windowListener = new WindowAdapter() {
-//
-//          public void windowClosing(WindowEvent we) {
-//              System.exit(0);
-//          }
-//      };
-
-//      frame.addWindowListener(windowListener);
-
-//      fail("Not yet implemented"); // TODO
     }
 
     /**
@@ -474,12 +453,12 @@ public class AnalysisStepper extends AbstractController {
     /**
      */
     public void updateActiveBlock() {
-    	
-    	if (loadBlockState!=null) {
-    		finalizeLoading();
-    		return;
-    	}
-    	
+
+        if (loadBlockState != null) {
+            finalizeLoading();
+
+            return;
+        }
 
         ConResBlock	activeBlock = getTargetManager().getModel().getActiveBlock();
 
@@ -502,7 +481,8 @@ public class AnalysisStepper extends AbstractController {
         }
 
         scratchFile = null;
-//        setScratchEnabled(false);
+
+//      setScratchEnabled(false);
 
         if (getTargetManager().getBlockImage() == null) return;
 
@@ -558,29 +538,7 @@ public class AnalysisStepper extends AbstractController {
             GrasppeKit.debugError("Updating Patch Preview (using model position)", exception, 2);
         }
     }
-    
-    
-    protected ActionListener blinkListener = new ActionListener() {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			blinkCursor();
-		}
-    	
-    };
-
-    protected Timer blinkTimer = new Timer(350, blinkListener);
-    
-    public synchronized void blinkCursor() {
-		try {
-			BlockGrid.blinkValue=!BlockGrid.blinkValue;
-			getModel().setImage(new BlockGrid(getModel().getBlockState()).getImage());
-			pushUpdates();
-		} catch (Exception exception) {
-			blinkTimer.stop();
-		}    	
-    }
-    
     /**
      *  @param row
      *  @param column
@@ -600,9 +558,9 @@ public class AnalysisStepper extends AbstractController {
 //          getModel().setPatchImage(patchImage);
 
             BlockGrid	blockGrid = new BlockGrid(getModel().getBlockState());
-            
+
             getModel().setImage(blockGrid.getImage());
-            
+
             blinkTimer.start();
 
         } catch (Exception exception) {
@@ -666,13 +624,11 @@ public class AnalysisStepper extends AbstractController {
      *  @return
      */
     public boolean isScratchEnabled() {
-    	
-    	return scratchFile!=null;
-    	
-        //return getModel().isScratchEnabled();
+
+        return scratchFile != null;
+
+        // return getModel().isScratchEnabled();
     }
-    
-    protected String scratchFile = null;
 
     /**
      *  @param newState

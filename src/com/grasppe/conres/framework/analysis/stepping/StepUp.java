@@ -21,7 +21,6 @@ public class StepUp extends SteppingStrategy {
     public StepUp(BlockState blockState) {
         super(blockState);
 
-        // TODO Auto-generated constructor stub
     }
 
     /*
@@ -35,7 +34,6 @@ public class StepUp extends SteppingStrategy {
     @Override
     public boolean execute() {
 
-        // TODO Auto-generated method stub
         if (!this.validMove(this.moveBy(-1, 0))) return false;
 
         return true;

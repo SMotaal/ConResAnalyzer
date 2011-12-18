@@ -59,34 +59,6 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
     	
     	controller.showSelectorView();
 
-        // prepareView();
-//      new CornerSelectorView(controller).run(null);
-
-//        view.run(null);
-
-//      setCornerSelectorVisibile(true);
-//      
-//        new Thread() {
-//          public void run() {
-//          }
-//        }.start();
-//        
-//        try {
-//            synchronized (threadLock) {
-//                threadLock.wait();
-//            }
-//        } catch (InterruptedException e) {
-//
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//      while(openWindow) {
-//          try {
-//              wait();
-//          } catch (InterruptedException e) {
-//              e.printStackTrace();
-//          }
-//      }
         return true;
     }
 
@@ -94,8 +66,6 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
      */
     public void prepareView() {
         view = new CornerSelectorView(null);
-
-        // view.attachObserver(this);
     }
 
     /**
@@ -106,10 +76,6 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
      */
     public void update() {
         GrasppeKit.debugText("OBSERVED", dbg);
-
-        // boolean cornersValid = view.blockROI!=null && view.blockROI.getNCoordinates()==4;
-        // boolean centresVaiid = view.patchSetROI!=null && view.patchSetROI.getNCoordinates() >10;
-//      if (getModel().isValidSelection()) windowClosed();
     }
 
     /**
@@ -118,34 +84,12 @@ public class SelectCornersFunction extends TargetManagerFunction implements Obse
         openWindow = false;
     }
 
-//    
-//  public static void main(String[] args) {
-//
-//      (new SelectCornersFunction()).perfomOperation();
-//      return;
-//  }
-//  
-
     /**
      * Returns a correctly-cast model.
      * @return
      */
     public CornerSelectorModel getModel() {
         return (CornerSelectorModel)model;
-    }
-
-    /**
-     *  @param visible
-     */
-    public void setCornerSelectorVisibile(boolean visible) {
-        if (visible) view.run(null);
-
-//      else
-//          try {
-//              view.terminate();
-//          } catch (Throwable e) {
-//              e.printStackTrace();
-//          }
     }
 
     /**

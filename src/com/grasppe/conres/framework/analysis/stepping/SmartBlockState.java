@@ -62,13 +62,10 @@ public class SmartBlockState extends BlockState implements Cloneable {
      */
     public int firstMissingBoundary(int startColumn) {
 
-        // for (int column = 0; column < this.columns; column++)
         int	column = startColumn + 1;
 
         do {
             if (getColumnBoundary(column) == -1) {
-
-                // System.out.println(">> Missing Boundary " + column);
                 return column;
             }
 
@@ -167,9 +164,7 @@ public class SmartBlockState extends BlockState implements Cloneable {
      * @return
      */
     public boolean isComplete() {
-
-        // TODO Check blockMap and determine if each column has an accept/reject boundry
-        // System.out.println("Complete " + checkBlockBoundries());
+        // Check blockMap and determine if each column has an accept/reject boundry
         return checkBlockBoundries();
     }
 }

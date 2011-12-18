@@ -42,7 +42,7 @@ public class SelectBlock extends TargetManagerCommand {
     /**
      * Constructs a realization of AbstractCommand.
      * @param listener
-     * @param controller TODO
+     * @param controller
      */
     public SelectBlock(TargetManager controller, ActionListener listener) {
         super(listener, name);

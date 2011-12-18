@@ -62,7 +62,6 @@ public class TargetManagerView extends AbstractView {
 
 	@Override
 	protected void finalizeUpdates() {
-		// TODO Auto-generated method stub
 		
 	}
 }

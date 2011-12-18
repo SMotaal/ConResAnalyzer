@@ -17,7 +17,6 @@ public class EnhancedCanvas extends ImageCanvas {
 	 */
 	public EnhancedCanvas(ImagePlus imp) {
 		super(imp);
-		// TODO Auto-generated constructor stub
 	}
 	
 	

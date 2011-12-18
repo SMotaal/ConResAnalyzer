@@ -319,7 +319,6 @@ public class ImageFile extends CaseFile {
     @Override
     public boolean isVerified() {
 
-        // TODO Auto-generated method stub
         return super.isVerified();
     }
 

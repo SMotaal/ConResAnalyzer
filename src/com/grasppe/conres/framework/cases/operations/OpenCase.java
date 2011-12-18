@@ -12,7 +12,7 @@ import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.io.model.CaseFolder;
-import com.grasppe.conres.preferences.ConResAnalyzerPreferencesAdapter;
+import com.grasppe.conres.preferences.PreferencesAdapter;
 import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -58,7 +58,7 @@ public class OpenCase extends CaseManagerCommand {
     /**
      * Constructs a realization of AbstractCommand.
      * @param listener
-     * @param controller TODO
+     * @param controller 
      */
     public OpenCase(CaseManager controller, ActionListener listener) {
         super(listener, name);
@@ -164,7 +164,7 @@ public class OpenCase extends CaseManagerCommand {
         
         String caseFolderPath = new File(newCase.path).getParent(); //.getAbsolutePath();
         
-        ConResAnalyzerPreferencesAdapter.putDefaultCasePath(caseFolderPath);
+        PreferencesAdapter.putDefaultCasePath(caseFolderPath);
 
         return canProceed;
 
@@ -189,7 +189,7 @@ public class OpenCase extends CaseManagerCommand {
 
             SelectCaseFolder	selectCaseFolder = new SelectCaseFolder();
 
-            canProceed = selectCaseFolder.quickSelect();
+            canProceed = selectCaseFolder.quickSelect();	// Verify case folder!
 
             if (canProceed)
                 GrasppeKit.debugText("Open Case Selected",
@@ -199,13 +199,9 @@ public class OpenCase extends CaseManagerCommand {
                 GrasppeKit.debugText("Open Case Cancled", "SelectCaseFolder was not completed",
                                      dbg);
             if (!canProceed) break;		// Action responded to in alternative scenario
-
-            // TODO: Verify case folder!
-            // TODO: Confirm and close current case before attempting to switching cases
-            canProceed = confirmCaseClose();
+            canProceed = confirmCaseClose();             // Confirm and close current case before attempting to switching cases
 
             if (!canProceed) break;		// Alternative scenario succeeded
-
             try {
                 canProceed = openCase(selectCaseFolder.getSelectedFile().getAbsoluteFile());
             } catch (CancellationException exception) {
@@ -232,7 +228,7 @@ public class OpenCase extends CaseManagerCommand {
      */
     @Override
     public void update() {
-        canExecute(true);		// getModel().hasCurrentCase());
+        canExecute(true);
         super.update();
     }
 

@@ -332,7 +332,6 @@ public class CornerSelectorView extends AbstractView
     @Override
     protected void finalizeUpdates() {
 
-        // TODO Auto-generated method stub
 
     }
 
@@ -404,19 +403,17 @@ public class CornerSelectorView extends AbstractView
 
         int	clickCount = e.getClickCount();
 
-        if (!(e.getSource() == getImageCanvas())) return;		// (e.getSource() == getZoomCanvas())
+        if (!(e.getSource() == getImageCanvas())) return;
 
         // TODO: Add points and calculate grid when possible
         try {
             switch (clickCount) {
 
-            case 2 :	// TODO: Clear points
+            case 2 :
                 clearBlockPoints();
                 break;
 
-            case 1 :	// TODO: Add points 1, 2, or 3 and when possible calculate 4 and then the grid
-
-//              PatchSetROI patchSetROI =  getModel().getPatchSetROI();
+            case 1 :
                 if ((getModel().getPatchSetROI() != null)
                         && (getModel().getPatchSetROI().getNCoordinates() > 0))
                     break;

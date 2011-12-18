@@ -62,33 +62,12 @@ public abstract class AbstractValue {
         try {
             newValue = this.getClass().newInstance();
         } catch (InstantiationException e) {
-
-            // TODO Auto-generated catch block
             e.printStackTrace();
-//            System.out.println("Cloning: " + toString());
-//            System.out.println("    to " + newValue.toString());
         } catch (IllegalAccessException e) {
-
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         return newValue;
-    }
-
-    /**
-     * @param value
-     * @param name
-     */
-    protected static void debugType(AbstractValue value, String name) {
-//        System.out.println("[" + name + "] " + value.toString());
-
-//      if (value.getDefinition().valueType == ValueTypes.ABSTRACT)
-//          System.out.println(name + " is abstract " + value.getDefinition().abstractType + " in "
-//                             + value.getDefinition().symbol);
-//      else
-//          System.out.println(name + " is " + value.getDefinition().valueType + " in "
-//                             + value.getDefinition().symbol);
     }
 
     /**

@@ -97,7 +97,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
     @Override
     public boolean verify() {
 
-        // TODO Auto-generated method stub
         return super.verify();
     }
 
@@ -205,7 +204,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
     @Override
     public boolean isValidated() {
 
-        // TODO Auto-generated method stub
         return super.isValidated();
     }
 
@@ -220,7 +218,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
     @Override
     public boolean isVerified() {
 
-        // TODO Auto-generated method stub
         return super.isVerified();
     }
 

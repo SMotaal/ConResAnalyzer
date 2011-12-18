@@ -59,7 +59,6 @@ public class AnalysisManagerView extends AbstractView {
 
 	@Override
 	protected void finalizeUpdates() {
-		// TODO Auto-generated method stub
 		
 	}
 }

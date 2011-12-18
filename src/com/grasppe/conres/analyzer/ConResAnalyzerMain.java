@@ -59,7 +59,7 @@ public class ConResAnalyzerMain {
     
     public static void initializeTest(ConResAnalyzer analyzer) {
         CaseFolder	caseFolder =
-                new CaseFolder("/Users/daflair/Documents/Data/ConRes/ConRes-Approval-0600");
+                new CaseFolder("/Users/daflair/Documents/Data/ConRes/ConRes-Approval-SA-0600");
 //        		new CaseFolder("/Users/daflair/Documents/Data/ConRes/Approval_Scans_ConRes26_FS");
         
             ((OpenCase)analyzer.getCaseManager().getCommand("OpenCase")).openCase(caseFolder);

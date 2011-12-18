@@ -21,8 +21,6 @@ public class TestTargetModel extends AbstractModel {
     /**
      */
     public TestTargetModel() {
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -30,7 +28,5 @@ public class TestTargetModel extends AbstractModel {
      */
     public TestTargetModel(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 }

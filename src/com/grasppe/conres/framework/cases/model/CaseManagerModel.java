@@ -38,8 +38,6 @@ public class CaseManagerModel extends AbstractModel {
     /** Field description */
     protected CaseModel	newCase = null;
 
-//  protected boolean locked  = false;
-
     /**
      * Constructs a new model with a predefined controller.
      * @param controller
@@ -60,17 +58,9 @@ public class CaseManagerModel extends AbstractModel {
      * @throws UnexpectedException
      */
     public void backgroundCurrentCase() throws UnexpectedException {
-
-//      if (newCase==null)
-//          currentCase = null;
         try {
             if ((backgroundCase == null) && (currentCase != null)) backgroundCase = currentCase;
         } catch (Exception exception) {}
-
-//      else
-//          throw new UnexpectedException(
-//              "Case manager could not background the current case case since it does not exist.");
-
         currentCase = null;
         notifyObservers();
         getController().backgroundCurrentCase();
@@ -89,31 +79,16 @@ public class CaseManagerModel extends AbstractModel {
      *  @throws UnexpectedException
      */
     public void discardBackgroundCase() throws UnexpectedException {
-
-//      if (newCase == null)  // return;
-//          throw new UnexpectedException(
-//              "Case manager could not discard a new case since it does not exist.");
-        // if (backgroundCase != null) currentCase = backgroundCase;
-
-//      newCase        = null;
         backgroundCase = null;
         getController().discardBackgroundCase();
         notifyObservers();
     }
-
-//  /**
-//   *  @return
-//   */
-//  protected boolean lock() {
-//      return locked = true;
-//  }
 
     /**
      *  @throws UnexpectedException
      */
     public void promoteNewCase() throws UnexpectedException {
 
-        // TODO: Wrong call sequence, must first getNewCase()
         if (newCase == null)
             throw new UnexpectedException(
                 "Case manager could not promote a new case since it does not exist.");
@@ -124,7 +99,7 @@ public class CaseManagerModel extends AbstractModel {
                 "Case manager is mulfunctioning and cannot promote a newcase when has both a background case and a current case.");
         currentCase    = newCase;
         newCase        = null;
-        backgroundCase = null;		// if (backgroundCase!=null)
+        backgroundCase = null;
         getController().discardBackgroundCase();
         notifyObservers();
     }
@@ -135,7 +110,6 @@ public class CaseManagerModel extends AbstractModel {
     public void restoreBackgroundCase() throws UnexpectedException {
         if (backgroundCase != null) {
 
-            // TODO: How should we recover from this?
             if ((backgroundCase != null) && (currentCase != null))
                 throw new UnexpectedException(
                     "Case manager is mulfunctioning and cannot rollback the current case since it has both a background case and a current case.");
@@ -148,13 +122,6 @@ public class CaseManagerModel extends AbstractModel {
         getController().restoreBackgroundCase();
         notifyObservers();
     }
-
-//  /**
-//   *  @return
-//   */
-//  protected boolean unlock() {
-//      return locked = false;
-//  }
 
     /**
      * @return the backgroundCase
@@ -212,14 +179,6 @@ public class CaseManagerModel extends AbstractModel {
      */
     public boolean isBusy() {
         return false;
-
-//      return ((newCase != null) && (backgroundCase != null));
     }
 
-//  /**
-//   * @return the locked
-//   */
-//  public boolean isLocked() {
-//      return locked;
-//  }
 }

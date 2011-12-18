@@ -171,18 +171,6 @@ public class GrasppeEventDispatcher implements KeyEventDispatcher, Observable {
     }
 
     /**
-     *  @param frame
-     */
-    public void makeClosable(JFrame frame) {
-
-        // ref: http://stackoverflow.com/questions/4209975/how-to-have-command-w-close-a-window-on-mac-os-in-java-or-clojure
-
-        // TODO: Figure out how to implement closeWindow!
-        // TODO: Attach closeWindow to frame!
-        return;
-    }
-
-    /**
      * @param observer
      */
     public void notifyObserver(Observer observer) {

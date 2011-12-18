@@ -21,8 +21,6 @@ public class PatchVertices extends AbstractModel {
     /**
      */
     public PatchVertices() {
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -30,7 +28,5 @@ public class PatchVertices extends AbstractModel {
      */
     public PatchVertices(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 }

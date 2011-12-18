@@ -1100,6 +1100,23 @@ public class GrasppeKit {
 
         return lookup.get(value);
     }
+    
+    /**
+     * @param value
+     * @param enumClass
+     * @param <E>
+     * @return
+     */
+    public static <E extends Enum<E>> IStringKey lookupByEnumKey(String key,
+            Class<E> enumClass) {
+        Map<String, IStringKey>	lookup = new HashMap<String, IStringKey>();
+
+        for (E s : EnumSet.allOf(enumClass))
+            lookup.put(((IStringKey)s).key(), (IStringKey)s);
+
+        return lookup.get(key);
+    }
+    
 
     /**
      */
@@ -1420,16 +1437,35 @@ public class GrasppeKit {
     }
 
     /**
-     * Interface description
      * @version        $Revision: 1.0, 11/11/25
      * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
      */
     public interface IIntegerValue {
-
-        /**
-         * @return
-         */
         public int value();
+    }
+    
+    /**
+     * @version        $Revision: 1.0, 11/11/25
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public interface IStringKey {
+        public String key();
+    }
+    
+    /**
+     * @version        $Revision: 1.0, 11/11/25
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public interface IObjectValue {
+        public Object value();
+    }
+    
+    /**
+     * @version        $Revision: 1.0, 11/11/25
+     * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+     */
+    public interface IStringDescription {
+        public String description();
     }
 
 

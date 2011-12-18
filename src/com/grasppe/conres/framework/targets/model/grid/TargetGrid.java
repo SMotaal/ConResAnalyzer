@@ -27,18 +27,9 @@ public class TargetGrid extends AbstractModel {
     protected TreeMap<Integer, Integer>	cMap;
 
     /**
-     */
-    public TargetGrid() {
-
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @param controller
      */
     public TargetGrid(AbstractController controller) {
         super(controller);
-
-        // TODO Auto-generated constructor stub
     }
 }

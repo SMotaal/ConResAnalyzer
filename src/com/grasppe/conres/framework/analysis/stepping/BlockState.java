@@ -226,7 +226,6 @@ public class BlockState implements ISteppingBlockState, Cloneable {
      */
     public boolean equivalent(ISteppingBlockState otherState) {
 
-        // TODO Auto-generated method stub
         return this.equivalent(otherState);
     }
 

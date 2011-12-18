@@ -43,7 +43,7 @@ public class AnalyzeBlock extends AnalysisCommand {
     /**
      * Constructs a realization of AbstractCommand.
      * @param listener
-     * @param controller TODO
+     * @param controller
      */
     public AnalyzeBlock(AnalysisManager controller, ActionListener listener) {
         super(listener, name);
