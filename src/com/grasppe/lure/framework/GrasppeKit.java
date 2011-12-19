@@ -202,7 +202,7 @@ public class GrasppeKit {
      * Enumeration of java.awt.event.KeyEvent virtual key code constants
      * {@link http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/KeyEvent.html}
      */
-    public enum KeyCode {
+    public enum KeyCode implements IIntegerValue {
         VK_0(KeyEvent.VK_0),							// VK_0 thru VK_9 are the same as ASCII '0' thru '9' (0x30 - 0x39)
         VK_1(KeyEvent.VK_1), VK_2(KeyEvent.VK_2), VK_3(KeyEvent.VK_3), VK_4(KeyEvent.VK_4),
         VK_5(KeyEvent.VK_5), VK_6(KeyEvent.VK_6), VK_7(KeyEvent.VK_7), VK_8(KeyEvent.VK_8),

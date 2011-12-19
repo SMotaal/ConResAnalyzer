@@ -68,14 +68,14 @@ public class BlockMapImagePanel extends PatchBoundView implements javax.swing.Sw
             g.setColor(getBackground());
             g.fillRect(0, 0, getWidth(), getHeight());
         } catch (Exception exception) {
-            GrasppeKit.debugError("Painting Block Map", exception, 2);
+            GrasppeKit.debugError("Painting Block Tags", exception, 2);
         }
 
         try {
             if (canPaint)
                 g.drawImage(getBlockMapImage(), imageLeft, imageTop, imageWidth, imageHeight, this);
         } catch (Exception exception) {
-            GrasppeKit.debugError("Painting Block Map", exception, 2);
+            GrasppeKit.debugError("Painting Block Tags", exception, 2);
         }
     }
 
@@ -187,7 +187,7 @@ public class BlockMapImagePanel extends PatchBoundView implements javax.swing.Sw
             canPaint = true;
 
         } catch (NullPointerException exception) {
-            GrasppeKit.debugError("Updating Block Map Size", exception, 2);
+            GrasppeKit.debugError("Updating Block Tags Size", exception, 2);
             canPaint = false;
         }
     }

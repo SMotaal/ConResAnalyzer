@@ -13,8 +13,10 @@ import com.grasppe.conres.io.TargetDefinitionReader;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.conres.io.model.TargetDefinitionFile;
+import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.PreferencesAdapter;
-import com.grasppe.conres.preferences.ConResPreferencesFactory;
+import com.grasppe.conres.preferences.PreferencesFactory;
+import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
@@ -36,7 +38,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public abstract class FileChooserFunction extends CaseManagerFunction {
 
-    String				defaultChooserPath = PreferencesAdapter.getDefaultCasePath();
+    String				defaultChooserPath = (String)Preferences.get(Tags.DEFAULT_CASE_PATH);
     File				selectedFile;
     protected boolean	executable = true;
     JFileChooser		fileChooser;

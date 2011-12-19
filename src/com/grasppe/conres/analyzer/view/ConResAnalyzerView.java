@@ -61,7 +61,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
     /** Field description */
 //    ConResAnalyzerMenu				menu;
-    String							name        = "ConResAnalyzer";
+    String							name        = "Tags";
     boolean							finalizable = true;
     int								activeCalls = 0;
     JFrame							mainFrame;
@@ -146,7 +146,7 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
         if (mainFrame != null) return;
 
-        mainFrame = new JFrame("ConResAnalyzer");
+        mainFrame = new JFrame("Tags");
 
         mainFrame.setUndecorated(true);
 

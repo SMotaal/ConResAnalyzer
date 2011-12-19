@@ -1,5 +1,5 @@
 /*
- * @(#)ConResAnalyzer.java   11/11/15
+ * @(#)Tags.java   11/11/15
  * Copyright (c) 2011 Saleh Abdel Motaal
  * This code is not licensed for use and is the property of it's owner.
  */

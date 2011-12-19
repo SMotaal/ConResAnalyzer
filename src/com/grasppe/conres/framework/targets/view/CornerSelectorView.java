@@ -1292,7 +1292,7 @@ public class CornerSelectorView extends AbstractView
 
             for (int r = 0; r < stepsY; r++) {
 
-                // TODO: Map the centers
+                // TODO: Tags the centers
                 float	yr = centerYs[r];
 
                 int		cI = (c * stepsY) + r;

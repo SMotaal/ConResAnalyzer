@@ -12,7 +12,9 @@ import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
 import com.grasppe.conres.io.model.CaseFolder;
+import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.PreferencesAdapter;
+import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -164,7 +166,7 @@ public class OpenCase extends CaseManagerCommand {
         
         String caseFolderPath = new File(newCase.path).getParent(); //.getAbsolutePath();
         
-        PreferencesAdapter.putDefaultCasePath(caseFolderPath);
+        Preferences.put(Tags.DEFAULT_CASE_PATH, caseFolderPath);	// PreferencesAdapter.getInstance().putDefaultCasePath(caseFolderPath);
 
         return canProceed;
 

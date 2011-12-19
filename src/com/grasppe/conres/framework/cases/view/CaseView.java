@@ -71,7 +71,7 @@ public class CaseView extends JPanel implements Observer {
 	
 	static float labelFontSize = 10F;
 	
-//	String defaultCaseText = "<html><b>ConResAnalyzer</b></html>";
+//	String defaultCaseText = "<html><b>Tags</b></html>";
 	String defaultCaseText = "<html><<pre style='font-family: Sans-Serif;'>Press <i>" + CONTROL_SYMBOL + "+O</i> to open a case</pre></html>";
 //	String defaultBlockText = "<html>Press <i>" + CONTROL_SYMBOL + "+B</i> to select target blocks</html>";
 //	String defaultCaseText = "<html><b>"
