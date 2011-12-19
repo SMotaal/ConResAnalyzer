@@ -11,8 +11,6 @@
 package com.grasppe.conres.framework.analysis.stepping;
 
 import com.grasppe.conres.framework.analysis.stepping.BlockState.PatchDesignation;
-import com.grasppe.conres.preferences.Preferences;
-import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,7 +36,15 @@ public class BlockGrid {
   protected static PatchDesignation	VOID             = PatchDesignation.VOID;
 
   /** Field description */
-  public static boolean	blinkValue = false;
+  public static boolean		blinkValue           = false;
+  protected static int[]	voidPatchColor       = { 63, 63, 63 };
+  protected static int[]	assumeFailPatchColor = { 128, 0, 0 };
+  protected static int[]	failPatchColor       = { 228, 0, 0 };
+  protected static int[]	marginalPatchColor   = { 255, 255, 0 };
+  protected static int[]	passPatchColor       = { 0, 220, 0 };
+  protected static int[]	assumePassPatchColor = { 0, 128, 0 };
+  protected static int[]	clearPatchColor      = { 128, 128, 128 };
+  protected static int[]	blinkerColor         = { 32, 32, 32 };
 
   /** Field description */
   BlockState	blockState;
@@ -77,6 +83,41 @@ public class BlockGrid {
   }
 
   /**
+   * @return the assumeFailPatchColor
+   */
+  protected static int[] getAssumeFailPatchColor() {
+    return assumeFailPatchColor;
+  }
+
+  /**
+   * @return the assumePassPatchColor
+   */
+  protected static int[] getAssumePassPatchColor() {
+    return assumePassPatchColor;
+  }
+
+  /**
+   * @return the blinkerColor
+   */
+  protected static int[] getBlinkerColor() {
+    return blinkerColor;
+  }
+
+  /**
+   * @return the clearPatchColor
+   */
+  protected static int[] getClearPatchColor() {
+    return clearPatchColor;
+  }
+
+  /**
+   * @return the failPatchColor
+   */
+  protected static int[] getFailPatchColor() {
+    return failPatchColor;
+  }
+
+  /**
    * @return
    */
   public BufferedImage getImage() {
@@ -93,27 +134,10 @@ public class BlockGrid {
    */
   public BufferedImage getImage(int width, int height) {
 
-    BufferedImage			image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    WritableRaster		raster = image.getRaster();
-    int[]							color  = new int[3];
-    int[][]						colors = {
-    	      { 63, 63, 63 },         // 0    VOID
-    	      { 128, 0, 0 },          // 1    ASSUMED_FAIL
-    	      { 228, 0, 0 },          // 2    FAIL
-    	      { 255, 255, 0 },        // 3    MARGINAL
-    	      { 0, 220, 0 },          // 4    PASS
-    	      { 0, 128, 0 },          // 5    ASSUMED_PASS
-    	      { 128, 128, 128 },     // 6    CLEAR
-    	      { 32,32, 32 },            // 7    CURSOR    		
-//      (int[])Preferences.get(Tags.VOID_COLOR),						// { 63, 63, 63 },         // 0    VOID
-//      (int[])Preferences.get(Tags.ASSUMED_FAIL_COLOR),		// { 128, 0, 0 },          // 1    ASSUMED_FAIL
-//      (int[])Preferences.get(Tags.FAIL_COLOR),						// { 228, 0, 0 },          // 2    FAIL
-//      (int[])Preferences.get(Tags.MARGINAL_COLOR),				// { 255, 255, 0 },        // 3    MARGINAL
-//      (int[])Preferences.get(Tags.PASS_COLOR),						// { 0, 220, 0 },          // 4    PASS
-//      (int[])Preferences.get(Tags.ASSUMED_PASS_COLOR),		// { 0, 128, 0 },          // 5    ASSUMED_PASS
-//      (int[])Preferences.get(Tags.CLEAR_COLOR),						// { 128, 128, 128 },     // 6    CLEAR
-//      (int[])Preferences.get(Tags.CURSOR_COLOR),					// { 32,32, 32 },            // 7    CURSOR
-    };
+    BufferedImage		image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    WritableRaster	raster = image.getRaster();
+    int[]						color  = new int[3];
+
     PatchDesignation	value;
     int								column      = blockState.getColumn(),
 											row         = blockState.getRow(),
@@ -124,22 +148,99 @@ public class BlockGrid {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
 
-        color = colors[6];
+        color = getClearPatchColor();
         value = this.blockState.getPatchValue(r, c);		// m, n);
 
-        if ((value == VOID) || (c < firstColumn)) color = colors[0];
-        else if (value == ASSUMED_FAIL) color = colors[1];
-        else if (value == FAIL) color = colors[2];
-        else if (value == MARGINAL) color = colors[3];
-        else if (value == PASS) color = colors[4];
-        else if (value == ASSUMED_PASS) color = colors[5];
+        if ((value == VOID) || (c < firstColumn)) color = getVoidPatchColor();
+        else if (value == ASSUMED_FAIL) color = getAssumeFailPatchColor();
+        else if (value == FAIL) color = getFailPatchColor();
+        else if (value == MARGINAL) color = getMarginalPatchColor();
+        else if (value == PASS) color = getPassPatchColor();
+        else if (value == ASSUMED_PASS) color = getAssumePassPatchColor();
 
-        raster.setPixel(c, r, (int[])color);
+        raster.setPixel(c, r, color);
       }
     }
 
-    if (blinkValue) raster.setPixel(column, row, (int[])colors[7]);
+    if (blinkValue) raster.setPixel(column, row, blinkerColor);
 
     return image;
+  }
+
+  /**
+   * @return the marginalPatchColor
+   */
+  protected static int[] getMarginalPatchColor() {
+    return marginalPatchColor;
+  }
+
+  /**
+   * @return the passPatchColor
+   */
+  protected static int[] getPassPatchColor() {
+    return passPatchColor;
+  }
+
+  /**
+   *   @return the voidPatchColor
+   */
+  protected static int[] getVoidPatchColor() {
+    return voidPatchColor;
+  }
+
+  /**
+   * @param assumeFailPatchColor the assumeFailPatchColor to set
+   */
+  public static void setAssumeFailPatchColor(int[] assumeFailPatchColor) {
+    BlockGrid.assumeFailPatchColor = assumeFailPatchColor;
+  }
+
+  /**
+   * @param assumePassPatchColor the assumePassPatchColor to set
+   */
+  public static void setAssumePassPatchColor(int[] assumePassPatchColor) {
+    BlockGrid.assumePassPatchColor = assumePassPatchColor;
+  }
+
+  /**
+   * @param blinkerColor the blinkerColor to set
+   */
+  public static void setBlinkerColor(int[] blinkerColor) {
+    BlockGrid.blinkerColor = blinkerColor;
+  }
+
+  /**
+   * @param clearPatchColor the clearPatchColor to set
+   */
+  public static void setClearPatchColor(int[] clearPatchColor) {
+    BlockGrid.clearPatchColor = clearPatchColor;
+  }
+
+  /**
+   * @param failPatchColor the failPatchColor to set
+   */
+  public static void setFailPatchColor(int[] failPatchColor) {
+    BlockGrid.failPatchColor = failPatchColor;
+  }
+
+  /**
+   * @param marginalPatchColor the marginalPatchColor to set
+   */
+  public static void setMarginalPatchColor(int[] marginalPatchColor) {
+    BlockGrid.marginalPatchColor = marginalPatchColor;
+  }
+
+  /**
+   * @param passPatchColor the passPatchColor to set
+   */
+  public static void setPassPatchColor(int[] passPatchColor) {
+    BlockGrid.passPatchColor = passPatchColor;
+  }
+
+  /**
+   *   @param voidPatchColor the voidPatchColor to set
+   */
+  public static void setVoidPatchColor(int[] voidPatchColor) {
+    BlockGrid.voidPatchColor = voidPatchColor;
   }
 }

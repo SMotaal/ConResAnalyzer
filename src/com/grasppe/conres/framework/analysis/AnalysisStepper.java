@@ -28,6 +28,7 @@ import com.grasppe.conres.framework.analysis.view.AnalysisStepperView;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.conres.preferences.PreferencesAdapter;
 import com.grasppe.lure.components.AbstractController;
@@ -270,7 +271,7 @@ public class AnalysisStepper extends AbstractController {
 
     setScratchEnabled(true);
 
-//  updatePatchPreviews();
+  updatePatchPreviews();
     getModel().notifyObservers();
   }
 
@@ -427,12 +428,33 @@ public class AnalysisStepper extends AbstractController {
 
     if (getAnalyzer().getCaseManager().getModel().hasCurrentCase() == false) getStepperView().setVisible(false);
   }
+  
+  public void updatePreferences() {
+	  getModel().setAssumeFailPatchColor((int[])Preferences.get(Tags.ASSUMED_FAIL_COLOR));
+	  getModel().setFailPatchColor((int[])Preferences.get(Tags.FAIL_COLOR));
+	  getModel().setMarginalPatchColor((int[])Preferences.get(Tags.MARGINAL_COLOR));
+	  getModel().setPassPatchColor((int[])Preferences.get(Tags.PASS_COLOR));
+	  getModel().setAssumePassPatchColor((int[])Preferences.get(Tags.ASSUMED_PASS_COLOR));
+	  getModel().setVoidPatchColor((int[])Preferences.get(Tags.VOID_COLOR));
+	  getModel().setClearPatchColor((int[])Preferences.get(Tags.CLEAR_COLOR));
+	  getModel().setCursorColor((int[])Preferences.get(Tags.CURSOR_COLOR));
+	  BlockGrid.setAssumeFailPatchColor(getModel().getAssumeFailPatchColor());
+	  BlockGrid.setFailPatchColor(getModel().getFailPatchColor());
+	  BlockGrid.setMarginalPatchColor(getModel().getMarginalPatchColor());
+	  BlockGrid.setPassPatchColor(getModel().getPassPatchColor());
+	  BlockGrid.setAssumePassPatchColor(getModel().getAssumePassPatchColor());
+	  BlockGrid.setVoidPatchColor(getModel().getVoidPatchColor());
+	  BlockGrid.setClearPatchColor(getModel().getClearPatchColor());
+	  BlockGrid.setBlinkerColor(getModel().getCursorColor());
+	  return;
+  }
 
   /**
    */
   public void updateActiveBlock() {
 
     if (loadBlockState != null) {
+    	updatePreferences();
       finalizeLoading();
 
       return;
@@ -450,11 +472,9 @@ public class AnalysisStepper extends AbstractController {
       return;
     }
 
+
     if (activeBlock == lastBlock) {
-
-//    forceUpdates();
       updatePatchPreviews();
-
       return;
     }
 
@@ -489,20 +509,8 @@ public class AnalysisStepper extends AbstractController {
     setScratchEnabled(false);
 
     loadBlockState = blockState;
-
-//  finalizeLoading();
-
     lastBlock = activeBlock;
-
-//  updatePatchPreviews();
-//  getModel().notifyObservers();
-//  }
-
-    // AnalysisStepperModel model = getModel();
-//  updatePatchPreviews(); //getModel().getActivePatch().getPatchRow(),getModel().getActivePatch().getPatchColumn());
-//  getStepperView().update();
-//  getStepperView().update();
-
+    
   }
 
   /**

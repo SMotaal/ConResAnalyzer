@@ -34,12 +34,27 @@ import javax.swing.JFrame;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
+	/**
+	 * @return the preferencesManager
+	 */
+	public PreferencesManager getPreferencesManager() {
+		return preferencesManager;
+	}
+
+	/**
+	 * @param preferencesManager the preferencesManager to set
+	 */
+	public void setPreferencesManager(PreferencesManager preferencesManager) {
+		this.preferencesManager = preferencesManager;
+	}
+
 	public static final String	BUILD = "0.1b-13";
     protected CaseManager			caseManager;
     protected TargetManager			targetManager;
     protected AnalysisManager		analysisManager;
     protected AbstractController[]	managers;		// = new AbstractController[]{caseManager, targetManager,analysisManager};
     protected ConResAnalyzerView	analyzerView;
+    protected PreferencesManager preferencesManager;
 
     // protected LinkedHashMap<String, AbstractCommand>  commands;
 
@@ -54,7 +69,8 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
         setCaseManager(new CaseManager(this));
         setTargetManager(new TargetManager(this));
         setAnalysisManager(new AnalysisManager(this));
-        managers = new AbstractController[] { caseManager, targetManager, analysisManager };
+        setPreferencesManager(new PreferencesManager(this));
+        managers = new AbstractController[] { caseManager, targetManager, analysisManager, preferencesManager };
         analyzerView.createView();
     }
 

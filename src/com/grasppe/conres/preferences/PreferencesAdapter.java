@@ -50,22 +50,6 @@ public class PreferencesAdapter extends AbstractPreferencesAdapter {
     public PreferencesAdapter() {
         super();
     }
-//
-//    /**
-//     *  @param newPath
-//     */
-//    public void putDefaultCasePath(String newPath) {
-//        getPreferences().put(DEFAULT_CASE_PATH_KEY, newPath);
-//    }
-//
-//    /**
-//     *  @return
-//     */
-//    public String getDefaultCasePath() {
-//        return getPreferences().get(DEFAULT_CASE_PATH_KEY, "").trim();
-//    }
-    
-//    public 
 
     /**
      * @return the factory

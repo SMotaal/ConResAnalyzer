@@ -81,9 +81,9 @@ public class Preferences {
     X_ROI_OFFSET("Horizontal ROI Offset", -1, "Horizontal offset in millimeters"),																			//
 
     /* Global Keys */
-    CORNER_SELECTOR_KEYCODE("Corner Selector Keycode", KeyCode.VK_G, "Key used to indicate a good patch."),							//
-    BLOCK_SELECTOR_KEYCODE("Block Selector Keycode", KeyCode.VK_R, "Key used to indicate a rejected patch."),						//
-    BLOCK_ANALYZER_KEYCODE("Block Analyzer Keycode", KeyCode.VK_R, "Key used to indicate a rejected patch."),						//
+    CORNER_SELECTOR_KEYCODE("Corner Selector Keycode", KeyCode.VK_M, "Key used to indicate a good patch."),							//
+    BLOCK_SELECTOR_KEYCODE("Block Selector Keycode", KeyCode.VK_B, "Key used to indicate a rejected patch."),						//
+    BLOCK_ANALYZER_KEYCODE("Block Analyzer Keycode", KeyCode.VK_A, "Key used to indicate a rejected patch."),						//
     ;
 
     private static final Map<String, Tags>	lookup = new HashMap<String, Tags>();
@@ -138,61 +138,4 @@ public class Preferences {
     }
   }
 
-///**
-// */
-//public enum GeneralPreferences implements IPreferencesEnum {                                                                                                        // , IObjectValue, IStringDescription {
-//
-//  ;
-//
-//  private static final Tags<String, GeneralPreferences>  lookup = new HashMap<String, GeneralPreferences>();
-//
-//  static {
-//    for (GeneralPreferences s : EnumSet.allOf(GeneralPreferences.class))
-//      lookup.put(s.key(), s);
-//  }
-//
-//  private String    key;
-//  private Object    defaultValue;
-//  private String    description;
-//
-//  /**
-//   *  @param key
-//   *  @param defaultValue
-//   *  @param description
-//   */
-//  private GeneralPreferences(String key, Object defaultValue, String description) {
-//    this.key          = key;
-//    this.defaultValue = defaultValue;
-//    this.description  = description;
-//  }
-//
-//  /**
-//   *  @return
-//   */
-//  public Object defaultValue() {
-//    return defaultValue;
-//  }
-//
-//  /**
-//   *  @return
-//   */
-//  public String description() {
-//    return description;
-//  }
-//
-//  /**
-//   *  @return
-//   */
-//  public String key() {
-//    return key;
-//  }
-//
-//  /**
-//   *  @param key
-//   *  @return
-//   */
-//  public GeneralPreferences get(String key) {
-//    return lookup.get(key);
-//  }
-//}
 }

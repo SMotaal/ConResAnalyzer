@@ -33,7 +33,119 @@ import java.util.List;
  */
 public class AnalysisStepperModel extends AbstractModel {
 
-    /** Field description */
+    /**
+	 * @return the cursorColor
+	 */
+	public int[] getCursorColor() {
+		return cursorColor;
+	}
+
+	/**
+	 * @param cursorColor the cursorColor to set
+	 */
+	public void setCursorColor(int[] cursorColor) {
+		this.cursorColor = cursorColor;
+	}
+
+	/**
+	 * @return the voidPatchColor
+	 */
+	public int[] getVoidPatchColor() {
+		return voidPatchColor;
+	}
+
+	/**
+	 * @param voidPatchColor the voidPatchColor to set
+	 */
+	public void setVoidPatchColor(int[] voidPatchColor) {
+		this.voidPatchColor = voidPatchColor;
+	}
+
+	/**
+	 * @return the assumeFailPatchColor
+	 */
+	public int[] getAssumeFailPatchColor() {
+		return assumeFailPatchColor;
+	}
+
+	/**
+	 * @param assumeFailPatchColor the assumeFailPatchColor to set
+	 */
+	public void setAssumeFailPatchColor(int[] assumeFailPatchColor) {
+		this.assumeFailPatchColor = assumeFailPatchColor;
+	}
+
+	/**
+	 * @return the failPatchColor
+	 */
+	public int[] getFailPatchColor() {
+		return failPatchColor;
+	}
+
+	/**
+	 * @param failPatchColor the failPatchColor to set
+	 */
+	public void setFailPatchColor(int[] failPatchColor) {
+		this.failPatchColor = failPatchColor;
+	}
+
+	/**
+	 * @return the marginalPatchColor
+	 */
+	public int[] getMarginalPatchColor() {
+		return marginalPatchColor;
+	}
+
+	/**
+	 * @param marginalPatchColor the marginalPatchColor to set
+	 */
+	public void setMarginalPatchColor(int[] marginalPatchColor) {
+		this.marginalPatchColor = marginalPatchColor;
+	}
+
+	/**
+	 * @return the passPatchColor
+	 */
+	public int[] getPassPatchColor() {
+		return passPatchColor;
+	}
+
+	/**
+	 * @param passPatchColor the passPatchColor to set
+	 */
+	public void setPassPatchColor(int[] passPatchColor) {
+		this.passPatchColor = passPatchColor;
+	}
+
+	/**
+	 * @return the assumePassPatchColor
+	 */
+	public int[] getAssumePassPatchColor() {
+		return assumePassPatchColor;
+	}
+
+	/**
+	 * @param assumePassPatchColor the assumePassPatchColor to set
+	 */
+	public void setAssumePassPatchColor(int[] assumePassPatchColor) {
+		this.assumePassPatchColor = assumePassPatchColor;
+	}
+
+	/**
+	 * @return the clearPatchColor
+	 */
+	public int[] getClearPatchColor() {
+		return clearPatchColor;
+	}
+
+	/**
+	 * @param clearPatchColor the clearPatchColor to set
+	 */
+	public void setClearPatchColor(int[] clearPatchColor) {
+		this.clearPatchColor = clearPatchColor;
+	}
+
+	/** Field description */
     private BlockState	blockState = null;		// new BlockState(10, 10, 0, 0, BlockState.fudgeMap0());
 
     /** Field description */
@@ -53,6 +165,15 @@ public class AnalysisStepperModel extends AbstractModel {
 							windowRatio      = 6.0;
     private ImageFile		blockImage       = null;
     private ImagePlus		blockImagePlus   = null;
+    
+    private int[] voidPatchColor = null;
+    private int[] assumeFailPatchColor = null;
+    private int[] failPatchColor = null;
+    private int[] marginalPatchColor = null;
+    private int[] passPatchColor = null;
+    private int[] assumePassPatchColor = null;
+    private int[] clearPatchColor = null;
+    private int[] cursorColor = null;
 
     /**
      * Constructs a new model object with no predefined controller.
