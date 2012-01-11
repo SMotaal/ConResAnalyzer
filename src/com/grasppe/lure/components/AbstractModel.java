@@ -13,9 +13,14 @@ package com.grasppe.lure.components;
 
 import java.io.InvalidObjectException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.swing.event.ChangeListener;
+
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  *     Models handle the data portion of a component. A model indirectly notifies a controller and any number of views of any changes to the data. The controller is responsible for initiating all attach/detach calls, however the model keeps track of observer view objects with special implementation.
@@ -23,8 +28,22 @@ import java.util.TreeSet;
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class AbstractModel extends ObservableComponent {
+	
+	boolean locked = false;
 
-    /**
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.ObservableComponent#notifyObservers()
+	 */
+	@Override
+	public void notifyObservers() { //synchronized
+		if (locked) return;
+		locked = true;
+		super.notifyObservers();
+		changeList.clear();
+		locked = false;
+	}
+
+	/**
 	 * @return the controller
 	 */
 	public AbstractController getController() {
@@ -74,6 +93,22 @@ public class AbstractModel extends ObservableComponent {
     public void attachController(AbstractController controller) {
         this.controller = controller;
     }
+    
+    public boolean hasChanged(String fieldName){
+    	boolean didChange = changeList.contains(fieldName); 
+    	GrasppeKit.debugText("Checking Field", fieldName + ((didChange) ? " has not changed" : " has changed"), 2);
+    	return didChange;
+    }
+    
+    public void changeField(String fieldName) {
+    	if (changeList.contains(fieldName)) return;
+    		GrasppeKit.debugText("Changing Field", fieldName, 2);
+    		changeList.add(fieldName);
+    }
+    
+    
+    
+    protected ArrayList<String> changeList = new ArrayList<String>();
 
     /**
      * @param view

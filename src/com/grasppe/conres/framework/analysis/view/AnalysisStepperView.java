@@ -232,8 +232,12 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
     @Override
     public void update() {
         super.update();
-
-//      if (canvas != null) canvas.updateStep();  // getModel().getBlockState())
+        updateView();
+    }
+    
+    /**
+     */
+    public void updateView() {    	
         if (patchImagePanel != null) patchImagePanel.update();
         if (blockMapImagePanel != null) blockMapImagePanel.update();
         if (patchInformationPanel != null) patchInformationPanel.update();
@@ -243,6 +247,7 @@ public class AnalysisStepperView extends AbstractView implements IChildView {
             viewContainer.validate();
         } catch (Exception exception) {}
     }
+
 
     /**
      *  @return

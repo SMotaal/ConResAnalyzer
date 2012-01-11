@@ -9,6 +9,7 @@
 package com.grasppe.conres.analyzer;
 
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
+import com.grasppe.conres.analyzer.operations.Quit;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.cases.CaseManager;
@@ -48,7 +49,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
 		this.preferencesManager = preferencesManager;
 	}
 
-	public static final String	BUILD = "0.1b-13";
+	public static final String	BUILD = "0.2a-01";
     protected CaseManager			caseManager;
     protected TargetManager			targetManager;
     protected AnalysisManager		analysisManager;
@@ -106,7 +107,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     @Override
     public void createCommands() {
 
-        // putCommand(new Quit(this));
+        putCommand(new Quit(this));
     }
 
     /**

@@ -69,7 +69,7 @@ public class AnalysisStepper extends AbstractController {
     }
 
   };
-  protected Timer		blinkTimer  = new Timer(350, blinkListener);
+  protected Timer		blinkTimer  = new Timer(Preferences.getInt(Tags.BLINK_SPEED), blinkListener);
   protected String	scratchFile = null;
 
   /**
@@ -253,6 +253,7 @@ public class AnalysisStepper extends AbstractController {
   public synchronized void blinkCursor() {
     try {
       BlockGrid.blinkValue = !BlockGrid.blinkValue;
+      blinkTimer.setDelay(Preferences.getInt(Tags.BLINK_SPEED));
       getModel().setImage(new BlockGrid(getModel().getBlockState()).getImage());
       pushUpdates();
     } catch (Exception exception) {

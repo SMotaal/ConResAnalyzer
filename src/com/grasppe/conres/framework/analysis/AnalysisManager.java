@@ -120,8 +120,8 @@ public class AnalysisManager extends AbstractController {
         	getModel().setActiveTarget(null);
         	updateActiveTarget = true;
         } else {
-        	if ((updateActiveTarget = areEqual(getModel().getActiveTarget(),
-        			activeTarget)) == false)
+//        	if ((updateActiveTarget = areEqual(getModel().getActiveTarget(), activeTarget)) == false)
+        	if (updateActiveTarget=getTargetManagerModel().hasChanged("activeTarget"))
         		getModel().setActiveTarget(activeTarget);        	
         }
         
@@ -131,8 +131,8 @@ public class AnalysisManager extends AbstractController {
         	getModel().setActiveBlock(null);
         	updateActiveBlock = true;
         } else {
-	        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(),
-	        		activeBlock)) == false)
+//	        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(), activeBlock)) == false)
+        	if (updateActiveBlock=getTargetManagerModel().hasChanged("activeBlock"))
 	            getModel().setActiveBlock(activeBlock);
         }
 

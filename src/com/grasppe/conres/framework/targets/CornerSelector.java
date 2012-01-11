@@ -114,6 +114,8 @@
 	    /**
 	     */
 	    public void showSelectorView() {
+	    	//if (blockImage!=modelImage && view!=null && view.getImageWindow()!=null) // && view.getImageWindow().isVisible())
+	    	//if (getModel().getTargetImageFile()==null) return;
 	        getSelectorView().run("");	
 	        showSelectorROIs();
 	    }
@@ -226,11 +228,11 @@
 	        		hideSelectorView();
 	        } catch (Exception exception) {}
 	        
-	        ImageFile blockImage =  getBlockImage();
-	        ImageFile modelImage = getModel().getTargetImageFile(); 
-	        CornerSelectorView view = getSelectorView();
-	        if (blockImage!=modelImage && view!=null && view.getImageWindow()!=null) // && view.getImageWindow().isVisible())
-	        		showSelectorView();
+//	        ImageFile blockImage =  getBlockImage();
+//	        ImageFile modelImage = getModel().getTargetImageFile(); 
+//	        CornerSelectorView view = getSelectorView();
+//	        if (blockImage!=modelImage && view!=null && view.getImageWindow()!=null) // && view.getImageWindow().isVisible())
+//	        		showSelectorView();
 	    	if (getBlockImage()!=null)
 	    		getModel().setTargetImageFile(getBlockImage());
 	    	else

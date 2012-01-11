@@ -32,8 +32,8 @@ public class Preferences {
 	public static Object get(Tags preference) {
 		return PreferencesAdapter.getInstance().get(preference);
 	}
-	public static Object getInt(Tags preference) {
-		return PreferencesAdapter.getInstance().get(preference);
+	public static int getInt(Tags preference) {
+		return ((Integer)PreferencesAdapter.getInstance().get(preference)).intValue();
 	}	
 	public static void put(Tags preference, Object value) {
 		PreferencesAdapter.getInstance().put(preference, value);
@@ -70,7 +70,7 @@ public class Preferences {
     PASS_KEYCODE("Pass Keycode", KeyCode.VK_G, "Key used to indicate a good patch."),																		//
     FAIL_KEYCODE("Fail Keycode", KeyCode.VK_R, "Key used to indicate a rejected patch."),																//
     MARGINAL_KEYCODE("Marginal Keycode", KeyCode.VK_W, "Key used to indicate a marginally accepted patch."),						//
-    CLEAR_COLUMN_KEYCODE("Pass Keycode", KeyCode.VK_C, "Key used to clearing a grid column."),													//
+    CLEAR_COLUMN_KEYCODE("Clear Column Keycode", KeyCode.VK_C, "Key used to clearing a grid column."),													//
 
     /* Case Manager Preferences */
     DEFAULT_CASE_PATH("Default Case Path", "", "Path to the folder parent folder the case files"),											//

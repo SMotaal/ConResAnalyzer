@@ -258,10 +258,10 @@ public abstract class AbstractPreferencesAdapter {
 
     if (returnValue == null) {		// || (returnValue.getClass() != defaultValue.getClass())) {
       put(preference, defaultValue);
-      GrasppeKit.debugText("Reading " + key + "Preferences", "Using default value", dbg);
+//      GrasppeKit.debugText("Reading " + key + "Preferences", "Using default value", dbg);
       returnValue = defaultValue;
     } else {
-      GrasppeKit.debugText("Reading " + key + "Preferences", "Using stored value", dbg);
+//      GrasppeKit.debugText("Reading " + key + "Preferences", "Using stored value", dbg);
     }
 
     return returnValue;

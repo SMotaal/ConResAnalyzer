@@ -6,7 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sanselan"/>
-	<classpathentry exported="true" kind="lib" path="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/ij.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/ij.jar" sourcepath="/Users/daflair/Documents/Workspace/libraries/ij145s/src"/>
 	<classpathentry exported="true" kind="lib" path="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/sanselan.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

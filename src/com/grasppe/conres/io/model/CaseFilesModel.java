@@ -102,34 +102,44 @@ public class CaseFilesModel extends AbstractModel {
      * @param caseFolder the caseFolder to set
      */
     public void setCaseFolder(File caseFolder) {
+    	if(this.caseFolder == caseFolder) return;
         this.caseFolder = caseFolder;
+        changeField("caseFolder");
     }
 
     /**
      * @param imageFiles the imageFiles to set
      */
     public void setImageFiles(File[] imageFiles) {
+    	if (this.imageFiles == imageFiles) return;
         this.imageFiles = imageFiles;
+        changeField("imageFiles");
     }
 
     /**
      * @param mapFile the mapFile to set
      */
     public void setMapFile(File[] mapFile) {
+    	if (this.mapFile == mapFile) return;
         this.mapFile = mapFile;
+        changeField("mapFile");
     }
 
     /**
      * @param otherFiles the otherFiles to set
      */
     public void setOtherFiles(File[] otherFiles) {
+    	if (this.otherFiles == otherFiles) return;
         this.otherFiles = otherFiles;
+        changeField("otherFiles");
     }
 
     /**
      * @param plotFiles the plotFiles to set
      */
     public void setPlotFiles(File[] plotFiles) {
+    	if (this.plotFiles == plotFiles) return;
         this.plotFiles = plotFiles;
+        changeField("plotFiles");
     }
 }

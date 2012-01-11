@@ -128,6 +128,7 @@ public class TargetManagerModel extends AbstractModel {
         		if (getActiveTarget()!=null) getActiveTarget().setActiveBlock(null);
         	}
         	getActiveTarget().setActiveBlock(activeBlock);        		
+        	changeField("activeBlock");
 //        	if (activeBlock!=null && getActiveTarget()!=null) {
 //        		if (activeBlock != getActiveTarget())
 //        	}
@@ -136,7 +137,7 @@ public class TargetManagerModel extends AbstractModel {
         	GrasppeKit.debugError("Updating Active Block", exception, 2);
         }
 
-        notifyObservers();
+        //notifyObservers();
     }
 
     /**
@@ -157,8 +158,9 @@ public class TargetManagerModel extends AbstractModel {
                 updated = true;
             } else {
 
-                if (activeTarget.getActiveBlock() == null && activeTarget.getTargetBlocks() != null && activeTarget.getTargetBlocks().length > 0)
-                        activeTarget.setActiveBlock(activeTarget.getTargetBlocks()[0]);
+//                if (activeTarget.getActiveBlock() == null && activeTarget.getTargetBlocks() != null && activeTarget.getTargetBlocks().length > 0)
+//                        activeTarget.setActiveBlock(activeTarget.getTargetBlocks()[0]);
+            	changeField("activeBlock");
 
                 if (this.activeTarget != activeTarget) {
                 	updated = true;
@@ -169,7 +171,7 @@ public class TargetManagerModel extends AbstractModel {
         	GrasppeKit.debugError("Updating Active Target", exception, 2);
         }
 
-        if (updated) notifyObservers();
+        if (updated) changeField("activeTarget"); // notifyObservers();
 
     }
 

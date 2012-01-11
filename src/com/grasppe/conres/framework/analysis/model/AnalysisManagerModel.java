@@ -56,7 +56,9 @@ public class AnalysisManagerModel extends AbstractModel {
      * @param activeBlock the activeBlock to set
      */
     public void setActiveBlock(ConResBlock activeBlock) {
+    	if (this.activeBlock == activeBlock) return;
         this.activeBlock = activeBlock;
+        changeField("activeBlock");
 //        notifyObservers();
     }
 
@@ -64,7 +66,9 @@ public class AnalysisManagerModel extends AbstractModel {
      * @param activeTarget the activeTarget to set
      */
     public void setActiveTarget(ConResTarget activeTarget) {
+    	if (this.activeTarget == activeTarget) return;
         this.activeTarget = activeTarget;
+    	changeField("activeTarget");
 //        notifyObservers();
     }
 }

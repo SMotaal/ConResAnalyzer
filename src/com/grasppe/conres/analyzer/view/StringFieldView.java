@@ -11,6 +11,9 @@
 
 package com.grasppe.conres.analyzer.view;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 import com.grasppe.conres.analyzer.PreferencesManager;
 import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.conres.preferences.PreferencesAdapter;
@@ -49,11 +52,41 @@ public class StringFieldView extends PreferencesFieldView {
     super.createView();
     if (textField != null) return;
 
-    textField = new JTextField(getValue());
+//    update();
+
+    textField = new JTextField((String)getCurrentValue());
+    
+    textField.addComponentListener(new ComponentListener() {
+		
+		@Override
+		public void componentShown(ComponentEvent e) {
+			// TODO Auto-generated method stub
+			updateView();
+			
+		}
+		
+		@Override
+		public void componentResized(ComponentEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void componentMoved(ComponentEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void componentHidden(ComponentEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+	});
 
     add(textField);
-    
-    updateView();
+
+//  updateView();
   }
 
   /*
@@ -65,8 +98,35 @@ public class StringFieldView extends PreferencesFieldView {
    */
   @Override
   protected void updateView() {
-	  textField.setText(getValue());
+    if (textField != null) {
+      if (getCurrentValue() != null) textField.setText((String)getCurrentValue());
+      else textField.setText("");
+    }
+
     super.updateView();
+  }
+
+  /*
+   *  (non-Javadoc)
+   *   @see com.grasppe.conres.analyzer.view.PreferencesFieldView#getNewValue()
+   */
+
+  /**
+   * 	@return
+   */
+  @Override
+  Object getNewValue() {
+	  if (textField!=null) {
+		  boolean updated = false;
+		  String fieldText = textField.getText();
+		  String currentText = (String)getCurrentValue(); 
+		  if (currentText!=null) 
+			  updated =  !fieldText.equals(currentText);
+			  
+			  if (updated)
+				  setNewValue(fieldText);
+	  }
+    return super.getNewValue();
   }
 
   /*
@@ -75,11 +135,11 @@ public class StringFieldView extends PreferencesFieldView {
    */
 
   /**
-   * 	@return
+   *    @return
    */
   @Override
-  protected String getValue() {
-    Object	value = super.getValue();
+  protected String getStoredValue() {
+    Object	value = super.getStoredValue();
 
     if (value == null) value = "null";
     else if (value.getClass().isArray())

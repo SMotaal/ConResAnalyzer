@@ -1,6 +1,6 @@
 /*
  * @(#)PreferencesFieldView.java   11/12/19
- * 
+ *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
  * This code is not licensed for use and is the property of it's owner.
@@ -13,7 +13,6 @@ package com.grasppe.conres.analyzer.view;
 
 import com.grasppe.conres.analyzer.PreferencesManager;
 import com.grasppe.conres.preferences.Preferences.Tags;
-import com.grasppe.lure.framework.IPreferencesEnum;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -22,6 +21,7 @@ import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *   Class description
@@ -37,9 +37,12 @@ public class PreferencesFieldView extends JPanel {
 //  this.maximumLabelWidth = maximumLabelWidth;
 //  }
 
-  Tags								preference = null;
-  PreferencesManager	manager    = null;
-  JLabel							label      = null;
+  Tags								preference   = null;
+  PreferencesManager	manager      = null;
+  JLabel							label        = null;
+  private Object							currentValue = null;
+private Object newValue     = null;
+private Object storedValue = null;
 
 //static int maximumLabelWidth = 0;
 
@@ -51,13 +54,20 @@ public class PreferencesFieldView extends JPanel {
     super();
     this.preference = preference;
     this.manager    = manager;
-    createView();
+    SwingUtilities.invokeLater(new Runnable() {
+		
+		@Override
+		public void run() {
+			createView();			
+		}
+	});
+    update();
   }
 
   /**
-   * 	@param preference
-   * 	@param manager
-   * 	@return
+   *    @param preference
+   *    @param manager
+   *    @return
    */
   public static PreferencesFieldView buildFieldView(Tags preference, PreferencesManager manager) {
     return new StringFieldView(preference, manager);
@@ -66,8 +76,9 @@ public class PreferencesFieldView extends JPanel {
   /**
    */
   protected void createView() {
-//	  if label
-  if (label!=null) return;
+
+//  if label
+    if (label != null) return;
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     setMinimumSize(new Dimension(200, 50));
     setAlignmentY(CENTER_ALIGNMENT);
@@ -83,7 +94,27 @@ public class PreferencesFieldView extends JPanel {
 
   /**
    */
-  protected void updateView() {}
+  protected void update() {
+	  if (getCurrentValue()==null)
+		  setCurrentValue(getStoredValue());
+	  updateView();
+  }
+  
+  protected void updateView() {
+	  repaint();
+  }
+  
+  
+  public void storeValue() {
+	  Object newValue = getNewValue();
+	  if (newValue!=null)
+		  getManager().putValue(getPreference(), getNewValue());
+	  setCurrentValue(getStoredValue());
+	  if (getCurrentValue()==null) setCurrentValue(preference.defaultValue());
+	  setNewValue(null);
+//	  if (getCurrentValue()==getNewValue())
+//		  return;
+  }
 
   /**
    * @return the label
@@ -109,7 +140,25 @@ public class PreferencesFieldView extends JPanel {
   /**
    * @return the value
    */
-  protected Object getValue() {
-    return getManager().getValue(getPreference());
+  protected Object getStoredValue() {
+    return getManager().getValue(getPreference()); //getCurrentValue();
   }
+
+Object getNewValue() {
+	return newValue;
+}
+
+void setNewValue(Object newValue) {
+	this.newValue = newValue;
+}
+
+Object getCurrentValue() {
+	return currentValue;
+}
+
+void setCurrentValue(Object currentValue) {
+	this.currentValue = currentValue;
+}
+
+//protected Object
 }

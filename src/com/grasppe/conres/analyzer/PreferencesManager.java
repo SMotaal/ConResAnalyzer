@@ -189,7 +189,16 @@ public class PreferencesManager extends AbstractController {
    */
   public Object getValue(Tags preference) {
 	  Object value =  Preferences.get(preference);
-    return value; //Preferences.get(preference);
+	  return value; //Preferences.get(preference);
+  }
+  
+  /**
+   * 	@param preference
+   * 	@return
+   */
+  public Object putValue(Tags preference, Object value) {
+	  Preferences.put(preference, value);
+	  return getValue(preference);
   }
 
   /*

@@ -41,6 +41,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -172,7 +173,17 @@ public class PreferencesManagerView extends AbstractView implements Observer, Ac
   /**
    */
   public void show() {
-    if (mainFrame != null) mainFrame.setVisible(true);
+    if (mainFrame == null) return;
+    
+    SwingUtilities.invokeLater(new Runnable() {
+		
+		@Override
+		public void run() {
+		    mainFrame.pack();
+		    mainFrame.setLocationRelativeTo(null);	  
+		    mainFrame.setVisible(true);
+		}
+	});
   }
 
   /*
@@ -187,7 +198,7 @@ public class PreferencesManagerView extends AbstractView implements Observer, Ac
     updateSize();
     if (fieldMap!=null && fieldMap.size()>0)
     for (PreferencesFieldView field : fieldMap.values())
-    	field.updateView();
+    	field.update();
     super.update();
   }
 
@@ -236,11 +247,17 @@ public class PreferencesManagerView extends AbstractView implements Observer, Ac
 public void actionPerformed(ActionEvent e) {
     if ("Set".equals(e.getActionCommand())) {
 //        ListDialog.value = (String)(list.getSelectedValue());
+    	storeValues();
     } else {
 //    	ListDialog.value = "";
     }
     mainFrame.setVisible(false);
 
 	
+}
+
+protected void storeValues() {
+    for (PreferencesFieldView field : fieldMap.values())
+    	field.storeValue();
 }
 }

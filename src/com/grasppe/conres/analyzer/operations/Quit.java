@@ -15,6 +15,8 @@ import ij.IJ;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JOptionPane;
+
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
  * @version        $Revision: 1.0, 11/11/08
@@ -47,11 +49,14 @@ public class Quit extends ConResAnalyzerCommand {
 
         if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
             System.exit(0);
+        
+//        int option = JOptionPane.showConfirmDialog((Component)actionListener, "Are you sure you want to quit?", "Quit?", JOptionPane.YES_NO_OPTION);
+//        return (option == JOptionPane.YES_OPTION);
 
 //      if (altPressed() || IJ.showMessageWithCancel(name, "Do you really want to quit?"))
 //          System.exit(0);
 
-        return true;	// Action responded to in intended scenario
+        return false;	// Action responded to in intended scenario
     }
 
     /**

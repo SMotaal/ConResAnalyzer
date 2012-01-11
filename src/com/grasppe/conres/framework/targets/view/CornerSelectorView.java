@@ -18,6 +18,8 @@ import com.grasppe.conres.framework.targets.model.TargetDimensions;
 import com.grasppe.conres.framework.targets.model.roi.BlockROI;
 import com.grasppe.conres.framework.targets.model.roi.PatchSetROI;
 import com.grasppe.conres.io.model.ImageFile;
+import com.grasppe.conres.preferences.Preferences;
+import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
@@ -212,6 +214,7 @@ public class CornerSelectorView extends AbstractView
 
         try {
             sortROIs();		// cornerSelectorCommons.overlayROI);
+            offsetROIs();
             warpPatchGrid();
         } catch (InvalidAttributesException exception) {
             GrasppeKit.debugText("CornerSelector - Calculate Grid", exception.getMessage(), dbg);
@@ -957,8 +960,8 @@ public class CornerSelectorView extends AbstractView
 //          viewContainer.dispose();
         } else {
             GrasppeEventDispatcher	eventDispatcher = GrasppeEventDispatcher.getInstance();
-
             eventDispatcher.attachEventHandler(this);
+//            viewContainer.setVisible(true);
         }
 
         getTargetManager().loadImage();
@@ -997,6 +1000,24 @@ public class CornerSelectorView extends AbstractView
         return isZoomPatch();
     }
 
+    /**
+     *  @throws InvalidAttributesException
+     */
+    private void offsetROIs( /* PointRoi pointROI */) throws InvalidAttributesException {
+        PointRoi	pointROI = getModel().getBlockROI();
+
+        if (pointROI == null) return;
+        
+        int dX = Preferences.getInt(Tags.X_ROI_OFFSET);
+        int dY = Preferences.getInt(Tags.Y_ROI_OFFSET);
+        
+        if (dX!=0 || dY!=0) {
+        	double dpm = getTargetManager().getBlockImage().getResolution().value*0.0393700787;
+        	Rectangle bounds = pointROI.getBounds();
+        	bounds.translate((int)(((double)dX)/10*dpm),(int)(((double)dY)/10*dpm));
+        	pointROI.setLocation(bounds.x, bounds.y);
+        }
+    }
     /**
      *  @throws InvalidAttributesException
      */

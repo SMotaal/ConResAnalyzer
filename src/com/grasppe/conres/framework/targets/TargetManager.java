@@ -661,8 +661,13 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
 
             getModel().setActiveBlock(activeBlock);
             if (activeBlock != null) loadImage();
-
+            
+//            getCornerSelector();
+//            getCornerSelector().update();		// hideSelectorView();            
             getCornerSelector().update();		// hideSelectorView();
+//            getCornerSelectorModel().setTargetImageFile(getBlockImage());
+            getCornerSelector().showSelectorView();
+//            getCornerSelector().update();		// hideSelectorView();
         } catch (Exception exception) {
             GrasppeKit.debugError("Setting Active Block", exception, 2);
         }
@@ -682,6 +687,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
+        getModel().notifyObservers();
         new SelectBlockFunction(this).execute(true);
     }
 }
