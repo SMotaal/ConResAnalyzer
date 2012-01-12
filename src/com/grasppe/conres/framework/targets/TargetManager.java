@@ -191,15 +191,42 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      * @throws InterruptedException 
      */
     public void loadImage() {
+    	
+    	ConResBlock activeBlock = getModel().getActiveBlock();
+    	
+    	ImageFile blockImage = getBlockImage();
+//    	
+//    	if (blockImage == null) {
+//    		blockImage = getBlockImage(activeBlock);
+//    	}
 
+    	boolean validBlockImage = (getBlockImage() != null);
+    	
+    	
+    	if (validBlockImage) {
+    		String blockImagePath = getBlockImage().getAbsolutePath();
+    	}
+    	
+    	boolean differentBlockImage = validBlockImage && !getBlockImage().getAbsolutePath().equals(loadedImagePath);
 
-        if ((getBlockImage() != null) && (getBlockImage().getAbsolutePath() != loadedImagePath)) {
+        if (validBlockImage && differentBlockImage) {//(getBlockImage() != null) && ()) {
         	
         	getAnalyzer().getView().setContainer(null);
         	
         	getAnalyzer().getView().getFrame().repaint();
         	
-        	final FloatingAlert	loadImageAlert = new FloatingAlert("Loading Block!", true);
+        	String loadingString = "Loading " + activeBlock.getZValue().value +"% tone value block!";
+        	
+        	if (!getActiveCase().caseFolder.isTdfIndexValid())
+        		loadingString = "<html><p>" + loadingString + "<br/>&nbsp;</p>" +
+                			"<p><font size=-1><font color=red><b>Warning: </b>TDF NLevels out of sync.</font> <br/>" +
+                			"Please append missing values to the TDF file.</font></p></html>";
+//        	else
+//        		loadingString = "<html><p>" + loadingString + "&nbsp;&nbsp; <font color=green></font></p>" +
+//            			"<p></p></html>";
+        	
+        	final FloatingAlert	loadImageAlert = new FloatingAlert(loadingString, true);
+        	
         	
 //        	getModel().setActiveImagePlus(null);
 //            getModel().notifyObservers();
@@ -298,7 +325,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      *  @param targetDefinitionFile
      *  @throws IOException
      */
-    public void loadTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile)
+    public static void loadTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile)
             throws IOException {
 
         // TODO: Create reader and read target from Case Manager current case
@@ -367,8 +394,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public ImageFile getBlockImage(ConResBlock block) {
         if (block == null) return null;
-
-        return getBlockImage(new Double(block.getZValue().value).intValue());
+        int blockValue = new Double(block.getZValue().value).intValue();
+        return getBlockImage(blockValue);
     }
 
     /**
@@ -377,6 +404,8 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      */
     public ImageFile getBlockImage(int toneValue) {
         if (getActiveCase() == null) return null;
+        
+        CaseModel activeCagetActiveCase = getActiveCase();
 
         return getActiveCase().caseFolder.getImageFile(toneValue);
     }
@@ -654,9 +683,11 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
      * @param activeBlock the activeBlock to set
      */
     public void setActiveBlock(ConResBlock activeBlock) {
+    	//model.hasViews();
+    	ConResBlock currentBlock = getModel().getActiveBlock();
         try {
-            if ((getModel().getActiveBlock() != null)
-                    && (getModel().getActiveBlock() == activeBlock))
+            if ((currentBlock != null)
+                    && (currentBlock == activeBlock))
                 return;
 
             getModel().setActiveBlock(activeBlock);
@@ -688,6 +719,7 @@ public class TargetManager extends AbstractController implements IAuxiliaryCaseM
     public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
         getModel().setActiveTarget(buildTargetModel(targetDefinitionFile));
         getModel().notifyObservers();
-        new SelectBlockFunction(this).execute(true);
+        getModel().setActiveBlock(null);
+//        new SelectBlockFunction(this).execute(true);
     }
 }

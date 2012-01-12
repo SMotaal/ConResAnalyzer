@@ -11,6 +11,7 @@ package com.grasppe.conres.framework.cases.operations;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.cases.model.CaseModel;
+import com.grasppe.conres.framework.targets.operations.SelectBlockFunction;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.PreferencesAdapter;
@@ -165,6 +166,11 @@ public class OpenCase extends CaseManagerCommand {
         }
         
         String caseFolderPath = new File(newCase.path).getParent(); //.getAbsolutePath();
+        
+//        if (!newCase.caseFolder.isTdfIndexValid())
+//        	new FloatingAlert("TDF block index out of sync!\n\n" +
+//        			"Please add the missing block values to the NLevels sections of the TDF file.").flashView(5000);
+        new SelectBlockFunction(getCaseManager().getTargetManager()).execute(true);
         
         Preferences.put(Tags.DEFAULT_CASE_PATH, caseFolderPath);	// PreferencesAdapter.getInstance().putDefaultCasePath(caseFolderPath);
 

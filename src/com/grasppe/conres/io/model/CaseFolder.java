@@ -11,6 +11,7 @@
 package com.grasppe.conres.io.model;
 
 import com.grasppe.conres.io.ImageFileReader;
+import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -18,9 +19,11 @@ import com.grasppe.lure.framework.GrasppeKit;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 
 import java.net.URI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,287 +33,353 @@ import java.util.HashSet;
  */
 public class CaseFolder extends CaseFile {
 
-    protected static FileFilter	fileFilter = new FileFilter() {
+  /**
+	 * @return the tdfIndexValid
+	 */
+	public boolean isTdfIndexValid() {
+		return tdfIndexValid;
+	}
 
-        public boolean accept(File file) {
-            return CaseFolder.validate(file);
-        }
+protected static FileFilter	fileFilter = new FileFilter() {
 
-    };
-    HashMap<Integer, ImageFile>		imageFileMap = new HashMap<Integer, ImageFile>();
-    protected ImageFile[]			imageFiles;
-    protected TargetDefinitionFile	targetDefinitionFile;
+    public boolean accept(File file) {
+      return CaseFolder.validate(file);
+    }
+
+  };
+  HashMap<Integer, ImageFile>			imageFileMap = new HashMap<Integer, ImageFile>();
+  protected ImageFile[]						imageFiles;
+  protected TargetDefinitionFile	targetDefinitionFile;
+  int															dbg = 0;
+
+  /**
+   * @param pathname
+   */
+  public CaseFolder(String pathname) {
+    super(pathname);
+  }
+
+  /**
+   * @param uri
+   */
+  public CaseFolder(URI uri) {
+    super(uri);
+  }
+
+  /**
+   * @param parent
+   * @param child
+   */
+  public CaseFolder(File parent, String child) {
+    super(parent, child);
+  }
+
+  /**
+   * @param parent
+   * @param child
+   */
+  public CaseFolder(String parent, String child) {
+    super(parent, child);
+  }
+  
+  boolean tdfIndexValid = false;
+
+  /**
+   *  @throws FileNotFoundException
+   */
+  public void enumerateImageFiles() throws FileNotFoundException {
+
+    File	folder = new File(getAbsolutePath() + File.separator + "Images");
+
+    if (!folder.exists()) folder = this;
+
+    File[]	fileList  = listFilesRecursively(folder, ImageFile.getFilenameFilter(),2);
+    int			fileCount = fileList.length;
+
+    setImageFiles(new ImageFile[fileCount]);
+
+    HashSet<Integer>	imageToneValues = new HashSet<Integer>();
+    HashSet<Integer>	blockToneValues = new HashSet<Integer>();
+
+    for (int value : getTargetDefinitionFile().getBlockToneValues())
+      blockToneValues.add(new Integer(value));
     
-    int dbg = 0;
+    tdfIndexValid = true;
 
-    /**
-     * @param pathname
-     */
-    public CaseFolder(String pathname) {
-        super(pathname);
+    for (int i = 0; i < fileCount; i++) {
+      ImageFile	thisFile = new ImageFile(fileList[i].getAbsolutePath());
+
+      try {
+        thisFile = (new ImageFileReader((ImageFile)thisFile)).getFile();
+      } catch (Exception exception) {
+        GrasppeKit.debugError("Loading Image File", exception, 2);
+      }
+
+      setImageFile(i, thisFile);
+      
+      if (blockToneValues.contains(thisFile.getImageID())) {
+        imageFileMap.put(thisFile.getImageID(), thisFile);
+        imageToneValues.add(thisFile.getImageID());
+      } else {
+    	  tdfIndexValid = false;
+
+        GrasppeKit.debugText("Enumerting Case Images",
+                             "The image " + thisFile.getName() + " was not load since " + "block value " + thisFile.getImageID()
+                             + " was not defined in the target defnition file.", dbg);
+      }
     }
 
-    /**
-     * @param uri
-     */
-    public CaseFolder(URI uri) {
-        super(uri);
-    }
+    if (!imageToneValues.containsAll(blockToneValues))
+      throw new FileNotFoundException(
+          "The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n"
+          + "Blocks in TDF: \t" + sortedString(blockToneValues) + "\n" + "Images in Folder: \t" + sortedString(imageToneValues));
 
-    /**
-     * @param parent
-     * @param child
-     */
-    public CaseFolder(File parent, String child) {
-        super(parent, child);
-    }
+    return;
+  }
 
-    /**
-     * @param parent
-     * @param child
-     */
-    public CaseFolder(String parent, String child) {
-        super(parent, child);
-    }
+  /**
+   */
+  public void enumerateTargetDefinitionFiles() {
+    File[]	fileList  = listFilesRecursively(this, TargetDefinitionFile.getFilenameFilter(),2);
+    int			fileCount = fileList.length;
 
-    /**
-     *  @throws FileNotFoundException
-     */
-    public void enumerateImageFiles() throws FileNotFoundException {
-    	
-    	File folder = new File(getAbsolutePath()+File.separator+"Images");
-    	
-    	if (!folder.exists()) folder = this;
-    	
-        File[]	fileList  = folder.listFiles(ImageFile.getFilenameFilter());
-        int		fileCount = fileList.length;
+    if (fileCount == 1) setTargetDefinitionFile(new TargetDefinitionFile(fileList[0].getAbsolutePath()));
 
-        setImageFiles(new ImageFile[fileCount]);
+  }
+  
+//  public static File[] listFilesRecursively(File folder, Object filter) {
+//	  public static File[] listFilesRecursively(File folder, Object filter,1
+//  }
 
-        HashSet<Integer>	imageToneValues = new HashSet<Integer>();
-        HashSet<Integer>	blockToneValues = new HashSet<Integer>();
+  /**
+   * 	@param folder
+   * 	@param filter
+   * 	@return
+   */
+  public static File[] listFilesRecursively(File folder, Object filter, int levels) {
+    File						files[]   = folder.listFiles();
+    ArrayList<File>	filesList = new ArrayList<File>();
+    if(levels<1) return new File[0];
 
-        for (int value : getTargetDefinitionFile().getBlockToneValues())
-            blockToneValues.add(new Integer(value));
+    if (files != null) {
+      for (File file : files) {
+        if (file.isDirectory() && levels>0) {
+          filesList.addAll(Arrays.asList(listFilesRecursively(file, filter,levels-1)));
+        } else {
+          if ((filter == null) || // No Filter
+        		  ((filter instanceof FilenameFilter) && ((FilenameFilter)filter).accept(folder, file.getName())) || // Filename Filter
+        		  ((filter instanceof FileFilter) && ((FileFilter)filter).accept(file))// FileFilter
+        		  )
+            filesList.add(file);
 
-        for (int i = 0; i < fileCount; i++) {
-            ImageFile	thisFile = new ImageFile(fileList[i].getAbsolutePath());
-        	try {
-        		thisFile = (new ImageFileReader((ImageFile)thisFile)).getFile();
-			} catch (Exception exception) {
-				GrasppeKit.debugError("Loading Image File", exception, 2);
-			}        	
-
-            setImageFile(i,thisFile);
-
-            if (blockToneValues.contains(thisFile.getImageID())) {
-                imageFileMap.put(thisFile.getImageID(), thisFile);
-                imageToneValues.add(thisFile.getImageID());
-            } else
-                GrasppeKit.debugText("Enumerting Case Images",
-                                     "The image " + thisFile.getName() + " was not load since "
-                                     + "block value " + thisFile.getImageID()
-                                     + " was not defined in the target defnition file.", dbg);
+//        if(filter==null) {
+//            filesList.add(file);
+//        } else if (filter instanceof FilenameFilter && ((FilenameFilter) filter).accept(folder, file.getName())) {
+//            filesList.add(file);
+//        } else if (filter instanceof FileFilter && ((FileFilter) filter).accept(file)) {
+//            filesList.add(file);
+//        }
         }
-
-        if (!imageToneValues.containsAll(blockToneValues))
-            throw new FileNotFoundException(
-                "The images for one or more blocks defined in the target definition file are missing or mislabeled.\n\n"
-                + "Blocks in TDF: \t" + sortedString(blockToneValues) + "\n" + "Images in Folder: \t"
-                + sortedString(imageToneValues));
-
-        return;
-    }
-    
-    private String sortedString(HashSet<Integer> set){
-    	try {
-    		Integer[] setArray = sortedArray(set);
-    		return Arrays.toString(setArray);
-    	} catch (Exception exception) {
-    		return "";
-    	}    	
-    }
-    
-    private Integer[] sortedArray(HashSet<Integer> set){
-    	Integer[] setArray = set.toArray(new Integer[0]);
-    	
-    	try {
-    		Arrays.sort(setArray);
-    		return setArray;
-    	} catch (Exception exception) {
-    		return null;
-    	}
-    	
-//    	int[] sortingArray = new int[setArray.length];
-//    	
-//    	for (int i = 0; i < integerList.size(); i++) {
-//    		intArray[i] = integerList.get(i);
-//    	
-//    	Arrays.
+      }
     }
 
-    /**
-     */
-    public void enumerateTargetDefinitionFiles() {
-        File[]	fileList  = listFiles(TargetDefinitionFile.getFilenameFilter());
-        int		fileCount = fileList.length;
+    return filesList.toArray(new File[0]);
+  }
 
-        if (fileCount == 1)
-            setTargetDefinitionFile(new TargetDefinitionFile(fileList[0].getAbsolutePath()));
+  /**
+   * 	@param set
+   * 	@return
+   */
+  private Integer[] sortedArray(HashSet<Integer> set) {
+    Integer[]	setArray = set.toArray(new Integer[0]);
 
+    try {
+      Arrays.sort(setArray);
+
+      return setArray;
+    } catch (Exception exception) {
+      return null;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#validate()
-     */
+//  int[] sortingArray = new int[setArray.length];
+//  
+//  for (int i = 0; i < integerList.size(); i++) {
+//      intArray[i] = integerList.get(i);
+//  
+//  Arrays.
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean validate() {
+  /**
+   * 	@param set
+   * 	@return
+   */
+  private String sortedString(HashSet<Integer> set) {
+    try {
+      Integer[]	setArray = sortedArray(set);
 
-        boolean	isValid = CaseFolder.validate(this);
+      return Arrays.toString(setArray);
+    } catch (Exception exception) {
+      return "";
+    }
+  }
 
-        this.validated = true;
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#validate()
+   */
 
-        return isValid;
+  /**
+   * @return
+   */
+  @Override
+  public boolean validate() {
+
+    boolean	isValid = CaseFolder.validate(this);
+
+    this.validated = true;
+
+    return isValid;
+  }
+
+  /**
+   * @param file
+   * @return
+   */
+  public static boolean validate(File file) {
+    boolean	isDirectory = file.isDirectory();
+
+    if (!isDirectory) return false;
+
+    File[]	imageFileList = listFilesRecursively(file,
+                                                ImageFile.getFilenameFilter(),2);			// file.listFiles(ImageFile.getFilenameFilter());
+    int			imageCount  = imageFileList.length;
+    boolean	hasImages   = imageCount > 0;
+    boolean	validImages = true;
+
+    for (File imageFile : imageFileList) {
+      validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
     }
 
-    /**
-     * @param file
-     * @return
-     */
-    public static boolean validate(File file) {
-        boolean	isDirectory = file.isDirectory();
+    int			tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
+    boolean	hasTDF   = tdfCount == 1;
 
-        if (!isDirectory) return false;
+    boolean	isValid  = isDirectory && hasImages && validImages && hasTDF;
 
-        File[]	imageFileList = file.listFiles(ImageFile.getFilenameFilter());
-        int		imageCount    = imageFileList.length;
-        boolean	hasImages     = imageCount > 0;
-        boolean	validImages   = true;
+    return isValid;
 
-        for (File imageFile : imageFileList) {
-            validImages = validImages && new ImageFile(imageFile.getAbsolutePath()).validate();
-        }
+  }
 
-        int		tdfCount = file.list(TargetDefinitionFile.getFilenameFilter()).length;
-        boolean	hasTDF   = tdfCount == 1;
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#verify()
+   */
 
-        boolean	isValid  = isDirectory && hasImages && validImages && hasTDF;
+  /**
+   * Inspect image characteristics to determine if the image is what is expected
+   * @return
+   */
+  @Override
+  public boolean verify() {
+    return super.verify();
+  }
 
-        return isValid;
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#getFileFilter()
+   */
 
-    }
+  /**
+   * @return
+   */
+  public static FileFilter getFileFilter() {
+    return fileFilter;
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#verify()
-     */
+  /**
+   *  @param toneValue
+   *  @return
+   */
+  public ImageFile getImageFile(int toneValue) {
+    return imageFileMap.get(toneValue);
+  }
 
-    /**
-     * Inspect image characteristics to determine if the image is what is expected
-     * @return
-     */
-    @Override
-    public boolean verify() {
-        return super.verify();
-    }
+  /**
+   * @return the imageFiles
+   * @throws FileNotFoundException
+   */
+  public ImageFile[] getImageFiles() throws FileNotFoundException {
+    if ((imageFiles == null) || (imageFiles.length == 0)) enumerateImageFiles();
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#getFileFilter()
-     */
+    return imageFiles;
+  }
 
-    /**
-     * @return
-     */
-    public static FileFilter getFileFilter() {
-        return fileFilter;
-    }
+  /**
+   * @return the targetDefinitionFile
+   */
+  public TargetDefinitionFile getTargetDefinitionFile() {
+    if (targetDefinitionFile == null) enumerateTargetDefinitionFiles();
 
-    /**
-     *  @param toneValue
-     *  @return
-     */
-    public ImageFile getImageFile(int toneValue) {
-        return imageFileMap.get(toneValue);
-    }
+    return targetDefinitionFile;
+  }
 
-    /**
-     * @return the imageFiles
-     * @throws FileNotFoundException
-     */
-    public ImageFile[] getImageFiles() throws FileNotFoundException {
-        if ((imageFiles == null) || (imageFiles.length == 0)) enumerateImageFiles();
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#isValidated()
+   */
 
-        return imageFiles;
-    }
+  /**
+   * @return
+   */
+  @Override
+  public boolean isValidated() {
+    return super.isValidated();
+  }
 
-    /**
-     * @return the targetDefinitionFile
-     */
-    public TargetDefinitionFile getTargetDefinitionFile() {
-        if (targetDefinitionFile == null) enumerateTargetDefinitionFiles();
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#isVerified()
+   */
 
-        return targetDefinitionFile;
-    }
+  /**
+   * @return
+   */
+  @Override
+  public boolean isVerified() {
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#isValidated()
-     */
+    return super.isVerified();
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean isValidated() {
-        return super.isValidated();
-    }
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.CaseFiles.model.CaseFile#setFileFilter(java.io.FileFilter)
+   */
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#isVerified()
-     */
+  /**
+   * @param fileFilter
+   */
+  public static void setFileFilter(FileFilter fileFilter) {
+    CaseFolder.fileFilter = (fileFilter);
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean isVerified() {
+  /**
+   * 	@param i
+   * 	@param imageFile
+   */
+  public void setImageFile(int i, ImageFile imageFile) {
+    this.imageFiles[i] = imageFile;
+  }
 
-        return super.isVerified();
-    }
+  /**
+   * @param imageFiles the imageFiles to set
+   */
+  public void setImageFiles(ImageFile[] imageFiles) {
+    this.imageFiles = imageFiles;
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.CaseFiles.model.CaseFile#setFileFilter(java.io.FileFilter)
-     */
-
-    /**
-     * @param fileFilter
-     */
-    public static void setFileFilter(FileFilter fileFilter) {
-        CaseFolder.fileFilter = (fileFilter);
-    }
-
-    public void setImageFile(int i, ImageFile imageFile) {
-    	this.imageFiles[i] = imageFile;
-    }
-    /**
-     * @param imageFiles the imageFiles to set
-     */
-    public void setImageFiles(ImageFile[] imageFiles) {
-        this.imageFiles = imageFiles;
-    }
-
-    /**
-     * @param targetDefinitionFile the targetDefinitionFile to set
-     */
-    public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
-        this.targetDefinitionFile = targetDefinitionFile;
-    }
+  /**
+   * @param targetDefinitionFile the targetDefinitionFile to set
+   */
+  public void setTargetDefinitionFile(TargetDefinitionFile targetDefinitionFile) {
+    this.targetDefinitionFile = targetDefinitionFile;
+  }
 }

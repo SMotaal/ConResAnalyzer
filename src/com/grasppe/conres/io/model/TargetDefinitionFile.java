@@ -37,11 +37,11 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
             return name.toLowerCase().endsWith(".log");
         }
     };
-    protected float[][]				fiducials       = new float[4][2];
+    protected float[][]				fiducials       = null; //new float[4][2];
     protected String[]				fiducialIDs     = new String[] { "ULC", "URC", "LRC", "LLC" };
-    protected TargetMeasurements	measurements    = new TargetMeasurements();
-    protected int[]					blockToneValues = new int[0];
-    protected String				name            = "";
+    protected TargetMeasurements	measurements    = null; //new TargetMeasurements();
+    protected int[]					blockToneValues = null; //new int[0];
+    protected String				name            = null; //"";
 
     /**
      * @param pathname

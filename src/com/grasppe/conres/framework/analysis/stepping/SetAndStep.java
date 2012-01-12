@@ -80,11 +80,23 @@ public class SetAndStep extends SteppingStrategy {
 
         setFinalState(after);
     }
+    
+    public boolean checkBlock() {
+    	for (int c = finalState.getFirstColumn(); c < finalState.getRows()-1; c++)
+    		if (!checkColumn(c)) return false;
+    	return true;
+    }
 
     /**
      * 	@return
      */
     public boolean checkColumn() {
+     return checkColumn(column);
+    }
+    /**
+     * 	@return
+     */
+    public boolean checkColumn(int column) {
         int	firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
         int firstPass = findNextIs(finalState, getMinRow(), column, PASS);
         int lastPass = findNextNot(finalState, getMinRow(), column, PASS)-1;

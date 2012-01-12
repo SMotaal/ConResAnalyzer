@@ -190,6 +190,7 @@ public class ListDialog extends JDialog implements ActionListener {
         label.setFont(label.getFont().deriveFont(16.0F));
 
         label.setLabelFor(list);
+//        label.setText(labelText);
         listPane.add(label);
         listPane.add(Box.createRigidArea(new Dimension(0, 5)));
         listPane.add(listScroller);

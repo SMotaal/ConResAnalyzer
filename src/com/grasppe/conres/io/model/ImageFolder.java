@@ -106,7 +106,7 @@ public class ImageFolder extends CaseFile {
 
         if (!isDirectory) return false;
 
-        File[]	imageFileList = file.listFiles(ImageFile.getFilenameFilter());
+        File[]	imageFileList = CaseFolder.listFilesRecursively(file,ImageFile.getFilenameFilter(),2);
         int		imageCount    = imageFileList.length;
         boolean	hasImages     = imageCount > 0;
         boolean	validImages   = true;

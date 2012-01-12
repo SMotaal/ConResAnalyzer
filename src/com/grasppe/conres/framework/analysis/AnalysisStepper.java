@@ -110,6 +110,8 @@ public class AnalysisStepper extends AbstractController {
    *  @return
    */
   public boolean BlockStepKey(int keyCodeValue, int keyModifiers) {			// SteppingStrategy thisStep) {
+	  
+	  if (keyModifiers==4) return false;
 
     SmartBlockState	smartState = new SmartBlockState(getModel().getBlockState());
 

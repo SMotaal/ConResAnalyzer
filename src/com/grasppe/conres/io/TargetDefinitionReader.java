@@ -132,6 +132,23 @@ public class TargetDefinitionReader extends BufferedReader implements IGrasppeFi
 //              System.out.print(field + "\t");
 //          System.out.println();
         }
+        
+        String errorText = "";
+        
+        if (file.getFiducials()==null)
+        	errorText=GrasppeKit.cat(errorText,"fiducials");
+
+        if (file.getBlockToneValues()==null || file.getBlockToneValues().length==0)
+        	errorText=GrasppeKit.cat(errorText,"block tone values");
+
+        if (file.getMeasurements()==null)
+        	errorText=GrasppeKit.cat(errorText,"measurements");
+        
+        if (file.getName()==null)
+        	errorText=GrasppeKit.cat(errorText,"name");
+        
+        if (!errorText.isEmpty())
+        	throw new java.io.IOException("Could not parse " + errorText + " from TDF!");
     }
 
     /**

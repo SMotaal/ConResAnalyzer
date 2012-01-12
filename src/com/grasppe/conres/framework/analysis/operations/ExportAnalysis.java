@@ -61,6 +61,7 @@ public class ExportAnalysis extends AnalysisCommand {
         this.controller   = controller;
         super.mnemonicKey = mnemonicKey;
         super.description = description;
+//        controller.getModel().attachObserver(this);
         update();
     }
 
@@ -74,8 +75,11 @@ public class ExportAnalysis extends AnalysisCommand {
 
         try {
 	        String filename = controller.getTargetManager().generateFilename("a.csv","Data");
-	        controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
-//	        IJ.showMessage("Analysis grid exported to " + FilenameUtils.getName(filename) + ".");
+	        if (!controller.getAnalysisStepper().getModel().getBlockState().isValid() && !IJ.showMessageWithCancel(name, "Analysis incomplete.\n\n" +
+	        		"Do you want to export the block?"))
+	        	return true;
+	        
+        	controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
 	        new FloatingAlert("Export Complete!").flashView(500);
         } catch (Exception exception) {
 //        	exception.printStackTrace();

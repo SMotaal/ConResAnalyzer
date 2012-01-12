@@ -560,7 +560,7 @@ public class CornerSelectorView extends AbstractView
 
         if (keyEvent.isAltDown()) {		// return false;
             getModel().getPatchSetROI().nudgeCorner(keyCode);
-        } else if (keyEvent.isShiftDown()) {
+        } else { //if (keyEvent.isShiftDown()) {
             Rectangle	bounds = getModel().getPatchSetROI().getBounds();
 
             switch (keyCode) {
@@ -581,8 +581,9 @@ public class CornerSelectorView extends AbstractView
                 getModel().getPatchSetROI().setLocation(bounds.x + offset, bounds.y);
                 break;
             }
-        } else
-            return false;
+        }
+//        } else
+//            return false;
 
         setOverlayROI(getModel().getPatchSetROI());
         notifyObservers();

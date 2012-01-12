@@ -12,6 +12,7 @@ import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -78,6 +79,15 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         HashMap<String, ConResBlock>	targetBlockMap    = new HashMap<String, ConResBlock>();
 
         String							listItems[] = new String[blocks.length];
+        
+        String listLabel = "<html>Select Block:</html>";
+        
+        boolean validTDF = getModel().getController().getCaseManager().getModel().getCurrentCase().caseFolder.isTdfIndexValid();
+        
+        if (!validTDF)
+        	listLabel =  "<html>Select Block:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+        			"<font color=red>Check TDF Index!</font>" +
+        			"</html>";
 
         for (int i = 0; i < blocks.length; i++) {		// ConResBlock block : blocks) {
             ConResBlock	block = blocks[i];
@@ -102,13 +112,19 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
 //        controller.getView().setFrameMenu(frame);
 
         // Ref: http://www.java2s.com/Code/Java/Swing-Components/Usethismodaldialogtolettheuserchooseonestringfromalonglist.htm
-        String	selectedItem = ListDialog.showDialog(frame, frame, "Available Blocks:",
+        String	selectedItem = ListDialog.showDialog(frame, frame, listLabel,
                                   "Block Chooser", listItems, activeItem, "   " + listItems[0]);
 
+        
         if (!selectedItem.isEmpty()) {
         	ConResBlock	selectedBlock = targetBlockMap.get(selectedItem);
         	getController().setActiveBlock(selectedBlock);
+        } else {
+	        if (!validTDF)
+	        	new FloatingAlert("<html><p>TDF block index out of sync!</p>" +
+	        			"<p>Please add the missing block values to the NLevels sections of the TDF file.</p></html>").flashView(1000);
         }
+        
 
         return true;
     }

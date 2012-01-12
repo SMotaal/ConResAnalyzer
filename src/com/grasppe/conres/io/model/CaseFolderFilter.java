@@ -84,8 +84,8 @@ public class CaseFolderFilter extends WildcardFileFilter {
 
         if (!file.isDirectory()) file = file.getParentFile();
 
-        File[]	imageFiles = file.listFiles(ImageFile.fileFilter);
-        File[]	tdfFiles   = file.listFiles(TargetDefinitionFile.fileFilter);
+        File[]	imageFiles = CaseFolder.listFilesRecursively(file,ImageFile.fileFilter,2);
+        File[]	tdfFiles   = CaseFolder.listFilesRecursively(file,TargetDefinitionFile.fileFilter,2);
 
         // TODO: Check TargetDefinitionFile
         isAccepted &= tdfFiles.length == 1;

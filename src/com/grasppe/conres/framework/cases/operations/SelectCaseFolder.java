@@ -8,6 +8,8 @@
 
 package com.grasppe.conres.framework.cases.operations;
 
+import javax.swing.JFileChooser;
+
 import com.grasppe.lure.framework.GrasppeKit.FileSelectionMode;
 
 import ij.IJ;
@@ -27,6 +29,7 @@ public class SelectCaseFolder extends FileChooserFunction {
      */
     public SelectCaseFolder() {
         super(name);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     }
 
     /**

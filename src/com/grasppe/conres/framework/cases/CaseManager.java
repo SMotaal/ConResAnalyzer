@@ -97,19 +97,20 @@ public class CaseManager extends AbstractController implements ActionListener {
      *  @param newCase
      * @throws Exception 
      */
-    public boolean verifyCaseFolder(CaseFolder caseFolder) throws Exception {
+    public static boolean verifyCaseFolder(CaseFolder caseFolder) throws Exception {
     	
 //    	CaseFolder	caseFolder = new CaseFolder(folder.getAbsolutePath());
     	
     	try {
     		TargetDefinitionFile targetDefinitionFile = caseFolder.getTargetDefinitionFile();
-    		getTargetManager().loadTargetDefinitionFile(targetDefinitionFile);
+    		TargetManager.loadTargetDefinitionFile(targetDefinitionFile);
     		ImageFile[]	imageFiles = caseFolder.getImageFiles();
+    		if(imageFiles.length==0) throw new IOException("Folder does not contain any images");
+    		return true;
     	} catch (IOException exception) {
     		throw exception;
 //    		return false;
     	}
-    	return true;
     }
     /**
      *  @param newCase

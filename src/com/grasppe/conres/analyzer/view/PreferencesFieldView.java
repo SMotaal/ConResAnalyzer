@@ -12,6 +12,7 @@
 package com.grasppe.conres.analyzer.view;
 
 import com.grasppe.conres.analyzer.PreferencesManager;
+import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.Preferences.Tags;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -70,23 +71,40 @@ private Object storedValue = null;
    *    @return
    */
   public static PreferencesFieldView buildFieldView(Tags preference, PreferencesManager manager) {
-    return new StringFieldView(preference, manager);
+	  
+	  if (preference.getFieldClass() == Preferences.COLOR_FIELD)
+		  return new StringFieldView(preference, manager);
+	  
+	  if (preference.getFieldClass() == Preferences.KEYCODE_FIELD)
+		  return new KeyCodeFieldView(preference, manager);
+	  
+	  if (preference.getFieldClass() == Preferences.COMMAND_KEYCODE_FIELD)
+		  return new CommandKeyCodeFieldView(preference, manager);	  
+	  
+	  if (preference.getFieldClass() == Preferences.VALUE_FIELD)
+		  return new StringFieldView(preference, manager);
+	  
+	  return null;
   }
 
   /**
    */
   protected void createView() {
+	  createLabel();
+  }
+  
+  protected void createLabel() {
+	    if (label != null) return;
+	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	    setMinimumSize(new Dimension(200, 50));
+	    setAlignmentY(CENTER_ALIGNMENT);
 
+	    label = new JLabel(getPreference().key() + ":");
+
+	    add(label);	  
 //  if label
-    if (label != null) return;
-    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-    setMinimumSize(new Dimension(200, 50));
-    setAlignmentY(CENTER_ALIGNMENT);
-
-    label = new JLabel(getPreference().key() + ":");
-
-    add(label);
-
+	    
+	    
 //  if (label.getWidth()+15 > maximumLabelWidth)
 //    maximumLabelWidth =
 ////  label.setPreferredSize(label.getWidth()+)

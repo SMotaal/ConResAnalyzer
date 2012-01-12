@@ -503,4 +503,8 @@ public class BlockState implements ISteppingBlockState, Cloneable {
 
         setValue(intValue, row, column);
     }
+    
+    public boolean isValid() {
+    	return new SetAndStep(this, 0).checkBlock();
+    }
 }

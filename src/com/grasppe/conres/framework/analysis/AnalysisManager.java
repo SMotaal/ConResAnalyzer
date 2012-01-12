@@ -39,8 +39,10 @@ public class AnalysisManager extends AbstractController {
 	 * @return the analysisStepper
 	 */
 	public AnalysisStepper getAnalysisStepper() {
-		if (analysisStepper==null)
+		if (analysisStepper==null) {
 			analysisStepper = new AnalysisStepper(this);
+			analysisStepper.getModel().attachObserver(getCommand("ExportAnalysis"));
+		}
 		return analysisStepper;
 	}
 
