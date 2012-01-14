@@ -35,6 +35,8 @@ import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 
+import ij.IJ;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Graphics;
@@ -110,8 +112,8 @@ public class AnalysisStepper extends AbstractController {
    *  @return
    */
   public boolean BlockStepKey(int keyCodeValue, int keyModifiers) {			// SteppingStrategy thisStep) {
-	  
-	  if (keyModifiers==4) return false;
+
+    if (keyModifiers == 4) return false;
 
     SmartBlockState	smartState = new SmartBlockState(getModel().getBlockState());
 
@@ -237,10 +239,11 @@ public class AnalysisStepper extends AbstractController {
         getModel().getHistory().add(currentState);
       }
 
-      if (thisStep != null)			// thisStep = new StepNext(smartState);
+      if (thisStep != null) {			// thisStep = new StepNext(smartState);
         thisStep.execute();
-
-      setNewBlockState(thisStep.getFinalState());
+        setNewBlockState(thisStep.getFinalState());
+        getModel().setModified(true);
+      }
 
     } catch (Exception exception) {
       GrasppeKit.debugError("Handling Stepper Key Event", exception, 2);
@@ -263,6 +266,24 @@ public class AnalysisStepper extends AbstractController {
     }
   }
 
+  /*
+   *  (non-Javadoc)
+   *   @see com.grasppe.lure.components.AbstractController#canQuit()
+   */
+
+  /**
+   * 	@return
+   */
+  @Override
+  public boolean canQuit() {
+    boolean	modified = getModel().isModified();
+
+    if (!modified || IJ.showMessageWithCancel("Quit", "Do you really want to quit before exporting the current analysis?"))
+      return true;
+
+    return false;
+  }
+
   /**
    */
   public void finalizeLoading() {
@@ -274,7 +295,7 @@ public class AnalysisStepper extends AbstractController {
 
     setScratchEnabled(true);
 
-  updatePatchPreviews();
+    updatePatchPreviews();
     getModel().notifyObservers();
   }
 
@@ -431,34 +452,15 @@ public class AnalysisStepper extends AbstractController {
 
     if (getAnalyzer().getCaseManager().getModel().hasCurrentCase() == false) getStepperView().setVisible(false);
   }
-  
-  public void updatePreferences() {
-	  getModel().setAssumeFailPatchColor((int[])Preferences.get(Tags.ASSUMED_FAIL_COLOR));
-	  getModel().setFailPatchColor((int[])Preferences.get(Tags.FAIL_COLOR));
-	  getModel().setMarginalPatchColor((int[])Preferences.get(Tags.MARGINAL_COLOR));
-	  getModel().setPassPatchColor((int[])Preferences.get(Tags.PASS_COLOR));
-	  getModel().setAssumePassPatchColor((int[])Preferences.get(Tags.ASSUMED_PASS_COLOR));
-	  getModel().setVoidPatchColor((int[])Preferences.get(Tags.VOID_COLOR));
-	  getModel().setClearPatchColor((int[])Preferences.get(Tags.CLEAR_COLOR));
-	  getModel().setCursorColor((int[])Preferences.get(Tags.CURSOR_COLOR));
-	  BlockGrid.setAssumeFailPatchColor(getModel().getAssumeFailPatchColor());
-	  BlockGrid.setFailPatchColor(getModel().getFailPatchColor());
-	  BlockGrid.setMarginalPatchColor(getModel().getMarginalPatchColor());
-	  BlockGrid.setPassPatchColor(getModel().getPassPatchColor());
-	  BlockGrid.setAssumePassPatchColor(getModel().getAssumePassPatchColor());
-	  BlockGrid.setVoidPatchColor(getModel().getVoidPatchColor());
-	  BlockGrid.setClearPatchColor(getModel().getClearPatchColor());
-	  BlockGrid.setBlinkerColor(getModel().getCursorColor());
-	  return;
-  }
 
   /**
    */
   public void updateActiveBlock() {
 
     if (loadBlockState != null) {
-    	updatePreferences();
+      updatePreferences();
       finalizeLoading();
+      getModel().setModified(false);
 
       return;
     }
@@ -475,9 +477,9 @@ public class AnalysisStepper extends AbstractController {
       return;
     }
 
-
     if (activeBlock == lastBlock) {
       updatePatchPreviews();
+
       return;
     }
 
@@ -512,8 +514,8 @@ public class AnalysisStepper extends AbstractController {
     setScratchEnabled(false);
 
     loadBlockState = blockState;
-    lastBlock = activeBlock;
-    
+    lastBlock      = activeBlock;
+
   }
 
   /**
@@ -556,6 +558,29 @@ public class AnalysisStepper extends AbstractController {
     }
 
     pushUpdates();
+  }
+
+  /**
+   */
+  public void updatePreferences() {
+    getModel().setAssumeFailPatchColor((int[])Preferences.get(Tags.ASSUMED_FAIL_COLOR));
+    getModel().setFailPatchColor((int[])Preferences.get(Tags.FAIL_COLOR));
+    getModel().setMarginalPatchColor((int[])Preferences.get(Tags.MARGINAL_COLOR));
+    getModel().setPassPatchColor((int[])Preferences.get(Tags.PASS_COLOR));
+    getModel().setAssumePassPatchColor((int[])Preferences.get(Tags.ASSUMED_PASS_COLOR));
+    getModel().setVoidPatchColor((int[])Preferences.get(Tags.VOID_COLOR));
+    getModel().setClearPatchColor((int[])Preferences.get(Tags.CLEAR_COLOR));
+    getModel().setCursorColor((int[])Preferences.get(Tags.CURSOR_COLOR));
+    BlockGrid.setAssumeFailPatchColor(getModel().getAssumeFailPatchColor());
+    BlockGrid.setFailPatchColor(getModel().getFailPatchColor());
+    BlockGrid.setMarginalPatchColor(getModel().getMarginalPatchColor());
+    BlockGrid.setPassPatchColor(getModel().getPassPatchColor());
+    BlockGrid.setAssumePassPatchColor(getModel().getAssumePassPatchColor());
+    BlockGrid.setVoidPatchColor(getModel().getVoidPatchColor());
+    BlockGrid.setClearPatchColor(getModel().getClearPatchColor());
+    BlockGrid.setBlinkerColor(getModel().getCursorColor());
+
+    return;
   }
 
   /**

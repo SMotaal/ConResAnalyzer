@@ -81,6 +81,7 @@ public class ExportAnalysis extends AnalysisCommand {
 	        
         	controller.getAnalysisStepper().getModel().getBlockState().writeFile(filename);
 	        new FloatingAlert("Export Complete!").flashView(500);
+	        controller.getAnalysisStepper().getModel().setModified(false);
         } catch (Exception exception) {
 //        	exception.printStackTrace();
         	Toolkit.getDefaultToolkit().beep();

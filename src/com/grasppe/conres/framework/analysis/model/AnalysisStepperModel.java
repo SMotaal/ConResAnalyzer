@@ -34,6 +34,20 @@ import java.util.List;
 public class AnalysisStepperModel extends AbstractModel {
 
     /**
+	 * @return the modified
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+	/**
+	 * @param modified the modified to set
+	 */
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
+	/**
 	 * @return the cursorColor
 	 */
 	public int[] getCursorColor() {
@@ -174,6 +188,8 @@ public class AnalysisStepperModel extends AbstractModel {
     private int[] assumePassPatchColor = null;
     private int[] clearPatchColor = null;
     private int[] cursorColor = null;
+    
+    private boolean modified = false;
 
     /**
      * Constructs a new model object with no predefined controller.

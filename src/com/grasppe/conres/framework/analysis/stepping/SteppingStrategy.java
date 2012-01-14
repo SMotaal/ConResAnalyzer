@@ -168,6 +168,9 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
                 if ((testValue == null) || (blockState.getDesignation(r, column) != testValue))
                     blockState.setValue(newValue, r, column);
             }
+        } else if (startRow == endRow) {
+            if ((testValue == null) || (blockState.getDesignation(endRow, column) != testValue))
+                blockState.setValue(newValue, endRow, column);        	
         }
 
         return blockState;
@@ -205,7 +208,7 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
         while ((row <= maxRow) && (blockState.getDesignation(row, column) == designation))
             row++;
 
-        return (row > maxRow) ? -1
+        return (row > maxRow) ? -1 
                               : row;
     }
 

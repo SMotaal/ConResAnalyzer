@@ -30,6 +30,15 @@ import java.util.LinkedHashMap;
  *     @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class AbstractController extends AbstractComponent implements Observer, ActionListener {
+	  
+    public boolean canQuit() {
+    	return true;
+    }
+    
+    public void attemptQuit() {
+//    	if (!canQuit()) return;
+//    	notify();
+    }
 
     /* (non-Javadoc)
 	 * @see java.lang.Object#finalize()
@@ -39,7 +48,6 @@ public class AbstractController extends AbstractComponent implements Observer, A
 		if(commands!=null && commands.size()>0) {
 			for (String key : commands.keySet()) {
 				commands.get(key).finalize();
-//				commands.remove(key);
 			}
 		}
 		

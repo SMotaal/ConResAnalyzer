@@ -35,222 +35,255 @@ import javax.swing.JFrame;
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-	/**
-	 * @return the preferencesManager
-	 */
-	public PreferencesManager getPreferencesManager() {
-		return preferencesManager;
-	}
+  /** Field description */
+  public static final String			BUILD = "0.2a-02";
+  protected CaseManager						caseManager;
+  protected TargetManager					targetManager;
+  protected AnalysisManager				analysisManager;
+  protected AbstractController[]	managers;			// = new AbstractController[]{caseManager, targetManager,analysisManager};
+  protected ConResAnalyzerView		analyzerView;
+  protected PreferencesManager		preferencesManager;
 
-	/**
-	 * @param preferencesManager the preferencesManager to set
-	 */
-	public void setPreferencesManager(PreferencesManager preferencesManager) {
-		this.preferencesManager = preferencesManager;
-	}
+  // protected LinkedHashMap<String, AbstractCommand>  commands;
 
-	public static final String	BUILD = "0.2a-01";
-    protected CaseManager			caseManager;
-    protected TargetManager			targetManager;
-    protected AnalysisManager		analysisManager;
-    protected AbstractController[]	managers;		// = new AbstractController[]{caseManager, targetManager,analysisManager};
-    protected ConResAnalyzerView	analyzerView;
-    protected PreferencesManager preferencesManager;
+  /**
+   * Constructs and attaches a new controller and a new model.
+   */
+  public ConResAnalyzer() {
+    this(new ConResAnalyzerModel());
+    analyzerView = new ConResAnalyzerView(this);
+    attachView(analyzerView);
+    updateCommands();
+    setCaseManager(new CaseManager(this));
+    setTargetManager(new TargetManager(this));
+    setAnalysisManager(new AnalysisManager(this));
+    setPreferencesManager(new PreferencesManager(this));
+    managers = new AbstractController[] { caseManager, targetManager, analysisManager, preferencesManager };
+    analyzerView.createView();
+  }
 
-    // protected LinkedHashMap<String, AbstractCommand>  commands;
+  /**
+   * Constructs a new controller and attaches it to the unattached model.
+   * @param model
+   */
+  private ConResAnalyzer(ConResAnalyzerModel model) {
+    super(model);
+  }
 
-    /**
-     * Constructs and attaches a new controller and a new model.
-     */
-    public ConResAnalyzer() {
-        this(new ConResAnalyzerModel());
-        analyzerView = new ConResAnalyzerView(this);
-        attachView(analyzerView);
-        updateCommands();
-        setCaseManager(new CaseManager(this));
-        setTargetManager(new TargetManager(this));
-        setAnalysisManager(new AnalysisManager(this));
-        setPreferencesManager(new PreferencesManager(this));
-        managers = new AbstractController[] { caseManager, targetManager, analysisManager, preferencesManager };
-        analyzerView.createView();
-    }
-
-    /**
-     * Constructs a new controller and attaches it to the unattached model.
-     * @param model
-     */
-    private ConResAnalyzer(ConResAnalyzerModel model) {
-        super(model);
-    }
-
-    /**
-     */
-    public void backgroundCurrentCase() {
-        try {
-            for (AbstractController manager : managers) {
-                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                    try {
-                        ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
-                    } catch (Exception exception) {
-                        GrasppeKit.debugError("Backgrounding Case", exception, 8);
-                    }
-                }
-            }
-        } catch (Exception exception) {
+  /**
+   */
+  public void backgroundCurrentCase() {
+    try {
+      for (AbstractController manager : managers) {
+        if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+          try {
+            ((IAuxiliaryCaseManager)manager).backgroundCurrentCase();
+          } catch (Exception exception) {
             GrasppeKit.debugError("Backgrounding Case", exception, 8);
+          }
         }
+      }
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Backgrounding Case", exception, 8);
+    }
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractController#canQuit()
+   */
+
+  /**
+   * 	@return
+   */
+  @Override
+  public boolean canQuit() {
+    return canQuitManagers();
+  }
+
+  /**
+   * 	@return
+   */
+  public boolean canQuitManagers() {
+    boolean	canQuit = true;
+
+    for (AbstractController manager : managers) {
+      manager.attemptQuit();
+
+//    try {
+//        manager.wait();
+//    } catch (InterruptedException exception) {
+//        return false;
+//    }
+      if (!manager.canQuit()) canQuit = false;
     }
 
-    /**
-     * Create and populate all commands from scratch.
-     */
-    @Override
-    public void createCommands() {
+    return canQuit;
+  }
 
-        putCommand(new Quit(this));
-    }
+  /**
+   * Create and populate all commands from scratch.
+   */
+  @Override
+  public void createCommands() {
 
-    /**
-     */
-    public void discardBackgroundCase() {
-        try {
-            for (AbstractController manager : managers) {
-                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                    try {
-                        ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
-                    } catch (Exception exception) {
-                        GrasppeKit.debugError("Discarding Case", exception, 8);
-                    }
-                }
-            }
-        } catch (Exception exception) {
+    putCommand(new Quit(this));
+  }
+
+  /**
+   */
+  public void discardBackgroundCase() {
+    try {
+      for (AbstractController manager : managers) {
+        if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+          try {
+            ((IAuxiliaryCaseManager)manager).discardBackgroundCase();
+          } catch (Exception exception) {
             GrasppeKit.debugError("Discarding Case", exception, 8);
+          }
         }
+      }
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Discarding Case", exception, 8);
     }
+  }
 
-    /**
-     */
-    public void forceCommandUpdates() {
-        Iterator<AbstractCommand>	commandIterator = getCommands().values().iterator();
+  /**
+   */
+  public void forceCommandUpdates() {
+    Iterator<AbstractCommand>	commandIterator = getCommands().values().iterator();
 
-        while (commandIterator.hasNext())
-            commandIterator.next().update();
-    }
+    while (commandIterator.hasNext())
+      commandIterator.next().update();
+  }
 
-    /**
-     */
-    public void restoreBackgroundCase() {
-        try {
-            for (AbstractController manager : managers) {
-                if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
-                    try {
-                        ((IAuxiliaryCaseManager)manager).restoreBackgroundCase();
-                    } catch (Exception exception) {
-                        GrasppeKit.debugError("Restoring Case", exception, 8);
-                    }
-                }
-            }
-        } catch (Exception exception) {
+  /**
+   */
+  public void restoreBackgroundCase() {
+    try {
+      for (AbstractController manager : managers) {
+        if ((manager != null) && (manager instanceof IAuxiliaryCaseManager)) {
+          try {
+            ((IAuxiliaryCaseManager)manager).restoreBackgroundCase();
+          } catch (Exception exception) {
             GrasppeKit.debugError("Restoring Case", exception, 8);
+          }
         }
+      }
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Restoring Case", exception, 8);
     }
+  }
 
-    /**
-     * @return the analysisManager
-     */
-    public AnalysisManager getAnalysisManager() {
-        return analysisManager;
-    }
+  /**
+   * @return the analysisManager
+   */
+  public AnalysisManager getAnalysisManager() {
+    return analysisManager;
+  }
 
-    /**
-     * @return the caseManager
-     */
-    public CaseManager getCaseManager() {
-        return caseManager;
-    }
+  /**
+   * @return the caseManager
+   */
+  public CaseManager getCaseManager() {
+    return caseManager;
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    public LinkedHashMap<String, AbstractCommand> getCommands() {
-        LinkedHashMap<String, AbstractCommand>	allCommands = new LinkedHashMap<String,
-                                                                 AbstractCommand>();
+  /**
+   * @return
+   */
+  @Override
+  public LinkedHashMap<String, AbstractCommand> getCommands() {
+    LinkedHashMap<String, AbstractCommand>	allCommands = new LinkedHashMap<String, AbstractCommand>();
 
-        for (AbstractController manager : managers)
-            if (manager != null) allCommands.putAll(appendCommands(manager));
+    for (AbstractController manager : managers)
+      if (manager != null) allCommands.putAll(appendCommands(manager));
 
-        return allCommands;
-    }
+    return allCommands;
+  }
 
-    /**
-     * 	@return
-     */
-    public JFrame getMainFrame() {
-        return getView().getFrame();
-    }
+  /**
+   *  @return
+   */
+  public JFrame getMainFrame() {
+    return getView().getFrame();
+  }
 
-    /**
-     * @return the managers
-     */
-    public AbstractController[] getManagers() {
-        return managers;
-    }
+  /**
+   * @return the managers
+   */
+  public AbstractController[] getManagers() {
+    return managers;
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    public ConResAnalyzerModel getModel() {
-        return (ConResAnalyzerModel)super.getModel();
-    }
+  /**
+   * @return
+   */
+  @Override
+  public ConResAnalyzerModel getModel() {
+    return (ConResAnalyzerModel)super.getModel();
+  }
 
-    /**
-     * @return the targetManager
-     */
-    public TargetManager getTargetManager() {
-        return targetManager;
-    }
+  /**
+   * @return the preferencesManager
+   */
+  public PreferencesManager getPreferencesManager() {
+    return preferencesManager;
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractController#getView()
-     */
+  /**
+   * @return the targetManager
+   */
+  public TargetManager getTargetManager() {
+    return targetManager;
+  }
 
-    /**
-     * 	@return
-     */
-    @Override
-    public ConResAnalyzerView getView() {
-        return analyzerView;
-    }
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractController#getView()
+   */
 
-    /**
-     * @param analysisManager the analysisManager to set
-     */
-    public void setAnalysisManager(AnalysisManager analysisManager) {
-        this.analysisManager = analysisManager;
-    }
+  /**
+   *  @return
+   */
+  @Override
+  public ConResAnalyzerView getView() {
+    return analyzerView;
+  }
 
-    /**
-     * @param caseManager the caseManager to set
-     */
-    public void setCaseManager(CaseManager caseManager) {
-        this.caseManager = caseManager;
-    }
+  /**
+   * @param analysisManager the analysisManager to set
+   */
+  public void setAnalysisManager(AnalysisManager analysisManager) {
+    this.analysisManager = analysisManager;
+  }
 
-    /**
-     * @param newModel
-     * @throws IllegalAccessException
-     */
-    public void setModel(ConResAnalyzerModel newModel) throws IllegalAccessException {
-        super.setModel(newModel);
-    }
+  /**
+   * @param caseManager the caseManager to set
+   */
+  public void setCaseManager(CaseManager caseManager) {
+    this.caseManager = caseManager;
+  }
 
-    /**
-     * @param targetManager the targetManager to set
-     */
-    public void setTargetManager(TargetManager targetManager) {
-        this.targetManager = targetManager;
-    }
+  /**
+   * @param newModel
+   * @throws IllegalAccessException
+   */
+  public void setModel(ConResAnalyzerModel newModel) throws IllegalAccessException {
+    super.setModel(newModel);
+  }
+
+  /**
+   * @param preferencesManager the preferencesManager to set
+   */
+  public void setPreferencesManager(PreferencesManager preferencesManager) {
+    this.preferencesManager = preferencesManager;
+  }
+
+  /**
+   * @param targetManager the targetManager to set
+   */
+  public void setTargetManager(TargetManager targetManager) {
+    this.targetManager = targetManager;
+  }
 }

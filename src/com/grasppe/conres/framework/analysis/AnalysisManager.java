@@ -21,6 +21,7 @@ import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -35,7 +36,15 @@ import java.util.LinkedHashMap;
  */
 public class AnalysisManager extends AbstractController {
 
-    /**
+    /* (non-Javadoc)
+	 * @see com.grasppe.lure.components.AbstractController#canQuit()
+	 */
+	@Override
+	public boolean canQuit() {
+		return getAnalysisStepper().canQuit();
+	}
+
+	/**
 	 * @return the analysisStepper
 	 */
 	public AnalysisStepper getAnalysisStepper() {
