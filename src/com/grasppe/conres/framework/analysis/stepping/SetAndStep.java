@@ -217,15 +217,21 @@ public class SetAndStep extends SteppingStrategy {
   public boolean execute() {
 
     PatchDesignation intended = PatchDesignation.designation(finalValue);
+    
+    boolean moveUp=false;
+    boolean moveDown=false;
 
     try {
       if (intended == PASS) {
+    	  moveDown=finalState.getValue(row, column)==ASSUMED_PASS.value();
         assumePass();
         finalState.setValue(ASSUMED_PASS, row, column);			// Judged Pass
       } else if (intended == FAIL) {
+    	  moveUp=finalState.getValue(row, column)==ASSUMED_FAIL.value();
         assumeFail();
         finalState.setValue(ASSUMED_FAIL, row, column);			// Judged Fail
       } else if (intended == MARGINAL) {
+    	  moveDown=finalState.getValue(row, column)==ASSUMED_MARGINAL.value();
         if (finalState.getPatchValue(row, column) != ASSUMED_MARGINAL) assumeMarginal();	//finalState.getPatchValue(row, column) != MARGINAL
         finalState.setValue(ASSUMED_MARGINAL, row, column);
       } else if (intended == CLEAR) {
@@ -237,8 +243,14 @@ public class SetAndStep extends SteppingStrategy {
     }
 
     try {
-      if (checkColumn()) setFinalState(new StepOver(finalState).executedState());
-      else setFinalState(new StepNext(finalState).executedState());
+    	if(moveDown)
+    		setFinalState(new StepDown(finalState).executedState());
+    	else if (moveUp)
+    		setFinalState(new StepUp(finalState).executedState());
+    	else { 
+    		if (checkColumn()) setFinalState(new StepOver(finalState).executedState());
+    		else setFinalState(new StepNext(finalState).executedState());
+    }
     } catch (Exception exception) {
       GrasppeKit.debugError("Stepping Next", exception, 2);
     }

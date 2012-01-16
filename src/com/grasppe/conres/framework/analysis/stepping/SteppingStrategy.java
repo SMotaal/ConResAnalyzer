@@ -301,10 +301,14 @@ public abstract class SteppingStrategy implements ISteppingStrategy {
 
     // Otherwise find Good boundary and move one above
 //  int firstNotPass = findNextNot(finalState, getMinRow(), column, PASS);
-    int lastPass = findPastIs(finalState, getMaxRow(), column, PASS);
+    int lastPass = findPastIs(finalState, getMaxRow(), column, ASSUMED_PASS);
+    
+    if (lastPass==-1) lastPass = findPastIs(finalState, getMaxRow(), column, PASS);
 
 //  int   lastMarginal = findPastIs(finalState, getMaxRow(), column, MARGINAL);
-    int firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
+    int firstMarginal = findNextIs(finalState, getMinRow(), column, ASSUMED_MARGINAL);
+    
+    if (firstMarginal ==-1) firstMarginal = findNextIs(finalState, getMinRow(), column, MARGINAL);
 
     if (lastPass > 0) return moveTo(lastPass - 1, column + 1);		// else if (lastIsPass == 0) return moveTo(lastIsPass, column + 1);
 

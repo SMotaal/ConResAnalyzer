@@ -51,6 +51,7 @@ import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
@@ -130,11 +131,13 @@ public class AnalysisStepper extends AbstractController {
 
 //  boolean                       undoStep        = false;
 //  boolean                       redoStep        = false;
-    boolean setStep         = false;
+    boolean setStep           = false;
 
-    double  scaleMultiplier = 1.15;
+    double  scaleMultiplier   = 1.15;
 
-    KeyCode keyCode         = KeyCode.get(keyCodeValue);
+    KeyCode keyCode           = KeyCode.get(keyCodeValue);
+
+    boolean forcedKeyModifier = keyModifiers == InputEvent.SHIFT_MASK;
 
     switch (keyCode) {
 
@@ -228,17 +231,21 @@ public class AnalysisStepper extends AbstractController {
 //     break;
 
      default :
-       if ((keyModifiers == 0) || (keyModifiers == 8)) {
+       if ((keyModifiers == 0) || forcedKeyModifier) {		// java.awt.event.InputEvent.SHIFT_MASK (1)
          int setValue = 0;
 
          if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.PASS_KEYCODE)) {
-           thisStep = createSettingStrategy(smartState, BlockState.PASS);
+           if (forcedKeyModifier) thisStep = new ForceSet(smartState, BlockState.PASS);
+           else thisStep = createSettingStrategy(smartState, BlockState.PASS);
          } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.FAIL_KEYCODE)) {
-           thisStep = createSettingStrategy(smartState, BlockState.FAIL);
+           if (forcedKeyModifier) thisStep = new ForceSet(smartState, BlockState.FAIL);
+           else thisStep = createSettingStrategy(smartState, BlockState.FAIL);
          } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.MARGINAL_KEYCODE)) {
-           thisStep = createSettingStrategy(smartState, BlockState.MARGINAL);
+           if (forcedKeyModifier) thisStep = new ForceSet(smartState, BlockState.MARGINAL);
+           else thisStep = createSettingStrategy(smartState, BlockState.MARGINAL);
          } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.CLEAR_COLUMN_KEYCODE)) {
-           thisStep = new SetAndStep(smartState, BlockState.CLEAR);
+           if (forcedKeyModifier) thisStep = new ForceSet(smartState, BlockState.CLEAR);
+           else thisStep = new SetAndStep(smartState, BlockState.CLEAR);
          } else
            return false;
 
