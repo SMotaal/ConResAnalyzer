@@ -15,18 +15,18 @@ package com.grasppe.conres.framework.analysis.stepping;
  */
 public interface ISteppingStrategy {
 
-    /**
-     * @return
-     */
-    boolean execute();
+  /**
+   * @return
+   */
+  boolean execute();
 
-    /**
-     * @return
-     */
-    boolean undo();
+  /**
+   * @return
+   */
+  boolean undo();
 
-    /**
-     * @return
-     */
-    boolean isValid();
+  /**
+   * @return
+   */
+  boolean isValid();
 }

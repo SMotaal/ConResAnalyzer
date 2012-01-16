@@ -26,28 +26,28 @@ import java.io.IOException;
  */
 public class BlockGrid {
 
-  protected static PatchDesignation	ASSUMED_FAIL     = PatchDesignation.ASSUMED_FAIL;
-  protected static PatchDesignation	ASSUMED_MARGINAL = PatchDesignation.ASSUMED_MARGINAL;
-  protected static PatchDesignation	ASSUMED_PASS     = PatchDesignation.ASSUMED_PASS;
-  protected static PatchDesignation	CLEAR            = PatchDesignation.CLEAR;
-  protected static PatchDesignation	FAIL             = PatchDesignation.FAIL;
-  protected static PatchDesignation	MARGINAL         = PatchDesignation.MARGINAL;
-  protected static PatchDesignation	PASS             = PatchDesignation.PASS;
-  protected static PatchDesignation	VOID             = PatchDesignation.VOID;
+  protected static PatchDesignation ASSUMED_FAIL     = PatchDesignation.ASSUMED_FAIL;
+  protected static PatchDesignation ASSUMED_MARGINAL = PatchDesignation.ASSUMED_MARGINAL;
+  protected static PatchDesignation ASSUMED_PASS     = PatchDesignation.ASSUMED_PASS;
+  protected static PatchDesignation CLEAR            = PatchDesignation.CLEAR;
+  protected static PatchDesignation FAIL             = PatchDesignation.FAIL;
+  protected static PatchDesignation MARGINAL         = PatchDesignation.MARGINAL;
+  protected static PatchDesignation PASS             = PatchDesignation.PASS;
+  protected static PatchDesignation VOID             = PatchDesignation.VOID;
 
   /** Field description */
-  public static boolean		blinkValue           = false;
-  protected static int[]	voidPatchColor       = { 63, 63, 63 };
-  protected static int[]	assumeFailPatchColor = { 128, 0, 0 };
-  protected static int[]	failPatchColor       = { 228, 0, 0 };
-  protected static int[]	marginalPatchColor   = { 255, 255, 0 };
-  protected static int[]	passPatchColor       = { 0, 220, 0 };
-  protected static int[]	assumePassPatchColor = { 0, 128, 0 };
-  protected static int[]	clearPatchColor      = { 128, 128, 128 };
-  protected static int[]	blinkerColor         = { 32, 32, 32 };
+  public static boolean  blinkValue           = false;
+  protected static int[] voidPatchColor       = { 63, 63, 63 };
+  protected static int[] assumeFailPatchColor = { 128, 0, 0 };
+  protected static int[] failPatchColor       = { 228, 0, 0 };
+  protected static int[] marginalPatchColor   = { 255, 255, 0 };
+  protected static int[] passPatchColor       = { 0, 220, 0 };
+  protected static int[] assumePassPatchColor = { 0, 128, 0 };
+  protected static int[] clearPatchColor      = { 128, 128, 128 };
+  protected static int[] blinkerColor         = { 32, 32, 32 };
 
   /** Field description */
-  BlockState	blockState;
+  BlockState blockState;
 
   /**
    * @param blockState
@@ -63,10 +63,10 @@ public class BlockGrid {
 
     // Ref: http://www.mkyong.com/java/how-to-export-data-to-csv-file-java/
     try {
-      FileWriter	writer = new FileWriter(filename);
+      FileWriter writer = new FileWriter(filename);
 
       for (int r = 0; r < blockState.rows; r++) {
-        String[]	rowData = new String[blockState.columns];
+        String[] rowData = new String[blockState.columns];
 
         for (int c = 0; c < blockState.columns; c++) {
           rowData[c] = "" + blockState.blockMap[c][r];
@@ -121,8 +121,8 @@ public class BlockGrid {
    * @return
    */
   public BufferedImage getImage() {
-    int	columns = this.blockState.getColumns();
-    int	rows    = this.blockState.getRows();
+    int columns = this.blockState.getColumns();
+    int rows    = this.blockState.getRows();
 
     return this.getImage(columns, rows);
   }
@@ -134,16 +134,16 @@ public class BlockGrid {
    */
   public BufferedImage getImage(int width, int height) {
 
-    BufferedImage		image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    WritableRaster	raster = image.getRaster();
-    int[]						color  = new int[3];
+    BufferedImage    image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    WritableRaster   raster = image.getRaster();
+    int[]            color  = new int[3];
 
-    PatchDesignation	value;
-    int								column      = blockState.getColumn(),
-											row         = blockState.getRow(),
-											columns     = blockState.getColumns(),
-											rows        = blockState.getRows(),
-											firstColumn = blockState.getFirstColumn();
+    PatchDesignation value;
+    int              column      = blockState.getColumn(),
+                     row         = blockState.getRow(),
+                     columns     = blockState.getColumns(),
+                     rows        = blockState.getRows(),
+                     firstColumn = blockState.getFirstColumn();
 
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -154,7 +154,7 @@ public class BlockGrid {
         if ((value == VOID) || (c < firstColumn)) color = getVoidPatchColor();
         else if (value == ASSUMED_FAIL) color = getAssumeFailPatchColor();
         else if (value == FAIL) color = getFailPatchColor();
-        else if (value == MARGINAL) color = getMarginalPatchColor();
+        else if ((value == MARGINAL) || (value == ASSUMED_MARGINAL)) color = getMarginalPatchColor();
         else if (value == PASS) color = getPassPatchColor();
         else if (value == ASSUMED_PASS) color = getAssumePassPatchColor();
 

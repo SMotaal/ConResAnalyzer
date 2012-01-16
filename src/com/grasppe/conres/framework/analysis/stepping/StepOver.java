@@ -13,23 +13,23 @@ package com.grasppe.conres.framework.analysis.stepping;
  */
 public class StepOver extends SteppingStrategy {
 
-    /** Field description */
-    protected int	step = 1;
-    protected int	finalValue;
+  /** Field description */
+  protected int step = 1;
+  protected int finalValue;
 
-    /**
-     * @param blockState
-     */
-    public StepOver(BlockState blockState) {
-        super(blockState);
-    }
+  /**
+   * @param blockState
+   */
+  public StepOver(BlockState blockState) {
+    super(blockState);
+  }
 
-    /**
-     * @return  true when executed successfully
-     */
-    @Override
-    public boolean execute() {
+  /**
+   * @return  true when executed successfully
+   */
+  @Override
+  public boolean execute() {
 
-        return moveOver();
-    }
+    return moveOver();
+  }
 }

@@ -17,30 +17,30 @@ import java.util.List;
  */
 public class StepBack extends SteppingStrategy {
 
-    /** Field description */
-    private int[]	pastStep;
+  /** Field description */
+  private int[] pastStep;
 
-    /**
-     * @param blockState
-     * @param history
-     */
-    public StepBack(BlockState blockState, List history) {
-        super(blockState);
-        this.pastStep = (int[])history.get(history.size() - 1);
+  /**
+   * @param blockState
+   * @param history
+   */
+  public StepBack(BlockState blockState, List history) {
+    super(blockState);
+    this.pastStep = (int[])history.get(history.size() - 1);
 
-    }
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.SteppingStrategy#execute()
-     */
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conresalpha.steppingLogic.SteppingStrategy#execute()
+   */
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean execute() {
+  /**
+   * @return
+   */
+  @Override
+  public boolean execute() {
 
-        return this.moveTo(this.pastStep[0], this.pastStep[1]);
-    }
+    return this.moveTo(this.pastStep[0], this.pastStep[1]);
+  }
 }

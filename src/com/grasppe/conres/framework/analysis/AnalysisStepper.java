@@ -13,8 +13,10 @@ package com.grasppe.conres.framework.analysis;
 import com.grasppe.conres.analyzer.ConResAnalyzer;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
+import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel.SteppingMode;
 import com.grasppe.conres.framework.analysis.stepping.BlockGrid;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
+import com.grasppe.conres.framework.analysis.stepping.ForceSet;
 import com.grasppe.conres.framework.analysis.stepping.SetAndStep;
 import com.grasppe.conres.framework.analysis.stepping.SmartBlockState;
 import com.grasppe.conres.framework.analysis.stepping.StepBack;
@@ -45,9 +47,11 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -58,12 +62,12 @@ import javax.swing.Timer;
  */
 public class AnalysisStepper extends AbstractController {
 
-  int														dbg             = 0;
-  protected AnalysisManager			analysisManager = null;
-  protected AnalysisStepperView	stepperView     = null;
-  protected ConResBlock					lastBlock       = null;
-  protected BlockState					loadBlockState  = null;
-  protected ActionListener			blinkListener   = new ActionListener() {
+  int                           dbg             = 0;
+  protected AnalysisManager     analysisManager = null;
+  protected AnalysisStepperView stepperView     = null;
+  protected ConResBlock         lastBlock       = null;
+  protected BlockState          loadBlockState  = null;
+  protected ActionListener      blinkListener   = new ActionListener() {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
@@ -71,8 +75,8 @@ public class AnalysisStepper extends AbstractController {
     }
 
   };
-  protected Timer		blinkTimer  = new Timer(Preferences.getInt(Tags.BLINK_SPEED), blinkListener);
-  protected String	scratchFile = null;
+  protected Timer  blinkTimer  = new Timer(Preferences.getInt(Tags.BLINK_SPEED), blinkListener);
+  protected String scratchFile = null;
 
   /**
    * Constructs and attaches a new controller and a new model.
@@ -115,18 +119,22 @@ public class AnalysisStepper extends AbstractController {
 
     if (keyModifiers == 4) return false;
 
-    SmartBlockState	smartState = new SmartBlockState(getModel().getBlockState());
+    SmartBlockState smartState = new SmartBlockState(getModel().getBlockState());
 
     if ((smartState == null) || (smartState.getBlockMap() == null)) return false;
 
-    SteppingStrategy	thisStep        = null;			// new StepNext(smartState);
+    SteppingStrategy thisStep  = null;		// new StepNext(smartState);
 
-    boolean						snapState       = true;
-    boolean						goBack          = false;
+    boolean          snapState = true;
+    boolean          goBack    = false;
 
-    double						scaleMultiplier = 1.15;
+//  boolean                       undoStep        = false;
+//  boolean                       redoStep        = false;
+    boolean setStep         = false;
 
-    KeyCode						keyCode         = KeyCode.get(keyCodeValue);
+    double  scaleMultiplier = 1.15;
+
+    KeyCode keyCode         = KeyCode.get(keyCodeValue);
 
     switch (keyCode) {
 
@@ -209,34 +217,81 @@ public class AnalysisStepper extends AbstractController {
 
        break;
 
+//   case VK_OPEN_BRACKET :
+//     undoStep = true;
+//
+//     break;
+//
+//   case VK_CLOSE_BRACKET :
+//     redoStep = true;
+//
+//     break;
+
      default :
-       if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.PASS_KEYCODE)) {
-         if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.PASS);
-       } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.FAIL_KEYCODE)) {
-         if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.FAIL);
-       } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.MARGINAL_KEYCODE)) {
-         if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.MARGINAL);
-       } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.CLEAR_COLUMN_KEYCODE)) {
-         if (keyModifiers == 0) thisStep = new SetAndStep(smartState, BlockState.CLEAR);
-       } else
-         return false;
+       if ((keyModifiers == 0) || (keyModifiers == 8)) {
+         int setValue = 0;
+
+         if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.PASS_KEYCODE)) {
+           thisStep = createSettingStrategy(smartState, BlockState.PASS);
+         } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.FAIL_KEYCODE)) {
+           thisStep = createSettingStrategy(smartState, BlockState.FAIL);
+         } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.MARGINAL_KEYCODE)) {
+           thisStep = createSettingStrategy(smartState, BlockState.MARGINAL);
+         } else if (keyCode == PreferencesAdapter.getInstance().getKeyCode(Tags.CLEAR_COLUMN_KEYCODE)) {
+           thisStep = new SetAndStep(smartState, BlockState.CLEAR);
+         } else
+           return false;
+
+         setStep = true;
+       }
     }
 
     try {
       if (goBack) {
-        if (!getModel().getHistory().isEmpty()) {
-          thisStep = new StepBack(smartState, getModel().getHistory());
-          getModel().getHistory().remove(getModel().getHistory().size() - 1);
+        if (!getModel().getCellHistory().isEmpty()) {
+          thisStep = new StepBack(smartState, getModel().getCellHistory());
+          getModel().getCellHistory().remove(getModel().getCellHistory().size() - 1);
           snapState = false;
         }
       }
 
-      if (snapState) {
-        int		row          = getModel().getBlockState().getRow();
-        int		column       = getModel().getBlockState().getColumn();
-        int[]	currentState = { row, column };
+//    if (redoStep) {
+//      if (!getModel().getBlockRedoHistory().isEmpty()) {
+//        thisStep = new ReStep(smartState, getModel().getBlockRedoHistory());
+//
+//        int stepIndex = getModel().getBlockRedoHistory().size() - 1;
+//
+//        getModel().getBlockUndoHistory().add(getModel().getBlockRedoHistory().get(stepIndex));
+//        getModel().getBlockRedoHistory().remove(stepIndex);
+//        snapState = false;
+//      }
+//    }
+//
+//    if (undoStep) {
+//      if (!getModel().getBlockUndoHistory().isEmpty()) {
+//        thisStep = new ReStep(smartState, getModel().getBlockUndoHistory());
+//
+//        int stepIndex = getModel().getBlockUndoHistory().size() - 1;
+//
+//        getModel().getBlockRedoHistory().add(getModel().getBlockUndoHistory().get(stepIndex));
+//        getModel().getBlockUndoHistory().remove(stepIndex);
+//        snapState = false;
+//      }
+//    }
 
-        getModel().getHistory().add(currentState);
+      if (snapState) {
+
+//      int       row          = getModel().getBlockState().getRow();
+//      int       column       = getModel().getBlockState().getColumn();
+        BlockState currentState = getModel().getBlockState();
+        int[]      currentCell  = { currentState.getRow(), currentState.getColumn() };
+
+        getModel().getCellHistory().add(currentCell);
+
+//      if (setStep) {
+//        getModel().getBlockUndoHistory().add(currentState);
+//        getModel().getBlockRedoHistory().clear();
+//      }
       }
 
       if (thisStep != null) {			// thisStep = new StepNext(smartState);
@@ -272,16 +327,35 @@ public class AnalysisStepper extends AbstractController {
    */
 
   /**
-   * 	@return
+   *    @return
    */
   @Override
   public boolean canQuit() {
-    boolean	modified = getModel().isModified();
+    boolean modified = getModel().isModified();
 
     if (!modified || IJ.showMessageWithCancel("Quit", "Do you really want to quit before exporting the current analysis?"))
       return true;
 
     return false;
+  }
+
+  /**
+   *    @param blockState
+   *    @param value
+   *    @return
+   */
+  private SteppingStrategy createSettingStrategy(BlockState blockState, int value) {		// , SteppingMode mode){
+
+    switch (getSteppingMode()) {
+
+     case AUTOMATIC_STEPPING :
+       return new SetAndStep(blockState, value);		// break;
+
+     case MANUAL_STEPPING :
+       return new ForceSet(blockState, value);			// break;
+    }
+
+    return null;
   }
 
   /**
@@ -333,7 +407,7 @@ public class AnalysisStepper extends AbstractController {
    *      @throws Exception
    */
   public void loadCSVFile(BlockState blockState) throws Exception {
-    String	filename = getTargetManager().generateFilename("a.csv", "Data");
+    String filename = getTargetManager().generateFilename("a.csv", "Data");
 
     blockState.readFile(filename);
   }
@@ -343,7 +417,7 @@ public class AnalysisStepper extends AbstractController {
    *      @throws Exception
    */
   public void loadScratchFile(BlockState blockState) throws Exception {
-    String	filename = getTargetManager().generateFilename("s.csv", "Resources");
+    String filename = getTargetManager().generateFilename("s.csv", "Resources");
 
     blockState.readFile(filename);
 
@@ -359,7 +433,7 @@ public class AnalysisStepper extends AbstractController {
     if (!isScratchEnabled()) return;
 
     try {
-      String	filename = getTargetManager().generateFilename("s.csv", "Resources");
+      String filename = getTargetManager().generateFilename("s.csv", "Resources");
 
       getModel().getBlockState().writeFile(filename);
     } catch (Exception exception) {
@@ -393,24 +467,24 @@ public class AnalysisStepper extends AbstractController {
 
     // Determine if the image has transparent pixels; for this method's
     // implementation, see Determining If an Image Has Transparent Pixels
-    boolean	hasAlpha = false;			// hasAlpha(image);
+    boolean hasAlpha = false;			// hasAlpha(image);
 
     // Create a buffered image with a format that's compatible with the screen
-    BufferedImage				bimage = null;
-    GraphicsEnvironment	ge     = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    BufferedImage       bimage = null;
+    GraphicsEnvironment ge     = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
     try {
 
       // Determine the commandMenu of transparency of the new buffered image
-      int	transparency = Transparency.OPAQUE;
+      int transparency = Transparency.OPAQUE;
 
       if (hasAlpha) {
         transparency = Transparency.BITMASK;
       }
 
       // Create the buffered image
-      GraphicsDevice				gs = ge.getDefaultScreenDevice();
-      GraphicsConfiguration	gc = gs.getDefaultConfiguration();
+      GraphicsDevice        gs = ge.getDefaultScreenDevice();
+      GraphicsConfiguration gc = gs.getDefaultConfiguration();
 
       bimage = gc.createCompatibleImage(image.getWidth(null), image.getHeight(null), transparency);
     } catch (HeadlessException exception) {
@@ -420,7 +494,7 @@ public class AnalysisStepper extends AbstractController {
     if (bimage == null) {
 
       // Create a buffered image using the default color model
-      int	type = BufferedImage.TYPE_INT_RGB;
+      int type = BufferedImage.TYPE_INT_RGB;
 
       if (hasAlpha) {
         type = BufferedImage.TYPE_INT_ARGB;
@@ -430,7 +504,7 @@ public class AnalysisStepper extends AbstractController {
     }
 
     // Copy image to buffered image
-    Graphics	g = bimage.createGraphics();
+    Graphics g = bimage.createGraphics();
 
     // Paint the image onto the buffered image
     g.drawImage(image, 0, 0, null);
@@ -465,7 +539,7 @@ public class AnalysisStepper extends AbstractController {
       return;
     }
 
-    ConResBlock	activeBlock = getTargetManager().getModel().getActiveBlock();
+    ConResBlock activeBlock = getTargetManager().getModel().getActiveBlock();
 
     if (activeBlock == null) {
       getModel().setBlockImage(null);
@@ -489,23 +563,23 @@ public class AnalysisStepper extends AbstractController {
 
     if (getTargetManager().getBlockImage() == null) return;
 
-    ImageFile	imageFile       = getTargetManager().getBlockImage();
+    ImageFile imageFile       = getTargetManager().getBlockImage();
 
-    double		imageDPI        = imageFile.getResolution().value;
+    double    imageDPI        = imageFile.getResolution().value;
 
-    double		resolutionRatio = imageDPI / getTargetManager().displayDPI;
+    double    resolutionRatio = imageDPI / getTargetManager().displayDPI;
 
     getModel().setResolutionRatio(resolutionRatio);
     getModel().setBlockImage(getTargetManager().getBlockImage());
     getModel().setBlockImagePlus(getTargetManager().getModel().getActiveImagePlus());			// .getImagePlus());
     getModel().setActiveBlock(getTargetManager().getModel().getActiveBlock());
 
-    int					blockColumns = getActiveBlock().getXAxis().getValues().length;
-    int					blockRows    = getActiveBlock().getYAxis().getValues().length;
+    int        blockColumns = getActiveBlock().getXAxis().getValues().length;
+    int        blockRows    = getActiveBlock().getYAxis().getValues().length;
 
-    int					firstColumn  = getTargetManager().getFirstColumnIndex();
+    int        firstColumn  = getTargetManager().getFirstColumnIndex();
 
-    BlockState	blockState   = new BlockState(blockRows, blockColumns, firstColumn);		// , BlockState.fudgeMap1());
+    BlockState blockState   = new BlockState(blockRows, blockColumns, firstColumn);			// , BlockState.fudgeMap1());
 
     blockState.setColumn(0);
     blockState.setRow(0);
@@ -547,7 +621,7 @@ public class AnalysisStepper extends AbstractController {
 //
 //    getModel().setPatchImage(patchImage);
 
-      BlockGrid	blockGrid = new BlockGrid(getModel().getBlockState());
+      BlockGrid blockGrid = new BlockGrid(getModel().getBlockState());
 
       getModel().setImage(blockGrid.getImage());
 
@@ -627,6 +701,14 @@ public class AnalysisStepper extends AbstractController {
   }
 
   /**
+   *    @return
+   */
+  private SteppingMode getSteppingMode() {
+    if (Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) return SteppingMode.MANUAL_STEPPING;
+    else return SteppingMode.AUTOMATIC_STEPPING;
+  }
+
+  /**
    *  @return
    */
   public TargetManager getTargetManager() {
@@ -658,8 +740,8 @@ public class AnalysisStepper extends AbstractController {
 //      if (newState != getModel().getBlockState()) {
         getModel().setBlockState(newState);
 
-        int	row    = newState.getRow();
-        int	column = newState.getColumn();
+        int row    = newState.getRow();
+        int column = newState.getColumn();
 
         saveScratchFile();
 

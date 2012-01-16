@@ -15,41 +15,44 @@ package com.grasppe.conres.framework.analysis.stepping;
  */
 public interface ISteppingBlockState {
 
-    /**
-     * @return
-     */
-    ISteppingBlockState clone();
+  /**
+   * @return
+   */
+  ISteppingBlockState clone();
 
-    /**
-     * @param otherState
-     * @return
-     */
-    boolean equivalent(ISteppingBlockState otherState);
+  /**
+   * @param otherState
+   * @return
+   */
+  boolean equivalent(ISteppingBlockState otherState);
 
-    /**
-     * @return
-     */
-    int[][] getBlockMap();
+  /**
+   * @return
+   */
+  int[][] getBlockMap();
 
-    /**
-     * @return
-     */
-    int getColumn();
+  /**
+   * @return
+   */
+  int getColumn();
 
-    /**
-     * @return
-     */
-    int getColumns();
+  /**
+   * @return
+   */
+  int getColumns();
 
-    /**
-     * @return
-     */
-    int getRow();
+  /**
+   * 	@return
+   */
+  int getFirstColumn();
 
-    /**
-     * @return
-     */
-    int getRows();
-    
-    int getFirstColumn();
+  /**
+   * @return
+   */
+  int getRow();
+
+  /**
+   * @return
+   */
+  int getRows();
 }

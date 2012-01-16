@@ -15,28 +15,27 @@ package com.grasppe.conres.framework.analysis.stepping;
  */
 public class StepDown extends SteppingStrategy {
 
-    /**
-     * @param blockState
-     */
-    public StepDown(BlockState blockState) {
-        super(blockState);
+  /**
+   * @param blockState
+   */
+  public StepDown(BlockState blockState) {
+    super(blockState);
 
-    }
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conresalpha.steppingLogic.SteppingStrategy#execute()
-     */
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conresalpha.steppingLogic.SteppingStrategy#execute()
+   */
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean execute() {
+  /**
+   * @return
+   */
+  @Override
+  public boolean execute() {
 
-        if (!this.validMove(this.moveBy(1, 0)))
-        	return false;
+    if (!this.validMove(this.moveBy(1, 0))) return false;
 
-        return true;
-    }
+    return true;
+  }
 }

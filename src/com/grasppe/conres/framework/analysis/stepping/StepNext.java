@@ -17,47 +17,46 @@ import com.grasppe.conres.framework.analysis.stepping.BlockState.PatchDesignatio
  */
 public class StepNext extends SteppingStrategy {
 
-    /** Field description */
-    protected int	step = 1;
-    protected int	finalValue;
+  /** Field description */
+  protected int step = 1;
+  protected int finalValue;
 
-    /**
-     * @param blockState
-     */
-    public StepNext(BlockState blockState) {
-        super(blockState);
-    }
+  /**
+   * @param blockState
+   */
+  public StepNext(BlockState blockState) {
+    super(blockState);
+  }
 
-    /**
-     * @return  true when executed successfully
-     */
-    @Override
-    public boolean execute() {
+  /**
+   * @return  true when executed successfully
+   */
+  @Override
+  public boolean execute() {
 
-        PatchDesignation	current = PatchDesignation.designation(startValue);
+    PatchDesignation current = PatchDesignation.designation(startValue);
 
-        if (current == PASS) return moveDownOrOver();
-        else if (current == FAIL) return moveUpOrOver();
-        else if (current == MARGINAL)
-                 return (checkAbove(row) && moveDownOrOver()) || moveUpOrOver();
-        else return false;
-    }
+    if (current == PASS || current == ASSUMED_PASS) return moveDownOrOver();
+    else if (current == FAIL || current == ASSUMED_FAIL) return moveUpOrOver();
+    else if (current == MARGINAL || current == ASSUMED_MARGINAL) return (checkAbove(row) && moveDownOrOver()) || moveUpOrOver();
+    else return false;
+  }
 
-    /**
-     *  @return
-     */
-    protected boolean moveDownOrOver() {
-        boolean	executed = moveDown() || moveOver();
+  /**
+   *  @return
+   */
+  protected boolean moveDownOrOver() {
+    boolean executed = moveDown() || moveOver();
 
-        return executed;
-    }
+    return executed;
+  }
 
-    /**
-     *  @return
-     */
-    protected boolean moveUpOrOver() {
-        boolean	executed = moveUp() || moveOver();
+  /**
+   *  @return
+   */
+  protected boolean moveUpOrOver() {
+    boolean executed = moveUp() || moveOver();
 
-        return executed;
-    }
+    return executed;
+  }
 }

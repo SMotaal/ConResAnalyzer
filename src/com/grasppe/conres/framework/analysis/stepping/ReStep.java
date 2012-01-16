@@ -1,5 +1,5 @@
 /*
- * @(#)StepUp.java   11/08/25
+ * @(#)StepBack.java   11/08/25
  * Copyright (c) 2011 Saleh Abdel Motaal
  * This code is not licensed for use and is the properyty of it's owner.
  */
@@ -10,16 +10,23 @@
  */
 package com.grasppe.conres.framework.analysis.stepping;
 
+import java.util.List;
+
 /**
  * @author daflair
  */
-public class StepUp extends SteppingStrategy {
+public class ReStep extends SteppingStrategy {
+
+  /** Field description */
+  private BlockState pastStep;
 
   /**
    * @param blockState
+   * @param history
    */
-  public StepUp(BlockState blockState) {
+  public ReStep(BlockState blockState, List history) {
     super(blockState);
+    this.pastStep = (BlockState)history.get(history.size() - 1);
 
   }
 
@@ -34,8 +41,9 @@ public class StepUp extends SteppingStrategy {
   @Override
   public boolean execute() {
 
-    if (!this.validMove(this.moveBy(-1, 0))) return false;
+//  finalState.setValue(pastStep);
+    setFinalState(pastStep);
 
-    return true;
+    return this.moveTo(pastStep.getRow(), pastStep.getColumn());
   }
 }
