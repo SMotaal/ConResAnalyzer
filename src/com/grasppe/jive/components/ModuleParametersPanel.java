@@ -9,10 +9,10 @@
 
 
 
-package com.grasppe.conres.matlab;
+package com.grasppe.jive.components;
 
-import com.grasppe.forms.fields.NumericValueField;
-import com.grasppe.forms.fields.ResolutionValueField;
+import com.grasppe.jive.fields.NumericValueField;
+import com.grasppe.jive.fields.ResolutionValueField;
 import com.grasppe.lure.components.Observers;
 import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;

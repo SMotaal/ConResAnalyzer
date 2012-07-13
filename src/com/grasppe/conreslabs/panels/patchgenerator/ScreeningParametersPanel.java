@@ -9,9 +9,11 @@
 
 
 
-package com.grasppe.conres.matlab;
+package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.forms.fields.NumericValueField;
+import com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
+import com.grasppe.jive.components.ModuleParametersPanel;
+import com.grasppe.jive.fields.NumericValueField;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.FormLayout;

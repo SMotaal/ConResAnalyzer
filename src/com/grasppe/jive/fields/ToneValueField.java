@@ -12,7 +12,7 @@
 /**
  *
  */
-package com.grasppe.forms.fields;
+package com.grasppe.jive.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -23,6 +23,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+
+import com.grasppe.jive.formatters.PercentFormatter;
 
 /**
  * @author daflair

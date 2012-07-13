@@ -9,8 +9,13 @@
 
 
 
-package com.grasppe.conres.matlab;
+package com.grasppe.conreslabs.panels;
 
+import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
+import com.grasppe.jive.components.ModulePanelContainer;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -50,7 +55,7 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
 
   /*
    *  (non-Javadoc)
-   *   @see com.grasppe.conres.matlab.ModulePanelContainer#createPanels()
+   *   @see com.grasppe.conreslabs.matlab.ModulePanelContainer#createPanels()
    */
 
   /**

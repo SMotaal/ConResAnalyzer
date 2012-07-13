@@ -9,9 +9,13 @@
 
 
 
-package com.grasppe.conres.matlab;
+package com.grasppe.jive.components;
 
-import com.grasppe.forms.fields.NumericValueField;
+import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
+import com.grasppe.jive.fields.NumericValueField;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 import com.oracle.layout.SpringUtilities;

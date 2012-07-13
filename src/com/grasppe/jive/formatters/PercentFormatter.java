@@ -1,4 +1,4 @@
-package com.grasppe.forms.fields;
+package com.grasppe.jive.formatters;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -12,7 +12,7 @@ public class PercentFormatter extends NumberFormatter {
 	/**
 	 * 
 	 */
-	protected PercentFormatter() {
+	public PercentFormatter() {
 		super(NumberFormat.getNumberInstance()); // getPercentInstance());
 	}
 
