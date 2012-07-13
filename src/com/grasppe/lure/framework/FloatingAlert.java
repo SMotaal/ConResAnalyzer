@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
+import com.sun.xml.internal.ws.org.objectweb.asm.Label;
+
 /**
  * @author daflair
  *
@@ -41,7 +43,8 @@ public class FloatingAlert {// extends JFrame {
     protected int		frame          = 0;
     protected Timer		fadeTimer      = null;
     
-    protected static JFrame floatingFrame = null;
+    protected static final JFrame floatingFrame = new JFrame();
+    protected static final JLabel floatingLabel = new JLabel();
 
     /**
      * @param messageText
@@ -97,42 +100,54 @@ public class FloatingAlert {// extends JFrame {
     		floatingFrame.setVisible(false);
     	}
     	
-    	floatingFrame = new JFrame();
+//    	floatingFrame = new JFrame();
+    	try {
+	    	floatingFrame.setBackground(Color.BLACK);
+	    	floatingFrame.setUndecorated(true);
+	    	floatingFrame.setAlwaysOnTop(true);
+	    	floatingFrame.setEnabled(false);
+	    	floatingFrame.setFocusable(false);
+	    	floatingFrame.setFocusableWindowState(false);	
+    	} catch (Exception exception) {
+//    		exception.printStackTrace();
+    	}
     	
-    	floatingFrame.setBackground(Color.BLACK);
-    	floatingFrame.setUndecorated(true);
-    	floatingFrame.setAlwaysOnTop(true);
-    	floatingFrame.setEnabled(false);
-    	floatingFrame.setFocusable(false);
-    	floatingFrame.setFocusableWindowState(false);
+        GrasppeKit.setFrameOpacity(floatingFrame, initialOpacity);    	
 
-        GrasppeKit.setFrameOpacity(floatingFrame, initialOpacity);
-
-        JLabel	label = new JLabel(messageText);
+//        JLabel	label = new JLabel(messageText);
+        
 
         // label.set
+        floatingLabel.setText(messageText);
 
-        label.setForeground(Color.WHITE);
-        label.setFont(label.getFont().deriveFont(16.0F));		// .deriveFont(Font.BOLD)
-        label.setMinimumSize(new Dimension(250, 100));
-        label.setVerticalAlignment(JLabel.CENTER);
-        label.setHorizontalAlignment(JLabel.CENTER);
+        floatingLabel.setForeground(Color.WHITE);
+        floatingLabel.setFont(floatingLabel.getFont().deriveFont(16.0F));		// .deriveFont(Font.BOLD)
+        floatingLabel.setMinimumSize(new Dimension(250, 100));
+        floatingLabel.setVerticalAlignment(JLabel.CENTER);
+        floatingLabel.setHorizontalAlignment(JLabel.CENTER);
 
         EmptyBorder	marginBorder = new EmptyBorder(30, 30, 30, 30);
 
-        label.setBorder(marginBorder);
+        floatingLabel.setBorder(marginBorder);
 
         Container	pane = floatingFrame.getContentPane();
 
         // pane.setLayout(new BorderLayout());
 
-        pane.add(label);	// ,BorderLayout.CENTER);
-
-        floatingFrame.setMinimumSize(new Dimension(250, 100));
-
-        floatingFrame.pack();
-
-        floatingFrame.setLocationRelativeTo(null);
+        pane.add(floatingLabel);	// ,BorderLayout.CENTER);
+        
+//        floatingLabel = floatingLabel;
+        
+    	try {
+	        floatingFrame.setMinimumSize(new Dimension(250, 100));
+	
+	        floatingFrame.pack();
+	
+	        floatingFrame.setLocationRelativeTo(null);
+        
+    	} catch (Exception exception) {
+//    		exception.printStackTrace();
+    	}        
 
     }
 
@@ -248,5 +263,7 @@ public class FloatingAlert {// extends JFrame {
      */
     public void setMessageText(String messageText) {
         this.messageText = messageText;
+        if (floatingLabel!=null)
+        	floatingLabel.setText(messageText);
     }
 }
