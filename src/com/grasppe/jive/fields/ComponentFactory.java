@@ -74,6 +74,24 @@ public class ComponentFactory {
 
     return newField;
   }
+  
+  /**
+   *      @param name
+   *      @param value
+   *      @param minimum
+   *      @param maximum
+   *      @return
+   */
+  public static JComponent createCustomFieldComponent(String name, NumericValueField newField) {
+	  // NumericValueField newField = new NumericValueField(minimum, maximum);
+
+    newField.setName(name);
+    // newField.setValue(value);
+    newField.setAlignmentX(defaultAlignmentX);
+    newField.setHorizontalAlignment(SwingConstants.TRAILING);
+
+    return newField;
+  }  
 
   /**
    *      @param name

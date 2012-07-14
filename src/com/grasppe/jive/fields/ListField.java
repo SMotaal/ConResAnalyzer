@@ -71,27 +71,41 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
     super.setEditable(true);
     super.putClientProperty("JComboBox.isSquare", true);
     super.putClientProperty("JComponent.sizeVariant", "regular");
-
+    
     super.addItemListener(new ItemListener() {
-
       @Override
       public void itemStateChanged(ItemEvent e) {
         try {
+        	
+        	 ((ValueField) e.getSource()).upateValue();
+//      	theField.updateValue();
 
-          Object newValue = getValue();
-          String name     = getName();
-
-          if ((name == null) || name.isEmpty()) name = "value";
-          if ((oldValue != null) && oldValue.equals(newValue)) return;
-
-          firePropertyChange(name, oldValue, newValue);
-
-          oldValue = newValue;
+//          Object newValue = getValue();
+//          String name     = getName();
+//
+//          if ((name == null) || name.isEmpty()) name = "value";
+//          if ((oldValue != null) && oldValue.equals(newValue)) return;
+//
+//          firePropertyChange(name, oldValue, newValue);
+//
+//          oldValue = newValue;
         } catch (Exception exception) {
           GrasppeKit.debugError("ListField>ItemStateChanged", exception, 1);
         }
       }
     });
+  }
+  
+  public void upateValue() { //Object newValue) {
+      Object newValue = getValue();
+      String name     = getName();
+
+      if ((name == null) || name.isEmpty()) name = "value";
+      if ((oldValue != null) && oldValue.equals(newValue)) return;
+
+      firePropertyChange(name, oldValue, newValue);
+
+      oldValue = newValue;	  
   }
 
   /**

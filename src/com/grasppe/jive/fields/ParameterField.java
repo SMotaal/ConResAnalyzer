@@ -14,6 +14,7 @@
  */
 package com.grasppe.jive.fields;
 
+import com.grasppe.jive.components.ModuleParametersPanel;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -21,8 +22,11 @@ import com.grasppe.lure.framework.GrasppeKit;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -34,12 +38,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * @author daflair
  *
  */
-public class ParameterField extends JPanel implements PropertyChangeListener, NamedField {
+public class ParameterField extends JPanel implements PropertyChangeListener, NamedField, FocusListener {
 
 //Size Variables
   protected static HashMap<String, GroupOptions> gourpOptionsMap = new HashMap<String, GroupOptions>();
@@ -164,6 +169,8 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
     fieldComponent.setMaximumSize(new Dimension(getOptions().fieldWidth, fieldComponent.getPreferredSize().height));
     fieldComponent.setSize(fieldComponent.getPreferredSize());
     fieldComponent.setOpaque(false);
+    
+    fieldComponent.addFocusListener(this);
 
     // Suffix Component
     suffixComponent.setPreferredSize(new Dimension(getOptions().suffixWidth, suffixComponent.getPreferredSize().height));
@@ -203,6 +210,16 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
     return ParameterField.gourpOptionsMap.get(id);
   }
+  
+  /**
+   *    @param id
+   *    @return
+   */
+  public static GroupOptions getGroupOptions(String id, boolean autoCreate) {
+	if (autoCreate) return getGroupOptions(id);
+	else if (!ParameterField.gourpOptionsMap.containsKey(id)) return null;
+	else return ParameterField.gourpOptionsMap.get(id);
+  }  
 
 /*(non-Javadoc)
     * @see java.awt.Component#getName()
@@ -304,4 +321,41 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
     }
 
   }
+
+@Override
+public void focusGained(FocusEvent e) {
+	// TODO Auto-generated method stub
+//	GrasppeKit.debugText("JiveField", "Focus gained: " + e.toString(), 4); //getAncestorOfClass
+	
+//	if (e.getSource() instanceof JComponent) {
+//		JComponent component = (JComponent)e.getSource();
+//		
+//		ModuleParametersPanel panel = (ModuleParametersPanel) SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class, component);
+//		
+//		GrasppeKit.debugText("JiveField>Panel", "Focus gained: " + panel.getTitle(), 2);
+//		
+//		panel.makeActive();
+//		
+//	} else {
+//		GrasppeKit.debugText("JiveField>Unknown", "Focus gained: " + e.getSource().toString(), 0);
+//		Toolkit.getDefaultToolkit().beep();
+//	}
+}
+
+//public void updateActivePanel() {
+//	
+//	ModuleParametersPanel panel = (ModuleParametersPanel) SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class, component);
+//
+//}
+
+@Override
+public void focusLost(FocusEvent e) {
+	// TODO Auto-generated method stub
+//	GrasppeKit.debugText("JiveField", "Focus lost: " + e.toString(), 2);//getAncestorOfClass
+	
+}
+
+
+//public void updateActiveComponent(JComponent)
+
 }

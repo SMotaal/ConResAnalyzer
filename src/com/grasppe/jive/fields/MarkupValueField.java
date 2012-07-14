@@ -35,7 +35,7 @@ import javax.swing.text.DefaultEditorKit;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class MarkupValueField extends JEditorPane implements ValueField, NamedField {			// PropertyChangeListener,
+public class MarkupValueField extends JEditorPane implements ValueField, NamedField, NameValueField {			// PropertyChangeListener,
 
   protected static com.mathworks.jmi.Matlab matlab         = null;
   protected String                          renderFunction = "Grasppe.Kit.Syntax.Highlight";
@@ -181,7 +181,7 @@ public class MarkupValueField extends JEditorPane implements ValueField, NamedFi
 
       MatLab.Initialize();
       
-      System.out.println(renderStatement.replace("\n","\r"));
+//      System.out.println(renderStatement.replace("\n","\r"));
       
       MatLab.getProxy().setVariable("escapeStatement", escapeStatement);
       
@@ -345,4 +345,10 @@ public class MarkupValueField extends JEditorPane implements ValueField, NamedFi
 
     this.selectAll();
   }
+
+@Override
+public void upateValue() {
+	// TODO Auto-generated method stub
+	
+}
 }

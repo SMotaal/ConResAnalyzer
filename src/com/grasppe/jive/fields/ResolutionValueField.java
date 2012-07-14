@@ -48,6 +48,16 @@ public class ResolutionValueField extends NumericValueField {
 		super(value, minimum, maximum, range);
 		// TODO Auto-generated constructor stub
 	}
+	
+	/**
+	 * @param value
+	 * @param minimum
+	 * @param maximum
+	 */
+	public ResolutionValueField(Double value, double minimum, double maximum) {
+		super(value, minimum, maximum, numericRange);
+	}
+	
 
 	/**
 	 * @param minimum

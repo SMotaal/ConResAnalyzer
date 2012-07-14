@@ -7,8 +7,14 @@ package com.grasppe.jive.fields;
    */
   public class GroupOptions {
 	  
-	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(150, 25);	  
-	  public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
+	  
+	  public static int DEFAULT_LABEL_WIDTH = 100;
+	  public static int DEFAULT_FIELD_WIDTH = 125;
+	  public static int DEFAULT_SUFFIX_WIDTH = 50;
+	  
+	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH + 25, DEFAULT_SUFFIX_WIDTH - 25);	  
+	  public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 25, DEFAULT_SUFFIX_WIDTH + 25);
+	  public static GroupOptions TINY_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 50, DEFAULT_SUFFIX_WIDTH + 50);
 	  //public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
 	  
 	  /**
@@ -75,15 +81,14 @@ package com.grasppe.jive.fields;
 		return marginWidth*2 + paddingWidth*2 + labelWidth + fieldWidth + suffixWidth;
 	}	
 	
-
-	/** Field description */
-    public int labelWidth = 75;
+    /** Field description */
+    public int labelWidth = DEFAULT_LABEL_WIDTH;
 
     /** Field description */
-    public int fieldWidth = 150;
+    public int fieldWidth = DEFAULT_FIELD_WIDTH;
 
     /** Field description */
-    public int suffixWidth = 50;
+    public int suffixWidth = DEFAULT_SUFFIX_WIDTH;
 
     /** Field description */
     public int marginWidth   = 5,

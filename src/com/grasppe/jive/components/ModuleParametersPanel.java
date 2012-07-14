@@ -76,6 +76,8 @@ public class ModuleParametersPanel extends JPanel implements Observable {
 	 * @param title the title to set
 	 */
 	public void setTitle(String title) {
+		if (this.title!=null && this.title.equals(title)) return;
+		firePropertyChange("Title", this.title, title);
 		this.title = title;
 	}
 
@@ -135,20 +137,28 @@ protected Observers observers = new Observers(this);
 			}
 	});
 	  
-	  this.addFocusListener(new FocusAdapter() {
-
-		/* (non-Javadoc)
-		 * @see java.awt.event.FocusAdapter#focusGained(java.awt.event.FocusEvent)
-		 */
-		@Override
-		public void focusGained(FocusEvent e) {
-			// TODO Auto-generated method stub
-			activePanel = (ModuleParametersPanel) e.getSource();
-			super.focusGained(e);
-		}
-		  
-	});
+//	  this.addFocusListener(new FocusAdapter() {
+//
+//		/* (non-Javadoc)
+//		 * @see java.awt.event.FocusAdapter#focusGained(java.awt.event.FocusEvent)
+//		 */
+//		@Override
+//		public void focusGained(FocusEvent e) {
+//			// TODO Auto-generated method stub
+//			activePanel = (ModuleParametersPanel) e.getSource();
+//			super.focusGained(e);
+//		}
+//		  
+//	});
 	  
+  }
+  
+  public void makeActive() {
+	  activePanel = this;
+  }
+  
+  public static ModuleParametersPanel getActivePanel() {
+	  return activePanel;
   }
 
   /**

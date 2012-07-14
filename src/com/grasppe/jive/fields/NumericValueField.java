@@ -26,11 +26,13 @@ import javax.swing.text.NumberFormatter;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class NumericValueField extends JFormattedTextField implements PropertyChangeListener, ValueField, NamedField {
+public class NumericValueField extends JFormattedTextField implements PropertyChangeListener, ValueField, NamedField, NameValueField {
 
-  protected double[] numericRange = {};			// 
+  protected double[] numericRange = {};
   protected Double minimumValue = null;
   protected Double maximumValue = null;
+  
+  protected Object oldValue = null;  
 
   /**
    */
@@ -124,10 +126,10 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
         closestValue = getClosestValue(newValue);
 
         if (newValue != closestValue) {
-          source.setValue(closestValue);
-
-          return;
+          setValue(closestValue);
         }
+        
+        upateValue();
       }
 
       if ((newValue == null) || (newValue >= minimumValue)
@@ -206,4 +208,19 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
 
     this.selectAll();    
   }
+  
+  
+  public void upateValue() { //Object newValue) {
+      Object newValue = getValue();
+      String name     = getName();
+
+      if ((name == null) || name.isEmpty()) name = "value";
+      if ((oldValue != null) && oldValue.equals(newValue)) return;
+
+      firePropertyChange(name, oldValue, newValue);
+
+      oldValue = newValue;	  
+  }
+
+  
 }
