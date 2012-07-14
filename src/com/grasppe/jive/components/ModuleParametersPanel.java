@@ -116,6 +116,50 @@ protected Observers observers = new Observers(this);
     this.initializePanel();
   }
   
+  protected void flowResize() {
+	  
+	  JComponent container = (JComponent)this;
+	  
+		int height = 0; int width = 0;
+		
+		for (Component component : container.getComponents()) {
+			height = Math.max(height, component.getY() + component.getHeight());
+			width = Math.max(width, component.getX() + component.getWidth());
+		}
+		
+		int minLayoutHeight = 10; //((Double)this.getLayout().minimumLayoutSize(this).getHeight()).intValue();
+		int minLayoutWidth = 150; //((Double)this.getLayout().minimumLayoutSize(this).getWidth()).intValue();
+		int minHeight = ((Double)this.getMinimumSize().getHeight()).intValue();
+		int minWidth = ((Double)this.getMinimumSize().getWidth()).intValue();
+		
+		if (width<minLayoutWidth || height < minLayoutHeight) return; //Math.max(width,getMinimumSize().getWidth()) < 100) return;
+//		if (Math.max(height,getMinimumSize().getHeight()) < this.getLayout().minimumLayoutSize(this).getHeight()) return;
+		
+
+		Dimension preferredSize = new Dimension(width, height); //container.getPreferredSize();
+//		Dimension minimumSize = new Dimension(width, height);
+//		Dimension maximumSize = container.getMaximumSize(); //getPreferredSize();
+//		Dimension newSize = new Dimension(maximumSize.width, preferredSize.height);
+		
+		container.setPreferredSize(preferredSize);
+		container.setMinimumSize(preferredSize); //minimumSize)Size(preferredSize);
+		container.setMaximumSize(preferredSize);
+		
+		container.setOpaque(false);
+		container.setBackground(Color.white);
+		// container.setMaximumSize(newSize);
+//		setAlignmentX(CENTER_ALIGNMENT);
+//		setOpaque(true);
+//		  setBackground(Color.blue);
+		
+		container.revalidate();
+		
+		if (container.getParent()!=null)
+			container.getParent().validate();
+		
+	  
+  }
+  
   protected void initializePanel() {
 	  this.addComponentListener(new ComponentAdapter() {
 
@@ -124,16 +168,22 @@ protected Observers observers = new Observers(this);
 		 */
 		@Override
 		public void componentResized(ComponentEvent e) {
-			JComponent component = (JComponent) e.getComponent();
+			ModuleParametersPanel container = (ModuleParametersPanel) e.getComponent();
 			
-			Dimension preferredSize = component.getPreferredSize();
-			Dimension maximumSize = component.getMaximumSize(); //getPreferredSize();
-			Dimension newSize = new Dimension(maximumSize.width, preferredSize.height);
+			container.flowResize();
+//			int height = 0; int width = 0;
+//			
+//			for (Component component : container.getComponents()) {
+//				height = Math.max(height, component.getY() + component.getHeight());
+//				width = Math.max(width, component.getX() + component.getWidth());
+//			}
+//
+//			Dimension preferredSize = new Dimension(width, height); //container.getPreferredSize();
+//			Dimension maximumSize = container.getMaximumSize(); //getPreferredSize();
+//			Dimension newSize = new Dimension(maximumSize.width, preferredSize.height);
+//			
+//			container.setPreferredSize(preferredSize);
 			
-			component.setMaximumSize(newSize);
-//			setAlignmentX(CENTER_ALIGNMENT);
-//			setOpaque(true);
-//			  setBackground(Color.blue);
 			}
 	});
 	  
@@ -150,7 +200,7 @@ protected Observers observers = new Observers(this);
 //		}
 //		  
 //	});
-	  
+	  flowResize();
   }
   
   public void makeActive() {

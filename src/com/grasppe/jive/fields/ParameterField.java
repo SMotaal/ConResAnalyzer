@@ -133,16 +133,13 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
     fieldPanel.removeAll();
 
-    // Field Panel
-    BoxLayout layout = new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS);
-
-    fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
+    // fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
     fieldPanel.add(labelComponent);			// , BorderLayout.LINE_START);
     fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
     fieldPanel.add(fieldComponent);			// , BorderLayout.CENTER);
     fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
     fieldPanel.add(suffixComponent);		// , BorderLayout.LINE_END);
-    fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
+    // fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
 
     labelComponent.setAlignmentX(LEFT_ALIGNMENT);
     fieldComponent.setAlignmentX(LEFT_ALIGNMENT);
@@ -180,9 +177,15 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
     suffixComponent.setHorizontalAlignment(JLabel.LEADING);
     suffixComponent.setOpaque(false);
 
+    // Field Panel
+    BoxLayout layout = new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS);
+    
     fieldPanel.setLayout(layout);
-    fieldPanel.setMaximumSize(new Dimension(getOptions().getMaximumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
-    fieldPanel.setMinimumSize(new Dimension(getOptions().getMinimumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
+//    fieldPanel.validate();
+//    fieldPanel.setPreferredSize(getPreferredSize());
+//    fieldPanel.validate();
+//    fieldPanel.setMaximumSize(new Dimension(getOptions().getMaximumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
+//    fieldPanel.setMinimumSize(new Dimension(getOptions().getMinimumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
     fieldPanel.setOpaque(false);
 
   }

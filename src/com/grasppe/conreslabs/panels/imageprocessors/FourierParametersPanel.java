@@ -56,30 +56,30 @@ public class FourierParametersPanel extends JiveParametersPanel implements Prope
   
   
 
-  /**
-   *    @param args
-   */
-  public static void main(String[] args) {
-
-    // Schedule a job for the event dispatch thread:
-    // creating and showing this application's GUI.
-    SwingUtilities.invokeLater(new Runnable() {
-
-      public void run() {
-
-        JFrame frame = new JFrame("FunctionParametersPanel Demo");
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Add contents to the window.
-        frame.getContentPane().add(new FourierParametersPanel());
-
-        // Display the window.
-        frame.pack();
-        frame.setVisible(true);
-      }
-
-    });
-  }
+//  /**
+//   *    @param args
+//   */
+//  public static void main(String[] args) {
+//
+//    // Schedule a job for the event dispatch thread:
+//    // creating and showing this application's GUI.
+//    SwingUtilities.invokeLater(new Runnable() {
+//
+//      public void run() {
+//
+//        JFrame frame = new JFrame("FunctionParametersPanel Demo");
+//
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//
+//        // Add contents to the window.
+//        frame.getContentPane().add(new FourierParametersPanel());
+//
+//        // Display the window.
+//        frame.pack();
+//        frame.setVisible(true);
+//      }
+//
+//    });
+//  }
   
 }

@@ -18,15 +18,15 @@ import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
-import com.grasppe.jive.fields.NameValueField;
 import com.grasppe.jive.fields.NumericValueField;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 import com.oracle.layout.SpringUtilities;
-import com.sun.snippets.ListDialog;
 
 //~--- JDK imports ------------------------------------------------------------
+
+import com.sun.snippets.ListDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,8 +40,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 
 import java.beans.PropertyChangeEvent;
@@ -63,7 +61,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -79,6 +76,8 @@ import javax.swing.border.EmptyBorder;
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class ModulePanelContainer extends JPanel implements Observer, ActionListener, PropertyChangeListener {
+
+  protected static int addNumber = 0;
 
 ///** Field description */
 //public static ColumnSpec[] COLUMN_SPEC = new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("50dlu"),
@@ -106,11 +105,13 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   protected float controlHSB[] = Color.RGBtoHSB(controlColor.getRed(), controlColor.getGreen(), controlColor.getBlue(), null);
   protected Color listColor    = Color.getHSBColor(controlHSB[0], controlHSB[1],
                                                 Math.min(controlHSB[2] * 1.1f, 0.97f));			// 0.5f * ( 0.75f + hsbVals[2] ));
-  protected Color                      headingColor      = Color.getHSBColor(controlHSB[0], controlHSB[1], 0.85f * controlHSB[2]);
-  protected String                     buttonType        = "segmentedCapsule";		// "segmentedRoundRect";     // "segmentedTextured"
-  protected String                     MacButtonType     = "JButton.buttonType";
-  protected String                     MacButtonPosition = "JButton.segmentPosition";
-  protected HashMap<KeyStroke, Action> keyMap            = new HashMap<KeyStroke, Action>();
+  protected Color                                headingColor      = Color.getHSBColor(controlHSB[0], controlHSB[1], 0.85f * controlHSB[2]);
+  protected String                               buttonType        = "segmentedCapsule";		// "segmentedRoundRect";     // "segmentedTextured"
+  protected String                               MacButtonType     = "JButton.buttonType";
+  protected String                               MacButtonPosition = "JButton.segmentPosition";
+  protected HashMap<KeyStroke, Action>           keyMap            = new HashMap<KeyStroke, Action>();
+  private int                                    moduleHashCode    = 0;
+  protected HashMap<String, JiveParametersPanel> modulesHashMap    = null;
 
   /**
    * Create the panel.
@@ -134,6 +135,44 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
+   * 	@param e
+   */
+  @Override
+  public void actionPerformed(ActionEvent e) {
+
+    Object source = e.getSource();
+
+    if (source.equals(applyButton)) {
+      GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+    }
+
+    if (source.equals(addButton)) {
+      GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+
+      // setValues(getValues());
+      addNewPanel();
+    }
+
+    if (source.equals(removeButton)) {
+      GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+      removeActivePanel();
+    }
+
+    if (source.equals(downButton)) {
+      GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+      moveActivePanel(1);
+    }
+
+    if (source.equals(upButton)) {
+      GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+      moveActivePanel(-1);
+    }
+
+    GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), e.toString(), 1);
+
+  }
+
+  /**
    * @param module
    * @return
    * @see java.util.LinkedList#add(java.lang.Object)
@@ -149,6 +188,18 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    */
   public void add(int index, JiveParametersPanel module) {
     modules.add(index, module);
+  }
+
+  /**
+   */
+  protected void addNewPanel() {
+    String[] panelTypes = { "Function", "Fourier" };
+
+    String   panelType  = ListDialog.showDialog(null, null, "Available Components", "Create New Component", panelTypes, "Function",
+                                             "Function         ");
+
+    createNewPanel(panelType, null);
+
   }
 
   /**
@@ -232,20 +283,19 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
           }
 
         }
-        
 
         button.doClick();
 
       }
-      
+
     };
-    
+
     action.putValue(Action.NAME, name + "-Button");
 
     button.setFocusable(false);
 
     attachKeyListener(keyStroke, action);
-    
+
     button.addActionListener(this);
 
     // KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
@@ -339,31 +389,49 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 //  attachKeyListener(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0), applyAction);
 
   }
-  
+
   /**
-   *    @param panel
-   *    @param title
+   * 	@param panelType
+   * 	@param index
+   * 	@return
    */
-  protected void createPermanentPanel(JiveParametersPanel panel, String title) {
-	  panel.setPermanent(true);
-	  createPanel(panel, title, null);
-  }  
+  protected JiveParametersPanel createNewPanel(String panelType, Integer index) {
+    JiveParametersPanel newPanel = null;
+
+    if (panelType.equals("Function")) newPanel = new FunctionParametersPanel();
+    else if (panelType.equals("Fourier")) newPanel = new FourierParametersPanel();
+
+    if (newPanel == null) return null;
+
+    GrasppeKit.debugText("ContainerPanel>Add", "Adding new " + newPanel.getClass().getSimpleName(), 1);
+
+    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+    String    title      = newPanel.getTitle();
+
+    if (getModules().keySet().contains(title)) newPanel.setTitle(title + "-" + addNumber++);
+
+    createPanel(newPanel, newPanel.getTitle(), index);
+
+    focusOwner.requestFocus();
+
+    return newPanel;
+  }
 
   /**
    *    @param panel
    *    @param title
+   * 	@param index
    */
   protected void createPanel(JiveParametersPanel panel, String title, Integer index) {
     if (this.contains(panel)) return;
 
     if ((title != null) &&!title.isEmpty()) panel.setTitle(title);
-    
+
     panel.addPropertyChangeListener("Title", this);
 
-    if (index==null)
-    	this.add(panel);
-    else
-    	this.add(index, panel);
+    if (index == null) this.add(panel);
+    else this.add(index, panel);
 
     this.updatePanels();
   }
@@ -374,6 +442,8 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     // Content Container
     contentPanel = new JPanel();
+
+//  contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); //(new SpringLayout());
     contentPanel.setLayout(new SpringLayout());
     contentPanel.setOpaque(false);
 
@@ -394,6 +464,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setBorder(null);			// new LineBorder(SystemColor.controlShadow));
     scrollPane.setBackground(listColor);
+    scrollPane.add(Box.createVerticalGlue());
 
     // Parent Container
     containerPanel = this;
@@ -417,12 +488,14 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
         if (contentPanel.isAncestorOf(focusOwner)) {
           ((JComponent)focusOwner.getParent().getParent()).scrollRectToVisible(focusOwner.getParent().getBounds());
-          
+
           try {
-  			ModuleParametersPanel panel = (ModuleParametersPanel) SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class, focusOwner);
-  			panel.makeActive();
+            ModuleParametersPanel panel = (ModuleParametersPanel)SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class,
+                                                                                                   focusOwner);
+
+            panel.makeActive();
           } catch (Exception exception) {
-        	  GrasppeKit.debugError("ContainerPanel>Focus", exception, 2);
+            GrasppeKit.debugError("ContainerPanel>Focus", exception, 2);
           }
 
           Iterator<KeyStroke> keyIterator = keyMap.keySet().iterator();
@@ -431,9 +504,9 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
             KeyStroke keyStroke = keyIterator.next();
 
             try {
-              InputMap ownerInput = focusOwner.getInputMap(WHEN_FOCUSED);
-              Action   action     = keyMap.get(keyStroke);
-              final String   name       = ((String)action.getValue(Action.NAME)).toLowerCase();
+              InputMap     ownerInput = focusOwner.getInputMap(WHEN_FOCUSED);
+              Action       action     = keyMap.get(keyStroke);
+              final String name       = ((String)action.getValue(Action.NAME)).toLowerCase();
 
               if (focusOwner instanceof JComponent) {			// (!(focusOwner instanceof NumericValueField)) {
                 final JComponent owner          = (JComponent)focusOwner;
@@ -457,7 +530,8 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
                         @Override
                         public void actionPerformed(ActionEvent e) {
                           ActionEvent e2 = new ActionEvent(e.getSource(), e.getID(), "Test", e.getWhen(), e.getModifiers());
-                          //e2.
+
+                          // e2.
                           owner.getActionMap().get(ownerActionKey).actionPerformed(e);
                           localAction.actionPerformed(e2);
                         }
@@ -523,6 +597,15 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
+   *    @param panel
+   *    @param title
+   */
+  protected void createPermanentPanel(JiveParametersPanel panel, String title) {
+    panel.setPermanent(true);
+    createPanel(panel, title, null);
+  }
+
+  /**
    */
   protected void initializePanel() {
     this.addComponentListener(new ComponentAdapter() {
@@ -542,9 +625,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
         component.setMaximumSize(newSize);
       }
     });
-    
-    
-    
+
   }
 
   /**
@@ -555,27 +636,70 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     return modules.iterator();
   }
 
-//  /**
-//   *    @param args
-//   */
-//  public static void main(String[] args) {
+  /**
+   * 	@param steps
+   */
+  protected void moveActivePanel(int steps) {
+
+    if (steps == 0) return;
+
+    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+
+    if ((activePanel == null) || (modules == null)) return;
+
+    if (!modules.contains(activePanel)) return;
+
+    int currentIndex = modules.indexOf(activePanel);
+    int newIndex     = currentIndex + steps;
+
+    GrasppeKit.debugText("ContainerPanel>MovePanel", activePanel.title + " " + currentIndex + " > " + newIndex, 1);
+
+    if ((newIndex < 0) || (newIndex > modules.size() - 1)) return;
+
+    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+    modules.remove(currentIndex);
+
+    modules.add(newIndex, activePanel);
+
+    updatePanels();
+
+    focusOwner.requestFocus();
+  }
+
+  /**
+   * 	@param evt
+   */
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+
+    if (evt.getPropertyName().equals("Title")) {
+      moduleHashCode = 0;
+    }
+
+  }
+
+///**
+// *    @param args
+// */
+//public static void main(String[] args) {
 //
-//    // Schedule a job for the event dispatch thread:
-//    // creating and showing this application's GUI.
-//    SwingUtilities.invokeLater(new Runnable() {
+//  // Schedule a job for the event dispatch thread:
+//  // creating and showing this application's GUI.
+//  SwingUtilities.invokeLater(new Runnable() {
 //
-//      public void run() {
+//    public void run() {
 //
-//        JFrame frame = new JFrame("PatchGeneratorParametersPanel Demo");
+//      JFrame frame = new JFrame("PatchGeneratorParametersPanel Demo");
 //
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //
-//        // Add contents to the window.
-//        frame.getContentPane().setLayout(new BorderLayout());
-//        frame.getContentPane().add(new ModulePanelContainer(), BorderLayout.EAST);
+//      // Add contents to the window.
+//      frame.getContentPane().setLayout(new BorderLayout());
+//      frame.getContentPane().add(new ModulePanelContainer(), BorderLayout.EAST);
 //
-//        // Display the window.
-//        frame.pack();
+//      // Display the window.
+//      frame.pack();
 //
 ////      Dimension  preferredSize = frame.getPreferredSize();
 ////      Dimension  maximumSize   = frame.getMaximumSize();        // getPreferredSize();
@@ -583,11 +707,11 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 ////      
 ////      frame.setMaximumSize(maximumSize);
 //
-//        frame.setVisible(true);
-//      }
+//      frame.setVisible(true);
+//    }
 //
-//    });
-//  }
+//  });
+//}
 
   /**
    * @param arg0
@@ -608,6 +732,27 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
   /**
    */
+  protected void removeActivePanel() {
+    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+
+    if ((activePanel == null) || (modules == null)) return;
+
+    if (activePanel.isPermanent()) return;
+
+    if (!modules.contains(activePanel)) return;
+
+    int currentIndex = modules.indexOf(activePanel);
+
+    GrasppeKit.debugText("ContainerPanel>RemovePanel", activePanel.title + " will be removed", 1);
+
+    modules.remove(currentIndex);
+
+    updatePanels();
+
+  }
+
+  /**
+   */
   @Override
   public void update() {
 
@@ -620,72 +765,9 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     int rows    = contentPanel.getComponentCount();
     int columns = 1;
 
-    SpringUtilities.makeCompactGrid(contentPanel, rows, columns, 3, 3, 3, 3);
+  SpringUtilities.makeCompactGrid(contentPanel, rows, columns, 3, 3, 3, 3);
+//    SpringUtilities.makeGrid(contentPanel, rows, columns, 3, 3, 3, 3);
   }
-  
-  public LinkedHashMap<String, HashMap> getValues() {
-	    LinkedHashMap<String, HashMap> values = new LinkedHashMap<String, HashMap>();
-	    // int                     i      = -1;
-	    
-	    Iterator<JiveParametersPanel> panelIterator = this.iterator();
-	    
-	    while (panelIterator.hasNext()) {
-	    	JiveParametersPanel module = panelIterator.next();
-	    	String name = module.getTitle();
-	    	values.put(name, module.getValues());
-	    }
-
-	    return values;	  
-  }
-  
-  private int moduleHashCode = 0;
-  
-  protected HashMap<String, JiveParametersPanel> modulesHashMap = null;
-  
-  public HashMap<String, JiveParametersPanel> getModules() {
-	  
-	  if (modules.hashCode()!=moduleHashCode) {
-		  GrasppeKit.debugText("ContainerPanel>Map", "Generating new hash map for hash code: " + modules.hashCode(), 2);
-		  
-	  	modulesHashMap = new HashMap<String, JiveParametersPanel>();
-	  	
-	    Iterator<JiveParametersPanel> panelIterator = this.iterator();
-	    
-	    while (panelIterator.hasNext()) {
-	    	JiveParametersPanel module = panelIterator.next();
-	    	String name = module.getTitle();
-	    	
-	    	modulesHashMap.put(name, module);
-	    }
-	  
-	    moduleHashCode = modules.hashCode();
-	  }
-	
-	    return modulesHashMap;
-  }
-  
-  public void setValues(HashMap<String, HashMap> allValues) {
-	  
-	  for (String moduleName : allValues.keySet()) {
-		  if (getModules().containsKey(moduleName)) {
-			JiveParametersPanel module = getModules().get(moduleName);
-			HashMap<String, HashMap> moduleValues = allValues.get(moduleName);
-			for (String propertyName : moduleValues.keySet()) {
-				try {
-					Object value = moduleValues.get(propertyName);
-					
-					 if (value instanceof Number) value = (Double)value+0.1;
-					
-					module.setValue(propertyName, value);
-				} catch (Exception exception) {
-					  GrasppeKit.debugError("ContainerPanel>Map", exception, 1);
-				}
-			}
-		  } else 
-			  GrasppeKit.debugText("ContainerPanel>Set", "Module " + moduleName + " is not found!", 2);
-	  }
-	  
-}  
 
   /**
    */
@@ -694,34 +776,50 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     contentPanel.setFont(listFont);
 
+    contentPanel.setSize(new Dimension(400, contentPanel.getSize().height));
+
     Iterator<JiveParametersPanel> panelIterator = this.iterator();
 
     while (panelIterator.hasNext()) {
       final JiveParametersPanel panel = panelIterator.next();
-      final JLabel                label = new JLabel(panel.getTitle());
+      final JLabel              label = new JLabel(panel.getTitle());
 
       label.setOpaque(true);
       label.setFont(headingFont);
       label.setBackground(headingColor);
       label.setBorder(new EmptyBorder(0, 2, 0, 2));			// LineBorder(label.getBackground(), 1, true));
-      label.setHorizontalTextPosition(JLabel.CENTER);
 
       panel.addPropertyChangeListener("Title", new PropertyChangeListener() {
-		
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			label.setText((String)evt.getNewValue());
-		}
-	});
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          label.setText((String)evt.getNewValue());
+        }
+      });
 
       contentPanel.add(label);
 
-      panel.setOpaque(false);														// panel.setBorder(BorderFactory.createTitledBorder(panel.getTitle()));
+      panel.setOpaque(false);			// panel.setBorder(BorderFactory.createTitledBorder(panel.getTitle()));
       panel.setFont(contentPanel.getFont());
       contentPanel.add(panel);
+
+      updateGrid();
+
+//      
+      revalidate();
+
+      panel.flowResize();
+
+//    panel.setMaximumSize(new Dimension(600, 99999));
+//    
+//    panel.validate();
+//    panel.setMinimumSize(panel.getPreferredSize());
     }
 
-    this.updateGrid();
+    contentPanel.add(Box.createVerticalGlue());
+
+    revalidate();
+
   }
 
   /**
@@ -765,6 +863,51 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
+   * 	@return
+   */
+  public HashMap<String, JiveParametersPanel> getModules() {
+
+    if (modules.hashCode() != moduleHashCode) {
+      GrasppeKit.debugText("ContainerPanel>Map", "Generating new hash map for hash code: " + modules.hashCode(), 2);
+
+      modulesHashMap = new HashMap<String, JiveParametersPanel>();
+
+      Iterator<JiveParametersPanel> panelIterator = this.iterator();
+
+      while (panelIterator.hasNext()) {
+        JiveParametersPanel module = panelIterator.next();
+        String              name   = module.getTitle();
+
+        modulesHashMap.put(name, module);
+      }
+
+      moduleHashCode = modules.hashCode();
+    }
+
+    return modulesHashMap;
+  }
+
+  /**
+   * 	@return
+   */
+  public LinkedHashMap<String, HashMap> getValues() {
+    LinkedHashMap<String, HashMap> values = new LinkedHashMap<String, HashMap>();
+
+    // int                     i      = -1;
+
+    Iterator<JiveParametersPanel> panelIterator = this.iterator();
+
+    while (panelIterator.hasNext()) {
+      JiveParametersPanel module = panelIterator.next();
+      String              name   = module.getTitle();
+
+      values.put(name, module.getValues());
+    }
+
+    return values;
+  }
+
+  /**
    * @return
    * @see java.util.AbstractCollection#isEmpty()
    */
@@ -804,130 +947,30 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
   }
 
-@Override
-public void actionPerformed(ActionEvent e) {
-	
-	Object source =  e.getSource();
-	
-	if (source.equals(applyButton)) {
-		GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), getValues().toString(), 1);
-	}
-	
-	if (source.equals(addButton)) {
-		GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), getValues().toString(), 1);
-		//setValues(getValues());
-		addNewPanel();
-	}
-	if (source.equals(removeButton)) {
-		GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), getValues().toString(), 1);
-		removeActivePanel();
-	}
-	
-	if (source.equals(downButton)) {
-		GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), getValues().toString(), 1);		
-		moveActivePanel(1);
-	}
+  /**
+   * 	@param allValues
+   */
+  public void setValues(HashMap<String, HashMap> allValues) {
 
-	if (source.equals(upButton)) {
-		GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), getValues().toString(), 1);		
-		moveActivePanel(-1);
-	}	
-	
-	GrasppeKit.debugText("ContainerPanel>"+e.getActionCommand(), e.toString(), 1);
+    for (String moduleName : allValues.keySet()) {
+      if (getModules().containsKey(moduleName)) {
+        JiveParametersPanel      module       = getModules().get(moduleName);
+        HashMap<String, HashMap> moduleValues = allValues.get(moduleName);
 
-}
+        for (String propertyName : moduleValues.keySet()) {
+          try {
+            Object value = moduleValues.get(propertyName);
 
-protected void removeActivePanel() {
-	JiveParametersPanel activePanel = (JiveParametersPanel) JiveParametersPanel.activePanel;
-	
-	if (activePanel==null || modules==null) return;
-	
-	if (activePanel.isPermanent()) return;
-	
-	if (!modules.contains(activePanel)) return;
-	
-	int currentIndex = modules.indexOf(activePanel);	
-	
-	GrasppeKit.debugText("ContainerPanel>RemovePanel",activePanel.title + " will be removed", 1);
-		
-	modules.remove(currentIndex);
-		
-	updatePanels();
-	
-}
+            if (value instanceof Number) value = (Double)value + 0.1;
 
-protected void addNewPanel() {
-    String[]	panelTypes = {"Function", "Fourier"};
-    
-    String	panelType = ListDialog.showDialog(null, null,
-            "Available Components", "Create New Component", panelTypes, "Function", "Function         ");
-    
-    
-    createNewPanel(panelType, null);
+            module.setValue(propertyName, value);
+          } catch (Exception exception) {
+            GrasppeKit.debugError("ContainerPanel>Map", exception, 1);
+          }
+        }
+      } else
+        GrasppeKit.debugText("ContainerPanel>Set", "Module " + moduleName + " is not found!", 2);
+    }
 
-}
-
-protected JiveParametersPanel createNewPanel(String panelType, Integer index) {
-	JiveParametersPanel newPanel = null;
-	
-	if (panelType.equals("Function"))
-		newPanel = new FunctionParametersPanel();
-	else 	if (panelType.equals("Fourier"))
-		newPanel = new FourierParametersPanel();
-	
-	if (newPanel==null) return null;
-	
-	GrasppeKit.debugText("ContainerPanel>Add", "Adding new " + newPanel.getClass().getSimpleName(), 1);
-	
-    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-	
-	String title = newPanel.getTitle();
-	
-	if (getModules().keySet().contains(title)) newPanel.setTitle(title + "-" + addNumber++);
-	
-	createPanel(newPanel, newPanel.getTitle(), index);
-	
-	focusOwner.requestFocus();
-	return newPanel;	
-}
-
-protected static int addNumber = 0;  
-
-protected void moveActivePanel(int steps) {
-	
-	if (steps==0) return;
-	
-	JiveParametersPanel activePanel = (JiveParametersPanel) JiveParametersPanel.activePanel;
-	
-	if (activePanel==null || modules==null) return;
-	
-	if (!modules.contains(activePanel)) return;
-	
-	int currentIndex = modules.indexOf(activePanel);
-	int newIndex = currentIndex+steps;
-	
-	GrasppeKit.debugText("ContainerPanel>MovePanel",activePanel.title + " " + currentIndex + " > " + newIndex, 1);
-	
-	if (newIndex<0 || newIndex>modules.size()-1) return;
-	
-    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-	
-	modules.remove(currentIndex);
-	
-	modules.add(newIndex, activePanel);
-	
-	updatePanels();
-	
-	focusOwner.requestFocus();
-}
-
-@Override
-public void propertyChange(PropertyChangeEvent evt) {
-	
-	if (evt.getPropertyName().equals("Title")) {
-		moduleHashCode = 0;
-	}
-	
-}
-
+  }
 }

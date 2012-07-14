@@ -10,11 +10,11 @@ package com.grasppe.jive.fields;
 	  
 	  public static int DEFAULT_LABEL_WIDTH = 100;
 	  public static int DEFAULT_FIELD_WIDTH = 125;
-	  public static int DEFAULT_SUFFIX_WIDTH = 50;
+	  public static int DEFAULT_SUFFIX_WIDTH = 25;
 	  
-	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH + 25, DEFAULT_SUFFIX_WIDTH - 25);	  
+	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH + 175, DEFAULT_SUFFIX_WIDTH - 25);	  
 	  public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 25, DEFAULT_SUFFIX_WIDTH + 25);
-	  public static GroupOptions TINY_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 50, DEFAULT_SUFFIX_WIDTH + 50);
+	  public static GroupOptions TINY_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 50, DEFAULT_SUFFIX_WIDTH + 25);
 	  //public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
 	  
 	  /**
