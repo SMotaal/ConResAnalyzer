@@ -1,0 +1,33 @@
+
+Halftoning Toolbox for Matlab
+
+Copyright (c) 1999-2005 The University of Texas
+All Rights Reserved.
+  
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+  
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+  
+The GNU Public License is available in the file LICENSE, or you
+can write to the Free Software Foundation, Inc., 59 Temple Place -
+Suite 330, Boston, MA 02111-1307, USA, or you can find it on the
+World Wide Web at http://www.fsf.org.
+  
+Programmers:  Vishal Monga, Niranjan Damera-Venkata, Hamood Rehman, Brian L. Evans
+Version:      1.2
+ 
+The authors are with the Department of Electrical and Computer
+Engineering, The University of Texas at Austin, Austin, TX.
+The primary author, Vishal Monga, can be reached by e-mail at
+vishal@ece.utexas.edu.  Niranjan Damera-Venkata developed this
+code while he was a graduate student at UT Austin.  At UT Austin,
+Prof. Brian L. Evans directed the development of this halftoning
+toolbox for Matlab.  He can be reached at bevans@ece.utexas.edu.
+More information about Prof. Evans' work on halftoning can be
+found at http://www.ece.utexas.edu/~bevans/projects/halftoning.

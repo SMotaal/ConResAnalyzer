@@ -1,0 +1,95 @@
+// package com.grasppe.lure.components;
+
+import com.grasppe.lure.components.Observers;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
+import com.grasppe.lure.framework.GrasppeKit.Observer;
+
+
+public class Facade implements Observer, Observable {
+
+    protected Observers observers = new Observers(this);
+  
+	/**
+	   * Attaches an observer through the observers object which will include the observer in future update() notify calls.
+	   * @param observer
+	   */
+	public void attachObserver(Observer observer) {
+	    observers.attachObserver(observer);
+	  }
+
+	/**
+	   * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
+	   * @param observer
+	   */
+	public void detachObserver(Observer observer) {
+	    observers.detachObserver(observer);
+	  }
+
+	/**
+	   * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
+	   */
+	public void detachObservers() {
+	    observers.detachObservers();
+	  }
+
+	/**
+	   *  @param observer
+	   */
+	public void notifyObserver(Observer observer) {
+	    observer.update();
+	  }
+
+	/**
+	   * Notifies all observer through the observers object which calls update().
+	   */
+	public void notifyObservers() {
+	    observers.notifyObservers();
+	  }
+  
+  
+  private java.util.Vector data = new java.util.Vector();
+  
+  public synchronized void addUpdateListener(UpdateListener lis) {
+    data.addElement(lis);
+  }
+  public synchronized void removeUpdateListener(UpdateListener lis) {
+    data.removeElement(lis);
+  }
+  
+  
+  public interface UpdateListener extends java.util.EventListener {
+    void updateEvent(UpdateEvent event);
+  }  
+  
+  public class UpdateEvent extends java.util.EventObject {
+    private static final long serialVersionUID = 1L;
+    public float oldValue,newValue;
+    UpdateEvent(Object obj) {
+      super(obj);
+    }
+    UpdateEvent(Object obj, float oldValue, float newValue) {
+      super(obj);
+      this.oldValue = oldValue;
+      this.newValue = newValue;
+    }
+  }  
+  
+  public void notifyUpdate() {
+//     this.update();
+    java.util.Vector dataCopy;
+    synchronized(this) {
+      dataCopy = (java.util.Vector)data.clone();
+    }
+    for (int i=0; i<dataCopy.size(); i++) {
+      UpdateEvent event = new UpdateEvent(this, 0, 1);
+      ((UpdateListener)dataCopy.elementAt(i)).updateEvent(event);
+    }
+  }
+  
+
+  /**
+   * Method called by observable object during notifyObserver calls.
+   */
+  public void update() {
+  }
+}
