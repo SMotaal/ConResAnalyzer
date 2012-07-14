@@ -26,7 +26,7 @@ import javax.swing.text.NumberFormatter;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class NumericValueField extends JFormattedTextField implements PropertyChangeListener {
+public class NumericValueField extends JFormattedTextField implements PropertyChangeListener, ValueField {
 
   protected double[] numericRange = {};			// 
   protected Double minimumValue = null;

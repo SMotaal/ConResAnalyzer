@@ -52,6 +52,8 @@ public class PatchParametersPanel extends ModuleParametersPanel implements Prope
 
     this.addPropertyChangeListener(this);
     this.setName("Patch-Panel");
+    
+    this.setTitle("Patch");
 
     setLayout(new FormLayout(PatchGeneratorParametersPanel.COLUMN_SPEC, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
                                                                                         FormFactory.DEFAULT_ROWSPEC,
@@ -70,7 +72,7 @@ public class PatchParametersPanel extends ModuleParametersPanel implements Prope
   private void createPanelFields() {
 
     // Mean Tone (aka Reference Tone Value)
-    meanToneComponent = (NumericValueField)createNumericField("Patch-Mean", meanToneValue, "Mean Tone", 0, 100, "%", 2);
+    meanToneComponent = (NumericValueField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
 
     // Contrast
     contrastComponent = (NumericValueField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
@@ -111,7 +113,7 @@ public class PatchParametersPanel extends ModuleParametersPanel implements Prope
     // NumericValueField txtResolution = new ResolutionValueField(0, 10);
     // txtResolution.setHorizontalAlignment(SwingConstants.TRAILING);
     // txtResolution.setValue(resolutionValue);
-    // resolutionComponent = txtResolution;
+    // functionComponent = txtResolution;
     // txtMeanTone.addPropertyChangeListener("value", this);
     // add(txtResolution, "4, 6");
 

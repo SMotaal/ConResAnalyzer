@@ -48,6 +48,8 @@ public class PrintingParametersPanel extends ModuleParametersPanel implements Pr
 
     this.addPropertyChangeListener(this);
     this.setName("Print-Panel");
+    
+    this.setTitle("Printing");
 
     setLayout(new FormLayout(PatchGeneratorParametersPanel.COLUMN_SPEC, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
                                                                                         FormFactory.DEFAULT_ROWSPEC,

@@ -51,6 +51,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -61,8 +62,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-
-import org.hamcrest.core.IsNull;
 
 /**
  * Class description
@@ -98,7 +97,7 @@ public class ModulePanelContainer extends JPanel implements Observer {
   protected Color listColor    = Color.getHSBColor(controlHSB[0], controlHSB[1],
                                                 Math.min(controlHSB[2] * 1.1f, 0.97f));			// 0.5f * ( 0.75f + hsbVals[2] ));
   protected Color                      headingColor      = Color.getHSBColor(controlHSB[0], controlHSB[1], 0.85f * controlHSB[2]);
-  protected String                     buttonType        = "segmentedCapsule"; // "segmentedRoundRect";		// "segmentedTextured"
+  protected String                     buttonType        = "segmentedCapsule";		// "segmentedRoundRect";     // "segmentedTextured"
   protected String                     MacButtonType     = "JButton.buttonType";
   protected String                     MacButtonPosition = "JButton.segmentPosition";
   protected HashMap<KeyStroke, Action> keyMap            = new HashMap<KeyStroke, Action>();
@@ -188,6 +187,9 @@ public class ModulePanelContainer extends JPanel implements Observer {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        
+        
+        System.out.println(focusOwner);
 
         if (focusOwner instanceof NumericValueField) {
           NumericValueField textOwner = ((NumericValueField)focusOwner);
@@ -203,6 +205,22 @@ public class ModulePanelContainer extends JPanel implements Observer {
 
           KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
           textOwner.requestFocus();
+
+        }
+
+        if (focusOwner instanceof JComboBox) {
+          JComboBox listOwner = (JComboBox)focusOwner;
+
+          try {
+            InputMap input = listOwner.getInputMap();
+
+            System.out.println(input.keys());
+          } catch (Exception exception) {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+            listOwner.requestFocus();
+
+            return;
+          }
 
         }
 
@@ -238,13 +256,13 @@ public class ModulePanelContainer extends JPanel implements Observer {
     downButton  = this.createButton("\u2193", "MoveDown", KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.META_DOWN_MASK));
 
     applyButton = this.createButton("Apply", "Apply", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-    
-//    //applyButton.setIcon(new Icon)
-//    try {
-//    	applyButton.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("NSImage://NSQuickLookTemplate")));
-//    	applyButton.setToolTipText(applyButton.getText());
-//    	applyButton.setText("");
-//    } finally {}
+
+//  //applyButton.setIcon(new Icon)
+//  try {
+//    applyButton.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("NSImage://NSQuickLookTemplate")));
+//    applyButton.setToolTipText(applyButton.getText());
+//    applyButton.setText("");
+//  } finally {}
     setNSButtonImage(addButton, "NSAddTemplate", "New");
     setNSButtonImage(removeButton, "NSRemoveTemplate", "Delete");
     setNSButtonImage(upButton, "NSLeftFacingTriangleTemplate", "Move Up");
@@ -272,8 +290,6 @@ public class ModulePanelContainer extends JPanel implements Observer {
     buttonPanel.add(Box.createHorizontalGlue());
 
     // buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
-
-    
 
     // applyButton.setVisible(false);
 //  addButton.addComponentListener(new ComponentAdapter() {
@@ -308,23 +324,6 @@ public class ModulePanelContainer extends JPanel implements Observer {
 //  attachKeyListener(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0), applyAction);
 
   }
-  
-  public void setNSButtonImage(JButton button, String imageName, String toolText) {
-	  
-	    //applyButton.setIcon(new Icon)
-	    try {
-	    	button.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("NSImage://" + imageName)));
-	    	
-	    	if (toolText==null || toolText.isEmpty()) {
-		    	button.setToolTipText(button.getText());
-	    	} else {
-	    		button.setToolTipText(toolText);
-	    	}
-	    		
-		    	button.setText("");
-	    } finally {}	  
-	  
-  }
 
   /**
    *    @param panel
@@ -333,7 +332,7 @@ public class ModulePanelContainer extends JPanel implements Observer {
   protected void createPanel(ModuleParametersPanel panel, String title) {
     if (this.contains(panel)) return;
 
-    panel.setTitle(title);
+    if ((title != null) &&!title.isEmpty()) panel.setTitle(title);
 
     this.add(panel);
 
@@ -385,10 +384,10 @@ public class ModulePanelContainer extends JPanel implements Observer {
       public void propertyChange(PropertyChangeEvent evt) {
         if (!(evt.getNewValue() instanceof JComponent)) return;
 
-        JComponent focused = (JComponent)evt.getNewValue();
+        JComponent focusOwner = (JComponent)evt.getNewValue();
 
-        if (contentPanel.isAncestorOf(focused)) {
-          ((JComponent)focused.getParent().getParent()).scrollRectToVisible(focused.getParent().getBounds());
+        if (contentPanel.isAncestorOf(focusOwner)) {
+          ((JComponent)focusOwner.getParent().getParent()).scrollRectToVisible(focusOwner.getParent().getBounds());
 
           Iterator<KeyStroke> keyIterator = keyMap.keySet().iterator();
 
@@ -396,12 +395,57 @@ public class ModulePanelContainer extends JPanel implements Observer {
             KeyStroke keyStroke = keyIterator.next();
 
             try {
-              InputMap input  = focused.getInputMap(WHEN_FOCUSED);
-              Action   action = keyMap.get(keyStroke);
-              String   name   = ((String)action.getValue(Action.NAME)).toLowerCase();
+              InputMap ownerInput = focusOwner.getInputMap(WHEN_FOCUSED);
+              Action   action     = keyMap.get(keyStroke);
+              String   name       = ((String)action.getValue(Action.NAME)).toLowerCase();
 
-              input.put(keyStroke, name);
-              focused.getActionMap().put(name, action);
+              if (focusOwner instanceof JComponent) {			// (!(focusOwner instanceof NumericValueField)) {
+                final JComponent owner       = (JComponent)focusOwner;
+                final Action     localAction = action;
+                final Object ownerActionKey = ownerInput.get(keyStroke);
+
+                if (ownerActionKey != null) {
+
+                  System.out.println(ownerActionKey);
+
+                  try {
+                	  
+                	  String ownerActionName;
+                	  
+                	  if (!(ownerActionKey instanceof String))
+                		  ownerActionName = ownerActionKey.toString();
+                	  else
+                		  ownerActionName = (String) ownerActionKey;
+
+                    if (!((String)ownerActionName).startsWith("wrap-" + name)) {
+                      Action wrapperAction = new AbstractAction(name) {
+
+                        @Override
+                        public void actionPerformed(ActionEvent arg0) {
+                          owner.getActionMap().get(ownerActionKey).actionPerformed(arg0);
+                          localAction.actionPerformed(arg0);
+                        }
+                      };
+
+                      String wrapperName = "wrap-" + name + "-" + ownerActionName;
+
+                      ownerInput.put(keyStroke, wrapperName);
+                      owner.getActionMap().put(wrapperName, wrapperAction);
+                    }
+                  } catch (Exception exception) {
+                    System.out.println(exception);
+                  }
+
+              } else {
+            	System.out.println(focusOwner);
+                ownerInput.put(keyStroke, name);
+                focusOwner.getActionMap().put(name, action);
+              }
+              } else {
+            	  System.out.println(focusOwner);
+            	  
+              }
+
             } finally {}
 
           }
@@ -585,7 +629,7 @@ public class ModulePanelContainer extends JPanel implements Observer {
 // * @param scanningParametersPanel the scanningParametersPanel to set
 // */
 //public void setScanningParametersPanel(
-//        ScanningParametersPanel scanningParametersPanel) {
+//        FourierParametersPanel scanningParametersPanel) {
 //    this.scanningParametersPanel = scanningParametersPanel;
 //}
 
@@ -628,6 +672,28 @@ public class ModulePanelContainer extends JPanel implements Observer {
    */
   public ModuleParametersPanel set(int arg0, ModuleParametersPanel arg1) {
     return modules.set(arg0, arg1);
+  }
+
+  /**
+   *    @param button
+   *    @param imageName
+   *    @param toolText
+   */
+  public void setNSButtonImage(JButton button, String imageName, String toolText) {
+
+    // applyButton.setIcon(new Icon)
+    try {
+      button.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("NSImage://" + imageName)));
+
+      if ((toolText == null) || toolText.isEmpty()) {
+        button.setToolTipText(button.getText());
+      } else {
+        button.setToolTipText(toolText);
+      }
+
+      button.setText("");
+    } finally {}
+
   }
 
 //

@@ -1,32 +1,63 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>Grasppe</groupId>
-  <artifactId>ConResAnalyzer</artifactId>
-  <packaging>pom</packaging>
-  <name>ConResAnalyzer Alpha</name>
-  <version>0.0.1-SNAPSHOT</version>
-  <description>		</description>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.apache.commons</groupId>
-  		<artifactId>commons-io</artifactId>
-  		<version>1.3.2</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.apache.sanselan</groupId>
-  		<artifactId>sanselan</artifactId>
-  		<version>0.97-incubator</version>
-  		<type>jar</type>
-  		<classifier>sources</classifier>
-  		<scope>compile</scope>
-  	</dependency>
-  </dependencies>
-  <dependencyManagement>
-  	<dependencies>
-  	</dependencies>
-  </dependencyManagement>
-  <modules>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>Grasppe</groupId>
+	<artifactId>ConResAnalyzer</artifactId>
+	<packaging>pom</packaging>
+	<name>ConResAnalyzer Alpha</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>		</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sanselan</groupId>
+			<artifactId>sanselan</artifactId>
+			<version>0.97-incubator</version>
+			<type>jar</type>
+			<classifier>sources</classifier>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mathworks.jmi</groupId>
+			<artifactId>jmi</artifactId>
+			<version>7.14.0</version>
+			<scope>system</scope>
+			<systemPath>/Applications/MATLAB_R2012a.app/java/jar/jmi.jar</systemPath>
+			<!--systemPath>${basedir}/lib/commons-utils.jar</systemPath-->
+		</dependency>
+		<dependency>
+			<groupId>matlabcontrol</groupId>
+			<artifactId>matlabcontrol</artifactId>
+			<version>4.0.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/dependencies/matlabcontrol-4.0.0.jar</systemPath>
+			<!--systemPath>${basedir}/lib/commons-utils.jar</systemPath-->
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.apache.commons.lang</artifactId>
+			<version>2.6</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openengsb.wrapped</groupId>
+			<artifactId>com.google.gdata</artifactId>
+			<version>1.41.5.w1</version>
+			<type>bundle</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+		</dependencies>
+	</dependencyManagement>
+	<modules>
+	</modules>
 </project>

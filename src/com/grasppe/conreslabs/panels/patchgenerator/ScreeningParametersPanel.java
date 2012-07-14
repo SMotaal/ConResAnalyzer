@@ -48,6 +48,8 @@ public class ScreeningParametersPanel extends ModuleParametersPanel implements P
     this.addPropertyChangeListener(this);
     this.setName("Screen-Panel");
     
+    this.setTitle("Screening");
+    
     setLayout(new FormLayout(PatchGeneratorParametersPanel.COLUMN_SPEC, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
                                                                                         FormFactory.DEFAULT_ROWSPEC,
                                                                                         FormFactory.RELATED_GAP_ROWSPEC,

@@ -12,7 +12,9 @@
 package com.grasppe.jive.components;
 
 import com.grasppe.jive.fields.NumericValueField;
+import com.grasppe.jive.fields.ParameterField;
 import com.grasppe.jive.fields.ResolutionValueField;
+import com.grasppe.jive.fields.TextValueField;
 import com.grasppe.lure.components.Observers;
 import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
@@ -26,12 +28,16 @@ import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
@@ -40,6 +46,8 @@ import javax.swing.SwingConstants;
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class ModuleParametersPanel extends JPanel implements Observable {
+	
+	protected static ModuleParametersPanel activePanel;
 
 /* (non-Javadoc)
 	 * @see javax.swing.JComponent#setFont(java.awt.Font)
@@ -127,6 +135,20 @@ protected Observers observers = new Observers(this);
 			}
 	});
 	  
+	  this.addFocusListener(new FocusAdapter() {
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.FocusAdapter#focusGained(java.awt.event.FocusEvent)
+		 */
+		@Override
+		public void focusGained(FocusEvent e) {
+			// TODO Auto-generated method stub
+			activePanel = (ModuleParametersPanel) e.getSource();
+			super.focusGained(e);
+		}
+		  
+	});
+	  
   }
 
   /**
@@ -166,6 +188,66 @@ protected Observers observers = new Observers(this);
 
     return txtField;
   }
+  
+  protected JComponent createListField(String name, Object value, Object[] options, String label, String suffix, int row) {
+	    JLabel lblName = new JLabel(label + ":");
+
+	    add(lblName, "2, " + row + ", right, default");
+
+	    JLabel lblSuffix = new JLabel(suffix);
+
+	    add(lblSuffix, "6, " + row + ", left, default");
+
+
+	    JComboBox lstField = new JComboBox(options);
+	    
+	    lstField.putClientProperty("JComboBox.isSquare", true);
+	    lstField.putClientProperty("JComponent.sizeVariant", "regular");
+	    
+	    lstField.setName(name);
+	    try {
+	    	lstField.setSelectedItem(value);
+	    } finally {
+	    	lstField.setSelectedIndex((Integer)value);
+	    }
+	    
+	    lstField.addPropertyChangeListener("value", (PropertyChangeListener)this);
+	    add(lstField, "4, " + row);
+	    
+	    lstField.setEditable(true);
+	    
+	    return lstField;
+  }
+  
+  protected void addParameterField(ParameterField field, int row) {
+	  add(field, "2, " + row + ", right, default");
+  }
+  
+  protected JComponent createTextField(String name, String value, String label, String suffix, int row) {
+	    JLabel lblName = new JLabel(label + ":");
+
+	    add(lblName, "2, " + row + ", right, default");
+
+	    JLabel lblSuffix = new JLabel(suffix);
+
+	    add(lblSuffix, "6, " + row + ", left, default");
+
+
+	    TextValueField txtField = new TextValueField(value);
+	    
+	    
+	    txtField.setName(name);
+	    
+	    txtField.addPropertyChangeListener("value", (PropertyChangeListener)this);
+	    add(txtField, "4, " + row);
+	    
+	    txtField.setMinimumSize(new Dimension(180, txtField.getMinimumSize().height));
+	    
+	    // txtField.setEditable(true);
+	    
+	    return txtField;
+}
+  
 
   /**
    *    @param name
