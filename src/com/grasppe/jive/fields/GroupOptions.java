@@ -7,7 +7,7 @@ package com.grasppe.jive.fields;
    */
   public class GroupOptions {
 	  
-	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(300, 25);	  
+	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(150, 25);	  
 	  public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
 	  //public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
 	  

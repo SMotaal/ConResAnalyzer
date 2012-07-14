@@ -11,19 +11,25 @@
 
 package com.grasppe.conreslabs.panels.imageprocessors;
 
-import com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
 import com.grasppe.jive.components.ModuleParametersPanel;
-import com.grasppe.jive.fields.NumericValueField;
-
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
+import com.grasppe.jive.fields.Factory;
+import com.grasppe.jive.fields.GroupOptions;
+import com.grasppe.jive.fields.NameValueField;
+import com.grasppe.jive.fields.ParameterField;
+import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -35,40 +41,70 @@ import javax.swing.SwingUtilities;
  */
 public class FourierParametersPanel extends ModuleParametersPanel implements PropertyChangeListener {
 
-  private int    modeValue = 0,
-                    methodValue = 0;
-  JComponent modeComponent, methodComponent;
+//  private NameValueField              modeComponent, methodComponent;
+  private Collection<ParameterField>  fields     = new LinkedHashSet<ParameterField>();
+  private Map<String, NameValueField> components = new HashMap<String, NameValueField>();
+  private ParameterField              modeField, methodField;
+  private String[]                    modeOptions   = { "Automatic", "Forward", "Reverse" };
+  private String[]                    methodOptions = { "Logarithmic Scaling", "Raw Power Spectrum" };
+  private GroupOptions                groupOptions  = new GroupOptions();
 
   /**
    * Create the panel.
    */
   public FourierParametersPanel() {
 
-    this.addPropertyChangeListener(this);
-    this.setName("FFT-Panel");
-    
-    this.setTitle("Fourier Transform");
+    this.setName("Fourier-Panel");
 
-    setLayout(new FormLayout(PatchGeneratorParametersPanel.COLUMN_SPEC, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
-                                                                                        FormFactory.DEFAULT_ROWSPEC,
-                                                                                        FormFactory.RELATED_GAP_ROWSPEC,
-                                                                                        FormFactory.DEFAULT_ROWSPEC,
-                                                                                        FormFactory.RELATED_GAP_ROWSPEC, }));
+    this.setTitle("Fourier");
 
     createPanelFields();
+  }
+
+  /**
+   *  @param field
+   */
+  private void addField(ParameterField field) {
+    fields.add(field);
+    field.addPropertyChangeListener(field.getName(), this);
+    this.addPropertyChangeListener(field.getName(), this);
+    components.put(field.getName(), (NameValueField)field.getFieldComponent());
   }
 
   /**
    */
   private void createPanelFields() {
 
-    String[] fftModes = {"Automatic", "Forward", "Reverse"};
-    
-    modeComponent = createListField("FFT-Mode", modeValue, fftModes, "Mode", "", 2);    
-    
-    String[] fftMethods = {"Logarithmic Scaling", "Raw Power Spectrum"};
-    
-    methodComponent = createListField("FFT-Method", methodValue, fftMethods, "Method", "", 4);
+    ParameterField.setGroupOptions("long-text", GroupOptions.LONG_TEXT_OPTIONS);
+    ParameterField.setGroupOptions("short-text", GroupOptions.SHORT_TEXT_OPTIONS);
+
+    methodField = Factory.createListField("Fourier-Method", "Method", 0, methodOptions, "");
+    methodField.setGroupID("long-text");
+//    methodComponent = (NameValueField)methodField.getFieldComponent();
+
+    addField(methodField);
+
+    modeField = Factory.createListField("Fourier-Mode", "Mode", 0, modeOptions, "");
+    modeField.setGroupID("long-text");
+//    modeComponent = (NameValueField)modeField.getFieldComponent();
+
+    addField(modeField);
+
+    BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
+
+    this.setLayout(layout);
+    this.setAlignmentX(LEFT_ALIGNMENT);
+
+    add(Box.createVerticalStrut(groupOptions.marginHeight));
+
+    int fieldIndex = 0;
+
+    for (ParameterField field : fields) {
+      if (fieldIndex++ > 1) add(Box.createVerticalStrut(groupOptions.paddingHeight));
+      add(field);
+    }
+
+    add(Box.createVerticalStrut(groupOptions.marginHeight));
 
   }
 
@@ -83,7 +119,7 @@ public class FourierParametersPanel extends ModuleParametersPanel implements Pro
 
       public void run() {
 
-        JFrame frame = new JFrame("FourierParametersPanel Demo");
+        JFrame frame = new JFrame("FunctionParametersPanel Demo");
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -103,69 +139,100 @@ public class FourierParametersPanel extends ModuleParametersPanel implements Pro
    */
   public void propertyChange(PropertyChangeEvent evt) {
 
-    String sourceName   = ((JComponent)evt.getSource()).getName();
-    String propertyName = evt.getPropertyName();
+    try {
 
-    if (sourceName.matches("FFT-Panel")) {
+      String sourceName   = ((JComponent)evt.getSource()).getName();
+      String propertyName = evt.getPropertyName();
 
-      // Panel Property Changed... Update Field
-//       if (propertyName.matches("Scan-Resolution")) functionComponent.setValue(modeValue);
-//
-//      else if (propertyName.matches("Scan-Scale")) methodComponent.setValue(methodValue);
-//
-//      else {
-//        return;
-//      }
+      if (sourceName.matches(getName())) {		// Panel Property Changed... Update Field
 
-      this.notifyObservers();
+        if (components.containsKey(propertyName)) {
+          components.get(propertyName).setValue(evt.getNewValue());
+          this.notifyObservers();
+        }
+      } else {																// Panel Field Changed... Update Property
+        if (components.containsKey(sourceName)) {
+        	setValue(sourceName, evt.getNewValue());
+        }
+      }
 
-    } else {
-
-      // Panel Field Changed... Update Property
-//      if (sourceName.matches("Scan-Resolution")) setResolutionValue(((Number)functionComponent.getValue()).doubleValue());
-//
-//      else if (sourceName.matches("Scan-Scale")) setScaleValue(((Number)methodComponent.getValue()).doubleValue());
-//
-//      else {
-//        return;
-//      }
-
-      // this.notifyObservers(); Not needed due to cascade from setting values
+      System.out.println(propertyName + ": " + evt.getNewValue().toString());
+      System.out.println(getValues());
+    } catch (Exception exception) {
+      System.out.println(evt);
+      System.out.println(exception);
     }
 
   }
-
-  /**
-   *   @return the modeValue
-   */
-  public int getModeValue() {
-    return modeValue;
+  
+  public HashMap<String, Object> getValues() {
+	  HashMap<String, Object> values = new HashMap<String, Object>();
+	  int i = -1;
+	  for (String name : components.keySet()) {
+		  values.put(name, components.get(name).getValue());
+	  }	 
+	  return values;
   }
 
   /**
-   * @return the methodValue
+   * 	@param name
+   * 	@return
    */
-  public int getMethodValue() {
-    return methodValue;
+  public Object getValue(String name) {
+    if (components.containsKey(name)) return components.get(name).getValue();
+    else return null;
   }
 
   /**
-   *    @param newValue
+   * 	@param name
+   * 	@param newValue
    */
-  public void setModeValue(int newValue) {
-    int oldValue = this.modeValue;
+  public void setValue(String name, Object newValue) {
+    if (!components.containsKey(name)) return;
 
-    this.modeValue = newValue;
-    this.firePropertyChange("FFT-Mode", oldValue, newValue);
+    NameValueField component = components.get(name);
+    Object         oldValue  = component.getValue();
+
+    if (oldValue.equals(newValue)) return;
+    component.setValue(newValue);
+    this.firePropertyChange(name, oldValue, newValue);
+    this.notifyObservers();
+    
+    //GrasppeKit.de
+    System.out.println(getValues());
   }
 
-  /**
-   *    @param newValue
-   */
-  public void setMethodValue(int newValue) {
-    int oldValue = this.methodValue;
+  // /**
+  // *   @return the functionValue
+  // */
+  // public String getFunctionValue() {
+  // return functionValue;
+  // }
 
-    this.methodValue = newValue;
-    this.firePropertyChange("FFT-Method", oldValue, newValue);
-  }
+  // /**
+  // *    @param newValue
+  // */
+  // public void setFunctionValue(String newValue) {
+  // //this.functionValue = functionValue;
+  //
+  // String oldValue = this.functionValue;
+  //
+  // this.functionValue = newValue;
+  // this.firePropertyChange("Function-Expression", oldValue, newValue);
+  //
+  // }
+
+  // /**
+  // *    @param newValue
+  // */
+  // public void setFunctionValue2(String newValue) {
+  //
+  // // this.functionValue2 = functionValue;
+  //
+  // String oldValue = this.functionValue;
+  //
+  // this.functionValue = newValue;
+  // this.firePropertyChange("Function-Expression-2", oldValue, newValue);
+  //
+  // }
 }

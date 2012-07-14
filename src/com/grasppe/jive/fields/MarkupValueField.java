@@ -35,7 +35,7 @@ import javax.swing.text.DefaultEditorKit;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class MarkupValueField extends JEditorPane implements ValueField {			// PropertyChangeListener,
+public class MarkupValueField extends JEditorPane implements ValueField, NamedField {			// PropertyChangeListener,
 
   protected static com.mathworks.jmi.Matlab matlab         = null;
   protected String                          renderFunction = "Grasppe.Kit.Syntax.Highlight";

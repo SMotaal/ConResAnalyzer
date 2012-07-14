@@ -629,7 +629,7 @@ public class ModulePanelContainer extends JPanel implements Observer {
 // * @param scanningParametersPanel the scanningParametersPanel to set
 // */
 //public void setScanningParametersPanel(
-//        FourierParametersPanel scanningParametersPanel) {
+//        FourierParametersPanelAlpha scanningParametersPanel) {
 //    this.scanningParametersPanel = scanningParametersPanel;
 //}
 

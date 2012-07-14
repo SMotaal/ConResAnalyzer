@@ -24,7 +24,7 @@ import javax.swing.event.DocumentListener;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class TextValueField extends JTextField implements ValueField { //PropertyChangeListener,
+public class TextValueField extends JTextField implements ValueField, NamedField { //PropertyChangeListener,
 
   /**
    */

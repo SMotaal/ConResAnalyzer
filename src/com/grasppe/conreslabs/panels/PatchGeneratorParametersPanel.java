@@ -89,7 +89,7 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
     this.createPanel(printingParametersPanel, null);			// "Print Parameters");
     this.createPanel(scanningParametersPanel, null);			// "Scan Parameters");
     this.createPanel(fourierParametersPanel, null);				// "Fourier Parameters");
-    this.createPanel(functionParametersPanel, null);			// "Math Parameters");
+//    this.createPanel(functionParametersPanel, null);			// "Math Parameters");
 
     // // Screening
     // screeningParametersPanel = new ScreeningParametersPanel();
@@ -139,17 +139,17 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
 
       public void run() {
 
-        try {
-          PatchGeneratorParametersPanel.helloMatlab();
-        } catch (MatlabConnectionException exception) {
-
-          // TODO Auto-generated catch block
-          exception.printStackTrace();
-        } catch (MatlabInvocationException exception) {
-
-          // TODO Auto-generated catch block
-          exception.printStackTrace();
-        }
+//        try {
+//          PatchGeneratorParametersPanel.helloMatlab();
+//        } catch (MatlabConnectionException exception) {
+//
+//          // TODO Auto-generated catch block
+//          exception.printStackTrace();
+//        } catch (MatlabInvocationException exception) {
+//
+//          // TODO Auto-generated catch block
+//          exception.printStackTrace();
+//        }
 
         JFrame frame = new JFrame("PatchGeneratorParametersPanel Demo");
 

@@ -14,11 +14,13 @@
  */
 package com.grasppe.jive.fields;
 
+import com.grasppe.lure.framework.GrasppeKit;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -32,30 +34,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.text.FlowView.FlowStrategy;
-
-import com.sun.tools.javac.comp.Flow;
 
 /**
  * @author daflair
  *
  */
-public class ParameterField extends JPanel implements PropertyChangeListener {
-
-/**
-	 * @return the fieldSuffix
-	 */
-	public Object getValue() {
-		return ((ValueField)fieldComponent).getValue();
-	}
-
-	/**
-	 * @param fieldSuffix the fieldSuffix to set
-	 */
-	public void setValue(Object newValue) {
-		((ValueField)fieldComponent).setValue(newValue);
-	}
+public class ParameterField extends JPanel implements PropertyChangeListener, NamedField {
 
 //Size Variables
   protected static HashMap<String, GroupOptions> gourpOptionsMap = new HashMap<String, GroupOptions>();
@@ -83,9 +67,9 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
 
     this.setName(name);
 
-    this.fieldComponent  = fieldComponent;
-    fieldComponent.addPropertyChangeListener("value", this);    
-    
+    this.fieldComponent = fieldComponent;
+    fieldComponent.addPropertyChangeListener(this);
+
     this.fieldLabel      = fieldLabel;
     this.fieldSuffix     = fieldSuffix;
 
@@ -93,27 +77,30 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
     this.suffixComponent = new JLabel(fieldSuffix);
 
     this.groupOptions    = getGroupOptions(groupID);
-    
+
     this.addComponentListener(new ComponentAdapter() {
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.ComponentEvent)
-		 */
-		@Override
-		public void componentResized(ComponentEvent e) {
-			// TODO Auto-generated method stub
-			super.componentResized(e);
-//			
-//			Component component = e.getComponent();
-//			
-//			double minX = component.getMinimumSize().getWidth();
-//			double minY = component.getMinimumSize().getHeight();
-//			double newX = component.getWidth();
-//			double newY = component.getHeight();
-//			
-//			component.setSize((int)Math.max(minX, newX), (int)Math.max(minY, newY));
-		}
-	});
+      /*
+       *  (non-Javadoc)
+       * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.ComponentEvent)
+       */
+      @Override
+      public void componentResized(ComponentEvent e) {
+
+        // TODO Auto-generated method stub
+        super.componentResized(e);
+
+//          
+//      Component component = e.getComponent();
+//      
+//      double minX = component.getMinimumSize().getWidth();
+//      double minY = component.getMinimumSize().getHeight();
+//      double newX = component.getWidth();
+//      double newY = component.getHeight();
+//      
+//      component.setSize((int)Math.max(minX, newX), (int)Math.max(minY, newY));
+      }
+    });
 
     this.updateLayout();
 
@@ -124,15 +111,15 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
    */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-	  try {
-	  if (evt.getSource().equals(fieldComponent)) // && evt.getPropertyName().equals("value"))
-		  	firePropertyChange(this.getName(), evt.getOldValue(), evt.getNewValue());
+    try {
+      if ((evt.getSource().equals(fieldComponent)) && (evt.getPropertyName().equals(fieldComponent.getName())))
+        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
 
-	    } catch (Exception exception) {
-	    	System.out.println(evt);
-	    	System.out.println(exception);
-	    }
-	  
+    } catch (Exception exception) {
+      System.out.println(evt);
+      System.out.println(exception);
+    }
+
   }
 
   /**
@@ -140,10 +127,10 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
   public void updateLayout() {
 
     fieldPanel.removeAll();
-    
+
     // Field Panel
     BoxLayout layout = new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS);
-    
+
     fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
     fieldPanel.add(labelComponent);			// , BorderLayout.LINE_START);
     fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
@@ -151,36 +138,46 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
     fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
     fieldPanel.add(suffixComponent);		// , BorderLayout.LINE_END);
     fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
-    
+
     labelComponent.setAlignmentX(LEFT_ALIGNMENT);
     fieldComponent.setAlignmentX(LEFT_ALIGNMENT);
-    suffixComponent.setAlignmentX(LEFT_ALIGNMENT);    
-    
+    suffixComponent.setAlignmentX(LEFT_ALIGNMENT);
+
     // Label Component
-    labelComponent.setLabelFor(fieldComponent);    
+    labelComponent.setLabelFor(fieldComponent);
     labelComponent.setPreferredSize(new Dimension(getOptions().labelWidth, labelComponent.getPreferredSize().height));
-    labelComponent.setMinimumSize(new Dimension(getOptions().labelWidth, labelComponent.getPreferredSize().height));//new Dimension(labelComponent.getPreferredSize()));
-    labelComponent.setMaximumSize(new Dimension(getOptions().labelWidth, labelComponent.getPreferredSize().height));//new Dimension(labelComponent.getPreferredSize()));
+    labelComponent.setMinimumSize(
+        new Dimension(
+            getOptions().labelWidth,
+            labelComponent.getPreferredSize().height));			// new Dimension(labelComponent.getPreferredSize()));
+    labelComponent.setMaximumSize(
+        new Dimension(
+            getOptions().labelWidth,
+            labelComponent.getPreferredSize().height));			// new Dimension(labelComponent.getPreferredSize()));
     labelComponent.setSize(labelComponent.getPreferredSize());
     labelComponent.setHorizontalAlignment(JLabel.TRAILING);
-    
+    labelComponent.setOpaque(false);
+
     // Field Component
     fieldComponent.setPreferredSize(new Dimension(getOptions().fieldWidth, fieldComponent.getPreferredSize().height));
-    fieldComponent.setMinimumSize(new Dimension(getOptions().fieldWidth/2, fieldComponent.getPreferredSize().height));
+    fieldComponent.setMinimumSize(new Dimension(getOptions().fieldWidth / 2, fieldComponent.getPreferredSize().height));
     fieldComponent.setMaximumSize(new Dimension(getOptions().fieldWidth, fieldComponent.getPreferredSize().height));
     fieldComponent.setSize(fieldComponent.getPreferredSize());
-    
+    fieldComponent.setOpaque(false);
+
     // Suffix Component
     suffixComponent.setPreferredSize(new Dimension(getOptions().suffixWidth, suffixComponent.getPreferredSize().height));
     suffixComponent.setMinimumSize(new Dimension(suffixComponent.getPreferredSize()));
-    suffixComponent.setMaximumSize(new Dimension(suffixComponent.getPreferredSize()));    
+    suffixComponent.setMaximumSize(new Dimension(suffixComponent.getPreferredSize()));
     suffixComponent.setSize(suffixComponent.getPreferredSize());
     suffixComponent.setHorizontalAlignment(JLabel.LEADING);
-    
+    suffixComponent.setOpaque(false);
+
     fieldPanel.setLayout(layout);
-    fieldPanel.setMaximumSize(new Dimension(getOptions().getMaximumWidth() , (int) fieldPanel.getMinimumSize().getHeight()));
-    fieldPanel.setMinimumSize(new Dimension(getOptions().getMinimumWidth() , (int) fieldPanel.getMinimumSize().getHeight()));
-    
+    fieldPanel.setMaximumSize(new Dimension(getOptions().getMaximumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
+    fieldPanel.setMinimumSize(new Dimension(getOptions().getMinimumWidth(), (int)fieldPanel.getMinimumSize().getHeight()));
+    fieldPanel.setOpaque(false);
+
   }
 
   /**
@@ -207,22 +204,63 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
     return ParameterField.gourpOptionsMap.get(id);
   }
 
+/*(non-Javadoc)
+    * @see java.awt.Component#getName()
+     */
+
   /**
-   * 	@return
+   *    @return
+   */
+  @Override
+  public String getName() {
+    return super.getName();
+  }
+
+  /**
+   *    @return
    */
   public GroupOptions getOptions() {
     return getGroupOptions(groupID);
   }
 
   /**
+   *     @return the fieldSuffix
+   */
+  public Object getValue() {
+    return ((ValueField)fieldComponent).getValue();
+  }
+
+  /*
+   *  (non-Javadoc)
+   *   @see javax.swing.JComponent#setFont(java.awt.Font)
+   */
+
+  /**
+   *    @param font
+   */
+  @Override
+  public void setFont(Font font) {
+
+    // TODO Auto-generated method stub
+    for (Component component : this.getComponents()) {
+      try {
+        component.setFont(font);
+      } finally {}
+    }
+
+    super.setFont(font);
+  }
+
+  /**
    * @param groupID the groupID to set
    */
   public void setGroupID(String groupID) {
-    this.groupID = groupID;
+    this.groupID      = groupID;
     this.groupOptions = ParameterField.getGroupOptions(groupID);
+
     try {
-    	this.updateLayout();
-    } catch (Exception exception){}
+      this.updateLayout();
+    } catch (Exception exception) {}
   }
 
   /**
@@ -232,21 +270,38 @@ public class ParameterField extends JPanel implements PropertyChangeListener {
   public static void setGroupOptions(String id, GroupOptions options) {
     ParameterField.gourpOptionsMap.put(id, options);
   }
-  
-  /* (non-Javadoc)
-	 * @see javax.swing.JComponent#setFont(java.awt.Font)
-	 */
-	@Override
-	public void setFont(Font font) {
-		// TODO Auto-generated method stub
-		for (Component component : this.getComponents()){
-			try {
-				component.setFont(font);
-			} finally {
-				
-			}
-		}
-		super.setFont(font);
-	}
-  
+
+  /*
+   *  (non-Javadoc)
+   * @see java.awt.Component#setName(java.lang.String)
+   */
+
+  /**
+   *    @param name
+   */
+  @Override
+  public void setName(String name) {
+    try {
+      getFieldComponent().setName(name);
+    } catch (Exception exception) {
+      GrasppeKit.debugError("ParameterField>Component>setName", exception, 0);
+    }
+
+    super.setName(name);
+  }
+
+  /**
+   *    @param newValue
+   */
+  public void setValue(Object newValue) {
+    try {
+      NameValueField field = (NameValueField)fieldComponent;
+
+      if (field.getValue().equals(newValue)) return;
+      field.setValue(newValue);
+    } catch (Exception exception) {
+      GrasppeKit.debugError("ParameterField>Component>SetValue", exception, 0);
+    }
+
+  }
 }
