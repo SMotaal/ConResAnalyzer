@@ -11,7 +11,7 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
+import com.grasppe.jive.components.JiveParametersPanel;
 
 /**
  * Class description
@@ -42,9 +42,9 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 //// angle (¼)
 //angleComponent = (NumericValueField)createNumericField("Screen-Angle", angleValue, "Angle", 0, 359, "¼", 6);
 
-    addField(TinyFactory().createNumericField("Addressability", "Addressability", 2450, 300, 4800, "spi"));
-    addField(TinyFactory().createNumericField("Resolution", "Resolution", 175, 50, 600, "lpi"));
-    addField(TinyFactory().createNumericField("Angle", "Angle", 37.5, 0, 359, "\u00B0"));
+    addField(TinyJiveFieldFactory().createNumericField("Addressability", "Addressability", 2450, 300, 4800, "spi"));
+    addField(TinyJiveFieldFactory().createNumericField("Resolution", "Resolution", 175, 50, 600, "lpi"));
+    addField(TinyJiveFieldFactory().createNumericField("Angle", "Angle", 37.5, 0, 359, "\u00B0"));
   }
 }
 

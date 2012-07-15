@@ -16,6 +16,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import com.grasppe.jive.components.JiveParametersPanel;
+
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
@@ -39,17 +41,17 @@ public class FourierParametersPanel extends JiveParametersPanel implements Prope
 //  ParameterField.setGroupOptions("long-text", GroupOptions.LONG_TEXT_OPTIONS);
 //  ParameterField.setGroupOptions("short-text", GroupOptions.SHORT_TEXT_OPTIONS);
 
-//  methodField = Factory.Default().createListField("Fourier-Method", "Method", 0, methodOptions, "");
+//  methodField = JiveFieldFactory.Default().createListField("Fourier-Method", "Method", 0, methodOptions, "");
 //  addField(methodField);
-//  modeField = Factory.Default().createListField("Fourier-Mode", "Mode", 0, modeOptions, "");
+//  modeField = JiveFieldFactory.Default().createListField("Fourier-Mode", "Mode", 0, modeOptions, "");
 //  addField(modeField);
 
     String[] modeOptions   = { "Automatic", "Forward", "Reverse" };
     String[] methodOptions = { "Logarithmic Scaling", "Raw Power Spectrum" };
 
-    addField(LongFactory().createListField("Method", "Method", 0, methodOptions, ""));
+    addField(LongJiveFieldFactory().createListField("Method", "Method", 0, methodOptions, ""));
 
-    addField(LongFactory().createListField("Mode", "Mode", 0, modeOptions, ""));
+    addField(LongJiveFieldFactory().createListField("Mode", "Mode", 0, modeOptions, ""));
 
   }
   

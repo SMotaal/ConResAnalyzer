@@ -14,6 +14,8 @@ package com.grasppe.conreslabs.panels.imageprocessors;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import com.grasppe.jive.components.JiveParametersPanel;
+
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
@@ -35,8 +37,8 @@ public class FunctionParametersPanel extends JiveParametersPanel {
   @Override
   protected void createFields() {
 	  
-    addField(DefaultFactory().createTextField("ID", "ID", getTitle(), ""));
-    addField(LongFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
+    addField(DefaultJiveFieldFactory().createTextField("ID", "ID", getTitle(), ""));
+    addField(LongJiveFieldFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
 //    addField(DefaultFactory().createTextField(getTitle() + "-ID", "ID", getTitle(), ""));
 //    addField(LongFactory().createTextField(getTitle() + "-Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
 

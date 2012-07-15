@@ -9,13 +9,11 @@
 
 
 
-package com.grasppe.conreslabs.panels.imageprocessors;
+package com.grasppe.jive.components;
 
-import com.grasppe.jive.components.ModuleParametersPanel;
-import com.grasppe.jive.fields.Factory;
+import com.grasppe.jive.JiveFieldFactory;
 import com.grasppe.jive.fields.GroupOptions;
 import com.grasppe.jive.fields.NameValueField;
-import com.grasppe.jive.fields.ParameterField;
 import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -174,32 +172,32 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
     createFieldUI();
   }
   
-  public static Factory TinyFactory() {
+  public static JiveFieldFactory TinyJiveFieldFactory() {
 	  String groupID = "default-tiny";
 	  GroupOptions groupOptions = GroupOptions.TINY_TEXT_OPTIONS;
 		if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
-		return Factory.Group(groupID);
+		return JiveFieldFactory.Group(groupID);
   }
   
-  public static Factory ShortFactory() {
+  public static JiveFieldFactory ShortJiveFieldFactory() {
 	  String groupID = "default-short";
 	  GroupOptions groupOptions = GroupOptions.SHORT_TEXT_OPTIONS;
 	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
-	  return Factory.Group(groupID);
+	  return JiveFieldFactory.Group(groupID);
   }
   
-  public static Factory LongFactory() {
+  public static JiveFieldFactory LongJiveFieldFactory() {
 	  String groupID = "default-long";
 	  GroupOptions groupOptions = GroupOptions.LONG_TEXT_OPTIONS;
 	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
-	  return Factory.Group(groupID);
+	  return JiveFieldFactory.Group(groupID);
   }
   
-  public static Factory DefaultFactory() {
+  public static JiveFieldFactory DefaultJiveFieldFactory() {
 	  String groupID = "default";
 	  GroupOptions groupOptions = new GroupOptions();
 	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
-	  return Factory.Group(groupID);
+	  return JiveFieldFactory.Group(groupID);
   }
 
   /**

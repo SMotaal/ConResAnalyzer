@@ -12,7 +12,6 @@
 package com.grasppe.jive.components;
 
 import com.grasppe.jive.fields.NumericValueField;
-import com.grasppe.jive.fields.ParameterField;
 import com.grasppe.jive.fields.ResolutionValueField;
 import com.grasppe.jive.fields.TextValueField;
 import com.grasppe.lure.components.Observers;

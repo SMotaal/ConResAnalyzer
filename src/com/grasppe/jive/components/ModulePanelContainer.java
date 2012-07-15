@@ -14,7 +14,6 @@ package com.grasppe.jive.components;
 import com.grasppe.conres.framework.imagej.newFrame;
 import com.grasppe.conreslabs.panels.imageprocessors.FourierParametersPanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FunctionParametersPanel;
-import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
@@ -123,6 +122,8 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   protected HashMap<KeyStroke, Action>           keyMap            = new HashMap<KeyStroke, Action>();
   private int                                    moduleHashCode    = 0;
   protected HashMap<String, JiveParametersPanel> modulesHashMap    = null;
+  
+  protected boolean debugBorders = false;
 
   /**
    * Create the panel.
@@ -176,12 +177,14 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     
     if (source.equals(copyButton)) {
     	GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
-    	copyValues();
+    	editValues();
+//    	copyValues();
     }
     
     if (source.equals(pasteButton)) {
     	GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
-    	pasteValues();
+//    	pasteValues();
+    	updateGrid();
     }
 
     if (source.equals(upButton)) {
@@ -259,7 +262,9 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    */
   protected void copyValues() {
 
-    String valueString = getValues().toString();
+    String valueString = getValues().toString().trim();
+    
+    valueString = valueString.substring(1, valueString.length()-1);
 
     Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valueString), new ClipboardOwner() {
 
@@ -411,23 +416,25 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     //
     copyButton.putClientProperty(MacButtonType, buttonType);
-    copyButton.putClientProperty(MacButtonPosition, "middle");
+    copyButton.putClientProperty(MacButtonPosition, "only");
     pasteButton.putClientProperty(MacButtonType, buttonType);
     pasteButton.putClientProperty(MacButtonPosition, "middle");
 
     //
     applyButton.putClientProperty(MacButtonType, buttonType);
-    applyButton.putClientProperty(MacButtonPosition, "middle");
+    applyButton.putClientProperty(MacButtonPosition, "only");
 
+    buttonPanel.add(copyButton);
     buttonPanel.add(Box.createHorizontalGlue());
     buttonPanel.add(addButton);
-    buttonPanel.add(copyButton);
+//    buttonPanel.add(copyButton);
     buttonPanel.add(upButton);
-    buttonPanel.add(applyButton);
+//    buttonPanel.add(applyButton);
     buttonPanel.add(downButton);
-    buttonPanel.add(pasteButton);
+//    buttonPanel.add(pasteButton);
     buttonPanel.add(removeButton);
     buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.add(applyButton);
 
     // buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -520,22 +527,24 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   /**
    */
   protected void createPanelContainer() {
-
+	  
     // Content Container
     contentPanel = new JPanel();
 
 //  contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); //(new SpringLayout());
     contentPanel.setLayout(new SpringLayout());
     contentPanel.setOpaque(false);
+//    contentPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
-    contentPanel.setBorder(new LineBorder(Color.red));
+    if (debugBorders) contentPanel.setBorder(new LineBorder(Color.red));
 
     // Button Container
     buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-    buttonPanel.setOpaque(false);
+    buttonPanel.setOpaque(false);    
+//    buttonPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
-    buttonPanel.setBorder(new LineBorder(Color.cyan));
+    if (debugBorders) buttonPanel.setBorder(new LineBorder(Color.cyan));
 
     // Scroll Pane
     scrollPanel = new JPanel();
@@ -543,18 +552,19 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     scrollPanel.add(contentPanel);
     scrollPanel.add(Box.createVerticalGlue());
     scrollPanel.setBackground(listColor);
+//    scrollPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
-    scrollPanel.setBorder(new LineBorder(Color.magenta));
+    if (debugBorders) scrollPanel.setBorder(new LineBorder(Color.magenta));
 
     scrollPane = new JScrollPane(scrollPanel);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setBorder(null);			// new LineBorder(SystemColor.controlShadow));
     scrollPane.setBackground(listColor);
+//    scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
-    scrollPane.setBorder(new LineBorder(Color.yellow));
+    if (debugBorders) scrollPane.setBorder(new LineBorder(Color.yellow));
 
-    scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
 //  scrollPane.add(Box.createVerticalGlue());
 
@@ -567,9 +577,9 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     containerPanel.add(scrollPane, BorderLayout.CENTER);
     containerPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-    containerPanel.setBorder(new LineBorder(Color.black));
+    if (debugBorders) containerPanel.setBorder(new LineBorder(Color.black));
 
-    containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//    containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
     // containerPanel.setBackground(SystemColor.controlLtHighlight);
 
@@ -675,7 +685,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 //  scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 //  scrollPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 //  
-//  revalidate();
+  revalidate();
 //  
 //  containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 //  containerPanel.setSize(new Dimension(500, containerPanel.getHeight()));    
@@ -811,6 +821,27 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     
     setValues(valueString);
   }
+  
+  protected void editValues() {
+	    //String valueString = new TextTransfer().getClipboardContents().replaceAll("}, ", "},\n");
+	  
+	    String valueString = getValues().toString().trim().replaceAll("}, ", "},\n");
+	    
+	    valueString = valueString.substring(1, valueString.length()-1);
+
+//	    if ((contents instanceof String) && (contents != null)) valueString = (String)contents;
+
+	    valueString = TextEditorDialog.showDialog(null, null, "Module Configuration", "Edit Configuration", valueString);
+
+	    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valueString), new ClipboardOwner() {
+
+	      @Override
+	      public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+	    });
+	    
+	    setValues(valueString);
+
+  }
 
   /**
    *    @param evt
@@ -935,6 +966,33 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     int columns = 1;
 
     SpringUtilities.makeCompactGrid(contentPanel, rows, columns, 3, 3, 3, 3);
+    
+    revalidate();    
+    
+    contentPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));    
+    buttonPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+    scrollPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+    scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+    containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+        
+    
+//    JComponent target = contentPanel;
+//    target.setSize(new Dimension(499, containerPanel.getHeight()));
+//    
+//    target.setSize(new Dimension(501, containerPanel.getHeight()));
+//    
+//    target.setSize(new Dimension(500, containerPanel.getHeight()));
+    try {
+    getParent().invalidate();
+    getParent().validate();
+    } catch (Exception exception) {
+    	GrasppeKit.debugError("ContainerPanel>Revalidate>Parent", exception, 2);
+    }
+
+//    revalidate();       
+
+    
+    //Toolkit.getDefaultToolkit().beep();
 
 //  SpringUtilities.makeGrid(contentPanel, rows, columns, 3, 3, 3, 3);
   }
@@ -1202,7 +1260,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 	  
 	  updatePanels();
 	  
-	  
+	  revalidate();
 //
 //	    Iterator<JiveParametersPanel> panelIterator = this.iterator();
 //

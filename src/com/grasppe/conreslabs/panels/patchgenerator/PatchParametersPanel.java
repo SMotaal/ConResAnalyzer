@@ -11,8 +11,8 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
-import com.grasppe.jive.fields.ComponentFactory;
+import com.grasppe.jive.JiveComponentFactory;
+import com.grasppe.jive.components.JiveParametersPanel;
 import com.grasppe.jive.fields.ResolutionValueField;
 
 /**
@@ -47,14 +47,14 @@ public class PatchParametersPanel extends JiveParametersPanel {
     // // Patch Size (mm)
     // patchSizeComponent = (NumericValueField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
 
-    addField(TinyFactory().createNumericField("Mean", "Tone", 50, 0, 100, "%"));
-    addField(TinyFactory().createNumericField("Contrast", "Contrast", 100, 0, 100, "%"));
+    addField(TinyJiveFieldFactory().createNumericField("Mean", "Tone", 50, 0, 100, "%"));
+    addField(TinyJiveFieldFactory().createNumericField("Contrast", "Contrast", 100, 0, 100, "%"));
     addField(
-        TinyFactory().createCustomField("Resolution", "Resolution",
-                                        ComponentFactory.createCustomFieldComponent("Resolution",
+        TinyJiveFieldFactory().createCustomField("Resolution", "Resolution",
+                                        JiveComponentFactory.createCustomFieldComponent("Resolution",
                                                                                     new ResolutionValueField(
                                                                                         0.0, 0.0, 10.0)), "lp/mm"));
-    addField(TinyFactory().createNumericField("Size", "Size", 5.3, 3.0, 16.0, "mm"));
+    addField(TinyJiveFieldFactory().createNumericField("Size", "Size", 5.3, 3.0, 16.0, "mm"));
   }
 }
 

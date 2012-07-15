@@ -11,7 +11,7 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
+import com.grasppe.jive.components.JiveParametersPanel;
 
 /**
  * Class description
@@ -32,7 +32,7 @@ public class ScanningParametersPanel extends JiveParametersPanel {
   @Override
   protected void createFields() {
 
-    addField(TinyFactory().createNumericField("Resolution", "Resolution", 1200, 100, 4800, "dpi"));
-    addField(TinyFactory().createNumericField("Scale", "Scale", 100, 10, 1000, "%"));
+    addField(TinyJiveFieldFactory().createNumericField("Resolution", "Resolution", 1200, 100, 4800, "dpi"));
+    addField(TinyJiveFieldFactory().createNumericField("Scale", "Scale", 100, 10, 1000, "%"));
   }
 }

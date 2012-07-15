@@ -1,5 +1,5 @@
 /*
- * @(#)Factory.java   12/07/14
+ * @(#)JiveFieldFactory.java   12/07/14
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -9,23 +9,25 @@
 
 
 
-package com.grasppe.jive.fields;
+package com.grasppe.jive;
 
 import javax.swing.JComponent;
+
+import com.grasppe.jive.components.ParameterField;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/14
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class Factory {
+public class JiveFieldFactory {
 
   protected static String  groupID  = "default";
-  protected static Factory instance = null;
+  protected static JiveFieldFactory instance = null;
 
   /**
    */
-  private Factory() {			// String groupID) {
+  private JiveFieldFactory() {			// String groupID) {
 
     // this.groupID = groupID;
   }
@@ -33,7 +35,7 @@ public class Factory {
   /**
    *  @return
    */
-  public static Factory Default() {
+  public static JiveFieldFactory Default() {
     return Group("default");
   }
 
@@ -41,14 +43,14 @@ public class Factory {
    *  @param id
    *  @return
    */
-  public static Factory Group(String id) {
+  public static JiveFieldFactory Group(String id) {
 
-    // if (instance == null) instance = new Factory();
-    Factory factory = new Factory();
+    // if (instance == null) instance = new JiveFieldFactory();
+    JiveFieldFactory jiveFieldFactory = new JiveFieldFactory();
 
-    factory.groupID = id;
+    jiveFieldFactory.groupID = id;
 
-    return factory;			// instance;
+    return jiveFieldFactory;			// instance;
   }
 
   /**
@@ -60,7 +62,7 @@ public class Factory {
    *  @return
    */
   public ParameterField createListField(String name, String label, Object value, Object[] options, String suffix) {
-    ParameterField newField = new ParameterField(name, ComponentFactory.createListField(name, value, options), label, suffix);
+    ParameterField newField = new ParameterField(name, JiveComponentFactory.createListField(name, value, options), label, suffix);
 
     newField.setGroupID(groupID);
 
@@ -76,7 +78,7 @@ public class Factory {
    */
   public ParameterField createMarkupField(String name, String label, String value, String suffix) {
 
-    ParameterField newField = new ParameterField(name, ComponentFactory.createMarkupFieldComponent(name, value), label, suffix);
+    ParameterField newField = new ParameterField(name, JiveComponentFactory.createMarkupFieldComponent(name, value), label, suffix);
 
     newField.setGroupID(groupID);
 
@@ -96,7 +98,7 @@ public class Factory {
   public ParameterField createNumericField(String name, String label, double value, double minimum, double maximum, String suffix) {
 
     ParameterField newField = new ParameterField(name,
-                                                 ComponentFactory.createNumericFieldComponent(name, value, minimum, maximum),
+                                                 JiveComponentFactory.createNumericFieldComponent(name, value, minimum, maximum),
                                                  label, suffix);
 
     newField.setGroupID(groupID);
@@ -133,7 +135,7 @@ public class Factory {
    */
   public ParameterField createTextField(String name, String label, String value, String suffix) {
 
-    ParameterField newField = new ParameterField(name, ComponentFactory.createTextFieldComponent(name, value), label, suffix);
+    ParameterField newField = new ParameterField(name, JiveComponentFactory.createTextFieldComponent(name, value), label, suffix);
 
     newField.setGroupID(groupID);
 

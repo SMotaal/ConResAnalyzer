@@ -1,5 +1,5 @@
 /*
- * @(#)ComponentFactory.java   12/07/14
+ * @(#)JiveComponentFactory.java   12/07/14
  * 
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -9,18 +9,23 @@
 
 
 
-package com.grasppe.jive.fields;
+package com.grasppe.jive;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
+
+import com.grasppe.jive.fields.ListField;
+import com.grasppe.jive.fields.MarkupValueField;
+import com.grasppe.jive.fields.NumericValueField;
+import com.grasppe.jive.fields.TextValueField;
 
 /**
  * Class description
  * 	@version        $Revision: 1.0, 12/07/14
  * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
  */
-public class ComponentFactory {
+public class JiveComponentFactory {
 	
 	protected static float defaultAlignmentX = JComponent.LEFT_ALIGNMENT;
 

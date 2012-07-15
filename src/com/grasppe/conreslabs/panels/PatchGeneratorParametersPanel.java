@@ -13,11 +13,11 @@ package com.grasppe.conreslabs.panels;
 
 import com.grasppe.conreslabs.panels.imageprocessors.FourierParametersPanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FunctionParametersPanel;
-import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
+import com.grasppe.jive.components.JiveParametersPanel;
 import com.grasppe.jive.components.ModulePanelContainer;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
