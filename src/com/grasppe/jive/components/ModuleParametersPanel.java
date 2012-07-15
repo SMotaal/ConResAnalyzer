@@ -130,7 +130,7 @@ protected Observers observers = new Observers(this);
 		int minLayoutHeight = 10; //((Double)this.getLayout().minimumLayoutSize(this).getHeight()).intValue();
 		int minLayoutWidth = 150; //((Double)this.getLayout().minimumLayoutSize(this).getWidth()).intValue();
 		int minHeight = ((Double)this.getMinimumSize().getHeight()).intValue();
-		int minWidth = ((Double)this.getMinimumSize().getWidth()).intValue();
+		int minWidth = ((Double)this.getMinimumSize().getWidth()).intValue() + 100;
 		
 		if (width<minLayoutWidth || height < minLayoutHeight) return; //Math.max(width,getMinimumSize().getWidth()) < 100) return;
 //		if (Math.max(height,getMinimumSize().getHeight()) < this.getLayout().minimumLayoutSize(this).getHeight()) return;
@@ -301,7 +301,7 @@ protected Observers observers = new Observers(this);
 	    txtField.addPropertyChangeListener("value", (PropertyChangeListener)this);
 	    add(txtField, "4, " + row);
 	    
-	    txtField.setMinimumSize(new Dimension(180, txtField.getMinimumSize().height));
+//	    txtField.setMinimumSize(new Dimension(180, txtField.getMinimumSize().height));
 	    
 	    // txtField.setEditable(true);
 	    

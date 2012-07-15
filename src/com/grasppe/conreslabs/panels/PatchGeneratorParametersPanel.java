@@ -103,8 +103,9 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
         frame.getContentPane().add(new PatchGeneratorParametersPanel(), BorderLayout.EAST);
 
         // Display the window.
-        frame.pack();
+//        frame.pack();
         frame.setVisible(true);
+        frame.pack(); 
       }
 
     });

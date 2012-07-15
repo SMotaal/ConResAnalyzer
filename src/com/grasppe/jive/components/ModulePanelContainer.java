@@ -11,6 +11,7 @@
 
 package com.grasppe.jive.components;
 
+import com.grasppe.conres.framework.imagej.newFrame;
 import com.grasppe.conreslabs.panels.imageprocessors.FourierParametersPanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FunctionParametersPanel;
 import com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel;
@@ -21,12 +22,14 @@ import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
 import com.grasppe.jive.fields.NumericValueField;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
+import com.javapractices.snippets.TextTransfer;
 
 import com.oracle.layout.SpringUtilities;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import com.sun.snippets.ListDialog;
+import com.sun.snippets.TextEditorDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,6 +39,10 @@ import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -47,6 +54,7 @@ import java.beans.PropertyChangeListener;
 
 import java.text.ParseException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -69,6 +77,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+import sun.awt.datatransfer.TransferableProxy;
 
 /**
  * Class description
@@ -95,7 +106,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   protected JPanel      buttonPanel;
 
   // Buttons
-  protected JButton applyButton, addButton, removeButton, upButton, downButton;
+  protected JButton applyButton, addButton, removeButton, upButton, downButton, copyButton, pasteButton;
 
   // GUI Appearance
   protected Font listFont    = new Font("Sans Serif", Font.PLAIN, 11);
@@ -135,7 +146,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@param e
+   *    @param e
    */
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -161,6 +172,16 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     if (source.equals(downButton)) {
       GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
       moveActivePanel(1);
+    }
+    
+    if (source.equals(copyButton)) {
+    	GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+    	copyValues();
+    }
+    
+    if (source.equals(pasteButton)) {
+    	GrasppeKit.debugText("ContainerPanel>" + e.getActionCommand(), getValues().toString(), 1);
+    	pasteValues();
     }
 
     if (source.equals(upButton)) {
@@ -232,6 +253,41 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    */
   public boolean contains(Object arg0) {
     return modules.contains(arg0);
+  }
+
+  /**
+   */
+  protected void copyValues() {
+
+    String valueString = getValues().toString();
+
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valueString), new ClipboardOwner() {
+
+      @Override
+      public void lostOwnership(Clipboard clipboard, Transferable contents) {
+
+        // TODO Auto-generated method stub
+
+      }
+    });
+
+    pasteValues();
+
+//  valueString  = TextEditorDialog.showDialog(null, null, "Module Configuration", "Edit Configuration", valueString);
+//      
+//  Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valueString), new ClipboardOwner() {
+//    
+//    @Override
+//    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+//        // TODO Auto-generated method stub
+//        
+//    }
+//  });
+//  
+//  getToolkit().getSystemClipboard().setContents(TextTransfer., owner)
+
+    // createNewPanel(panelType, null);
+
   }
 
   /**
@@ -320,7 +376,13 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     downButton  = this.createButton("\u2193", "MoveDown", KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.META_DOWN_MASK));
 
-    applyButton = this.createButton("Apply", "Apply", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+    applyButton = this.createButton("\u23ce", "Apply", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+
+    copyButton  = this.createButton("\u2397", "Copy",
+                                   KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
+
+    pasteButton = this.createButton("\u2398", "Paste",
+                                    KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 
 //  //applyButton.setIcon(new Icon)
 //  try {
@@ -332,10 +394,14 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     setNSButtonImage(removeButton, "NSRemoveTemplate", "Delete");
     setNSButtonImage(upButton, "NSLeftFacingTriangleTemplate", "Move Up");
     setNSButtonImage(downButton, "NSRightFacingTriangleTemplate", "Move Down");
+    setNSButtonImage(copyButton, "NSSmartBadgeTemplate", "Copy Setup");			// NSActionTemplate //NSRevealFreestandingTemplate
+    setNSButtonImage(pasteButton, "NSRefreshTemplate", "Paste Setup");			// NSRefreshFreestandingTemplate
     setNSButtonImage(applyButton, "NSQuickLookTemplate", "Apply");
 
     addButton.putClientProperty(MacButtonType, buttonType);
     addButton.putClientProperty(MacButtonPosition, "first");
+
+    //
     upButton.putClientProperty(MacButtonType, buttonType);
     upButton.putClientProperty(MacButtonPosition, "middle");
     downButton.putClientProperty(MacButtonType, buttonType);
@@ -343,19 +409,30 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     removeButton.putClientProperty(MacButtonType, buttonType);
     removeButton.putClientProperty(MacButtonPosition, "last");
 
+    //
+    copyButton.putClientProperty(MacButtonType, buttonType);
+    copyButton.putClientProperty(MacButtonPosition, "middle");
+    pasteButton.putClientProperty(MacButtonType, buttonType);
+    pasteButton.putClientProperty(MacButtonPosition, "middle");
+
+    //
     applyButton.putClientProperty(MacButtonType, buttonType);
     applyButton.putClientProperty(MacButtonPosition, "middle");
 
     buttonPanel.add(Box.createHorizontalGlue());
     buttonPanel.add(addButton);
+    buttonPanel.add(copyButton);
     buttonPanel.add(upButton);
     buttonPanel.add(applyButton);
     buttonPanel.add(downButton);
+    buttonPanel.add(pasteButton);
     buttonPanel.add(removeButton);
     buttonPanel.add(Box.createHorizontalGlue());
 
     // buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
 
+    // copyButton.setVisible(false);
+    // pasteButton.setVisible(false);
     // applyButton.setVisible(false);
 //  addButton.addComponentListener(new ComponentAdapter() {
 //
@@ -391,15 +468,19 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@param panelType
-   * 	@param index
-   * 	@return
+   *    @param panelType
+   *    @param index
+   *    @return
    */
   protected JiveParametersPanel createNewPanel(String panelType, Integer index) {
     JiveParametersPanel newPanel = null;
 
     if (panelType.equals("Function")) newPanel = new FunctionParametersPanel();
     else if (panelType.equals("Fourier")) newPanel = new FourierParametersPanel();
+    else if (panelType.equals("Patch")) newPanel = new PatchParametersPanel();
+    else if (panelType.equals("Screening")) newPanel = new ScreeningParametersPanel();
+    else if (panelType.equals("Printing")) newPanel = new PrintingParametersPanel();
+    else if (panelType.equals("Scanning")) newPanel = new ScanningParametersPanel();
 
     if (newPanel == null) return null;
 
@@ -421,7 +502,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   /**
    *    @param panel
    *    @param title
-   * 	@param index
+   *    @param index
    */
   protected void createPanel(JiveParametersPanel panel, String title, Integer index) {
     if (this.contains(panel)) return;
@@ -447,24 +528,35 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     contentPanel.setLayout(new SpringLayout());
     contentPanel.setOpaque(false);
 
+    contentPanel.setBorder(new LineBorder(Color.red));
+
     // Button Container
     buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
     buttonPanel.setOpaque(false);
 
+    buttonPanel.setBorder(new LineBorder(Color.cyan));
+
     // Scroll Pane
     scrollPanel = new JPanel();
+    scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
     scrollPanel.add(contentPanel);
     scrollPanel.add(Box.createVerticalGlue());
-    scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
     scrollPanel.setBackground(listColor);
+
+    scrollPanel.setBorder(new LineBorder(Color.magenta));
 
     scrollPane = new JScrollPane(scrollPanel);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setBorder(null);			// new LineBorder(SystemColor.controlShadow));
     scrollPane.setBackground(listColor);
-    scrollPane.add(Box.createVerticalGlue());
+
+    scrollPane.setBorder(new LineBorder(Color.yellow));
+
+    scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+
+//  scrollPane.add(Box.createVerticalGlue());
 
     // Parent Container
     containerPanel = this;
@@ -474,6 +566,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     containerPanel.add(scrollPane, BorderLayout.CENTER);
     containerPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+    containerPanel.setBorder(new LineBorder(Color.black));
+
+    containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 
     // containerPanel.setBackground(SystemColor.controlLtHighlight);
 
@@ -572,6 +668,18 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     });
 
+//  contentPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//  contentPanel.setSize(new Dimension(500, contentPanel.getHeight()));    
+//  buttonPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//  buttonPanel.setSize(new Dimension(500, buttonPanel.getHeight()));
+//  scrollPane.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//  scrollPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//  
+//  revalidate();
+//  
+//  containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//  containerPanel.setSize(new Dimension(500, containerPanel.getHeight()));    
+
   }
 
   /**
@@ -612,17 +720,31 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
       /*
        *  (non-Javadoc)
-       * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.ComponentEvent)
+       *   @see java.awt.event.ComponentAdapter#componentShown(java.awt.event.ComponentEvent)
+       */
+      @Override
+      public void componentShown(ComponentEvent e) {
+        super.componentShown(e);
+        revalidate();
+
+//      getParent().validate();
+//      setSize(500,(int)getSize().getHeight());
+      }
+
+      /*
+       *    (non-Javadoc)
+       *   @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.ComponentEvent)
        */
       @Override
       public void componentResized(ComponentEvent e) {
-        JComponent component     = (JComponent)e.getComponent();
+        JComponent component = (JComponent)e.getComponent();
 
-        Dimension  preferredSize = component.getPreferredSize();
-        Dimension  maximumSize   = component.getMaximumSize();		// getPreferredSize();
-        Dimension  newSize       = new Dimension(preferredSize.width, maximumSize.height);
-
-        component.setMaximumSize(newSize);
+//      Dimension  preferredSize = component.getPreferredSize();
+//      Dimension  maximumSize   = component.getMaximumSize();        // getPreferredSize();
+//      Dimension  newSize       = new Dimension(500, maximumSize.height); //preferredSize.width
+//      component.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
+//      component.setSize(new Dimension(500, component.getHeight()));
+//      component.setMaximumSize(newSize);
       }
     });
 
@@ -637,7 +759,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@param steps
+   *    @param steps
    */
   protected void moveActivePanel(int steps) {
 
@@ -668,7 +790,30 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@param evt
+   */
+  protected void pasteValues() {
+
+//    Object contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+//    
+//    if (contents instanceof TransferableProxy) contents = ((TransferableProxy) contents).getTransferData(arg0) 
+
+    String valueString = new TextTransfer().getClipboardContents().replaceAll("}, ", "},\n");
+
+//    if ((contents instanceof String) && (contents != null)) valueString = (String)contents;
+
+    valueString = TextEditorDialog.showDialog(null, null, "Module Configuration", "Edit Configuration", valueString);
+
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valueString), new ClipboardOwner() {
+
+      @Override
+      public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+    });
+    
+    setValues(valueString);
+  }
+
+  /**
+   *    @param evt
    */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
@@ -750,6 +895,30 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     updatePanels();
 
   }
+  
+  /**
+   */
+  protected void removeAllPanel() {
+	  
+//	  for (JiveParametersPanel panel : modules.get)
+//    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+//
+//    if ((activePanel == null) || (modules == null)) return;
+//
+//    if (activePanel.isPermanent()) return;
+//
+//    if (!modules.contains(activePanel)) return;
+//
+//    int currentIndex = modules.indexOf(activePanel);
+//
+//    GrasppeKit.debugText("ContainerPanel>RemovePanel", activePanel.title + " will be removed", 1);
+
+    modules.clear(); //(currentIndex);
+
+    updatePanels();
+
+  }
+  
 
   /**
    */
@@ -765,8 +934,9 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     int rows    = contentPanel.getComponentCount();
     int columns = 1;
 
-  SpringUtilities.makeCompactGrid(contentPanel, rows, columns, 3, 3, 3, 3);
-//    SpringUtilities.makeGrid(contentPanel, rows, columns, 3, 3, 3, 3);
+    SpringUtilities.makeCompactGrid(contentPanel, rows, columns, 3, 3, 3, 3);
+
+//  SpringUtilities.makeGrid(contentPanel, rows, columns, 3, 3, 3, 3);
   }
 
   /**
@@ -776,7 +946,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     contentPanel.setFont(listFont);
 
-    contentPanel.setSize(new Dimension(400, contentPanel.getSize().height));
+//  contentPanel.setSize(new Dimension(400, contentPanel.getSize().height));
 
     Iterator<JiveParametersPanel> panelIterator = this.iterator();
 
@@ -803,10 +973,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
       panel.setFont(contentPanel.getFont());
       contentPanel.add(panel);
 
-      updateGrid();
+//    updateGrid();
 
-//      
-      revalidate();
+//    
+      panel.revalidate();
 
       panel.flowResize();
 
@@ -816,9 +986,15 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 //    panel.setMinimumSize(panel.getPreferredSize());
     }
 
-    contentPanel.add(Box.createVerticalGlue());
+    // contentPanel.add(Box.createVerticalGlue());
+
+//  setSize(new Dimension(500, getHeight()));
 
     revalidate();
+
+    updateGrid();
+
+//    
 
   }
 
@@ -863,7 +1039,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@return
+   *    @return
    */
   public HashMap<String, JiveParametersPanel> getModules() {
 
@@ -888,12 +1064,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   }
 
   /**
-   * 	@return
+   *    @return
    */
   public LinkedHashMap<String, HashMap> getValues() {
     LinkedHashMap<String, HashMap> values = new LinkedHashMap<String, HashMap>();
-
-    // int                     i      = -1;
 
     Iterator<JiveParametersPanel> panelIterator = this.iterator();
 
@@ -946,9 +1120,114 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     } finally {}
 
   }
+  
+  public String arrayString(Object[] array) {
+	  return Arrays.asList(array).toString();
+  }
+  
+  public void setValues(String valueString) {
+	  String[] sourceString = new String[8];
+	  
+	  LinkedList<JiveParametersPanel> previousModules = (LinkedList<JiveParametersPanel>) modules.clone(); //new LinkedList<JiveParametersPanel>();
+	  
+	  modules.clear();
+	  
+	  int n = 0;
+	  
+	  sourceString[n++] = valueString.replaceAll("\\s", "");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\{\\{", "\\{");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\}\\}", "\\}");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\=\\{", "\\|");
+	  //sourceString[n++] = sourceString[n-2].replaceAll("\\=", "\\|");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\},", "###");
+	  sourceString[n++] = sourceString[n-2].replaceAll(",", "\\|");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\{", "");
+	  sourceString[n++] = sourceString[n-2].replaceAll("\\}", "");
+	  
+	  GrasppeKit.debugText("SetValues>SourceStrings", arrayString(sourceString), 2);	  
+	  
+	  String[] processStrings = sourceString[sourceString.length-1].split("###");
+	  
+	  GrasppeKit.debugText("SetValues>ProcessStrings", arrayString(processStrings), 2);
+	  
+	  //LinkedHashMap<String, HashMap> values = new LinkedHashMap<String, HashMap>();
+	  
+	  for (String processString : processStrings){
+		  try {
+			  // LinkedHashMap<String, HashMap> moduleValues = new LinkedHashMap<String, HashMap>();
+			  String[] moduleStrings = processString.split("\\|");
+			  
+			  GrasppeKit.debugText("SetValues>ModuleStrings", arrayString(moduleStrings), 2);
+			  
+			  String moduleName = moduleStrings[0];
+			  String moduleType = moduleName.split("-")[0];
+			  
+			  GrasppeKit.debugText("SetValues>ModuleName", moduleName, 2);
+			  GrasppeKit.debugText("SetValues>ModuleType", moduleType, 2);
+			  
+			  String[] valuePairs = Arrays.copyOfRange(moduleStrings, 1, moduleStrings.length);
+			  
+//			  Arrays.asList(moduleStrings).toString();
+			  
+			  GrasppeKit.debugText("SetValues>ValuePairs", arrayString(valuePairs), 2);
+			  
+			  JiveParametersPanel newPanel = createNewPanel(moduleType, null);
+			  
+			  for (String valuePair : valuePairs) {
+				  String[] pairStrings = valuePair.split("\\=");
+				  
+				  GrasppeKit.debugText("SetValues>PairStrings", arrayString(pairStrings), 2);
+				  try {
+					  Object value = newPanel.getValue(pairStrings[0]);
+					  
+					  if (value instanceof Double)
+						  newPanel.setValue(pairStrings[0], new Double(pairStrings[1]).doubleValue());
+					  if (value instanceof Integer)
+						  newPanel.setValue(pairStrings[0], new Double(pairStrings[1]).intValue());
+					  else
+						  newPanel.setValue(pairStrings[0], pairStrings[1]);
+				  } catch (Exception exception) {
+					  GrasppeKit.debugError("SetValues>Pairs", exception, 1);
+				  }
+			  }
+		  } catch (Exception exception) {
+			  GrasppeKit.debugError("SetValues>Modules", exception, 1);
+		  }
+	  }
+	  
+	  if (modules.size()==0) {
+		  GrasppeKit.debugText("SetValues>ResetModules", modules.toString(), 2);
+		  modules = previousModules;
+	  }
+	  
+	  updatePanels();
+	  
+	  
+//
+//	    Iterator<JiveParametersPanel> panelIterator = this.iterator();
+//
+//	    while (panelIterator.hasNext()) {
+//	      JiveParametersPanel module = panelIterator.next();
+//	      String              name   = module.getTitle();
+//
+//	      values.put(name, module.getValues());
+//	    }
+//
+//	    return values;
+	  
+	  
+	  System.out.println(sourceString);
+			  
+//			  ={	|
+//			  =	|
+//			  },	;
+//			  {	
+//			  }	
+	  	 // String[] processStrings = sourceString. // ("(?<=\\=\\{)[^\\}](?=\\})");
+  }
 
   /**
-   * 	@param allValues
+   *    @param allValues
    */
   public void setValues(HashMap<String, HashMap> allValues) {
 

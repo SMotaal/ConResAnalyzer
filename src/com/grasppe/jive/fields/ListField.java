@@ -113,7 +113,7 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
    */
   @Override
   public Object getValue() {
-    return super.getSelectedItem();
+    return super.getSelectedIndex(); // Item();
   }
 
   /**
@@ -121,11 +121,49 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
    */
   @Override
   public void setValue(Object value) {
-    try {
-      super.setSelectedItem(value);
-    } finally {
-      super.setSelectedIndex((Integer)value);
-    }
-
+	  
+	  try {
+		  super.setSelectedIndex((Integer)value);
+	  } catch (Exception exception) {
+		  super.setSelectedItem(value);
+	  }
+//	  boolean valueSet = false;
+//	    try {
+//	    	if (!valueSet) {
+//      super.setSelectedItem(value);
+//      valueSet = true;
+//      return; 
+//	    	}
+//    } finally {}
+//    
+//    try {
+//    	if (!valueSet) {
+//        	// Get number of items
+//        	int num = super.getItemCount();
+//        	
+//        	String trimValue = ((String)value).replaceAll("\\W", "").toLowerCase();
+//
+//        	// Get items
+//        	for (int i=0; i<num; i++) {
+//        	    Object item = super.getItemAt(i);
+//        	    String trimItem = ((String)item).replaceAll("\\W", "").toLowerCase();
+//        	    if (trimItem.matches(trimValue)) {
+//        	    	super.setSelectedIndex(i);
+//        	    	valueSet = true;
+//        	    	return;
+//        	    }
+//        	}
+//        	
+//        	valueSet = true;
+//    	}
+//    } finally {}
+//
+//    try {
+//    	if (!valueSet) {
+//    super.setSelectedIndex((Integer)value);
+//    valueSet = true;
+//    return;
+//    	}
+//    } finally {}    
   }
 }

@@ -20,6 +20,7 @@ import com.grasppe.lure.framework.GrasppeKit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -37,6 +38,7 @@ import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.border.LineBorder;
 
 /**
  * Class description
@@ -121,13 +123,13 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
 	    boolean box = false;
 	  
 //	GridLayout layout = new GridLayout();
-	FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 1); // groupOptions.paddingWidth, groupOptions.paddingHeight);
+	FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0); // groupOptions.paddingWidth, groupOptions.paddingHeight);
       
 
     this.setLayout(layout);
     this.setAlignmentX(LEFT_ALIGNMENT);
     
-    this.setMaximumSize(new Dimension(GroupOptions.LONG_TEXT_OPTIONS.getMaximumWidth()+10, Integer.MAX_VALUE));
+    this.setMaximumSize(new Dimension(GroupOptions.LONG_TEXT_OPTIONS.getMaximumWidth()+80, Integer.MAX_VALUE));
     
     // Dimension minimumLayout1 =  layout.minimumLayoutSize(this);
 
@@ -144,7 +146,10 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
     if (box) add(Box.createVerticalStrut(groupOptions.marginHeight));
     
     // Dimension minimumLayout2 =  layout.minimumLayoutSize(this);
+    
+    // this.setBorder(new LineBorder(Color.green));
   
+//    flowResize();
     
     return;
     
