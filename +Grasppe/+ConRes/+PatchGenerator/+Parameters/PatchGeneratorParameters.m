@@ -7,6 +7,7 @@ classdef PatchGeneratorParameters < handle
     Screen  = Grasppe.ConRes.PatchGenerator.Parameters.ScreenParameters;
     Print   = Grasppe.ConRes.PatchGenerator.Parameters.PrintParameters;
     Scan    = Grasppe.ConRes.PatchGenerator.Parameters.ScanParameters;
+    Processors = [];
   end
   
   methods

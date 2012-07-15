@@ -23,7 +23,6 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
   
   methods
     function obj = PatchGeneratorPanel()
-      
     end
     
     function Run(obj)
@@ -80,54 +79,85 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
     function createPanel(obj)
       % mjLink
       
-      set(gcf, 'CloseRequestFcn', @(src, event) delete(obj) );
+      hFrame = gcf;
       
-      [obj.jParametersPanel obj.hParametersPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel', 'East');
+      set(hFrame, 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL');
       
-      obj.jPatchParametersPanel   = handle(obj.jParametersPanel.getPatchParametersPanel);
-      obj.jScreenParametersPanel  = handle(obj.jParametersPanel.getScreeningParametersPanel);
-      obj.jPrintParametersPanel   = handle(obj.jParametersPanel.getPrintingParametersPanel);
-      obj.jScanParametersPanel    = handle(obj.jParametersPanel.getScanningParametersPanel);
+      set(hFrame, 'CloseRequestFcn', @(src, event) delete(obj) );
+      
+      %[obj.jParametersPanel obj.hParametersPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel', 'East');
+%       [obj.jParametersPanel obj.hParametersPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel'); %, 'East');
+
+      obj.jParametersPanel = com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
+
+      jFrame = get(handle(hFrame),'JavaFrame');
+     
+      
+      jPane = jFrame.fHG1Client.getContentPane;
+      jPane.add(obj.jParametersPanel, java.awt.BorderLayout.EAST);
+      
+      %jPane.revalidate; % repaint jPane with the added JButt
+      
+      obj.jParametersPanel.requestFocus();
+      
+      %figure(hFrame);
+      
+%       obj.jPatchParametersPanel   = handle(obj.jParametersPanel.getPatchParametersPanel);
+%       obj.jScreenParametersPanel  = handle(obj.jParametersPanel.getScreeningParametersPanel);
+%       obj.jPrintParametersPanel   = handle(obj.jParametersPanel.getPrintingParametersPanel);
+%       obj.jScanParametersPanel    = handle(obj.jParametersPanel.getScanningParametersPanel);
+
+
       
       obj.jApplyButton = handle(obj.jParametersPanel.getApplyButton(),'CallbackProperties');
       
       set(obj.jApplyButton, 'actionPerformedCallback', @(src, event)obj.applyChanges);
+      
+      drawnow expose update;
+
+      try jFrame.setMaximized(true); end
+
       
     end
     
     function applyChanges(obj)
       import Grasppe.ConRes.PatchGenerator.*;
       
-      % Patch Parameters
-      Patch                   = Parameters.PatchParameters;
-      Patch.MeanTone          = obj.jPatchParametersPanel.getMeanToneValue;
-      Patch.Contrast          = obj.jPatchParametersPanel.getContrastValue;
-      Patch.Resolution        = obj.jPatchParametersPanel.getResolutionValue;
-      Patch.Size              = obj.jPatchParametersPanel.getPatchSizeValue;
-            
-      % Screen Parameters
-      Screen                  = Parameters.ScreenParameters;
-      Screen.Addressability   = obj.jScreenParametersPanel.getAddressabilityValue;
-      Screen.Resolution       = obj.jScreenParametersPanel.getResolutionValue;
-      Screen.Angle            = obj.jScreenParametersPanel.getAngleValue;
-            
-      % Print Parameters
-      Print                   = Parameters.PrintParameters;
-      Print.DotGain           = obj.jPrintParametersPanel.getDotgainValue;
-      Print.Noise             = obj.jPrintParametersPanel.getNoiseValue;
-      Print.Spread            = obj.jPrintParametersPanel.getSpreadValue;
-      Print.Unsharp           = obj.jPrintParametersPanel.getUnsharpValue;
-            
-      % Scan Parameters
-      Scan    = Parameters.ScanParameters;
-      Scan.Resolution         = obj.jScanParametersPanel.getResolutionValue;
-      Scan.Scale              = obj.jScanParametersPanel.getScaleValue;
-            
-      % Generator Parameters
-      obj.PatchGeneratorParameters.Patch  = Patch;
-      obj.PatchGeneratorParameters.Screen = Screen;
-      obj.PatchGeneratorParameters.Print  = Print;
-      obj.PatchGeneratorParameters.Scan   = Scan;
+      parameters = obj.jParametersPanel.getValues();
+      
+      try parameters = hashmap2struct(parameters); end %, true); end
+      
+
+      try
+        Patch     = parameters.Patch; % Parameters.PatchParameters;
+        Screen    = parameters.Screening; %Parameters.ScreenParameters;
+        Print     = parameters.Printing; % Parameters.PrintParameters;
+        Scan      = parameters.Scanning; % Parameters.ScanParameters;
+        
+        for fn = fieldnames(parameters)'
+          % fn iterates through the field names of S
+          % fn is a 1x1 cell array
+          fn = char(fn);
+          fnl = lower(fn);
+          
+          if strfind(fnl, 'fourier')==1;
+            disp(fn);
+            Processors.(fnl) = parameters.(fn);
+          elseif strfind(fnl, 'function')==1;
+            disp(fn);
+            Processors.(fnl) = parameters.(fn);
+          else
+            % beep;
+          end
+        end
+        
+
+        obj.PatchGeneratorParameters.Patch  = Patch;
+        obj.PatchGeneratorParameters.Screen = Screen;
+        obj.PatchGeneratorParameters.Print  = Print;
+        obj.PatchGeneratorParameters.Scan   = Scan;
+        obj.PatchGeneratorParameters.Processors = Processors;
+      end
 
       % beep;
       notify(obj, 'ParametersApplied');

@@ -58,7 +58,7 @@ classdef MJLink
     
     function InitializeJava()
       import Grasppe.Lure.Framework.*;
-      inted = MJLink.IsInitialized
+      inted = MJLink.IsInitialized;
       if MJLink.IsInitialized(true)==true, return; end;
       
       % mjLink;

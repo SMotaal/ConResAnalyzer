@@ -24,6 +24,8 @@ function [ output_args ] = initialize( input_args )
 end
 
 function initializeScript()
+  
+  mjLink;
   % PersistentSources readonly;
   % PersistentSources load; %PersistentSources load;
   fprintf(2,'\nWorkspace: '); fprintf(1, 'Ready\n');
