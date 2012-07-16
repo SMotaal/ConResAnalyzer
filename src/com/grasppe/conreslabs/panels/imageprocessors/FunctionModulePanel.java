@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -14,21 +14,21 @@ package com.grasppe.conreslabs.panels.imageprocessors;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import com.grasppe.jive.components.JiveParametersPanel;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class FunctionParametersPanel extends JiveParametersPanel {
+public class FunctionModulePanel extends JiveModulePanel {
 	
 	protected static int instances = 0;
 
   /**
    * Create the panel.
    */
-  public FunctionParametersPanel() {
+  public FunctionModulePanel() {
     super("Function-Panel", "Function-" + instances++);
   }
 
@@ -67,12 +67,12 @@ public class FunctionParametersPanel extends JiveParametersPanel {
 
       public void run() {
 
-        JFrame frame = new JFrame("FunctionParametersPanel Demo");
+        JFrame frame = new JFrame("FunctionModulePanel Demo");
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Add contents to the window.
-        frame.getContentPane().add(new FunctionParametersPanel());
+        frame.getContentPane().add(new FunctionModulePanel());
 
         // Display the window.
         frame.pack();

@@ -15,10 +15,10 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 
-import com.grasppe.jive.fields.ListField;
+import com.grasppe.jive.fields.JiveListField;
 import com.grasppe.jive.fields.MarkupValueField;
-import com.grasppe.jive.fields.NumericValueField;
-import com.grasppe.jive.fields.TextValueField;
+import com.grasppe.jive.fields.JiveNumericField;
+import com.grasppe.jive.fields.JiveTextField;
 
 /**
  * Class description
@@ -37,7 +37,7 @@ public class JiveComponentFactory {
    */
   public static JComponent createListField(String name, Object value, Object[] options) {
 
-    ListField newField = new ListField(options);
+    JiveListField newField = new JiveListField(options);
 
     newField.setName(name);
     newField.setValue(value);
@@ -70,7 +70,7 @@ public class JiveComponentFactory {
    *      @return
    */
   public static JComponent createNumericFieldComponent(String name, double value, double minimum, double maximum) {
-    NumericValueField newField = new NumericValueField(minimum, maximum);
+    JiveNumericField newField = new JiveNumericField(minimum, maximum);
 
     newField.setName(name);
     newField.setValue(value);
@@ -87,8 +87,8 @@ public class JiveComponentFactory {
    *      @param maximum
    *      @return
    */
-  public static JComponent createCustomFieldComponent(String name, NumericValueField newField) {
-	  // NumericValueField newField = new NumericValueField(minimum, maximum);
+  public static JComponent createCustomFieldComponent(String name, JiveNumericField newField) {
+	  // JiveNumericField newField = new JiveNumericField(minimum, maximum);
 
     newField.setName(name);
     // newField.setValue(value);
@@ -105,7 +105,7 @@ public class JiveComponentFactory {
    */
   public static JComponent createTextFieldComponent(String name, String value) {
 
-    TextValueField newField = new TextValueField();
+    JiveTextField newField = new JiveTextField();
 
     newField.setName(name);
     newField.setValue(value);

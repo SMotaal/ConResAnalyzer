@@ -1,5 +1,5 @@
 /*
- * @(#)JiveParametersPanel.java   12/07/14
+ * @(#)JiveModulePanel.java   12/07/14
  * 
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -12,7 +12,7 @@
 package com.grasppe.jive.components;
 
 import com.grasppe.jive.JiveFieldFactory;
-import com.grasppe.jive.fields.GroupOptions;
+import com.grasppe.jive.fields.JiveGroupMetrics;
 import com.grasppe.jive.fields.NameValueField;
 import com.grasppe.lure.framework.GrasppeKit;
 
@@ -43,7 +43,7 @@ import javax.swing.border.LineBorder;
  * 	@version        $Revision: 1.0, 12/07/14
  * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
  */
-public abstract class JiveParametersPanel extends ModuleParametersPanel implements PropertyChangeListener {
+public abstract class JiveModulePanel extends JiveAbstractPanel implements PropertyChangeListener {
 
 
 
@@ -61,15 +61,15 @@ public abstract class JiveParametersPanel extends ModuleParametersPanel implemen
 		this.permanent = permanent;
 	}
 
-protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterField>();
+protected Collection<JiveField> fields       = new LinkedHashSet<JiveField>();
   private Map<String, NameValueField>  components   = new HashMap<String, NameValueField>();
-  protected GroupOptions               groupOptions = new GroupOptions();
+  protected JiveGroupMetrics               groupMetrics = new JiveGroupMetrics();
 
   /**
    * 	@param name
    * 	@param title
    */
-  public JiveParametersPanel(String name, String title) {    super();
+  public JiveModulePanel(String name, String title) {    super();
     initializePanel(name, title);
   }
 
@@ -78,7 +78,7 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
    * 	@param title
    * 	@param isDoubleBuffered
    */
-  public JiveParametersPanel(String name, String title, boolean isDoubleBuffered) {
+  public JiveModulePanel(String name, String title, boolean isDoubleBuffered) {
     super(isDoubleBuffered);
     initializePanel(name, title);
   }
@@ -88,7 +88,7 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
    * 	@param title
    * 	@param layout
    */
-  public JiveParametersPanel(String name, String title, LayoutManager layout) {
+  public JiveModulePanel(String name, String title, LayoutManager layout) {
     super(layout);
     initializePanel(name, title);
   }
@@ -99,7 +99,7 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
    * 	@param layout
    * 	@param isDoubleBuffered
    */
-  public JiveParametersPanel(String name, String title, LayoutManager layout, boolean isDoubleBuffered) {
+  public JiveModulePanel(String name, String title, LayoutManager layout, boolean isDoubleBuffered) {
     super(layout, isDoubleBuffered);
     initializePanel(name, title);
   }
@@ -107,7 +107,7 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
   /**
    *  @param field
    */
-  protected void addField(ParameterField field) {
+  protected void addField(JiveField field) {
     fields.add(field);
     field.addPropertyChangeListener(field.getName(), this);
     this.addPropertyChangeListener(field.getName(), this);
@@ -121,27 +121,27 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
 	    boolean box = false;
 	  
 //	GridLayout layout = new GridLayout();
-	FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0); // groupOptions.paddingWidth, groupOptions.paddingHeight);
+	FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0); // groupMetrics.paddingWidth, groupMetrics.paddingHeight);
       
 
     this.setLayout(layout);
     this.setAlignmentX(LEFT_ALIGNMENT);
     
-    this.setMaximumSize(new Dimension(GroupOptions.LONG_TEXT_OPTIONS.getMaximumWidth()+80, Integer.MAX_VALUE));
+    this.setMaximumSize(new Dimension(JiveGroupMetrics.LONG_TEXT_OPTIONS.getMaximumWidth()+80, Integer.MAX_VALUE));
     
     // Dimension minimumLayout1 =  layout.minimumLayoutSize(this);
 
-    if (box) add(Box.createVerticalStrut(groupOptions.marginHeight));
+    if (box) add(Box.createVerticalStrut(groupMetrics.marginHeight));
 
     int fieldIndex = 0;
 
-    for (ParameterField field : fields) {
+    for (JiveField field : fields) {
     	field.setAlignmentX(LEFT_ALIGNMENT);
-      if (box && fieldIndex++ > 1) add(Box.createVerticalStrut(groupOptions.paddingHeight));
+      if (box && fieldIndex++ > 1) add(Box.createVerticalStrut(groupMetrics.paddingHeight));
       add(field);
     }
 
-    if (box) add(Box.createVerticalStrut(groupOptions.marginHeight));
+    if (box) add(Box.createVerticalStrut(groupMetrics.marginHeight));
     
     // Dimension minimumLayout2 =  layout.minimumLayoutSize(this);
     
@@ -162,8 +162,8 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
    * 	@param title
    */
   private void initializePanel(String name, String title) {
-//	if (ParameterField.getGroupOptions("default-long", false)==null) ParameterField.setGroupOptions("default-long", GroupOptions.LONG_TEXT_OPTIONS);
-//	if (ParameterField.getGroupOptions("default-short", false)==null) ParameterField.setGroupOptions("default-short", GroupOptions.SHORT_TEXT_OPTIONS);
+//	if (JiveField.getGroupOptions("default-long", false)==null) JiveField.setGroupOptions("default-long", JiveGroupMetrics.LONG_TEXT_OPTIONS);
+//	if (JiveField.getGroupOptions("default-short", false)==null) JiveField.setGroupOptions("default-short", JiveGroupMetrics.SHORT_TEXT_OPTIONS);
 
 	  
     setName(name);
@@ -174,29 +174,29 @@ protected Collection<ParameterField> fields       = new LinkedHashSet<ParameterF
   
   public static JiveFieldFactory TinyJiveFieldFactory() {
 	  String groupID = "default-tiny";
-	  GroupOptions groupOptions = GroupOptions.TINY_TEXT_OPTIONS;
-		if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
+	  JiveGroupMetrics groupMetrics = JiveGroupMetrics.TINY_TEXT_OPTIONS;
+		if (JiveField.getGroupMetrics(groupID, false)==null) JiveField.setGroupMetrics(groupID, groupMetrics);
 		return JiveFieldFactory.Group(groupID);
   }
   
   public static JiveFieldFactory ShortJiveFieldFactory() {
 	  String groupID = "default-short";
-	  GroupOptions groupOptions = GroupOptions.SHORT_TEXT_OPTIONS;
-	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
+	  JiveGroupMetrics groupMetrics = JiveGroupMetrics.SHORT_TEXT_OPTIONS;
+	  if (JiveField.getGroupMetrics(groupID, false)==null) JiveField.setGroupMetrics(groupID, groupMetrics);
 	  return JiveFieldFactory.Group(groupID);
   }
   
   public static JiveFieldFactory LongJiveFieldFactory() {
 	  String groupID = "default-long";
-	  GroupOptions groupOptions = GroupOptions.LONG_TEXT_OPTIONS;
-	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
+	  JiveGroupMetrics groupMetrics = JiveGroupMetrics.LONG_TEXT_OPTIONS;
+	  if (JiveField.getGroupMetrics(groupID, false)==null) JiveField.setGroupMetrics(groupID, groupMetrics);
 	  return JiveFieldFactory.Group(groupID);
   }
   
   public static JiveFieldFactory DefaultJiveFieldFactory() {
 	  String groupID = "default";
-	  GroupOptions groupOptions = new GroupOptions();
-	  if (ParameterField.getGroupOptions(groupID, false)==null) ParameterField.setGroupOptions(groupID, groupOptions);
+	  JiveGroupMetrics groupMetrics = new JiveGroupMetrics();
+	  if (JiveField.getGroupMetrics(groupID, false)==null) JiveField.setGroupMetrics(groupID, groupMetrics);
 	  return JiveFieldFactory.Group(groupID);
   }
 

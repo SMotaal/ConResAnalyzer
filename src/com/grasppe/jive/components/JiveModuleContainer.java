@@ -12,13 +12,13 @@
 package com.grasppe.jive.components;
 
 import com.grasppe.conres.framework.imagej.newFrame;
-import com.grasppe.conreslabs.panels.imageprocessors.FourierParametersPanel;
-import com.grasppe.conreslabs.panels.imageprocessors.FunctionParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
-import com.grasppe.jive.fields.NumericValueField;
+import com.grasppe.conreslabs.panels.imageprocessors.FourierModulePanel;
+import com.grasppe.conreslabs.panels.imageprocessors.FunctionModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PatchModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PrintingModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScanningModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScreeningModulePanel;
+import com.grasppe.jive.fields.JiveNumericField;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 import com.javapractices.snippets.TextTransfer;
@@ -85,7 +85,7 @@ import sun.awt.datatransfer.TransferableProxy;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ModulePanelContainer extends JPanel implements Observer, ActionListener, PropertyChangeListener {
+public class JiveModuleContainer extends JPanel implements Observer, ActionListener, PropertyChangeListener {
 
   protected static int addNumber = 0;
 
@@ -95,7 +95,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 //                                                            ColumnSpec.decode("0dlu"), ColumnSpec.decode("30dlu:grow"),
 //                                                            FormFactory.RELATED_GAP_COLSPEC, };
   // private JButton                           btnApply;
-  protected LinkedList<JiveParametersPanel> modules = new LinkedList<JiveParametersPanel>();
+  protected LinkedList<JiveModulePanel> modules = new LinkedList<JiveModulePanel>();
 
   // GUI Components
   protected JPanel      containerPanel;
@@ -121,14 +121,14 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   protected String                               MacButtonPosition = "JButton.segmentPosition";
   protected HashMap<KeyStroke, Action>           keyMap            = new HashMap<KeyStroke, Action>();
   private int                                    moduleHashCode    = 0;
-  protected HashMap<String, JiveParametersPanel> modulesHashMap    = null;
+  protected HashMap<String, JiveModulePanel> modulesHashMap    = null;
   
   protected boolean debugBorders = false;
 
   /**
    * Create the panel.
    */
-  public ModulePanelContainer() {
+  public JiveModuleContainer() {
 
 //  GraphicsEnvironment e           = GraphicsEnvironment.getLocalGraphicsEnvironment();
 //
@@ -201,7 +201,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.LinkedList#add(java.lang.Object)
    */
-  public boolean add(JiveParametersPanel module) {
+  public boolean add(JiveModulePanel module) {
     return modules.add(module);
   }
 
@@ -210,7 +210,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    *     @param module
    *     @see java.util.LinkedList#add(int, java.lang.Object)
    */
-  public void add(int index, JiveParametersPanel module) {
+  public void add(int index, JiveModulePanel module) {
     modules.add(index, module);
   }
 
@@ -312,8 +312,8 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
 //      System.out.println(focusOwner);
 
-        if (focusOwner instanceof NumericValueField) {
-          NumericValueField textOwner = ((NumericValueField)focusOwner);
+        if (focusOwner instanceof JiveNumericField) {
+          JiveNumericField textOwner = ((JiveNumericField)focusOwner);
 
           try {
             textOwner.commitEdit();
@@ -479,15 +479,15 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    *    @param index
    *    @return
    */
-  protected JiveParametersPanel createNewPanel(String panelType, Integer index) {
-    JiveParametersPanel newPanel = null;
+  protected JiveModulePanel createNewPanel(String panelType, Integer index) {
+    JiveModulePanel newPanel = null;
 
-    if (panelType.equals("Function")) newPanel = new FunctionParametersPanel();
-    else if (panelType.equals("Fourier")) newPanel = new FourierParametersPanel();
-    else if (panelType.equals("Patch")) newPanel = new PatchParametersPanel();
-    else if (panelType.equals("Screening")) newPanel = new ScreeningParametersPanel();
-    else if (panelType.equals("Printing")) newPanel = new PrintingParametersPanel();
-    else if (panelType.equals("Scanning")) newPanel = new ScanningParametersPanel();
+    if (panelType.equals("Function")) newPanel = new FunctionModulePanel();
+    else if (panelType.equals("Fourier")) newPanel = new FourierModulePanel();
+    else if (panelType.equals("Patch")) newPanel = new PatchModulePanel();
+    else if (panelType.equals("Screening")) newPanel = new ScreeningModulePanel();
+    else if (panelType.equals("Printing")) newPanel = new PrintingModulePanel();
+    else if (panelType.equals("Scanning")) newPanel = new ScanningModulePanel();
 
     if (newPanel == null) return null;
 
@@ -511,7 +511,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    *    @param title
    *    @param index
    */
-  protected void createPanel(JiveParametersPanel panel, String title, Integer index) {
+  protected void createPanel(JiveModulePanel panel, String title, Integer index) {
     if (this.contains(panel)) return;
 
     if ((title != null) &&!title.isEmpty()) panel.setTitle(title);
@@ -596,7 +596,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
           ((JComponent)focusOwner.getParent().getParent()).scrollRectToVisible(focusOwner.getParent().getBounds());
 
           try {
-            ModuleParametersPanel panel = (ModuleParametersPanel)SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class,
+            JiveAbstractPanel panel = (JiveAbstractPanel)SwingUtilities.getAncestorOfClass(JiveAbstractPanel.class,
                                                                                                    focusOwner);
 
             panel.makeActive();
@@ -614,7 +614,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
               Action       action     = keyMap.get(keyStroke);
               final String name       = ((String)action.getValue(Action.NAME)).toLowerCase();
 
-              if (focusOwner instanceof JComponent) {			// (!(focusOwner instanceof NumericValueField)) {
+              if (focusOwner instanceof JComponent) {			// (!(focusOwner instanceof JiveNumericField)) {
                 final JComponent owner          = (JComponent)focusOwner;
                 final Action     localAction    = action;
                 final Object     ownerActionKey = ownerInput.get(keyStroke);
@@ -701,12 +701,12 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
     for (int i = 1; i < rows + 1; i++) {
 
       // JLabel newLabel = new JLabel(i + "");
-      JiveParametersPanel newPanel;
+      JiveModulePanel newPanel;
 
-      if ((i) % 4 == 0) newPanel = new ScanningParametersPanel();
-      else if ((i) % 3 == 0) newPanel = new PrintingParametersPanel();
-      else if ((i) % 2 == 0) newPanel = new ScreeningParametersPanel();
-      else newPanel = new PatchParametersPanel();
+      if ((i) % 4 == 0) newPanel = new ScanningModulePanel();
+      else if ((i) % 3 == 0) newPanel = new PrintingModulePanel();
+      else if ((i) % 2 == 0) newPanel = new ScreeningModulePanel();
+      else newPanel = new PatchModulePanel();
 
       this.createPanel(newPanel, i + "", null);
 
@@ -718,7 +718,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    *    @param panel
    *    @param title
    */
-  protected void createPermanentPanel(JiveParametersPanel panel, String title) {
+  protected void createPermanentPanel(JiveModulePanel panel, String title) {
     panel.setPermanent(true);
     createPanel(panel, title, null);
   }
@@ -764,7 +764,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.AbstractSequentialList#iterator()
    */
-  public Iterator<JiveParametersPanel> iterator() {
+  public Iterator<JiveModulePanel> iterator() {
     return modules.iterator();
   }
 
@@ -775,7 +775,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     if (steps == 0) return;
 
-    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+    JiveModulePanel activePanel = (JiveModulePanel)JiveModulePanel.activePanel;
 
     if ((activePanel == null) || (modules == null)) return;
 
@@ -872,7 +872,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 //
 //      // Add contents to the window.
 //      frame.getContentPane().setLayout(new BorderLayout());
-//      frame.getContentPane().add(new ModulePanelContainer(), BorderLayout.EAST);
+//      frame.getContentPane().add(new JiveModuleContainer(), BorderLayout.EAST);
 //
 //      // Display the window.
 //      frame.pack();
@@ -909,7 +909,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   /**
    */
   protected void removeActivePanel() {
-    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+    JiveModulePanel activePanel = (JiveModulePanel)JiveModulePanel.activePanel;
 
     if ((activePanel == null) || (modules == null)) return;
 
@@ -931,8 +931,8 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    */
   protected void removeAllPanel() {
 	  
-//	  for (JiveParametersPanel panel : modules.get)
-//    JiveParametersPanel activePanel = (JiveParametersPanel)JiveParametersPanel.activePanel;
+//	  for (JiveModulePanel panel : modules.get)
+//    JiveModulePanel activePanel = (JiveModulePanel)JiveModulePanel.activePanel;
 //
 //    if ((activePanel == null) || (modules == null)) return;
 //
@@ -1006,10 +1006,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
 //  contentPanel.setSize(new Dimension(400, contentPanel.getSize().height));
 
-    Iterator<JiveParametersPanel> panelIterator = this.iterator();
+    Iterator<JiveModulePanel> panelIterator = this.iterator();
 
     while (panelIterator.hasNext()) {
-      final JiveParametersPanel panel = panelIterator.next();
+      final JiveModulePanel panel = panelIterator.next();
       final JLabel              label = new JLabel(panel.getTitle());
 
       label.setOpaque(true);
@@ -1061,7 +1061,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.LinkedList#get(int)
    */
-  public JiveParametersPanel get(int arg0) {
+  public JiveModulePanel get(int arg0) {
     return modules.get(arg0);
   }
 
@@ -1084,7 +1084,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.LinkedList#getFirst()
    */
-  public JiveParametersPanel getFirst() {
+  public JiveModulePanel getFirst() {
     return modules.getFirst();
   }
 
@@ -1092,24 +1092,24 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.LinkedList#getLast()
    */
-  public JiveParametersPanel getLast() {
+  public JiveModulePanel getLast() {
     return modules.getLast();
   }
 
   /**
    *    @return
    */
-  public HashMap<String, JiveParametersPanel> getModules() {
+  public HashMap<String, JiveModulePanel> getModules() {
 
     if (modules.hashCode() != moduleHashCode) {
       GrasppeKit.debugText("ContainerPanel>Map", "Generating new hash map for hash code: " + modules.hashCode(), 2);
 
-      modulesHashMap = new HashMap<String, JiveParametersPanel>();
+      modulesHashMap = new HashMap<String, JiveModulePanel>();
 
-      Iterator<JiveParametersPanel> panelIterator = this.iterator();
+      Iterator<JiveModulePanel> panelIterator = this.iterator();
 
       while (panelIterator.hasNext()) {
-        JiveParametersPanel module = panelIterator.next();
+        JiveModulePanel module = panelIterator.next();
         String              name   = module.getTitle();
 
         modulesHashMap.put(name, module);
@@ -1127,10 +1127,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   public LinkedHashMap<String, HashMap> getValues() {
     LinkedHashMap<String, HashMap> values = new LinkedHashMap<String, HashMap>();
 
-    Iterator<JiveParametersPanel> panelIterator = this.iterator();
+    Iterator<JiveModulePanel> panelIterator = this.iterator();
 
     while (panelIterator.hasNext()) {
-      JiveParametersPanel module = panelIterator.next();
+      JiveModulePanel module = panelIterator.next();
       String              name   = module.getTitle();
 
       values.put(name, module.getValues());
@@ -1153,7 +1153,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
    * @return
    * @see java.util.LinkedList#set(int, java.lang.Object)
    */
-  public JiveParametersPanel set(int arg0, JiveParametersPanel arg1) {
+  public JiveModulePanel set(int arg0, JiveModulePanel arg1) {
     return modules.set(arg0, arg1);
   }
 
@@ -1186,7 +1186,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
   public void setValues(String valueString) {
 	  String[] sourceString = new String[8];
 	  
-	  LinkedList<JiveParametersPanel> previousModules = (LinkedList<JiveParametersPanel>) modules.clone(); //new LinkedList<JiveParametersPanel>();
+	  LinkedList<JiveModulePanel> previousModules = (LinkedList<JiveModulePanel>) modules.clone(); //new LinkedList<JiveModulePanel>();
 	  
 	  modules.clear();
 	  
@@ -1229,7 +1229,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 			  
 			  GrasppeKit.debugText("SetValues>ValuePairs", arrayString(valuePairs), 2);
 			  
-			  JiveParametersPanel newPanel = createNewPanel(moduleType, null);
+			  JiveModulePanel newPanel = createNewPanel(moduleType, null);
 			  
 			  for (String valuePair : valuePairs) {
 				  String[] pairStrings = valuePair.split("\\=");
@@ -1262,10 +1262,10 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 	  
 	  revalidate();
 //
-//	    Iterator<JiveParametersPanel> panelIterator = this.iterator();
+//	    Iterator<JiveModulePanel> panelIterator = this.iterator();
 //
 //	    while (panelIterator.hasNext()) {
-//	      JiveParametersPanel module = panelIterator.next();
+//	      JiveModulePanel module = panelIterator.next();
 //	      String              name   = module.getTitle();
 //
 //	      values.put(name, module.getValues());
@@ -1291,7 +1291,7 @@ public class ModulePanelContainer extends JPanel implements Observer, ActionList
 
     for (String moduleName : allValues.keySet()) {
       if (getModules().containsKey(moduleName)) {
-        JiveParametersPanel      module       = getModules().get(moduleName);
+        JiveModulePanel      module       = getModules().get(moduleName);
         HashMap<String, HashMap> moduleValues = allValues.get(moduleName);
 
         for (String propertyName : moduleValues.keySet()) {

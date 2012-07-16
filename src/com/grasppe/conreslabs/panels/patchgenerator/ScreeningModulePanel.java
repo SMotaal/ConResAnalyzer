@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -11,19 +11,19 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.jive.components.JiveParametersPanel;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ScreeningParametersPanel extends JiveParametersPanel {
+public class ScreeningModulePanel extends JiveModulePanel {
 
   /**
    * Create the panel.
    */
-  public ScreeningParametersPanel() {
+  public ScreeningModulePanel() {
     super("Screening-Panel", "Screening");
   }
 
@@ -32,15 +32,15 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
   @Override
   protected void createFields() {
 
-//  addressabilityComponent = (NumericValueField)createNumericField("Screen-Addressability", addressabilityValue,
+//  addressabilityComponent = (JiveNumericField)createNumericField("Screen-Addressability", addressabilityValue,
 //  "Addressability", 300, 3600, "spi", 2);
 //
 //// Resolution (lpi)
-//resolutionComponent = (NumericValueField)createNumericField("Screen-Resolution", resolutionValue, "Resolution", 50, 600,
+//resolutionComponent = (JiveNumericField)createNumericField("Screen-Resolution", resolutionValue, "Resolution", 50, 600,
 //"lpi", 4);
 //
 //// angle (¼)
-//angleComponent = (NumericValueField)createNumericField("Screen-Angle", angleValue, "Angle", 0, 359, "¼", 6);
+//angleComponent = (JiveNumericField)createNumericField("Screen-Angle", angleValue, "Angle", 0, 359, "¼", 6);
 
     addField(TinyJiveFieldFactory().createNumericField("Addressability", "Addressability", 2450, 300, 4800, "spi"));
     addField(TinyJiveFieldFactory().createNumericField("Resolution", "Resolution", 175, 50, 600, "lpi"));
@@ -51,7 +51,7 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 
 
 // /*
-// * @(#)PatchParametersPanel.java   12/07/07
+// * @(#)PatchModulePanel.java   12/07/07
 // *
 // * Copyright (c) 2011 Saleh Abdel Motaal
 // *
@@ -64,8 +64,8 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // package com.grasppe.conreslabs.panels.patchgenerator;
 //
 // import com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
-// import com.grasppe.jive.components.ModuleParametersPanel;
-// import com.grasppe.jive.fields.NumericValueField;
+// import com.grasppe.jive.components.JiveAbstractPanel;
+// import com.grasppe.jive.fields.JiveNumericField;
 //
 // import com.jgoodies.forms.factories.FormFactory;
 // import com.jgoodies.forms.layout.FormLayout;
@@ -85,17 +85,17 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // *  @version        $Revision: 1.0, 12/07/07
 // *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
 // */
-// public class ScreeningParametersPanel extends ModuleParametersPanel implements PropertyChangeListener {
+// public class ScreeningModulePanel extends JiveAbstractPanel implements PropertyChangeListener {
 //
 // private double    addressabilityValue = 2450,
 // resolutionValue     = 175,
 // angleValue          = 37.5;
-// NumericValueField addressabilityComponent, resolutionComponent, angleComponent;
+// JiveNumericField addressabilityComponent, resolutionComponent, angleComponent;
 //
 // /**
 // * Create the panel.
 // */
-// public ScreeningParametersPanel() {
+// public ScreeningModulePanel() {
 //
 // this.addPropertyChangeListener(this);
 // this.setName("Screen-Panel");
@@ -118,15 +118,15 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // private void createPanelFields() {
 //
 // // Addressability (spi)
-// addressabilityComponent = (NumericValueField)createNumericField("Screen-Addressability", addressabilityValue,
+// addressabilityComponent = (JiveNumericField)createNumericField("Screen-Addressability", addressabilityValue,
 // "Addressability", 300, 3600, "spi", 2);
 //
 // // Resolution (lpi)
-// resolutionComponent = (NumericValueField)createNumericField("Screen-Resolution", resolutionValue, "Resolution", 50, 600,
+// resolutionComponent = (JiveNumericField)createNumericField("Screen-Resolution", resolutionValue, "Resolution", 50, 600,
 // "lpi", 4);
 //
 // // angle (¼)
-// angleComponent = (NumericValueField)createNumericField("Screen-Angle", angleValue, "Angle", 0, 359, "¼", 6);
+// angleComponent = (JiveNumericField)createNumericField("Screen-Angle", angleValue, "Angle", 0, 359, "¼", 6);
 //
 // //  JLabel lblAddressability = new JLabel("Addressability");
 // //
@@ -136,7 +136,7 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // //
 // //  add(lblAddressabilitySuffix, "6, 2, left, default");
 // //
-// //  NumericValueField txtAddressability = new NumericValueField(300, 3600);
+// //  JiveNumericField txtAddressability = new JiveNumericField(300, 3600);
 // //
 // //  txtAddressability.setHorizontalAlignment(SwingConstants.TRAILING);
 // //  txtAddressability.setValue(addressabilityValue);
@@ -151,7 +151,7 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // //
 // //  add(lblResolutionSuffix, "6, 4, left, default");
 // //
-// //  NumericValueField txtResolution = new NumericValueField(50, 600);
+// //  JiveNumericField txtResolution = new JiveNumericField(50, 600);
 // //
 // //  txtResolution.setHorizontalAlignment(SwingConstants.TRAILING);
 // //  txtResolution.setValue(resolutionValue);
@@ -166,7 +166,7 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 // //
 // //  add(lblAngleSuffix, "6, 6, left, default");
 // //
-// //  NumericValueField txtAngle = new NumericValueField(0, 360);
+// //  JiveNumericField txtAngle = new JiveNumericField(0, 360);
 // //
 // //  txtAngle.setHorizontalAlignment(SwingConstants.TRAILING);
 // //  txtAngle.setValue(angleValue);
@@ -186,12 +186,12 @@ public class ScreeningParametersPanel extends JiveParametersPanel {
 //
 // public void run() {
 //
-// JFrame frame = new JFrame("ScreeningParametersPanel Demo");
+// JFrame frame = new JFrame("ScreeningModulePanel Demo");
 //
 // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //
 // // Add contents to the window.
-// frame.getContentPane().add(new ScreeningParametersPanel());
+// frame.getContentPane().add(new ScreeningModulePanel());
 //
 // // Display the window.
 // frame.pack();

@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -11,19 +11,19 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
-import com.grasppe.jive.components.JiveParametersPanel;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ScanningParametersPanel extends JiveParametersPanel {
+public class ScanningModulePanel extends JiveModulePanel {
 
   /**
    * Create the panel.
    */
-  public ScanningParametersPanel() {
+  public ScanningModulePanel() {
     super("Scanning-Panel", "Scanning");
   }
 

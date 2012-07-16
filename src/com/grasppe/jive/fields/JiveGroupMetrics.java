@@ -5,23 +5,23 @@ package com.grasppe.jive.fields;
    *    @version        $Revision: 1.0, 12/07/13
    *    @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
    */
-  public class GroupOptions {
+  public class JiveGroupMetrics {
 	  
 	  
 	  public static int DEFAULT_LABEL_WIDTH = 100;
 	  public static int DEFAULT_FIELD_WIDTH = 125;
 	  public static int DEFAULT_SUFFIX_WIDTH = 25;
 	  
-	  public static GroupOptions LONG_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH + 175, DEFAULT_SUFFIX_WIDTH - 25);	  
-	  public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 25, DEFAULT_SUFFIX_WIDTH + 25);
-	  public static GroupOptions TINY_TEXT_OPTIONS = new GroupOptions(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 50, DEFAULT_SUFFIX_WIDTH + 25);
-	  //public static GroupOptions SHORT_TEXT_OPTIONS = new GroupOptions(100, 25);
+	  public static JiveGroupMetrics LONG_TEXT_OPTIONS = new JiveGroupMetrics(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH + 175, DEFAULT_SUFFIX_WIDTH - 25);	  
+	  public static JiveGroupMetrics SHORT_TEXT_OPTIONS = new JiveGroupMetrics(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 25, DEFAULT_SUFFIX_WIDTH + 25);
+	  public static JiveGroupMetrics TINY_TEXT_OPTIONS = new JiveGroupMetrics(DEFAULT_LABEL_WIDTH, DEFAULT_FIELD_WIDTH - 50, DEFAULT_SUFFIX_WIDTH + 25);
+	  //public static JiveGroupMetrics SHORT_TEXT_OPTIONS = new JiveGroupMetrics(100, 25);
 	  
 	  /**
 	 * 
 	 */
 
-	public GroupOptions() {
+	public JiveGroupMetrics() {
 		  super();
 		
 	  }
@@ -35,7 +35,7 @@ package com.grasppe.jive.fields;
 	 * @param paddingWidth
 	 * @param paddingHeight
 	 */
-	public GroupOptions( int labelWidth, int fieldWidth, int suffixWidth,
+	public JiveGroupMetrics( int labelWidth, int fieldWidth, int suffixWidth,
 			int marginWidth, int marginHeight, int paddingWidth,
 			int paddingHeight) {
 		super();
@@ -54,7 +54,7 @@ package com.grasppe.jive.fields;
 	 * @param fieldWidth
 	 * @param suffixWidth
 	 */
-	public GroupOptions( int labelWidth, int fieldWidth, int suffixWidth) {
+	public JiveGroupMetrics( int labelWidth, int fieldWidth, int suffixWidth) {
 		super();
 		
 		this.labelWidth = labelWidth;
@@ -66,7 +66,7 @@ package com.grasppe.jive.fields;
 	 * @param fieldWidth
 	 * @param suffixWidth
 	 */
-	public GroupOptions( int fieldWidth, int suffixWidth) {
+	public JiveGroupMetrics( int fieldWidth, int suffixWidth) {
 		super();
 		
 		this.fieldWidth = fieldWidth;

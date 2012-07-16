@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -11,21 +11,21 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
+import com.grasppe.conreslabs.fields.ResolutionValueField;
 import com.grasppe.jive.JiveComponentFactory;
-import com.grasppe.jive.components.JiveParametersPanel;
-import com.grasppe.jive.fields.ResolutionValueField;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class PatchParametersPanel extends JiveParametersPanel {
+public class PatchModulePanel extends JiveModulePanel {
 
   /**
    * Create the panel.
    */
-  public PatchParametersPanel() {
+  public PatchModulePanel() {
     super("Patch-Panel", "Patch");
   }
 
@@ -35,17 +35,17 @@ public class PatchParametersPanel extends JiveParametersPanel {
   protected void createFields() {
 
     // // Mean Tone (aka Reference Tone Value)
-    // meanToneComponent = (NumericValueField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
+    // meanToneComponent = (JiveNumericField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
     //
     // // Contrast
-    // contrastComponent = (NumericValueField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
+    // contrastComponent = (JiveNumericField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
     //
     // // Resolution (lp/mm)
-    // resolutionComponent = (NumericValueField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
+    // resolutionComponent = (JiveNumericField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
     // "lp/mm", 6);
     //
     // // Patch Size (mm)
-    // patchSizeComponent = (NumericValueField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
+    // patchSizeComponent = (JiveNumericField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
 
     addField(TinyJiveFieldFactory().createNumericField("Mean", "Tone", 50, 0, 100, "%"));
     addField(TinyJiveFieldFactory().createNumericField("Contrast", "Contrast", 100, 0, 100, "%"));
@@ -61,7 +61,7 @@ public class PatchParametersPanel extends JiveParametersPanel {
 
 
 // /*
-// * @(#)PatchParametersPanel.java   12/07/07
+// * @(#)PatchModulePanel.java   12/07/07
 // *
 // * Copyright (c) 2011 Saleh Abdel Motaal
 // *
@@ -74,8 +74,8 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // package com.grasppe.conreslabs.panels.patchgenerator;
 //
 // import com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
-// import com.grasppe.jive.components.ModuleParametersPanel;
-// import com.grasppe.jive.fields.NumericValueField;
+// import com.grasppe.jive.components.JiveAbstractPanel;
+// import com.grasppe.jive.fields.JiveNumericField;
 // import com.grasppe.jive.fields.ResolutionValueField;
 //
 // import com.jgoodies.forms.factories.FormFactory;
@@ -98,19 +98,19 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // *  @version        $Revision: 1.0, 12/07/07
 // *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
 // */
-// public class PatchParametersPanel extends ModuleParametersPanel implements PropertyChangeListener {
+// public class PatchModulePanel extends JiveAbstractPanel implements PropertyChangeListener {
 //
 // //private ToneValueField txtMeanToneValue, txtContrast;
 // private double    meanToneValue   = 50,
 // contrastValue   = 100,
 // resolutionValue = 0.63,
 // patchSizeValue  = 5.3;
-// NumericValueField contrastComponent, resolutionComponent, meanToneComponent, patchSizeComponent;
+// JiveNumericField contrastComponent, resolutionComponent, meanToneComponent, patchSizeComponent;
 //
 // /**
 // * Create the panel.
 // */
-// public PatchParametersPanel() {
+// public PatchModulePanel() {
 //
 // this.addPropertyChangeListener(this);
 // this.setName("Patch-Panel");
@@ -134,23 +134,23 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // private void createPanelFields() {
 //
 // // Mean Tone (aka Reference Tone Value)
-// meanToneComponent = (NumericValueField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
+// meanToneComponent = (JiveNumericField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
 //
 // // Contrast
-// contrastComponent = (NumericValueField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
+// contrastComponent = (JiveNumericField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
 //
 // // Resolution (lp/mm)
-// resolutionComponent = (NumericValueField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
+// resolutionComponent = (JiveNumericField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
 // "lp/mm", 6);
 //
 // // Patch Size (mm)
-// patchSizeComponent = (NumericValueField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
+// patchSizeComponent = (JiveNumericField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
 //
 // // JLabel lblMeanToneValue = new JLabel("Mean Tone");
 // // add(lblMeanToneValue, "2, 2, right, default");
 // // JLabel lblMeanToneValueSuffix = new JLabel("");
 // // add(lblMeanToneValueSuffix, "6, 2, left, default");
-// // NumericValueField txtMeanTone = new NumericValueField(0, 100);
+// // JiveNumericField txtMeanTone = new JiveNumericField(0, 100);
 // // txtMeanTone.setHorizontalAlignment(SwingConstants.TRAILING);
 // // txtMeanTone.setValue(meanToneValue);
 // // meanToneComponent = txtMeanTone;
@@ -161,7 +161,7 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // // add(lblContrast, "2, 4, right, default");
 // // JLabel lblContrastSuffix = new JLabel("");
 // // add(lblContrastSuffix, "6, 4, left, default");
-// // NumericValueField txtContrast = new NumericValueField(0, 100);
+// // JiveNumericField txtContrast = new JiveNumericField(0, 100);
 // // txtContrast.setHorizontalAlignment(SwingConstants.TRAILING);
 // // txtContrast.setValue(contrastValue);
 // // contrastComponent = txtContrast;
@@ -172,7 +172,7 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // // add(lblResolution, "2, 6, right, default");
 // // JLabel lblResolutionSuffix = new JLabel("lp/mm");
 // // add(lblResolutionSuffix, "6, 6, left, default");
-// // NumericValueField txtResolution = new ResolutionValueField(0, 10);
+// // JiveNumericField txtResolution = new ResolutionValueField(0, 10);
 // // txtResolution.setHorizontalAlignment(SwingConstants.TRAILING);
 // // txtResolution.setValue(resolutionValue);
 // // functionComponent = txtResolution;
@@ -183,7 +183,7 @@ public class PatchParametersPanel extends JiveParametersPanel {
 // // add(lblPatchSize, "2, 8, right, default");
 // // JLabel lblPatchSizeSuffix = new JLabel("mm");
 // // add(lblPatchSizeSuffix, "6, 8, left, default");
-// // NumericValueField txtPatchSize = new NumericValueField(3.0, 16.0);
+// // JiveNumericField txtPatchSize = new JiveNumericField(3.0, 16.0);
 // // txtPatchSize.setHorizontalAlignment(SwingConstants.TRAILING);
 // // txtPatchSize.setValue(patchSize);
 // // txtPatchSize.addPropertyChangeListener("value", this);
@@ -234,12 +234,12 @@ public class PatchParametersPanel extends JiveParametersPanel {
 //
 // public void run() {
 //
-// JFrame frame = new JFrame("PatchParametersPanel Demo");
+// JFrame frame = new JFrame("PatchModulePanel Demo");
 //
 // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //
 // // Add contents to the window.
-// frame.getContentPane().add(new PatchParametersPanel());
+// frame.getContentPane().add(new PatchModulePanel());
 //
 // // Display the window.
 // frame.pack();

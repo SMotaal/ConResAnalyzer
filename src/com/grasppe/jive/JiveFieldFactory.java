@@ -13,7 +13,7 @@ package com.grasppe.jive;
 
 import javax.swing.JComponent;
 
-import com.grasppe.jive.components.ParameterField;
+import com.grasppe.jive.components.JiveField;
 
 /**
  * Class description
@@ -61,8 +61,8 @@ public class JiveFieldFactory {
    *  @param suffix
    *  @return
    */
-  public ParameterField createListField(String name, String label, Object value, Object[] options, String suffix) {
-    ParameterField newField = new ParameterField(name, JiveComponentFactory.createListField(name, value, options), label, suffix);
+  public JiveField createListField(String name, String label, Object value, Object[] options, String suffix) {
+    JiveField newField = new JiveField(name, JiveComponentFactory.createListField(name, value, options), label, suffix);
 
     newField.setGroupID(groupID);
 
@@ -76,9 +76,9 @@ public class JiveFieldFactory {
    *    @param suffix
    *    @return
    */
-  public ParameterField createMarkupField(String name, String label, String value, String suffix) {
+  public JiveField createMarkupField(String name, String label, String value, String suffix) {
 
-    ParameterField newField = new ParameterField(name, JiveComponentFactory.createMarkupFieldComponent(name, value), label, suffix);
+    JiveField newField = new JiveField(name, JiveComponentFactory.createMarkupFieldComponent(name, value), label, suffix);
 
     newField.setGroupID(groupID);
 
@@ -95,9 +95,9 @@ public class JiveFieldFactory {
    *      @param suffix
    *      @return
    */
-  public ParameterField createNumericField(String name, String label, double value, double minimum, double maximum, String suffix) {
+  public JiveField createNumericField(String name, String label, double value, double minimum, double maximum, String suffix) {
 
-    ParameterField newField = new ParameterField(name,
+    JiveField newField = new JiveField(name,
                                                  JiveComponentFactory.createNumericFieldComponent(name, value, minimum, maximum),
                                                  label, suffix);
 
@@ -116,9 +116,9 @@ public class JiveFieldFactory {
    *      @param suffix
    *      @return
    */
-  public ParameterField createCustomField(String name, String label, JComponent fieldComponent, String suffix) {
+  public JiveField createCustomField(String name, String label, JComponent fieldComponent, String suffix) {
 
-    ParameterField newField = new ParameterField(name, fieldComponent, label, suffix);
+    JiveField newField = new JiveField(name, fieldComponent, label, suffix);
 
     newField.setGroupID(groupID);
 
@@ -133,9 +133,9 @@ public class JiveFieldFactory {
    *      @param suffix
    *      @return
    */
-  public ParameterField createTextField(String name, String label, String value, String suffix) {
+  public JiveField createTextField(String name, String label, String value, String suffix) {
 
-    ParameterField newField = new ParameterField(name, JiveComponentFactory.createTextFieldComponent(name, value), label, suffix);
+    JiveField newField = new JiveField(name, JiveComponentFactory.createTextFieldComponent(name, value), label, suffix);
 
     newField.setGroupID(groupID);
 

@@ -1,5 +1,5 @@
 /*
- * @(#)ModuleParametersPanel.java   12/07/09
+ * @(#)JiveAbstractPanel.java   12/07/09
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -11,9 +11,9 @@
 
 package com.grasppe.jive.components;
 
-import com.grasppe.jive.fields.NumericValueField;
-import com.grasppe.jive.fields.ResolutionValueField;
-import com.grasppe.jive.fields.TextValueField;
+import com.grasppe.conreslabs.fields.ResolutionValueField;
+import com.grasppe.jive.fields.JiveNumericField;
+import com.grasppe.jive.fields.JiveTextField;
 import com.grasppe.lure.components.Observers;
 import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
@@ -44,9 +44,9 @@ import javax.swing.SwingConstants;
  *  @version        $Revision: 1.0, 12/07/09
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class ModuleParametersPanel extends JPanel implements Observable {
+public class JiveAbstractPanel extends JPanel implements Observable {
 	
-	protected static ModuleParametersPanel activePanel;
+	protected static JiveAbstractPanel activePanel;
 
 /* (non-Javadoc)
 	 * @see javax.swing.JComponent#setFont(java.awt.Font)
@@ -85,7 +85,7 @@ protected Observers observers = new Observers(this);
 
   /**
    */
-  public ModuleParametersPanel() {
+  public JiveAbstractPanel() {
     super();
     this.initializePanel();
   }
@@ -93,7 +93,7 @@ protected Observers observers = new Observers(this);
   /**
    *    @param isDoubleBuffered
    */
-  public ModuleParametersPanel(boolean isDoubleBuffered) {
+  public JiveAbstractPanel(boolean isDoubleBuffered) {
     super(isDoubleBuffered);
     this.initializePanel();
   }
@@ -101,7 +101,7 @@ protected Observers observers = new Observers(this);
   /**
    *    @param layout
    */
-  public ModuleParametersPanel(LayoutManager layout) {
+  public JiveAbstractPanel(LayoutManager layout) {
     super(layout);
     this.initializePanel();
   }
@@ -110,7 +110,7 @@ protected Observers observers = new Observers(this);
    *    @param layout
    *    @param isDoubleBuffered
    */
-  public ModuleParametersPanel(LayoutManager layout, boolean isDoubleBuffered) {
+  public JiveAbstractPanel(LayoutManager layout, boolean isDoubleBuffered) {
     super(layout, isDoubleBuffered);
     this.initializePanel();
   }
@@ -167,7 +167,7 @@ protected Observers observers = new Observers(this);
 		 */
 		@Override
 		public void componentResized(ComponentEvent e) {
-			ModuleParametersPanel container = (ModuleParametersPanel) e.getComponent();
+			JiveAbstractPanel container = (JiveAbstractPanel) e.getComponent();
 			
 			container.flowResize();
 //			int height = 0; int width = 0;
@@ -194,7 +194,7 @@ protected Observers observers = new Observers(this);
 //		@Override
 //		public void focusGained(FocusEvent e) {
 //			// TODO Auto-generated method stub
-//			activePanel = (ModuleParametersPanel) e.getSource();
+//			activePanel = (JiveAbstractPanel) e.getSource();
 //			super.focusGained(e);
 //		}
 //		  
@@ -206,7 +206,7 @@ protected Observers observers = new Observers(this);
 	  activePanel = this;
   }
   
-  public static ModuleParametersPanel getActivePanel() {
+  public static JiveAbstractPanel getActivePanel() {
 	  return activePanel;
   }
 
@@ -237,7 +237,7 @@ protected Observers observers = new Observers(this);
 
     add(lblSuffix, "6, " + row + ", left, default");
 
-    NumericValueField txtField = new NumericValueField(minimum, maximum);
+    JiveNumericField txtField = new JiveNumericField(minimum, maximum);
 
     txtField.setHorizontalAlignment(SwingConstants.TRAILING);
     txtField.setName(name);
@@ -278,7 +278,7 @@ protected Observers observers = new Observers(this);
 	    return lstField;
   }
   
-  protected void addParameterField(ParameterField field, int row) {
+  protected void addJiveField(JiveField field, int row) {
 	  add(field, "2, " + row + ", right, default");
   }
   
@@ -292,7 +292,7 @@ protected Observers observers = new Observers(this);
 	    add(lblSuffix, "6, " + row + ", left, default");
 
 
-	    TextValueField txtField = new TextValueField(value);
+	    JiveTextField txtField = new JiveTextField(value);
 	    
 	    
 	    txtField.setName(name);

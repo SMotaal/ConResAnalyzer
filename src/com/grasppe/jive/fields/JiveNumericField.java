@@ -1,5 +1,5 @@
 /*
- * @(#)NumericValueField.java   12/07/07
+ * @(#)JiveNumericField.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -26,7 +26,7 @@ import javax.swing.text.NumberFormatter;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class NumericValueField extends JFormattedTextField implements PropertyChangeListener, ValueField, NamedField, NameValueField {
+public class JiveNumericField extends JFormattedTextField implements PropertyChangeListener, ValueField, NamedField, NameValueField {
 
   protected double[] numericRange = {};
   protected Double minimumValue = null;
@@ -36,7 +36,7 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
 
   /**
    */
-  public NumericValueField() {
+  public JiveNumericField() {
 
     // Initialize
     this(new DefaultFormatterFactory(
@@ -49,7 +49,7 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
   /**
    *   @param factory
    */
-  public NumericValueField(AbstractFormatterFactory factory) {
+  public JiveNumericField(AbstractFormatterFactory factory) {
     super(factory);
 
     setColumns(4);
@@ -76,7 +76,7 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
   /**
    *    @param value
    */
-  public NumericValueField(Double value) {
+  public JiveNumericField(Double value) {
     this();
     if (value != null) setValue(value);
   }
@@ -85,7 +85,7 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
    *    @param minimum
    *    @param maximum
    */
-  public NumericValueField(double minimum, double maximum) {
+  public JiveNumericField(double minimum, double maximum) {
     this();
     minimumValue = minimum;
     maximumValue = maximum;
@@ -97,7 +97,7 @@ public class NumericValueField extends JFormattedTextField implements PropertyCh
    *    @param maximum
    *    @param range
    */
-  public NumericValueField(Double value, double minimum, double maximum, double[] range) {
+  public JiveNumericField(Double value, double minimum, double maximum, double[] range) {
     this();
     minimumValue = minimum;
     maximumValue = maximum;

@@ -1,5 +1,5 @@
 /*
- * @(#)NumericValueField.java   12/07/07
+ * @(#)JiveNumericField.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -27,13 +27,13 @@ import com.grasppe.lure.framework.GrasppeKit;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class TextValueField extends JTextField implements ValueField, NamedField, NameValueField {		// PropertyChangeListener,
+public class JiveTextField extends JTextField implements ValueField, NamedField, NameValueField {		// PropertyChangeListener,
 
   protected Object oldValue = null;
 
   /**
    */
-  public TextValueField() {
+  public JiveTextField() {
     this("");
 
     // TODO Auto-generated constructor stub
@@ -42,10 +42,10 @@ public class TextValueField extends JTextField implements ValueField, NamedField
   /**
    *    @param text
    */
-  public TextValueField(String text) {
+  public JiveTextField(String text) {
     super(text);
 
-    final TextValueField textField = this;
+    final JiveTextField textField = this;
 
 //    getDocument().addDocumentListener(new DocumentListener() {
 //

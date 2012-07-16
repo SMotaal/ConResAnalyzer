@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -11,21 +11,21 @@
 
 package com.grasppe.conreslabs.panels.patchgenerator;
 
+import com.grasppe.conreslabs.fields.ResolutionValueField;
 import com.grasppe.jive.JiveComponentFactory;
-import com.grasppe.jive.components.JiveParametersPanel;
-import com.grasppe.jive.fields.ResolutionValueField;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class PrintingParametersPanel extends JiveParametersPanel {
+public class PrintingModulePanel extends JiveModulePanel {
 
   /**
    * Create the panel.
    */
-  public PrintingParametersPanel() {
+  public PrintingModulePanel() {
     super("Printing-Panel", "Printing");
   }
 
@@ -35,17 +35,17 @@ public class PrintingParametersPanel extends JiveParametersPanel {
   protected void createFields() {
 
     // // Mean Tone (aka Reference Tone Value)
-    // meanToneComponent = (NumericValueField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
+    // meanToneComponent = (JiveNumericField)createNumericField("Patch-Mean", meanToneValue, "Tone", 0, 100, "%", 2);
     //
     // // Contrast
-    // contrastComponent = (NumericValueField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
+    // contrastComponent = (JiveNumericField)createNumericField("Patch-Contrast", contrastValue, "Contrast", 0, 100, "%", 4);
     //
     // // Resolution (lp/mm)
-    // resolutionComponent = (NumericValueField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
+    // resolutionComponent = (JiveNumericField)createResolutionField("Patch-Resolution", resolutionValue, "Resolution", 0, 10,
     // "lp/mm", 6);
     //
     // // Patch Size (mm)
-    // patchSizeComponent = (NumericValueField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
+    // patchSizeComponent = (JiveNumericField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
 
     addField(TinyJiveFieldFactory().createNumericField("Gain", "Dot Gain", 0, 0, 100, "%"));
     addField(TinyJiveFieldFactory().createNumericField("Noise", "Noise", 0, 0, 100, "%"));
@@ -55,7 +55,7 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 }
 
 ///*
-// * @(#)PatchParametersPanel.java   12/07/07
+// * @(#)PatchModulePanel.java   12/07/07
 // *
 // * Copyright (c) 2011 Saleh Abdel Motaal
 // *
@@ -68,8 +68,8 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //package com.grasppe.conreslabs.panels.patchgenerator;
 //
 //import com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
-//import com.grasppe.jive.components.ModuleParametersPanel;
-//import com.grasppe.jive.fields.NumericValueField;
+//import com.grasppe.jive.components.JiveAbstractPanel;
+//import com.grasppe.jive.fields.JiveNumericField;
 //
 //import com.jgoodies.forms.factories.FormFactory;
 //import com.jgoodies.forms.layout.FormLayout;
@@ -89,18 +89,18 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 // *  @version        $Revision: 1.0, 12/07/07
 // *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
 // */
-//public class PrintingParametersPanel extends ModuleParametersPanel implements PropertyChangeListener {
+//public class PrintingModulePanel extends JiveAbstractPanel implements PropertyChangeListener {
 //
 //  private double    dotgainValue = 0 / 100,
 //                    noiseValue   = 0 / 100,
 //                    spreadValue  = 0,
 //                    unsharpValue = 0 / 100;
-//  NumericValueField dotgainComponent, noiseComponent, spreadComponent, unsharpComponent;
+//  JiveNumericField dotgainComponent, noiseComponent, spreadComponent, unsharpComponent;
 //
 //  /**
 //   * Create the panel.
 //   */
-//  public PrintingParametersPanel() {
+//  public PrintingModulePanel() {
 //
 //    this.addPropertyChangeListener(this);
 //    this.setName("Print-Panel");
@@ -125,13 +125,13 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //  private void createPanelFields() {
 //
 //    // Dot Gain (aka TVI, Tone Value Increase)
-//    dotgainComponent = (NumericValueField)createNumericField("Print-DotGain", dotgainValue, "Dot Gain", 0, 100, "%", 2);
+//    dotgainComponent = (JiveNumericField)createNumericField("Print-DotGain", dotgainValue, "Dot Gain", 0, 100, "%", 2);
 //
 //    // JLabel lblDotGain = new JLabel("Dot Gain");
 //    // add(lblDotGain, "2, 2, right, default");
 //    // JLabel lblDotGainSuffix = new JLabel("%");
 //    // add(lblDotGainSuffix, "6, 2, left, default");
-//    // NumericValueField txtDotGain = new NumericValueField(0, 100);
+//    // JiveNumericField txtDotGain = new JiveNumericField(0, 100);
 //    // txtDotGain.setHorizontalAlignment(SwingConstants.TRAILING);
 //    // txtDotGain.setName("Print-DotGain");
 //    // txtDotGain.setValue(dotgainValue);
@@ -140,13 +140,13 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //    // add(txtDotGain, "4, 2");
 //
 //    // Imaging Noise
-//    noiseComponent = (NumericValueField)createNumericField("Print-Noise", noiseValue, "Noise", 0, 100, "%", 4);
+//    noiseComponent = (JiveNumericField)createNumericField("Print-Noise", noiseValue, "Noise", 0, 100, "%", 4);
 //
 //    // JLabel lblNoise = new JLabel("Noise");
 //    // add(lblNoise, "2, 4, right, default");
 //    // JLabel lblNoiseSuffix = new JLabel("%");
 //    // add(lblNoiseSuffix, "6, 4, left, default");
-//    // NumericValueField txtNoise = new NumericValueField(0, 100);
+//    // JiveNumericField txtNoise = new JiveNumericField(0, 100);
 //    // txtNoise.setHorizontalAlignment(SwingConstants.TRAILING);
 //    // txtNoise.setName("Print-Noise");
 //    // txtNoise.setValue(noiseValue);
@@ -155,13 +155,13 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //    // add(txtNoise, "4, 4");
 //
 //    // Imaging Spread (aka Gaussian Blur Radius);
-//    spreadComponent = (NumericValueField)createNumericField("Print-Spread", spreadValue, "Spread", 0, 100, "spots", 6);
+//    spreadComponent = (JiveNumericField)createNumericField("Print-Spread", spreadValue, "Spread", 0, 100, "spots", 6);
 //
 //    // JLabel lblSpread = new JLabel("Spread");
 //    // add(lblSpread, "2, 6, right, default");
 //    // JLabel lblSpreadSuffix = new JLabel("spots");
 //    // add(lblSpreadSuffix, "6, 6, left, default");
-//    // NumericValueField txtSpread = new NumericValueField(0, 999);
+//    // JiveNumericField txtSpread = new JiveNumericField(0, 999);
 //    // txtSpread.setHorizontalAlignment(SwingConstants.TRAILING);
 //    // txtSpread.setName("Print-Spread");
 //    // txtSpread.setValue(spreadValue);
@@ -170,13 +170,13 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //    // add(txtSpread, "4, 6");
 //
 //    // Imaging Spread (aka Gaussian Blur Strength);
-//    unsharpComponent = (NumericValueField)createNumericField("Print-Unsharp", unsharpValue, "Blur", 0, 100, "%", 8);
+//    unsharpComponent = (JiveNumericField)createNumericField("Print-Unsharp", unsharpValue, "Blur", 0, 100, "%", 8);
 //
 //    // JLabel lblUnsharp = new JLabel("Blur");
 //    // add(lblUnsharp, "2, 8, right, default");
 //    // JLabel lblUnsharpSuffix = new JLabel("%");
 //    // add(lblUnsharpSuffix, "6, 8, left, default");
-//    // NumericValueField txtUnsharp = new NumericValueField(0, 100);
+//    // JiveNumericField txtUnsharp = new JiveNumericField(0, 100);
 //    // txtUnsharp.setHorizontalAlignment(SwingConstants.TRAILING);
 //    // txtUnsharp.setName("Print-Unsharp");
 //    // txtUnsharp.setValue(unsharpValue);
@@ -197,12 +197,12 @@ public class PrintingParametersPanel extends JiveParametersPanel {
 //
 //      public void run() {
 //
-//        JFrame frame = new JFrame("ScreeningParametersPanel Demo");
+//        JFrame frame = new JFrame("ScreeningModulePanel Demo");
 //
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //
 //        // Add contents to the window.
-//        PrintingParametersPanel panel = new PrintingParametersPanel();
+//        PrintingModulePanel panel = new PrintingModulePanel();
 //
 //        frame.getContentPane().add(panel);
 //

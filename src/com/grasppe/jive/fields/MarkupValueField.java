@@ -1,5 +1,5 @@
 /*
- * @(#)NumericValueField.java   12/07/07
+ * @(#)JiveNumericField.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *

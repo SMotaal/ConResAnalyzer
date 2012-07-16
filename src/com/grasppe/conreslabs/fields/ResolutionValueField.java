@@ -12,7 +12,7 @@
 /**
  *
  */
-package com.grasppe.jive.fields;
+package com.grasppe.conreslabs.fields;
 
 import java.beans.PropertyChangeListener;
 
@@ -22,11 +22,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import com.grasppe.jive.fields.JiveNumericField;
+
 /**
  * @author daflair
  *
  */
-public class ResolutionValueField extends NumericValueField {
+public class ResolutionValueField extends JiveNumericField {
 	
 	private static double[] numericRange = { 0.625, 0.746, 0.891, 1.064, 1.269, 1.515, 1.812, 2.155, 2.577, 3.086, 3.676, 4.386, 5.208, 6.25 };
 

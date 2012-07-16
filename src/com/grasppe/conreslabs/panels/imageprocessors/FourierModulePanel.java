@@ -1,5 +1,5 @@
 /*
- * @(#)PatchParametersPanel.java   12/07/07
+ * @(#)PatchModulePanel.java   12/07/07
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -16,20 +16,20 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import com.grasppe.jive.components.JiveParametersPanel;
+import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class FourierParametersPanel extends JiveParametersPanel implements PropertyChangeListener {
+public class FourierModulePanel extends JiveModulePanel implements PropertyChangeListener {
 
 
 /**
    * Create the panel.
    */
-  public FourierParametersPanel() {
+  public FourierModulePanel() {
     super("Fourier-Panel", "Fourier");
   }
 
@@ -38,8 +38,8 @@ public class FourierParametersPanel extends JiveParametersPanel implements Prope
   @Override
   protected void createFields() {
 
-//  ParameterField.setGroupOptions("long-text", GroupOptions.LONG_TEXT_OPTIONS);
-//  ParameterField.setGroupOptions("short-text", GroupOptions.SHORT_TEXT_OPTIONS);
+//  JiveField.setGroupOptions("long-text", JiveGroupMetrics.LONG_TEXT_OPTIONS);
+//  JiveField.setGroupOptions("short-text", JiveGroupMetrics.SHORT_TEXT_OPTIONS);
 
 //  methodField = JiveFieldFactory.Default().createListField("Fourier-Method", "Method", 0, methodOptions, "");
 //  addField(methodField);
@@ -69,12 +69,12 @@ public class FourierParametersPanel extends JiveParametersPanel implements Prope
 //
 //      public void run() {
 //
-//        JFrame frame = new JFrame("FunctionParametersPanel Demo");
+//        JFrame frame = new JFrame("FunctionModulePanel Demo");
 //
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //
 //        // Add contents to the window.
-//        frame.getContentPane().add(new FourierParametersPanel());
+//        frame.getContentPane().add(new FourierModulePanel());
 //
 //        // Display the window.
 //        frame.pack();

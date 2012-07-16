@@ -11,14 +11,14 @@
 
 package com.grasppe.conreslabs.panels;
 
-import com.grasppe.conreslabs.panels.imageprocessors.FourierParametersPanel;
-import com.grasppe.conreslabs.panels.imageprocessors.FunctionParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.PatchParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.PrintingParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.ScanningParametersPanel;
-import com.grasppe.conreslabs.panels.patchgenerator.ScreeningParametersPanel;
-import com.grasppe.jive.components.JiveParametersPanel;
-import com.grasppe.jive.components.ModulePanelContainer;
+import com.grasppe.conreslabs.panels.imageprocessors.FourierModulePanel;
+import com.grasppe.conreslabs.panels.imageprocessors.FunctionModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PatchModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.PrintingModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScanningModulePanel;
+import com.grasppe.conreslabs.panels.patchgenerator.ScreeningModulePanel;
+import com.grasppe.jive.components.JiveModulePanel;
+import com.grasppe.jive.components.JiveModuleContainer;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class PatchGeneratorParametersPanel extends ModulePanelContainer implements Observer {
+public class PatchGeneratorParametersPanel extends JiveModuleContainer implements Observer {
 
   /** Field description */
   public static ColumnSpec[] COLUMN_SPEC = new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("40dlu"),
@@ -51,12 +51,12 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
                                                               FormFactory.RELATED_GAP_COLSPEC, };
 
 //private JButton                  btnApply;
-  private PatchParametersPanel     patchParametersPanel;
-  private ScreeningParametersPanel screeningParametersPanel;
-  private PrintingParametersPanel  printingParametersPanel;
-  private ScanningParametersPanel  scanningParametersPanel;
-  private JiveParametersPanel   fourierParametersPanel;
-  private FunctionParametersPanel  functionParametersPanel;
+  private PatchModulePanel     patchModulePanel;
+  private ScreeningModulePanel screeningModulePanel;
+  private PrintingModulePanel  printingModulePanel;
+  private ScanningModulePanel  scanningModulePanel;
+  private JiveModulePanel   fourierModulePanel;
+  private FunctionModulePanel  functionModulePanel;
 
   /*
    *  (non-Javadoc)
@@ -68,20 +68,20 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
   @Override
   protected void createPanels() {
 
-    patchParametersPanel     = new PatchParametersPanel();
-    screeningParametersPanel = new ScreeningParametersPanel();
-    printingParametersPanel  = new PrintingParametersPanel();
-    scanningParametersPanel  = new ScanningParametersPanel();
+    patchModulePanel     = new PatchModulePanel();
+    screeningModulePanel = new ScreeningModulePanel();
+    printingModulePanel  = new PrintingModulePanel();
+    scanningModulePanel  = new ScanningModulePanel();
 
-    fourierParametersPanel   = new FourierParametersPanel();
-    functionParametersPanel  = new FunctionParametersPanel();
+    fourierModulePanel   = new FourierModulePanel();
+    functionModulePanel  = new FunctionModulePanel();
 
-    this.createPermanentPanel(patchParametersPanel, null);					// "Patch Parameters");
-    this.createPermanentPanel(screeningParametersPanel, null);			// "Screen Parameters");
-    this.createPermanentPanel(printingParametersPanel, null);			// "Print Parameters");
-    this.createPermanentPanel(scanningParametersPanel, null);			// "Scan Parameters");
-    this.createPanel(functionParametersPanel, null, null);				// "Fourier Parameters");
-    this.createPanel(fourierParametersPanel, null, null);				// "Fourier Parameters");
+    this.createPermanentPanel(patchModulePanel, null);					// "Patch Parameters");
+    this.createPermanentPanel(screeningModulePanel, null);			// "Screen Parameters");
+    this.createPermanentPanel(printingModulePanel, null);			// "Print Parameters");
+    this.createPermanentPanel(scanningModulePanel, null);			// "Scan Parameters");
+    this.createPanel(functionModulePanel, null, null);				// "Fourier Parameters");
+    this.createPanel(fourierModulePanel, null, null);				// "Fourier Parameters");
   }
 
   /**
@@ -120,30 +120,30 @@ public class PatchGeneratorParametersPanel extends ModulePanelContainer implemen
   }
 
   /**
-   *   @return the patchParametersPanel
+   *   @return the patchModulePanel
    */
-  public PatchParametersPanel getPatchParametersPanel() {
-    return patchParametersPanel;
+  public PatchModulePanel getPatchModulePanel() {
+    return patchModulePanel;
   }
 
   /**
-   * @return the printingParametersPanel
+   * @return the printingModulePanel
    */
-  public PrintingParametersPanel getPrintingParametersPanel() {
-    return printingParametersPanel;
+  public PrintingModulePanel getPrintingModulePanel() {
+    return printingModulePanel;
   }
 
   /**
-   * @return the scanningParametersPanel
+   * @return the scanningModulePanel
    */
-  public ScanningParametersPanel getScanningParametersPanel() {
-    return scanningParametersPanel;
+  public ScanningModulePanel getScanningModulePanel() {
+    return scanningModulePanel;
   }
 
   /**
-   * @return the screeningParametersPanel
+   * @return the screeningModulePanel
    */
-  public ScreeningParametersPanel getScreeningParametersPanel() {
-    return screeningParametersPanel;
+  public ScreeningModulePanel getScreeningModulePanel() {
+    return screeningModulePanel;
   }
 }

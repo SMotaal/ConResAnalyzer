@@ -1,5 +1,5 @@
 /*
- * @(#)ListField.java   12/07/14
+ * @(#)JiveListField.java   12/07/14
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -30,21 +30,21 @@ import javax.swing.JComboBox;
  * @author daflair
  *
  */
-public class ListField extends JComboBox implements ValueField, NamedField, NameValueField {
+public class JiveListField extends JComboBox implements ValueField, NamedField, NameValueField {
 
   protected Object oldValue = null;
 
   /**
    *
    */
-  public ListField() {
+  public JiveListField() {
     initializeField();
   }
 
   /**
    * @param aModel
    */
-  public ListField(ComboBoxModel aModel) {
+  public JiveListField(ComboBoxModel aModel) {
     super(aModel);
     initializeField();
   }
@@ -52,7 +52,7 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
   /**
    * @param items
    */
-  public ListField(Object[] items) {
+  public JiveListField(Object[] items) {
     super(items);
     initializeField();
   }
@@ -60,7 +60,7 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
   /**
    * @param items
    */
-  public ListField(Vector<?> items) {
+  public JiveListField(Vector<?> items) {
     super(items);
     initializeField();
   }
@@ -90,7 +90,7 @@ public class ListField extends JComboBox implements ValueField, NamedField, Name
 //
 //          oldValue = newValue;
         } catch (Exception exception) {
-          GrasppeKit.debugError("ListField>ItemStateChanged", exception, 1);
+          GrasppeKit.debugError("JiveListField>ItemStateChanged", exception, 1);
         }
       }
     });

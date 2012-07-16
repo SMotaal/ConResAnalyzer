@@ -1,5 +1,5 @@
 /*
- * @(#)ParameterField.java   12/07/13
+ * @(#)JiveField.java   12/07/13
  *
  * Copyright (c) 2011 Saleh Abdel Motaal
  *
@@ -14,7 +14,7 @@
  */
 package com.grasppe.jive.components;
 
-import com.grasppe.jive.fields.GroupOptions;
+import com.grasppe.jive.fields.JiveGroupMetrics;
 import com.grasppe.jive.fields.NameValueField;
 import com.grasppe.jive.fields.NamedField;
 import com.grasppe.jive.fields.ValueField;
@@ -47,21 +47,21 @@ import javax.swing.border.LineBorder;
  * @author daflair
  *
  */
-public class ParameterField extends JPanel implements PropertyChangeListener, NamedField, FocusListener {
+public class JiveField extends JPanel implements PropertyChangeListener, NamedField, FocusListener {
 
 //Size Variables
-  protected static HashMap<String, GroupOptions> gourpOptionsMap = new HashMap<String, GroupOptions>();
+  protected static HashMap<String, JiveGroupMetrics> gourpMetricsMap = new HashMap<String, JiveGroupMetrics>();
   protected String                               fieldLabel;
   protected String                               fieldSuffix;
   protected JComponent                           fieldComponent;
   protected JLabel                               labelComponent;
   protected JLabel                               suffixComponent;
-  protected ParameterField                       fieldPanel;
-  protected GroupOptions                         groupOptions;
+  protected JiveField                       fieldPanel;
+  protected JiveGroupMetrics                         groupMetrics;
   protected String                               groupID      = "default";
   protected boolean                              debugBorders = false;
 
-  // protected static GroupOptions textGroupOptions = new GroupOptions(200, 0);
+  // protected static JiveGroupMetrics textGroupOptions = new JiveGroupMetrics(200, 0);
 
   /**
    *    @param name
@@ -69,7 +69,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
    *   @param fieldLabel
    *   @param fieldSuffix
    */
-  public ParameterField(String name, JComponent fieldComponent, String fieldLabel, String fieldSuffix) {
+  public JiveField(String name, JComponent fieldComponent, String fieldLabel, String fieldSuffix) {
     super();
 
     this.fieldPanel = this;
@@ -85,7 +85,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
     this.labelComponent  = new JLabel(fieldLabel);
     this.suffixComponent = new JLabel(fieldSuffix);
 
-    this.groupOptions    = getGroupOptions(groupID);
+    this.groupMetrics    = getGroupMetrics(groupID);
 
     this.addComponentListener(new ComponentAdapter() {
 
@@ -127,7 +127,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 //  if (e.getSource() instanceof JComponent) {
 //      JComponent component = (JComponent)e.getSource();
 //      
-//      ModuleParametersPanel panel = (ModuleParametersPanel) SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class, component);
+//      JiveAbstractPanel panel = (JiveAbstractPanel) SwingUtilities.getAncestorOfClass(JiveAbstractPanel.class, component);
 //      
 //      GrasppeKit.debugText("JiveField>Panel", "Focus gained: " + panel.getTitle(), 2);
 //      
@@ -141,7 +141,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
 //public void updateActivePanel() {
 //  
-//  ModuleParametersPanel panel = (ModuleParametersPanel) SwingUtilities.getAncestorOfClass(ModuleParametersPanel.class, component);
+//  JiveAbstractPanel panel = (JiveAbstractPanel) SwingUtilities.getAncestorOfClass(JiveAbstractPanel.class, component);
 //
 //}
 
@@ -180,9 +180,9 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
     // fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
     fieldPanel.add(labelComponent);			// , BorderLayout.LINE_START);
-    fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
+    fieldPanel.add(Box.createHorizontalStrut(getMetrics().paddingWidth));
     fieldPanel.add(fieldComponent);			// , BorderLayout.CENTER);
-    fieldPanel.add(Box.createHorizontalStrut(getOptions().paddingWidth));
+    fieldPanel.add(Box.createHorizontalStrut(getMetrics().paddingWidth));
     fieldPanel.add(suffixComponent);		// , BorderLayout.LINE_END);
 
     // fieldPanel.add(Box.createHorizontalStrut(getOptions().marginWidth));
@@ -193,30 +193,30 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
     // Label Component
     labelComponent.setLabelFor(fieldComponent);
-    labelComponent.setPreferredSize(new Dimension(getOptions().labelWidth, labelComponent.getPreferredSize().height));
+    labelComponent.setPreferredSize(new Dimension(getMetrics().labelWidth, labelComponent.getPreferredSize().height));
     labelComponent.setMinimumSize(
         new Dimension(
-            getOptions().labelWidth,
+            getMetrics().labelWidth,
             labelComponent.getPreferredSize().height));			// new Dimension(labelComponent.getPreferredSize()));
     labelComponent.setMaximumSize(
         new Dimension(
-            getOptions().labelWidth,
+            getMetrics().labelWidth,
             labelComponent.getPreferredSize().height));			// new Dimension(labelComponent.getPreferredSize()));
     labelComponent.setSize(labelComponent.getPreferredSize());
     labelComponent.setHorizontalAlignment(JLabel.TRAILING);
     labelComponent.setOpaque(false);
 
     // Field Component
-    fieldComponent.setPreferredSize(new Dimension(getOptions().fieldWidth, fieldComponent.getPreferredSize().height));
-    fieldComponent.setMinimumSize(new Dimension(getOptions().fieldWidth / 2, fieldComponent.getPreferredSize().height));
-    fieldComponent.setMaximumSize(new Dimension(getOptions().fieldWidth, fieldComponent.getPreferredSize().height));
+    fieldComponent.setPreferredSize(new Dimension(getMetrics().fieldWidth, fieldComponent.getPreferredSize().height));
+    fieldComponent.setMinimumSize(new Dimension(getMetrics().fieldWidth / 2, fieldComponent.getPreferredSize().height));
+    fieldComponent.setMaximumSize(new Dimension(getMetrics().fieldWidth, fieldComponent.getPreferredSize().height));
     fieldComponent.setSize(fieldComponent.getPreferredSize());
     fieldComponent.setOpaque(false);
 
     fieldComponent.addFocusListener(this);
 
     // Suffix Component
-    suffixComponent.setPreferredSize(new Dimension(getOptions().suffixWidth, suffixComponent.getPreferredSize().height));
+    suffixComponent.setPreferredSize(new Dimension(getMetrics().suffixWidth, suffixComponent.getPreferredSize().height));
     suffixComponent.setMinimumSize(new Dimension(suffixComponent.getPreferredSize()));
     suffixComponent.setMaximumSize(new Dimension(suffixComponent.getPreferredSize()));
     suffixComponent.setSize(suffixComponent.getPreferredSize());
@@ -256,10 +256,10 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
    *    @param id
    *    @return
    */
-  public static GroupOptions getGroupOptions(String id) {
-    if (!ParameterField.gourpOptionsMap.containsKey(id)) ParameterField.setGroupOptions(id, new GroupOptions());
+  public static JiveGroupMetrics getGroupMetrics(String id) {
+    if (!JiveField.gourpMetricsMap.containsKey(id)) JiveField.setGroupMetrics(id, new JiveGroupMetrics());
 
-    return ParameterField.gourpOptionsMap.get(id);
+    return JiveField.gourpMetricsMap.get(id);
   }
 
   /**
@@ -267,10 +267,10 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
    * 	@param autoCreate
    *    @return
    */
-  public static GroupOptions getGroupOptions(String id, boolean autoCreate) {
-    if (autoCreate) return getGroupOptions(id);
-    else if (!ParameterField.gourpOptionsMap.containsKey(id)) return null;
-    else return ParameterField.gourpOptionsMap.get(id);
+  public static JiveGroupMetrics getGroupMetrics(String id, boolean autoCreate) {
+    if (autoCreate) return getGroupMetrics(id);
+    else if (!JiveField.gourpMetricsMap.containsKey(id)) return null;
+    else return JiveField.gourpMetricsMap.get(id);
   }
 
 /*(non-Javadoc)
@@ -288,8 +288,8 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
   /**
    *    @return
    */
-  public GroupOptions getOptions() {
-    return getGroupOptions(groupID);
+  public JiveGroupMetrics getMetrics() {
+    return getGroupMetrics(groupID);
   }
 
   /**
@@ -325,7 +325,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
    */
   public void setGroupID(String groupID) {
     this.groupID      = groupID;
-    this.groupOptions = ParameterField.getGroupOptions(groupID);
+    this.groupMetrics = JiveField.getGroupMetrics(groupID);
 
     try {
       this.updateLayout();
@@ -334,10 +334,10 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
 
   /**
    *    @param id
-   *    @param options
+   *    @param metrics
    */
-  public static void setGroupOptions(String id, GroupOptions options) {
-    ParameterField.gourpOptionsMap.put(id, options);
+  public static void setGroupMetrics(String id, JiveGroupMetrics metrics) {
+    JiveField.gourpMetricsMap.put(id, metrics);
   }
 
   /*
@@ -353,7 +353,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
     try {
       getFieldComponent().setName(name);
     } catch (Exception exception) {
-      GrasppeKit.debugError("ParameterField>Component>setName", exception, 0);
+      GrasppeKit.debugError("JiveField>Component>setName", exception, 0);
     }
 
     super.setName(name);
@@ -369,7 +369,7 @@ public class ParameterField extends JPanel implements PropertyChangeListener, Na
       if (field.getValue().equals(newValue)) return;
       field.setValue(newValue);
     } catch (Exception exception) {
-      GrasppeKit.debugError("ParameterField>Component>SetValue", exception, 0);
+      GrasppeKit.debugError("JiveField>Component>SetValue", exception, 0);
     }
 
   }
