@@ -1,8 +1,11 @@
-function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFolder)
+function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, printing, outputFolder)
   %HALFTONE1 Summary of this function goes here
   %   Detailed explanation goes here
   
   persistent screenGrid screenFrequency screenSize screens;
+  
+  import Grasppe.ConRes.PatchGenerator.Parameters.*;
+  import Grasppe.ConRes.PatchGenerator.*;
   
   bufferScreen  = false;
   bufferGrid    = true;
@@ -13,33 +16,7 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
   rotateImage   = false;
   
   outputScreen  = false;
-  
-  % %% Batch Files
-  % BatchFolder  = '/Users/daflair/Desktop/CirRe31S Slices/ITIFF/';
-  %
-  % BatchFiles   = { ...
-  %   'TV50.tif', 'TV75.tif', 'TV25.tif', 'TV55.tif', 'TV45.tif', ...
-  %   'TV10.tif', 'TV15.tif', 'TV20.tif', 'TV30.tif', 'TV35.tif', ...
-  %   'TV40.tif', 'TV60.tif', 'TV65.tif', 'TV70.tif', 'TV80.tif', ...
-  %   'TV85.tif', 'TV90.tif', 'TV95.tif', 'TV05.tif', ...
-  %   'HSW.tif', 'VSW.tif', 'SAW.tif' };
-  %
-  % for bi = 1:numel(BatchFiles)
-  %   filename    = BatchFiles{bi};
-  %   imagePath   = fullfile(BatchFolder, filename);
-  %   if ~(exist(imagePath, 'file') >0)
-  %     error('Grasppe:BatchScreening:FileIO:NotFound', 'The file %s is not found.', filename);
-  %   end
-  % end
-  
-  
-  % %% Wrapper Script
-  % for bi = 1:numel(BatchFiles)
-  %
-  %     filename    = BatchFiles{bi};
-  %   imagePath   = fullfile(BatchFolder, filename);
-  %
-  
+    
   %% Screening Settings
   DEFAULT = {2450, 175, 37.5};      % {2400, 150};  
   
@@ -58,6 +35,24 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
   if ~exist('angle', 'var') || ~isscalar(ppi) || ~isnumeric(ppi)
     angle = DEFAULT{3};
   end  
+  
+  NP      = 0; try ...
+      NP  = findField(printing, 'Noise' );
+  end
+  
+  DP      = 0; try ...
+      DP  = findField(printing, 'Gain'  );
+  end
+  
+  BP      = 0; try ...
+      BP  = findField(printing, 'Blur'  );
+  end
+  
+  BS      = 0; try ...
+      BS  = findField(printing, 'Radius');
+  end
+  
+  % if BS > 0, BP = 1; end
 
   SPI     = spi;       % Spots/Inch  [Screening Addresibility    ]
   LPI     = lpi;       % Lines/Inch  [Screening Resolution       ]
@@ -141,13 +136,6 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
     
     mv = 100-im2double(imageData).*100; %[...
     
-    % mv = mv(180:540, 180:540);
-    %     100 100 90 90 80 80; 100 100 90 90 80 80;
-    %     70 70 60 60 50 50; 70 70 60 60 50 50;
-    %     40 40 30 30 20 20; 40 40 30 30 20 20;
-    %     10 10 05 05 00 00; 10 10 05 05 00 00;];
-    
-    %mv = imresize(mv, 2, 'nearest'); % mr/8
     
     [mvw  ] = size(mv,2);
     [mvh  ] = size(mv,1);
@@ -166,12 +154,7 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
     % Elapsed time is 13.698273 seconds.
     [mrx  ] = interp1(1:mvw,1:PPS:mvw, 'nearest'); %1:size(mv,2);
     [mry  ] = interp1(1:mvh,1:PPS:mvh, 'nearest'); %1:size(mv,1);
-    
-    %   mspec = [SPI LPI mt];
-    %   if all(size(maxmq) > [mry mrx]) && isequal(mspec, maxmqspec(m,:));
-    %     mq = maxmq;
-    %   else
-    
+        
     %fprintf('.');
     
     if rotateCells && mt~=0
@@ -179,7 +162,6 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
       [mx my] = meshgrid(1:mrmax*1.5, 1:mrmax*1.5);
       mq = cos((cos(mt)*mx*mk - sin(mt)*my*mk)) .* cos((sin(mt)*mx*mk + cos(mt)*my*mk));
     else
-      % mq = cos(mx.*(mk*2*pi)) .* cos(my.*(mk*2*pi));
       
       [msw  ] = numel(mrx);
       [msh  ] = numel(mry);
@@ -198,11 +180,24 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
         [mx my] = meshgrid(1:msw, 1:msh);
         mkf = mk*pi; %mk*pi*2;
         
-        mq = cos(mx*mkf) .* cos(my*mkf);
+        %% Generate Noise Filter
+        if NP>0
+          np = NP/100;
+          
+          nq = rand(ceil(msw/SPL), ceil(msh/SPL));
+          nq = imresize(nq, 14, 'nearest');
+          nq = nq(1:msw, 1:msh)-0.5;
+          
+          nq = 1+((nq-0.5).*np);
+
+          nq(nq>1) = 1;
+          nq(nq<0) = 0;
+        else
+          nq = 1;
+        end
         
-        % H  = fspecial('disk', 3); mq = imfilter(mq + 0.8*rand(size(mx)), H);
-        
-        %fprintf(':');
+        %% Generate Screen
+        mq = cos(mx.*nq*mkf) .* cos(my.*nq*mkf);
         
         if bufferGrid
           screenGrid      = mq;
@@ -247,33 +242,40 @@ function [ Output ] = grasppeScreen3( imagePath, ppi, spi, lpi, angle, outputFol
     mq = mq2;
     
     %fprintf(' ');
-    
-    % % Elapsed time is 120.130082 seconds. vs 33.867527 seconds.
-    % if mt~=0, gx = cos(mt)*mx - sin(mt)*my;    gy = sin(mt)*mx + cos(mt)*my;
-    % else      gx = mx;                         gy = my; end
-    % [mq   ] = cos(gx.*mk) .* cos(gy.*mk);
-    
-    %     if all(size(maxmq) < size(mq))
-    %       maxmq = mq;
-    %       maxmqspec = mspec;
-    %     end
-    %   end
-    
+        
     % try toc(T); end
     
     %% Apply Screen
     
     % T = tic; %fprintf('\tApplying Screen... ');
-    
+        
     [mvs  ] = mv; %imresize(mv, mp, 'nearest');
     [mqs  ] = mq; %imresize(mq, mp, 'nearest');
+    
+    if DP > 0
+      mvs(mvs>0) = mvs(mvs>0) + DP;
+    end
+    
     [mz   ] = mqs>((mvs(mry, mrx)-50).*0.02);
     
     mzf = 1; % Floor & Ceil outside 1%-99%
     mz(mvs(mry, mrx)>100-mzf) = 0;
-    mz(mvs(mry, mrx)<mzf) = 1;
+    mz(mvs(mry, mrx)<mzf)     = mzf;
     
     mzdbl   = im2double(mz);
+    
+    %% Apply Blur
+    
+    if BS>0 && BP>0
+      bs      = BS;
+      bp      = (BP/100);
+      
+      fblur   = fspecial('disk', bs);
+      mblur   = imfilter(mzdbl, fblur);
+      fmask   = mblur<mzdbl;
+      
+      mzdbl(fmask)  = mzdbl(fmask)*(1-bp) + mblur(fmask)*bp;
+    end
     
     % try toc(T); end
     

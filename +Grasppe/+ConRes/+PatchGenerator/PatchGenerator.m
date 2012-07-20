@@ -1,4 +1,4 @@
-classdef PatchGenerator < Grasppe.ConRes.PatchGenerator.Generator
+classdef PatchGenerator < Grasppe.Occam.Module
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
@@ -8,15 +8,13 @@ classdef PatchGenerator < Grasppe.ConRes.PatchGenerator.Generator
   
   methods
     function obj = PatchGenerator()
-      obj.Initialize;
+      obj = obj@Grasppe.Occam.Module;
+      obj.permanent = true;
+      obj.Run;
+
+      %obj.Initialize;
     end
     
-    function Initialize(obj)
-      % obj.CreateProcessor;
-      % obj.CreateView;
-      
-      obj.Run;
-    end
     
     function CreateView(obj)
       obj.View = Grasppe.ConRes.PatchGenerator.PatchGeneratorPanel;
@@ -27,7 +25,7 @@ classdef PatchGenerator < Grasppe.ConRes.PatchGenerator.Generator
       Listeners.ParametersChanged = changeListener;
       Listeners.ParametersApplied = applyListener;
       
-      obj.View.Execute;
+      output = obj.View.Execute;
       
     end
     
@@ -35,12 +33,13 @@ classdef PatchGenerator < Grasppe.ConRes.PatchGenerator.Generator
       obj.Processor = Grasppe.ConRes.PatchGenerator.PatchGeneratorProcessor;
     end
     
-    function Run(obj)
-      if ~isobject(obj.Processor) || ~isvalid(obj.Processor), obj.CreateProcessor; end      
-      if ~isobject(obj.View) || ~isvalid(obj.View), obj.CreateView; end
-        
+    function output = Run(obj)
+      output = [];
+      % if ~isobject(obj.Processor) || ~isvalid(obj.Processor), obj.CreateProcessor; end      
+      % if ~isobject(obj.View) || ~isvalid(obj.View), obj.CreateView; end
+      obj.Processor.View = obj.View;
       obj.Processor.Parameters = obj.Parameters;
-      obj.Processor.Execute;
+      output = obj.Processor.Execute;
     end
     
     function UpdateParameters(obj, source, event)
@@ -50,7 +49,7 @@ classdef PatchGenerator < Grasppe.ConRes.PatchGenerator.Generator
     function ApplyParameters(obj, source, event)
       obj.Parameters = source.getParameters;
       
-      obj.Execute;
+      output = obj.Execute;
     end
     
     function delete(obj)

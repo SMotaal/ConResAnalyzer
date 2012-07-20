@@ -1,4 +1,4 @@
-classdef Print < Grasppe.ConRes.PatchGenerator.Processors.Process
+classdef Print < Grasppe.Occam.Process
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
@@ -7,8 +7,8 @@ classdef Print < Grasppe.ConRes.PatchGenerator.Processors.Process
   
   methods
         
-    function Run(obj)
-      
+    function output = Run(obj)
+      output = [];
     end
     
   end

@@ -1,4 +1,4 @@
-classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
+classdef PatchGeneratorPanel < Grasppe.Occam.Process
   %PATCHGENERATORPARAMETERSPANEL Summary of this class goes here
   %   Detailed explanation goes here
   
@@ -9,53 +9,45 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
     jScreenParametersPanel, hScreenParametersPanel
     jPrintParametersPanel, hPrintParametersPanel
     jScanParametersPanel, hScanParametersPanel
+    jImagePanel, hImagePanel
+    hScrollPane;
+    hFrame;
     
   end
   
   events
-    ParametersChanged
+    % ParametersChanged
     ParametersApplied
   end
   
   properties
-    PatchGeneratorParameters = Grasppe.ConRes.PatchGenerator.Parameters.PatchGeneratorParameters;
+    PatchGeneratorParameters = Grasppe.ConRes.PatchGenerator.Models.PatchGeneratorParameters;
   end
   
   methods
     function obj = PatchGeneratorPanel()
+      obj=obj@Grasppe.Occam.Process();
+      obj.permanent = true;
     end
     
-    function Run(obj)
+    function output = Run(obj)
+      output = [];
       obj.initializePanel;
       
-%       %# figure
-%       hFig = gcf;
-% 
-%       %# handle figure resize events
-%       hAx = gca;
-%       set(hFig, 'ResizeFcn',{@obj.onResize,hAx})
-% 
-%       %# call it at least once
-%       feval(@obj.onResize,hFig,[],hAx);
-
-%       keyboard;
-%     jFrame = get(handle(gcf),'JavaFrame')
-%     jFrame.setMaximized(true);   % to maximize the figure % false: to un-maximize the figure
-    
       obj.applyChanges;
     end
-%     
-%     function onResize(obj, source, event,hAx)
-%       %# get axes limits in pixels
-%       oldUnits = get(hAx, 'Units');    %# backup normalized units
-%       set(hAx, 'Units','pixels')
-%       pos = get(hAx, 'Position');
-%       set(hAx, 'Units',oldUnits)       %# restore units (so it auto-resize)
-%       
-%       %# display the top left part of the image at magnification 100%
-%       xlim(hAx, [0 pos(3)]+0.5)
-%       ylim(hAx, [0 pos(4)]+0.5)
-%     end
+    %
+    %     function onResize(obj, source, event,hAx)
+    %       %# get axes limits in pixels
+    %       oldUnits = get(hAx, 'Units');    %# backup normalized units
+    %       set(hAx, 'Units','pixels')
+    %       pos = get(hAx, 'Position');
+    %       set(hAx, 'Units',oldUnits)       %# restore units (so it auto-resize)
+    %
+    %       %# display the top left part of the image at magnification 100%
+    %       xlim(hAx, [0 pos(3)]+0.5)
+    %       ylim(hAx, [0 pos(4)]+0.5)
+    %     end
     
     
     function parameters = getParameters(obj)
@@ -63,61 +55,55 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
     end
     
     function initializePanel(obj)
-      % try
-        obj.createPanel();
-%       catch err
-%         mjLink;
-%         rethrow err;
-%         try
-%           obj.createPanel();
-%         catch err2
-%           rethrow(err2)
-%         end
-%       end
+      obj.createPanel();
     end
     
     function createPanel(obj)
       % mjLink
       
-      hFrame = gcf;
+      cFigure = get(0,'CurrentFigure');
       
-      set(hFrame, 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL');
+      oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL'};
+      
+      if ~isempty(cFigure) && ishandle(cFigure) && isvalid(cFigure)
+        hFrame = figure(cFigure, oFrame{:});
+      else
+        hFrame = figure(oFrame{:});
+      end
+      
+      
+      % set(hFrame, 'Position', get(0,'Screensize'));
+      
+      % set(hFrame, 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL');
       
       set(hFrame, 'CloseRequestFcn', @(src, event) delete(obj) );
       
-      %[obj.jParametersPanel obj.hParametersPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel', 'East');
-%       [obj.jParametersPanel obj.hParametersPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel'); %, 'East');
-
-      obj.jParametersPanel = com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
-
-      jFrame = get(handle(hFrame),'JavaFrame');
-     
+      obj.hFrame      = hFrame;
       
-      jPane = jFrame.fHG1Client.getContentPane;
+      jFrame = get(handle(hFrame),'JavaFrame');
+      
+      jPane = jFrame.fHG1Client.getContentPane;      
+      
+      obj.jParametersPanel = com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
       jPane.add(obj.jParametersPanel, java.awt.BorderLayout.EAST);
       
-      %jPane.revalidate; % repaint jPane with the added JButt
-      
-      obj.jParametersPanel.requestFocus();
-      
-      %figure(hFrame);
-      
-%       obj.jPatchParametersPanel   = handle(obj.jParametersPanel.getPatchParametersPanel);
-%       obj.jScreenParametersPanel  = handle(obj.jParametersPanel.getScreeningParametersPanel);
-%       obj.jPrintParametersPanel   = handle(obj.jParametersPanel.getPrintingParametersPanel);
-%       obj.jScanParametersPanel    = handle(obj.jParametersPanel.getScanningParametersPanel);
-
-
+      obj.jImagePanel = com.grasppe.jive.components.ImagePanel;
+      jPane.add(obj.jImagePanel, java.awt.BorderLayout.CENTER);
       
       obj.jApplyButton = handle(obj.jParametersPanel.getApplyButton(),'CallbackProperties');
       
       set(obj.jApplyButton, 'actionPerformedCallback', @(src, event)obj.applyChanges);
       
-      drawnow expose update;
-
-      try jFrame.setMaximized(true); end
-
+      %drawnow expose update;
       
+      drawnow expose update;
+      
+%       jFrame.fHG1Client.toFront();
+%       
+%       obj.jParametersPanel.grabFocus();
+%       obj.jParametersPanel.transferFocus();
+      
+      try jFrame.setMaximized(true); end
     end
     
     function applyChanges(obj)
@@ -127,7 +113,7 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
       
       try parameters = hashmap2struct(parameters); end %, true); end
       
-
+      
       try
         Patch     = parameters.Patch; % Parameters.PatchParameters;
         Screen    = parameters.Screening; %Parameters.ScreenParameters;
@@ -151,16 +137,60 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
           end
         end
         
-
+        
         obj.PatchGeneratorParameters.Patch  = Patch;
         obj.PatchGeneratorParameters.Screen = Screen;
         obj.PatchGeneratorParameters.Print  = Print;
         obj.PatchGeneratorParameters.Scan   = Scan;
         obj.PatchGeneratorParameters.Processors = Processors;
       end
-
+      
       % beep;
       notify(obj, 'ParametersApplied');
+    end
+    
+    function setImage(obj, img)
+      if isempty(img)
+        obj.jImagePanel.setPreviewImage(null);
+      else
+        obj.jImagePanel.setPreviewImage(im2java2d(img));
+      end
+        % clf;
+        % hIm = imshow(image); % ,'InitialMagnification', 100, 'Border', 'loose');
+        % hSP = imscrollpanel(gcf,hIm);
+        % obj.hFrame      = hFrame;
+%         obj.jParametersPanel.getWidth
+%         
+%         hScrollpane = obj.hScrollPane;
+% 
+%         hAxes  = axes('Visible', 'off', 'Parent', obj.hFrame);
+%         hImage = image(img,'Visible', 'off', 'Parent', hAxes); %imshow(img, 'Parent', hAxes);
+%         
+%         delete(hAxes);
+%                 
+%         if ~(~isempty(hScrollpane) && ishandle(hScrollpane)) % && isvalid(hScrollpane))
+%           hScrollpane = imscrollpanel(obj.hFrame, hImage);
+%           obj.hScrollPane = hScrollpane;
+%           api = iptgetapi(hScrollpane);
+%         else
+%           api = iptgetapi(hScrollpane);
+%           api.replaceImage(hImage);
+%         end
+%                 
+%         
+        
+%         if ~isempty(hImage)
+%           
+%         end
+        
+%         api.setMagnification(1.0);
+%         
+%         set(hScrollpane, 'Unit', ' pixels', 'Position', get(0,'Screensize') - [0 0 obj.jParametersPanel.getWidth 0]);
+%         
+        % set(hScrollpane, 'ResizeFcn', []);
+        
+
+
     end
     
     function delete(obj)
@@ -176,13 +206,13 @@ classdef PatchGeneratorPanel < Grasppe.ConRes.PatchGenerator.Processors.Process
       
       try delete(gcf); end
       
-%       try delete(obj.jPatchParametersPanel);  end % hPatchParametersPanel
-%       try delete(obj.jScreenParametersPanel); end % hScreenParametersPanel
-%       try delete(obj.jPrintParametersPanel);  end % hPrintParametersPanel
-%       try delete(obj.jScanParametersPanel);   end % hScanParametersPanel      
-%       try delete(obj.jParametersPanel);       end %hParametersPanel
-    end 
-
+      %       try delete(obj.jPatchParametersPanel);  end % hPatchParametersPanel
+      %       try delete(obj.jScreenParametersPanel); end % hScreenParametersPanel
+      %       try delete(obj.jPrintParametersPanel);  end % hPrintParametersPanel
+      %       try delete(obj.jScanParametersPanel);   end % hScanParametersPanel
+      %       try delete(obj.jParametersPanel);       end %hParametersPanel
+    end
+    
   end
   
 end
