@@ -18,7 +18,44 @@ import com.grasppe.lure.framework.GrasppeKit;
  */
 public class ImagePanel extends JPanel {
 	
-    protected BufferedImage	previewImage = null;
+    /**
+	 * @return the previewImage
+	 */
+	public BufferedImage getPreviewImage() {
+		return previewImage;
+	}
+
+	/**
+	 * @param previewImage the previewImage to set
+	 */
+	public void setPreviewImage(BufferedImage previewImage) {
+		this.previewImage = previewImage;
+		update();
+	}
+
+	/**
+	 * @return the backgroundColor
+	 */
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	/**
+	 * @param backgroundColor the backgroundColor to set
+	 */
+	public void setBackgroundColor(Color backgroundColor) {
+		this.backgroundColor = backgroundColor;
+		update();
+	}
+	
+    /**
+     */
+    public void update() {
+    	repaint(100);
+    	System.out.println("update!");
+    }	
+
+	protected BufferedImage	previewImage = null;
 
     protected Color backgroundColor = Color.GRAY;
     
@@ -72,6 +109,24 @@ public class ImagePanel extends JPanel {
      */
     public void paint(Graphics g) {
         super.paint(g);
+        
+        try {
+            g.setColor(backgroundColor);
+            g.drawRect(0, 0, getWidth(), getHeight());
+            g.fillRect(0, 0, getWidth(), getHeight());
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Painting Patch Preview", exception, 2);
+        }
+        
+        
+        try {
+            if (previewImage != null)
+                g.drawImage(previewImage, (getWidth() - previewImage.getWidth()) / 2,
+                            (getHeight() - previewImage.getHeight()) / 2, this);
+        } catch (Exception exception) {
+            GrasppeKit.debugError("Painting Patch Preview", exception, 2);
+        }
+        
         GrasppeKit.debugText("Patch Preview", "Painting Patch Preview...", 0);
     }	
 

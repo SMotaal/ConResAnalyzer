@@ -145,6 +145,19 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     createButtons();
 
   }
+  
+  public void snatchFocus() {
+	  final JComponent component = this;
+	  SwingUtilities.invokeLater(new Runnable() {
+
+		     @Override
+		     public void run() {
+		    	 component.grabFocus();
+		    	 component.requestFocus();          
+		     }
+		});
+	  
+  }
 
   /**
    *    @param e
