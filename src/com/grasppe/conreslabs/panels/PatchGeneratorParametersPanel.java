@@ -74,13 +74,13 @@ public class PatchGeneratorParametersPanel extends JiveModuleContainer implement
     scanningModulePanel  = new ScanningModulePanel();
 
     fourierModulePanel   = new FourierModulePanel();
-    functionModulePanel  = new FunctionModulePanel();
+    // functionModulePanel  = new FunctionModulePanel();
 
     this.createPermanentPanel(patchModulePanel, null);					// "Patch Parameters");
     this.createPermanentPanel(screeningModulePanel, null);			// "Screen Parameters");
     this.createPermanentPanel(printingModulePanel, null);			// "Print Parameters");
     this.createPermanentPanel(scanningModulePanel, null);			// "Scan Parameters");
-    this.createPanel(functionModulePanel, null, null);				// "Fourier Parameters");
+    // this.createPanel(functionModulePanel, null, null);				// "Fourier Parameters");
     this.createPanel(fourierModulePanel, null, null);				// "Fourier Parameters");
   }
 

@@ -23,13 +23,21 @@ import com.grasppe.jive.components.JiveModulePanel;
  */
 public class FunctionModulePanel extends JiveModulePanel {
 	
+	/**
+	 * @param name
+	 * @param title
+	 */
+	public FunctionModulePanel(String name, String title) {
+		super(name, title);
+	}
+
 	protected static int instances = 0;
 
   /**
    * Create the panel.
    */
   public FunctionModulePanel() {
-    super("Function-Panel", "Function-" + instances++);
+    this("Function-Panel", "Function-" + instances++);
   }
 
   /**

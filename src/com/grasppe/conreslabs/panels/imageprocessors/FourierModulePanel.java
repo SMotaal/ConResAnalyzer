@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import com.grasppe.jive.components.JiveField;
 import com.grasppe.jive.components.JiveModulePanel;
 
 /**
@@ -23,7 +24,7 @@ import com.grasppe.jive.components.JiveModulePanel;
  *  @version        $Revision: 1.0, 12/07/07
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
-public class FourierModulePanel extends JiveModulePanel implements PropertyChangeListener {
+public class FourierModulePanel extends FunctionModulePanel { // implements PropertyChangeListener {
 
 
 /**
@@ -38,18 +39,16 @@ public class FourierModulePanel extends JiveModulePanel implements PropertyChang
   @Override
   protected void createFields() {
 
-//  JiveField.setGroupOptions("long-text", JiveGroupMetrics.LONG_TEXT_OPTIONS);
-//  JiveField.setGroupOptions("short-text", JiveGroupMetrics.SHORT_TEXT_OPTIONS);
-
-//  methodField = JiveFieldFactory.Default().createListField("Fourier-Method", "Method", 0, methodOptions, "");
-//  addField(methodField);
-//  modeField = JiveFieldFactory.Default().createListField("Fourier-Mode", "Mode", 0, modeOptions, "");
-//  addField(modeField);
-
     String[] modeOptions   = { "Automatic", "Forward", "Reverse" };
     String[] methodOptions = { "Logarithmic Scaling", "Raw Power Spectrum" };
+    
+    JiveField expressionField = LongJiveFieldFactory().createTextField("Expression", "Expression", "fourier(Mode);","");
+    
+    expressionField.setVisible(false);
+    
+    addField(expressionField);
 
-    addField(LongJiveFieldFactory().createListField("Method", "Method", 0, methodOptions, ""));
+    // addField(LongJiveFieldFactory().createListField("Method", "Method", 0, methodOptions, ""));
 
     addField(LongJiveFieldFactory().createListField("Mode", "Mode", 0, modeOptions, ""));
 
