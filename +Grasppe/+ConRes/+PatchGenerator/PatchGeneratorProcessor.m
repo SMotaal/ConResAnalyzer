@@ -7,6 +7,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     ScreenProcessor = Grasppe.ConRes.PatchGenerator.Processors.Screen;
     PrintProcessor  = Grasppe.ConRes.PatchGenerator.Processors.Print;
     ScanProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Scan;
+    UserProcessor   = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
     View
   end
   
@@ -79,37 +80,31 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         scanProcessor.Execute(parameters.Scan);
         scannedImage = output.Image;
         
-      
-        
-        % [img s] = Grasppe.Kit.ConRes.GeneratePatchImage(reference, contrast, resolution); %, width, addressability);
-        
-        % patchImage    = im2double(img);
-        %screenedImage = grasppeScreen3(patchImage, scanpdi, addressability, screenlpi, screenangle );
-%         printedImage  = im2double(screenedImage);
-%         scannedImage  = im2double(printedImage);
-        
-        % imagePath, ppi, spi, lpi, angle
-        
-        %subplot(2,3,[1 2 4 5]);
-        
-        s = warning('off', 'Images:initSize:adjustingMag');
-
-        % clf;
-        % hIm = imshow(scannedImage); % ,'InitialMagnification', 100, 'Border', 'loose');
-        % hSP = imscrollpanel(gcf,hIm);
-        % api = iptgetapi(hSP);
-        % api.setMagnification(1); % 2X = 20
-        
-        obj.View.setImage(scannedImage);
-        
-        %output = scannedImage;
-        
-        % figure, imshow(scannedImage);
-        
-        warning(s);
-        
-        set(gcf,'Name',toString(s));
       end
+      
+      try
+        %% User Functions
+        
+        fxNames     = fieldnames(parameters.Processors);
+        fxProcessor = obj.UserProcessor;
+        
+        for fxName = fxNames'
+          fx = parameters.Processors.(char(fxName));
+          fxProcessor.Parameters = fx;
+          fxProcessor.Execute;
+          disp(fx);
+        end
+
+      end
+      
+      try
+        obj.View.setImage(output.Image);
+                
+        set(gcf,'Name','ConRes');
+        
+        % disp(output);
+      end      
+      
       drawnow expose update;
       % imshow(imfilter(im2double(grasppeScreen3(img, addressability)), H),'InitialMagnification', 100); set(gcf,'Name',toString(s)); drawnow expose update;
     end

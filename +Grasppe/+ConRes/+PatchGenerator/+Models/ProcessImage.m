@@ -12,6 +12,7 @@ classdef ProcessImage < handle
     Process
     ProcessData
     Image
+    Domain
   end
   
   properties (Access=private)
@@ -24,6 +25,7 @@ classdef ProcessImage < handle
     process     = {};
     processData = Grasppe.Occam.ProcessData.empty;
     image
+    domain = 'spatial';
   end
   
   methods
@@ -160,6 +162,18 @@ classdef ProcessImage < handle
       obj.mode    = mode;
       
     end
+    
+    
+    function domain = get.Domain(obj)
+      domain = obj.domain;
+    end
+    
+    function set.Domain(obj, domain)
+      if ~isequal(obj.domain, domain)
+        obj.domain = domain;
+      end
+    end
+    
     
     
   end

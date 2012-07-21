@@ -29,7 +29,6 @@ classdef ImageProcessor < Grasppe.Occam.Process
       try
         if isequal(obj.Results, obj.NO_ERRORS)
           output.addProcess(obj);
-          disp(output);
         end
       catch err
         disp(err);
