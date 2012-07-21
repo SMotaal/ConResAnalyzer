@@ -62,6 +62,9 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       end
       
       try
+        
+        %% Fix size
+        % parameters.Patch.Size = parameters.Patch.Size/
       
         %% Generate Patch
         patchProcessor.Execute(parameters.Patch);
@@ -97,12 +100,23 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
 
       end
       
+      
       try
-        obj.View.setImage(output.Image);
+        
+        image = output.Image;
+        
+
+        if isequal(output.Domain,'frequency')
+          image     = real(log(1+abs(image)));
+          imageMin  = min(image(:)); imageMax = max(image(:));
+          image     = (image-imageMin) / (imageMax-imageMin);
+        end
+        %elseif output.Domain = 'spatial'
+
+        obj.View.setImage(image);
                 
         set(gcf,'Name','ConRes');
         
-        % disp(output);
       end      
       
       drawnow expose update;

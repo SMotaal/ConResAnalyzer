@@ -1,0 +1,753 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AGuideToTheFFT_odd</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-21"><meta name="DC.source" content="AGuideToTheFFT_odd.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Symmetric Time Domain</a></li><li><a href="#4">Graphical output</a></li><li><a href="#5">Fig.1</a></li><li><a href="#6">Fig.2</a></li><li><a href="#7">Fig.3</a></li><li><a href="#8">Fig.4</a></li><li><a href="#9">Fig.5</a></li><li><a href="#10">Fig.6</a></li><li><a href="#11">Asymmetric Time Domain</a></li><li><a href="#12">Graphical output</a></li><li><a href="#13">Fig.7</a></li><li><a href="#14">Fig.8</a></li><li><a href="#15">Fig.9</a></li><li><a href="#16">Fig.10</a></li><li><a href="#17">Fig.11</a></li><li><a href="#18">Periodic function</a></li><li><a href="#19">Graphical output</a></li><li><a href="#20">Fig.12</a></li><li><a href="#21">Fig.13</a></li><li><a href="#22">Fig.14</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> AGuideToTheFFT_odd()
+</pre><pre class="codeinput">  <span class="comment">% A Guide to the FFT - 2dn Edition</span>
+  <span class="comment">%</span>
+  <span class="comment">% This script is a simple introduction to the Fast Fourier Transform</span>
+  <span class="comment">% Analytic and numerical solution are take into account.</span>
+  <span class="comment">% In the following, temporal signals will be characterized by</span>
+  <span class="comment">% lower letters and the Fourier Transform with capilats letters:</span>
+  <span class="comment">%           x(t) === FT ===&gt; X(f).</span>
+  <span class="comment">% Three examples are considered:</span>
+  <span class="comment">%</span>
+  <span class="comment">%        Symmetric Time Domain (Gaussian)</span>
+  <span class="comment">%        ================================</span>
+  <span class="comment">%        The signals:</span>
+  <span class="comment">%            x(t) = exp[- t^2 / ( 2 A^2 )].</span>
+  <span class="comment">%        The analityc FT:</span>
+  <span class="comment">%            X(f) = T sqrt(2 pi) exp(- 2 pi^2 f^2 A^2)</span>
+  <span class="comment">%        The bandwidth a 3dB</span>
+  <span class="comment">%            Bx = sqrt(log(2)) / (2 pi A );</span>
+  <span class="comment">%</span>
+  <span class="comment">%        Asymmetric Time Domain (Rayleigh)</span>
+  <span class="comment">%        =================================</span>
+  <span class="comment">%        The signals:</span>
+  <span class="comment">%            x(t) = A t exp(-A t)     t&gt;=0</span>
+  <span class="comment">%        The analityc FT:</span>
+  <span class="comment">%                       A</span>
+  <span class="comment">%        X(f) = ------------------</span>
+  <span class="comment">%               ( A + 2 j pi f)^2</span>
+  <span class="comment">%        The bandwidth a 3dB</span>
+  <span class="comment">%            Bx = A sqrt(sqrt(2)-1) / (2 pi);</span>
+  <span class="comment">%</span>
+  <span class="comment">%        Periodic function</span>
+  <span class="comment">%        =================</span>
+  <span class="comment">%        The signal</span>
+  <span class="comment">%            x(t) = cos(2*pi*f0*t)</span>
+  <span class="comment">%        The analytic FT:</span>
+  <span class="comment">%            X(F) = 0.5[delta(f-f0)+delta(f+f0)]</span>
+  <span class="comment">%</span>
+  <span class="comment">% The analysis are related to</span>
+  <span class="comment">%      o FFT normalization;</span>
+  <span class="comment">%      o Verify the symmetry properties of the FFT</span>
+  <span class="comment">%      o Use of the FFT to produce a delayed segnal:</span>
+  <span class="comment">%           x(t) === FFT ===&gt; X(f);</span>
+  <span class="comment">%           X(f) exp[-j(2*pi*f*taun)] === IFFT ===&gt; x(t - taun).</span>
+  <span class="comment">%        This algorithm is useful when the delay is not a multiple</span>
+  <span class="comment">%        of the sampling time.</span>
+  <span class="comment">%</span>
+
+  <span class="comment">% Daniele Disco</span>
+  <span class="comment">% arkkimede@gmail.com</span>
+  <span class="comment">% 11.04.2007</span>
+
+
+  close <span class="string">all</span>
+</pre><h2>Symmetric Time Domain<a name="3"></a></h2><pre class="codeinput">  <span class="comment">% Parameters definition</span>
+
+  Bx = 10;
+  A = sqrt(log(2))/(2*pi*Bx);
+  fs = 500;
+  dt = 1/fs;
+  T=1;
+  t = -T/2:dt:T/2;
+  disp(sprintf(<span class="string">' Symmetric case: length(t) = %4d points'</span>,length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+  taun = 0.055;
+
+  <span class="comment">%  Numerical evaluations</span>
+
+  x = exp(-t.^2/2/A^2);
+  Xan = A*sqrt(2*pi)*exp(-2*pi^2*f.^2*A^2);
+  X = dt * fftshift(fft(fftshift(x)));
+  Xbad = dt * fftshift(fft(x));
+  ifftx = fs * ifftshift(ifft(ifftshift(X)));
+  esp = exp(-j * 2 * pi * f * taun);
+  Xshift = X .*esp;
+  Xanshift = Xan .* esp;
+  ifftxshift = fs * ifftshift(ifft(ifftshift(Xshift)));
+</pre><pre class="codeoutput"> Symmetric case: length(t) =  501 points
+</pre><h2>Graphical output<a name="4"></a></h2><h2>Fig.1<a name="5"></a></h2><pre class="codeinput">  figure(1);
+  plot(f,real(Xbad))
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'fft()'</span>);
+  axis([-50 50 -0.04 0.04])
+  grid;
+  <span class="comment">%print -depsc fig0.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_01.png" alt=""> <h2>Fig.2<a name="6"></a></h2><pre class="codeinput">  figure(2);
+  subplot(2,1,2);
+  plot(t,x,<span class="string">'k'</span>);
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t)'</span>);
+  axis([-0.1 0.1 0 1])
+  grid
+  subplot(2,1,1);
+  plot(f,Xan,<span class="string">'k'</span>);
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'X(f)'</span>);
+  axis([-250 250 0 0.04])
+  grid;
+  <span class="comment">%print -depsc fig1.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_02.png" alt=""> <h2>Fig.3<a name="7"></a></h2><pre class="codeinput">  figure(3);
+  plot(f,20*log10(Xan/(A*sqrt(2*pi))),<span class="string">'k'</span>);hold <span class="string">on</span>;
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'|X(f)| [dB]'</span>);
+  plot([+Bx +Bx],[-10 -3],<span class="string">'r'</span>);
+  plot([-Bx -Bx],[-10 -3],<span class="string">'r'</span>);
+  plot([-Bx +Bx],[-3 -3],<span class="string">'r'</span>);
+  h=text(-1.7, -2.6, <span class="string">'2B_x'</span>,<span class="string">'fontweight'</span>,<span class="string">'bold'</span>,<span class="string">'fontangle'</span>,<span class="string">'italic'</span>);
+  axis([-50 50 -10 0]);
+  grid
+  <span class="comment">%print -depsc fig2.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_03.png" alt=""> <h2>Fig.4<a name="8"></a></h2><pre class="codeinput">  figure(4);
+  subplot(2,1,1)
+  plot(f,real(X),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,Xan,<span class="string">'r--'</span>);
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'X(f)'</span>);
+  legend(<span class="string">'Num.'</span>,<span class="string">'Ana.'</span>);
+  axis([-250 250 0 0.04])
+  grid
+  subplot(2,1,2)
+  plot(t,real(ifftx),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(t,x,<span class="string">'r--'</span>);
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t)'</span>);
+  legend(<span class="string">'Num.'</span>,<span class="string">'Ana.'</span>);
+  axis([-0.1 0.1 0 1]);
+  grid
+  <span class="comment">%print -depsc fig3.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_04.png" alt=""> <h2>Fig.5<a name="9"></a></h2><pre class="codeinput">  figure(5);
+  subplot(2,1,1);
+  plot(f,real(Xshift),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,real(Xanshift),<span class="string">'r--'</span>);
+  title(<span class="string">'X(f) exp(-j2 \pi f \tau_{n})'</span>);
+  legend(<span class="string">'Re[Num.]'</span>,<span class="string">'Re[Ana.]'</span>);
+  grid;
+  hold <span class="string">off</span>
+  subplot(2,1,2);
+  plot(f,imag(Xshift),<span class="string">'k-'</span>); hold <span class="string">on</span>
+  plot(f,imag(Xanshift),<span class="string">'r--'</span>);
+  legend(<span class="string">'Im[Num.]'</span>,<span class="string">'Im[Ana.]'</span>);
+  grid;
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  <span class="comment">%print -depsc fig4.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_05.png" alt=""> <h2>Fig.6<a name="10"></a></h2><pre class="codeinput">  figure(6);
+  plot(t(1),real(ifftxshift(1)),<span class="string">'r'</span>,t,x,<span class="string">'k--'</span>,t,real(ifftxshift),<span class="string">'k'</span>);hold <span class="string">on</span>
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t - \tau_{n})'</span>);
+  plot([taun taun],[0 1],<span class="string">'r'</span>);
+  legend([<span class="string">'\tau_n = 0.055s = '</span> num2str(taun/dt,3) <span class="string">'dt'</span>]);
+  grid;
+  axis([-0.1 0.3 0 1]);
+  <span class="comment">%print -depsc fig5.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_06.png" alt=""> <h2>Asymmetric Time Domain<a name="11"></a></h2><pre class="codeinput">  <span class="comment">% Parameters definition</span>
+
+  ui = complex(0,1);
+  Bx = 5;
+  A = 2*pi*Bx/sqrt(sqrt(2)-1);
+  fs = 500;
+  dt = 1/fs;
+  T = 3;
+  t = 0:dt:T;
+  disp(sprintf(<span class="string">'Asymmetric case: length(t) = %4d points'</span>,length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+  taun = 0.055;
+
+  <span class="comment">%  Numerical evaluations</span>
+
+  x = A*t.*exp(-A*t);
+  Xan = A./(A+ui*2*pi.*f).^2;
+  X = dt * fftshift(fft(x));
+  ifftx = fs *ifft(ifftshift(X));
+  esp = exp(-j * 2 * pi * f * taun);
+  Xshift = X .*esp;
+  Xanshift = Xan .* esp;
+  ifftxshift = fs * ifft(ifftshift(Xshift));
+</pre><pre class="codeoutput">Asymmetric case: length(t) = 1501 points
+</pre><h2>Graphical output<a name="12"></a></h2><h2>Fig.7<a name="13"></a></h2><pre class="codeinput">  figure(7);
+  subplot(2,1,2)
+  plot(t,x,<span class="string">'k'</span>);
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t)'</span>);
+  grid
+  subplot(2,1,1)
+  [AX,H1,H2] = plotyy(f,real(Xan),f,imag(Xan),<span class="string">'plot'</span>);
+  set(get(AX(1),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'Re[X(f)]'</span>);
+  set(get(AX(2),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'Im[X(f)]'</span>);
+  set(AX(1),<span class="string">'Ycolor'</span>,<span class="string">'k'</span>);
+  set(AX(2),<span class="string">'Ycolor'</span>,<span class="string">'r'</span>);
+  set(H1,<span class="string">'Color'</span>,<span class="string">'k'</span>)
+  set(H2,<span class="string">'Color'</span>,<span class="string">'r'</span>)
+  grid;
+  title(<span class="string">'X(f)'</span>);
+  xlabel(<span class="string">'Frequency [Hz]'</span>)
+  <span class="comment">%print -depsc fig6.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_07.png" alt=""> <h2>Fig.8<a name="14"></a></h2><pre class="codeinput">  figure(8);
+  plot(f,20*log10(abs(Xan)*A),<span class="string">'k'</span>);hold <span class="string">on</span>;
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'Amplitude [dB]'</span>);
+  plot([+Bx +Bx],[-10 -3],<span class="string">'r'</span>);
+  plot([-Bx -Bx],[-10 -3],<span class="string">'r'</span>);
+  plot([-Bx +Bx],[-3 -3],<span class="string">'r'</span>);
+  text(-1.7, -2.6, <span class="string">'2B_x'</span>,<span class="string">'fontweight'</span>,<span class="string">'bold'</span>,<span class="string">'fontangle'</span>,<span class="string">'italic'</span>);
+  axis([-50 50 -10 0]);
+  grid
+  <span class="comment">%print -depsc fig7.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_08.png" alt=""> <h2>Fig.9<a name="15"></a></h2><pre class="codeinput">  figure(9);
+  subplot(3,1,1);
+  plot(f,real(X),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,real(Xan),<span class="string">'r--'</span>);
+  ylabel(<span class="string">'Re[X(f)]'</span>);
+  legend(<span class="string">'Num.'</span>,<span class="string">'Ana.'</span>);
+  grid
+  subplot(3,1,2);
+  plot(f,imag(X),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,imag(Xan),<span class="string">'r--'</span>);
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  ylabel(<span class="string">'Im[X(f)]'</span>);
+  legend(<span class="string">'Num.'</span>,<span class="string">'Ana.'</span>);
+  grid
+  subplot(3,1,3);
+  plot(t,real(ifftx),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(t,real(x),<span class="string">'r--'</span>);
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t)'</span>);
+  legend(<span class="string">'Num.'</span>,<span class="string">'Ana.'</span>);
+  grid
+  <span class="comment">%print -depsc fig8.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_09.png" alt=""> <h2>Fig.10<a name="16"></a></h2><pre class="codeinput">  figure(10);
+  subplot(2,1,1);
+  plot(f,real(Xshift),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,real(Xanshift),<span class="string">'r--'</span>);
+  title(<span class="string">'X(f) exp(-j2 \pi f \tau_{n})'</span>);
+  legend(<span class="string">'Re[Num.]'</span>,<span class="string">'Re[Ana.]'</span>);
+  grid;
+  hold <span class="string">off</span>
+  subplot(2,1,2);
+  plot(f,imag(Xshift),<span class="string">'k'</span>); hold <span class="string">on</span>
+  plot(f,imag(Xanshift),<span class="string">'r--'</span>);
+  legend(<span class="string">'Im[Num.]'</span>,<span class="string">'Im[Ana.]'</span>);
+  grid;
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  <span class="comment">%print -depsc fig9.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_10.png" alt=""> <h2>Fig.11<a name="17"></a></h2><pre class="codeinput">  figure(11);
+  plot(t(1),real(ifftxshift(1)),<span class="string">'r'</span>,t,x,<span class="string">'k--'</span>,t,real(ifftxshift),<span class="string">'k'</span>);hold <span class="string">on</span>
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t - \tau_{n})'</span>);
+  plot([taun taun],[0 1],<span class="string">'r'</span>);
+  legend([<span class="string">'\tau_n = 0.055s = '</span> num2str(taun/dt,3) <span class="string">'dt'</span>]);
+  grid;
+  axis([-0.1 0.2 0 0.4]);
+  <span class="comment">%print -depsc fig10.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_11.png" alt=""> <h2>Periodic function<a name="18"></a></h2><pre class="codeinput">  <span class="comment">% Parameters definition</span>
+
+  f0 = 50;
+  fs = 5000;
+  dt = 1/fs;
+  T=1;
+  t = -T/2:dt:T/2;
+  disp(sprintf(<span class="string">'  Periodic case: length(t) = %4d points'</span>,length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+
+  <span class="comment">%  Numerical evaluations</span>
+
+  x = cos(2*pi*f0*t)+10;
+  X = fftshift(fft(fftshift(x)))/length(x);
+  ifftx = fs * ifftshift(ifft(ifftshift(X)));
+</pre><pre class="codeoutput">  Periodic case: length(t) = 5001 points
+</pre><h2>Graphical output<a name="19"></a></h2><h2>Fig.12<a name="20"></a></h2><pre class="codeinput">  figure(12);
+  plot(t,x,<span class="string">'k'</span>);
+  xlabel(<span class="string">'Time [s]'</span>);
+  ylabel(<span class="string">'x(t)'</span>);
+  <span class="comment">%axis([-0.1 0.1 -1.5 1.5])</span>
+  grid
+  <span class="comment">%print -depsc fig11.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_12.png" alt=""> <h2>Fig.13<a name="21"></a></h2><pre class="codeinput">  figure(13);
+  plot(f,real(X),<span class="string">'r'</span>);
+  ylabel(<span class="string">'X(f)'</span>);
+  xlabel(<span class="string">'Frequency [Hz]'</span>);
+  <span class="comment">%axis([-150 150 0 0.6])</span>
+  grid
+  <span class="comment">%print -depsc fig12.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_13.png" alt=""> <h2>Fig.14<a name="22"></a></h2><pre class="codeinput">  figure(14);
+  plot(t,real(ifftx))
+  grid
+  <span class="comment">%axis([-0.1 0.1 -1.5 1.5])</span>
+
+  ylabel(<span class="string">'x(t)=FFT^{-1}[X(f)]'</span>);
+  xlabel(<span class="string">'time [s]'</span>);
+  <span class="comment">%print -depsc fig13.eps</span>
+  snapnow;
+</pre><img vspace="5" hspace="5" src="AGuideToTheFFT_odd_14.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+function AGuideToTheFFT_odd()
+  % A Guide to the FFT - 2dn Edition
+  %
+  % This script is a simple introduction to the Fast Fourier Transform
+  % Analytic and numerical solution are take into account.
+  % In the following, temporal signals will be characterized by
+  % lower letters and the Fourier Transform with capilats letters:
+  %           x(t) === FT ===> X(f).
+  % Three examples are considered:
+  %
+  %        Symmetric Time Domain (Gaussian)
+  %        ================================
+  %        The signals:
+  %            x(t) = exp[- t^2 / ( 2 A^2 )].
+  %        The analityc FT:
+  %            X(f) = T sqrt(2 pi) exp(- 2 pi^2 f^2 A^2)
+  %        The bandwidth a 3dB
+  %            Bx = sqrt(log(2)) / (2 pi A );
+  %
+  %        Asymmetric Time Domain (Rayleigh)
+  %        =================================
+  %        The signals:
+  %            x(t) = A t exp(-A t)     t>=0
+  %        The analityc FT:
+  %                       A
+  %        X(f) = REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+  %               ( A + 2 j pi f)^2
+  %        The bandwidth a 3dB
+  %            Bx = A sqrt(sqrt(2)-1) / (2 pi);
+  %
+  %        Periodic function
+  %        =================
+  %        The signal
+  %            x(t) = cos(2*pi*f0*t)
+  %        The analytic FT:
+  %            X(F) = 0.5[delta(f-f0)+delta(f+f0)]
+  %
+  % The analysis are related to
+  %      o FFT normalization;
+  %      o Verify the symmetry properties of the FFT
+  %      o Use of the FFT to produce a delayed segnal:
+  %           x(t) === FFT ===> X(f);
+  %           X(f) exp[-j(2*pi*f*taun)] === IFFT ===> x(t - taun).
+  %        This algorithm is useful when the delay is not a multiple
+  %        of the sampling time.
+  %
+  
+  % Daniele Disco
+  % arkkimede@gmail.com
+  % 11.04.2007
+  
+  
+  close all
+  %% Symmetric Time Domain
+  
+  % Parameters definition
+  
+  Bx = 10;
+  A = sqrt(log(2))/(2*pi*Bx);
+  fs = 500;
+  dt = 1/fs;
+  T=1;
+  t = -T/2:dt:T/2;
+  disp(sprintf(' Symmetric case: length(t) = %4d points',length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+  taun = 0.055;
+
+  %  Numerical evaluations
+  
+  x = exp(-t.^2/2/A^2);
+  Xan = A*sqrt(2*pi)*exp(-2*pi^2*f.^2*A^2);
+  X = dt * fftshift(fft(fftshift(x)));
+  Xbad = dt * fftshift(fft(x));
+  ifftx = fs * ifftshift(ifft(ifftshift(X)));
+  esp = exp(-j * 2 * pi * f * taun);
+  Xshift = X .*esp;
+  Xanshift = Xan .* esp;
+  ifftxshift = fs * ifftshift(ifft(ifftshift(Xshift)));
+  
+  
+  
+  
+  %% Graphical output
+  
+  %% Fig.1
+  
+  figure(1);
+  plot(f,real(Xbad))
+  xlabel('Frequency [Hz]');
+  ylabel('fft()');
+  axis([-50 50 -0.04 0.04])
+  grid;
+  %print -depsc fig0.eps
+  snapnow;
+  
+  
+  %% Fig.2
+  
+  figure(2);
+  subplot(2,1,2);
+  plot(t,x,'k');
+  xlabel('Time [s]');
+  ylabel('x(t)');
+  axis([-0.1 0.1 0 1])
+  grid
+  subplot(2,1,1);
+  plot(f,Xan,'k');
+  xlabel('Frequency [Hz]');
+  ylabel('X(f)');
+  axis([-250 250 0 0.04])
+  grid;
+  %print -depsc fig1.eps
+  snapnow;
+  
+  %% Fig.3
+  
+  figure(3);
+  plot(f,20*log10(Xan/(A*sqrt(2*pi))),'k');hold on;
+  xlabel('Frequency [Hz]');
+  ylabel('|X(f)| [dB]');
+  plot([+Bx +Bx],[-10 -3],'r');
+  plot([-Bx -Bx],[-10 -3],'r');
+  plot([-Bx +Bx],[-3 -3],'r');
+  h=text(-1.7, -2.6, '2B_x','fontweight','bold','fontangle','italic');
+  axis([-50 50 -10 0]);
+  grid
+  %print -depsc fig2.eps
+  snapnow;
+  
+  %% Fig.4
+  
+  figure(4);
+  subplot(2,1,1)
+  plot(f,real(X),'k'); hold on
+  plot(f,Xan,'rREPLACE_WITH_DASH_DASH');
+  xlabel('Frequency [Hz]');
+  ylabel('X(f)');
+  legend('Num.','Ana.');
+  axis([-250 250 0 0.04])
+  grid
+  subplot(2,1,2)
+  plot(t,real(ifftx),'k'); hold on
+  plot(t,x,'rREPLACE_WITH_DASH_DASH');
+  xlabel('Time [s]');
+  ylabel('x(t)');
+  legend('Num.','Ana.');
+  axis([-0.1 0.1 0 1]);
+  grid
+  %print -depsc fig3.eps
+  snapnow;
+  
+  %% Fig.5
+  
+  figure(5);
+  subplot(2,1,1);
+  plot(f,real(Xshift),'k'); hold on
+  plot(f,real(Xanshift),'rREPLACE_WITH_DASH_DASH');
+  title('X(f) exp(-j2 \pi f \tau_{n})');
+  legend('Re[Num.]','Re[Ana.]');
+  grid;
+  hold off
+  subplot(2,1,2);
+  plot(f,imag(Xshift),'k-'); hold on
+  plot(f,imag(Xanshift),'rREPLACE_WITH_DASH_DASH');
+  legend('Im[Num.]','Im[Ana.]');
+  grid;
+  xlabel('Frequency [Hz]');
+  %print -depsc fig4.eps
+  snapnow;
+  
+  %% Fig.6
+  
+  figure(6);
+  plot(t(1),real(ifftxshift(1)),'r',t,x,'kREPLACE_WITH_DASH_DASH',t,real(ifftxshift),'k');hold on
+  xlabel('Time [s]');
+  ylabel('x(t - \tau_{n})');
+  plot([taun taun],[0 1],'r');
+  legend(['\tau_n = 0.055s = ' num2str(taun/dt,3) 'dt']);
+  grid;
+  axis([-0.1 0.3 0 1]);
+  %print -depsc fig5.eps
+  snapnow;
+  
+  
+  
+  
+  
+  
+  %% Asymmetric Time Domain
+  
+  % Parameters definition
+  
+  ui = complex(0,1);
+  Bx = 5;
+  A = 2*pi*Bx/sqrt(sqrt(2)-1);
+  fs = 500;
+  dt = 1/fs;
+  T = 3;
+  t = 0:dt:T;
+  disp(sprintf('Asymmetric case: length(t) = %4d points',length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+  taun = 0.055;
+  
+  %  Numerical evaluations
+  
+  x = A*t.*exp(-A*t);
+  Xan = A./(A+ui*2*pi.*f).^2;
+  X = dt * fftshift(fft(x));
+  ifftx = fs *ifft(ifftshift(X));
+  esp = exp(-j * 2 * pi * f * taun);
+  Xshift = X .*esp;
+  Xanshift = Xan .* esp;
+  ifftxshift = fs * ifft(ifftshift(Xshift));
+  
+  
+  
+  %% Graphical output
+  
+  %% Fig.7
+  
+  figure(7);
+  subplot(2,1,2)
+  plot(t,x,'k');
+  xlabel('Time [s]');
+  ylabel('x(t)');
+  grid
+  subplot(2,1,1)
+  [AX,H1,H2] = plotyy(f,real(Xan),f,imag(Xan),'plot');
+  set(get(AX(1),'Ylabel'),'String','Re[X(f)]');
+  set(get(AX(2),'Ylabel'),'String','Im[X(f)]');
+  set(AX(1),'Ycolor','k');
+  set(AX(2),'Ycolor','r');
+  set(H1,'Color','k')
+  set(H2,'Color','r')
+  grid;
+  title('X(f)');
+  xlabel('Frequency [Hz]')
+  %print -depsc fig6.eps
+  snapnow;
+  
+  
+  %% Fig.8
+  
+  figure(8);
+  plot(f,20*log10(abs(Xan)*A),'k');hold on;
+  xlabel('Frequency [Hz]');
+  ylabel('Amplitude [dB]');
+  plot([+Bx +Bx],[-10 -3],'r');
+  plot([-Bx -Bx],[-10 -3],'r');
+  plot([-Bx +Bx],[-3 -3],'r');
+  text(-1.7, -2.6, '2B_x','fontweight','bold','fontangle','italic');
+  axis([-50 50 -10 0]);
+  grid
+  %print -depsc fig7.eps
+  snapnow;
+  
+  
+  %% Fig.9
+  
+  figure(9);
+  subplot(3,1,1);
+  plot(f,real(X),'k'); hold on
+  plot(f,real(Xan),'rREPLACE_WITH_DASH_DASH');
+  ylabel('Re[X(f)]');
+  legend('Num.','Ana.');
+  grid
+  subplot(3,1,2);
+  plot(f,imag(X),'k'); hold on
+  plot(f,imag(Xan),'rREPLACE_WITH_DASH_DASH');
+  xlabel('Frequency [Hz]');
+  ylabel('Im[X(f)]');
+  legend('Num.','Ana.');
+  grid
+  subplot(3,1,3);
+  plot(t,real(ifftx),'k'); hold on
+  plot(t,real(x),'rREPLACE_WITH_DASH_DASH');
+  xlabel('Time [s]');
+  ylabel('x(t)');
+  legend('Num.','Ana.');
+  grid
+  %print -depsc fig8.eps
+  snapnow;
+  
+  
+  %% Fig.10
+  
+  figure(10);
+  subplot(2,1,1);
+  plot(f,real(Xshift),'k'); hold on
+  plot(f,real(Xanshift),'rREPLACE_WITH_DASH_DASH');
+  title('X(f) exp(-j2 \pi f \tau_{n})');
+  legend('Re[Num.]','Re[Ana.]');
+  grid;
+  hold off
+  subplot(2,1,2);
+  plot(f,imag(Xshift),'k'); hold on
+  plot(f,imag(Xanshift),'rREPLACE_WITH_DASH_DASH');
+  legend('Im[Num.]','Im[Ana.]');
+  grid;
+  xlabel('Frequency [Hz]');
+  %print -depsc fig9.eps
+  snapnow;
+  
+  
+  %% Fig.11
+  
+  figure(11);
+  plot(t(1),real(ifftxshift(1)),'r',t,x,'kREPLACE_WITH_DASH_DASH',t,real(ifftxshift),'k');hold on
+  xlabel('Time [s]');
+  ylabel('x(t - \tau_{n})');
+  plot([taun taun],[0 1],'r');
+  legend(['\tau_n = 0.055s = ' num2str(taun/dt,3) 'dt']);
+  grid;
+  axis([-0.1 0.2 0 0.4]);
+  %print -depsc fig10.eps
+  snapnow;
+  
+  
+  
+  
+  %% Periodic function
+  
+  % Parameters definition
+  
+  f0 = 50;
+  fs = 5000;
+  dt = 1/fs;
+  T=1;
+  t = -T/2:dt:T/2;
+  disp(sprintf('  Periodic case: length(t) = %4d points',length(t)));
+  df = 1/T;
+  Fmax = 1/2/dt;
+  f=-Fmax:df:Fmax;
+  
+  %  Numerical evaluations
+  
+  x = cos(2*pi*f0*t)+10;
+  X = fftshift(fft(fftshift(x)))/length(x);
+  ifftx = fs * ifftshift(ifft(ifftshift(X)));
+  
+
+  %% Graphical output
+  
+  %% Fig.12
+  
+  figure(12);
+  plot(t,x,'k');
+  xlabel('Time [s]');
+  ylabel('x(t)');
+  %axis([-0.1 0.1 -1.5 1.5])
+  grid
+  %print -depsc fig11.eps
+  snapnow;
+  
+  %% Fig.13
+  
+  figure(13);
+  plot(f,real(X),'r');
+  ylabel('X(f)');
+  xlabel('Frequency [Hz]');
+  %axis([-150 150 0 0.6])
+  grid
+  %print -depsc fig12.eps
+  snapnow;
+  
+  %% Fig.14
+  
+  figure(14);
+  plot(t,real(ifftx))
+  grid
+  %axis([-0.1 0.1 -1.5 1.5])
+  
+  ylabel('x(t)=FFT^{-1}[X(f)]');
+  xlabel('time [s]');
+  %print -depsc fig13.eps
+  snapnow;
+end
+
+##### SOURCE END #####
+--></body></html>

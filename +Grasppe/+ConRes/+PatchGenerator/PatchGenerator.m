@@ -10,7 +10,7 @@ classdef PatchGenerator < Grasppe.Occam.Module
     function obj = PatchGenerator()
       obj = obj@Grasppe.Occam.Module;
       obj.permanent = true;
-      obj.Run;
+      % obj.Run;
 
       %obj.Initialize;
     end

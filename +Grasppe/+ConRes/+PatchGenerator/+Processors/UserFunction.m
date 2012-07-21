@@ -21,7 +21,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     end
     
     function sandbox(obj, params, output)
-      fourier   = @(method,mode) obj.fourier(method, mode);
+      fourier   = @(varargin) obj.fourier(varargin{:});
       
       processData = output.ProcessData;
       %resolution = @
@@ -39,31 +39,42 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       return;      
     end
     
-    function image = fourier(obj, method, mode)
+    function image = fourier(obj, varargin)
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
       
-      %method  = 1;
+      method  = 1;
+      
       
       switch (output.Domain)
         case 'frequency'
-        % case 'spatial'  
-          if method == 0
-            image = 1-exp(image);
-          end
-          image = ifft2(ifftshift(image));
+          
+          % Unpadding
+          sP  = size(image,1);
+          sQ  = size(image,2);          
+          fP  = ceil(sP/2);
+          fQ  = ceil(sQ/2);
+          image = ifft2(ifftshift(image)); %, fP, fQ);
+          image = image(1:fP, 1:fQ);
           output.Domain = 'spatial';
-        otherwise
-          image = fftshift(fft2(image));
-          if method == 0
-            image = log(1+abs(image));
-            image = (image-min(image(:)));
-            image = image / max(image(:));
-          end
+
+        otherwise % case 'spatial' 
+
+          % Sizing & Padding
+          sP  = size(image,1);
+          sQ  = size(image,2);
+          nP  = 1-mod(sP,2);
+          nQ  = 1-mod(sQ,2);
+          fP  = ceil(2*(sP-nP));
+          fQ  = ceil(2*(sQ-nQ));
+          
+          image = image(1:end-(nP),1:end-(nQ));
+
+          image = fftshift(fft2(image, fP, fQ));
           output.Domain = 'frequency';
       end
       
-      disp([method mode]);
+      disp([method varargin{1}]);
     end
   end
 end

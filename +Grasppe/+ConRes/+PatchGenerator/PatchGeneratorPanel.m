@@ -34,7 +34,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       output = [];
       obj.initializePanel;
       
-      obj.applyChanges;
     end
     %
     %     function onResize(obj, source, event,hAx)
@@ -55,11 +54,14 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     end
     
     function initializePanel(obj)
-      obj.createPanel();
+      try obj.createPanel(); end
+      try obj.applyChanges; end
     end
     
     function createPanel(obj)
       % mjLink
+      
+      disp('Creating Panel');
       
       cFigure = get(0,'CurrentFigure');
       
@@ -71,14 +73,9 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         hFrame = figure(oFrame{:});
       end
       
-      
-      % set(hFrame, 'Position', get(0,'Screensize'));
-      
-      % set(hFrame, 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL');
-      
       set(hFrame, 'CloseRequestFcn', @(src, event) delete(obj) );
       
-      obj.hFrame      = hFrame;
+      obj.hFrame      = hFrame;     
       
       jFrame = get(handle(hFrame),'JavaFrame');
       
@@ -94,20 +91,33 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       set(obj.jApplyButton, 'actionPerformedCallback', @(src, event)obj.applyChanges);
       
-      %drawnow expose update;
       
       drawnow expose update;
       
-%       jFrame.fHG1Client.toFront();
+      jFrame.fHG1Client.toFront();
 %       
 %       obj.jParametersPanel.grabFocus();
-%       obj.jParametersPanel.transferFocus();
+
       
       try jFrame.setMaximized(true); end
+      
+      tic; 
+        frame = handle(frame);
+%         set(frame, 'Visible', 'off')
+%         set(frame, 'Visible', 'on');
+        obj.jParametersPanel.grabFocus();
+        obj.jParametersPanel.transferFocus();
+      toc;
+      
+      drawnow expose update;
+      
+      % obj.jParametersPanel.transferFocus();      
     end
     
     function applyChanges(obj)
       import Grasppe.ConRes.PatchGenerator.*;
+      
+      disp('Applying Changes');
       
       parameters = obj.jParametersPanel.getValues();
       
@@ -150,6 +160,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     end
     
     function setImage(obj, img)
+      disp('Setting Image');
       if isempty(img)
         obj.jImagePanel.setPreviewImage(null);
       else
