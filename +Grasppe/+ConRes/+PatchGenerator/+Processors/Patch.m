@@ -11,6 +11,8 @@ classdef Patch < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     
     function output = Run(obj)
       output          = obj.Input;
+      variables       = obj.Variables;
+      
       parameters      = obj.Parameters;
       
       addressibility  = obj.Addressability;
@@ -26,12 +28,15 @@ classdef Patch < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         image= imresize(image,1/obj.Scale);
       end
       
-      parameters.Mean       = spec(1);
-      parameters.Contrast   = spec(2);
-      parameters.Resolution = spec(3);
-      parameters.Size       = size;
+      parameters.(CONRES.Mean')       = spec(1);
+      parameters.(CONRES.Contrast')   = spec(2);
+      parameters.(CONRES.Resolution') = spec(3);
+      parameters.(CONRES.Size')       = size;
       
       output.setImage(im2double(image), obj.Addressability);
+      
+      variables.Patch = parameters;
+      obj.Variables   = variables;
     end
     
   end

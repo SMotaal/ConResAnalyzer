@@ -8,6 +8,7 @@ classdef Scan < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   methods
     function output = Run(obj)
       output  = obj.Input;
+      variables       = obj.Variables;
       params  = obj.Parameters;
       
       dpi     = findField(params, 'resolution');
@@ -18,7 +19,14 @@ classdef Scan < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image   = imresize(image, (scale/100) * (dpi/spi), 'bicubic');
       
+      parameters.(CONRES.DPI')    = dpi;
+      parameters.(CONRES.Scale')  = scale;
+      
       output.setImage(im2double(image), dpi);
+      
+      variables.Scan = parameters;
+      
+      obj.Variables = variables;
       
     end
   end

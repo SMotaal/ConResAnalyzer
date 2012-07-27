@@ -7,7 +7,7 @@ classdef ImageProcessor < Grasppe.Occam.Process
   
   methods
     
-    function output = InitializeProcess(obj, input)
+    function input = InitializeProcess(obj, input)
       
       if isnumeric(input) && ndims(input) <= 3;
         input = obj.createProcessImage(input, obj);
@@ -15,12 +15,14 @@ classdef ImageProcessor < Grasppe.Occam.Process
       
       if ~isa(input, 'Grasppe.ConRes.PatchGenerator.Models.ProcessImage')
         input = obj.createProcessImage([], obj);
+      else
+        obj.Variables = input.Variables;
       end
       
       if nargout == 0
         obj.InitializeProcess@Grasppe.Occam.Process(input);
       elseif nargout > 0
-        output = obj.InitializeProcess@Grasppe.Occam.Process(input);
+        input = obj.InitializeProcess@Grasppe.Occam.Process(input);
       end
     end
     
@@ -38,6 +40,7 @@ classdef ImageProcessor < Grasppe.Occam.Process
       %       if nargout == 0
       %         obj.TerminateProcess@Grasppe.Occam.Process(output);
       %       elseif nargout > 0
+      output.Variables = obj.Variables;
         output = obj.TerminateProcess@Grasppe.Occam.Process(output);
 %       end
     end

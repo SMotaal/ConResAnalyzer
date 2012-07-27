@@ -15,6 +15,10 @@ classdef ProcessImage < handle
     Domain
   end
   
+  properties
+    Variables = struct;
+  end
+  
   properties (Access=private)
     width
     height
@@ -25,7 +29,8 @@ classdef ProcessImage < handle
     process     = {};
     processData = Grasppe.Occam.ProcessData.empty;
     image
-    domain = 'spatial';
+    domain      = 'spatial';
+    % variables   = struct;
   end
   
   methods
@@ -174,7 +179,15 @@ classdef ProcessImage < handle
       end
     end
     
-    
+    % function variables = get.Variables(obj)
+    %   variables = obj.variables;
+    % end
+    %
+    % function set.Variables(obj, variables)
+    %   if ~isequal(obj.variables, variables)
+    %     obj.variables = variables;
+    %   end
+    % end
     
   end
   

@@ -13,7 +13,7 @@ classdef PrintParameters < handle
     
     function obj = PrintParameters(dotGain, noise, spread, unsharp)
       if nargin==4
-        obj.setParameters(dotGain, noise, spread, unsharp); 
+        obj.setParameters(dotGain, noise, spread, unsharp);
       end
     end
     
@@ -25,6 +25,9 @@ classdef PrintParameters < handle
     end
     
   end
+  
+  properties (Dependent), Print; end
+  methods, function obj = get.Print(obj), end, end
   
 end
 

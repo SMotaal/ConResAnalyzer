@@ -3,11 +3,12 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
   %   Detailed explanation goes here
   
   properties
-    PatchProcessor  = Grasppe.ConRes.PatchGenerator.Processors.Patch;
-    ScreenProcessor = Grasppe.ConRes.PatchGenerator.Processors.Screen;
-    PrintProcessor  = Grasppe.ConRes.PatchGenerator.Processors.Print;
-    ScanProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Scan;
-    UserProcessor   = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
+    PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
+    ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
+    PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
+    ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
+    UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
+    % DisplayProcessor  = Grasppe.ConRes.PatchGenerator.Processors.Display;
     View
   end
   
@@ -20,15 +21,16 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       obj.addProcess(obj.ScreenProcessor);
       obj.addProcess(obj.PrintProcessor);
       obj.addProcess(obj.ScanProcessor);
+      % obj.addProcess(obj.DisplayProcessor);
     end
     
     function output = Run(obj)
       output = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
       
-      patchProcessor  = obj.PatchProcessor;
-      screenProcessor = obj.ScreenProcessor;
-      printProcessor  = obj.PrintProcessor;
-      scanProcessor   = obj.ScanProcessor;
+      patchProcessor    = obj.PatchProcessor;
+      screenProcessor   = obj.ScreenProcessor;
+      printProcessor    = obj.PrintProcessor;
+      scanProcessor     = obj.ScanProcessor;
       
       parameters      = obj.Parameters;
       
@@ -86,7 +88,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       end
       
       try
-        %% User Functions
+        %% Functions
         
         fxNames     = fieldnames(parameters.Processors);
         fxProcessor = obj.UserProcessor;

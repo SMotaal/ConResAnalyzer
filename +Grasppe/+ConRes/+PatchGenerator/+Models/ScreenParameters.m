@@ -10,10 +10,11 @@ classdef ScreenParameters < handle
     PrintParameters
   end
   
+  
   methods
     
     function obj = ScreenParameters(addressability, resolution, angle)
-      if nargin==3 
+      if nargin==3
         obj.setParameters(addressability, resolution, angle);
       end
     end
@@ -25,6 +26,9 @@ classdef ScreenParameters < handle
     end
     
   end
+  
+  properties (Dependent), Screen; end
+  methods, function obj = get.Screen(obj), end, end
   
 end
 

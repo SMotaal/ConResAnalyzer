@@ -8,7 +8,11 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   
   methods
     function output = Run(obj)
-      output  = obj.Input;
+      
+      import Grasppe.*;
+      
+      output          = obj.Input;
+      variables       = obj.Variables;
       params  = obj.Parameters;
       
       ppi     = findField(params, 'pixelresolution');
@@ -21,8 +25,22 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image   = grasppeScreen3(image, ppi, spi, lpi, theta, print);
       
+      parameters.(CONRES.PPI')      = ppi;
+      parameters.(CONRES.SPI')      = spi;
+      parameters.(CONRES.LPI')      = lpi;
+      parameters.(CONRES.Angle')    = theta;      
+      
+      printParams.(CONRES.TVI')     = print.Gain;
+      printParams.(CONRES.Noise')   = print.Noise;
+      printParams.(CONRES.Radius')  = print.Radius;
+      printParams.(CONRES.Blur')    = print.Blur;
+      
       output.setImage(im2double(image), spi);
       
+      variables.Print   = printParams;
+      variables.Screen  = parameters;
+      
+      obj.Variables = variables;
     end
   end
   

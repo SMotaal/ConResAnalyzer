@@ -44,7 +44,16 @@ classdef Process < Grasppe.Occam.ProcessData % handle & matlab.mixin.Heterogeneo
     function obj = Process()
       obj = obj@Grasppe.Occam.ProcessData();
       obj.Type = class(obj);
-      % obj.Name = eval(CLASS);
+      try
+        typeName  = char(regexp(obj.Type, '(?=.)\w*$', 'match'));
+      end
+
+      instanceNumber = 1;
+      try instanceNumber = Grasppe.Occam.Singleton.Get.Names.(typeName) + 1; end
+      Grasppe.Occam.Singleton.Get.Names.(typeName) = instanceNumber + 1;
+      
+      obj.Name = [typeName int2str(instanceNumber)];
+      
     end
     
     function set.Status(obj, value)
@@ -84,14 +93,20 @@ classdef Process < Grasppe.Occam.ProcessData % handle & matlab.mixin.Heterogeneo
       output = obj.Output;
     end
     
-    function output = InitializeProcess(obj, input)
-      output      = input;
+    function input = InitializeProcess(obj, input)
+      % intput        = input;
+      
       notify(obj, 'ExecutionStarted');
+      
+      try obj.Variables = input.Variables; end
+            
       obj.Results = obj.NO_ERRORS;
       obj.Status  = obj.EXECUTING_STATUS;
     end
     
     function output = TerminateProcess(obj, output)
+      output.Variables = obj.Variables;
+      
       output      = output;
       obj.Status  = obj.TERMINATING_STATUS;
       switch obj.Results

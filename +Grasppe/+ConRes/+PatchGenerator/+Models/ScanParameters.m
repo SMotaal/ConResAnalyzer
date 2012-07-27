@@ -20,7 +20,10 @@ classdef ScanParameters < handle
       obj.Scale = scale;
     end
     
-    
   end
+  
+  
+  properties (Dependent), Scan; end
+  methods, function obj = get.Scan(obj), end, end  
 end
   

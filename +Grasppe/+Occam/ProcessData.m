@@ -6,6 +6,7 @@ classdef ProcessData < handle
     Type
     Name
     Parameters
+    Variables = struct;
   end
   
   methods
@@ -29,12 +30,47 @@ classdef ProcessData < handle
       data = Grasppe.Occam.ProcessData(obj.Type, obj.Name, obj.Parameters);
     end
     
+    function S = getDataStruct(obj)
+      S = struct;
+      for m = 1:numel(obj)
+        item = obj(m);
+        try
+          type = item.Type;
+        end
+        
+        if isempty(type), type = class(item); end
+        
+        typeName  = type;
+        
+        try
+          typeName  = char(regexp(typeName, '(?=.)\w*$', 'match'));
+        end        
+        
+        try 
+          name = item.Name;
+        end
+        
+        if isempty(name)
+          instanceNumber = 1;
+          try instanceNumber = Grasppe.Occam.Singleton.Get.Names.(typeName) + 1; end
+          Grasppe.Occam.Singleton.Get.Names.(typeName) = instanceNumber + 1;
+          name = [typeName int2str(instanceNumber)];
+        end
+        
+        try S.(name) = item.Parameters; end
+        
+      end
+    end
+    
+    
+    
     function S = saveobj(obj)
       % Save property values in struct
       % Return struct for save function to write to MAT-file
       S.Type        = obj.Type;
       S.Name        = obj.Name;
       S.Parameters  = obj.Parameters;
+      S.Variables   = obj.Variables;
     end
     
     function display(obj)
@@ -68,6 +104,13 @@ classdef ProcessData < handle
 
         dispf('%s [%s]:', name, type);
         
+        try
+          disp(structTree(struct('Variables',obj(m).Variables),2,['\t' name]));
+        catch err
+          dispf(['\t' name '.Variables'])
+          disp(obj(m));
+        end        
+        
         
         try
           disp(structTree(struct('Parameters',obj(m).Parameters),2,['\t' name]));
@@ -86,6 +129,7 @@ classdef ProcessData < handle
       obj.Type        = S.Type;
       obj.Name        = S.Name;
       obj.Parameters  = S.Parameters;
+      obj.Variables   = S.Variables;
     end
   end
   

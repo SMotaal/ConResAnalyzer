@@ -6,9 +6,12 @@ classdef Print < Grasppe.Occam.Process
   end
   
   methods
-        
+    
     function output = Run(obj)
+      variables = obj.Variables;
       output = [];
+      obj.Variables = variables;
+      
     end
     
   end

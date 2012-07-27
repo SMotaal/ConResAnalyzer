@@ -142,6 +142,9 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
           elseif strfind(fnl, 'function')==1;
             disp(fn);
             Processors.(fnl) = parameters.(fn);
+          elseif strfind(fnl, 'display')==1;
+            disp(fn);
+            Processors.(fnl) = parameters.(fn);
           else
             % beep;
           end

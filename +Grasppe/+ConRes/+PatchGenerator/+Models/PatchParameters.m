@@ -8,7 +8,7 @@ classdef PatchParameters < handle
     Resolution
     Size
   end
-  
+    
   methods
     
     function obj = PatchParameters(meanTone, contrast, resolution, size)
@@ -23,8 +23,11 @@ classdef PatchParameters < handle
       obj.Resolution = resolution;
       obj.Size = size;
     end
-    
+        
   end
+  
+  properties (Dependent), Patch; end
+  methods, function obj = get.Patch(obj), end, end  
   
 end
 
