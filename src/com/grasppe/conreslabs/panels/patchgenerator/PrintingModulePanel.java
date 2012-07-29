@@ -47,7 +47,7 @@ public class PrintingModulePanel extends JiveModulePanel {
     // // Patch Size (mm)
     // patchSizeComponent = (JiveNumericField)createNumericField("Patch-Size", patchSizeValue, "Patch Size", 3.0, 16.0, "mm", 8);
 
-    addField(TinyJiveFieldFactory().createNumericField("Gain", "Dot Gain", 0, 0, 100, "%"));
+    addField(TinyJiveFieldFactory().createNumericField("Gain", "Dot Gain", 0, -100, 100, "%"));
     addField(TinyJiveFieldFactory().createNumericField("Noise", "Noise", 0, 0, 100, "%"));
     addField(TinyJiveFieldFactory().createNumericField("Blur", "Blur", 0, 0, 100, "%"));
     addField(TinyJiveFieldFactory().createNumericField("Radius", "Radius", 0, 0, 100, "spots"));

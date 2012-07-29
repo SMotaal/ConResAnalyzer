@@ -11,6 +11,7 @@
 
 package com.grasppe.conreslabs.panels;
 
+import com.grasppe.conreslabs.panels.imageprocessors.DisplayModulePanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FourierModulePanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FunctionModulePanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PatchModulePanel;
@@ -57,6 +58,7 @@ public class PatchGeneratorParametersPanel extends JiveModuleContainer implement
   private ScanningModulePanel  scanningModulePanel;
   private JiveModulePanel   fourierModulePanel;
   private FunctionModulePanel  functionModulePanel;
+  private DisplayModulePanel displayModulePanel;
 
   /*
    *  (non-Javadoc)
@@ -73,15 +75,17 @@ public class PatchGeneratorParametersPanel extends JiveModuleContainer implement
     printingModulePanel  = new PrintingModulePanel();
     scanningModulePanel  = new ScanningModulePanel();
 
-    fourierModulePanel   = new FourierModulePanel();
-    // functionModulePanel  = new FunctionModulePanel();
+    // fourierModulePanel   = new FourierModulePanel();
+    // displayModulePanel   = new DisplayModulePanel();
+    functionModulePanel  = new FunctionModulePanel();
 
     this.createPermanentPanel(patchModulePanel, null);					// "Patch Parameters");
     this.createPermanentPanel(screeningModulePanel, null);			// "Screen Parameters");
     this.createPermanentPanel(printingModulePanel, null);			// "Print Parameters");
     this.createPermanentPanel(scanningModulePanel, null);			// "Scan Parameters");
-    // this.createPanel(functionModulePanel, null, null);				// "Fourier Parameters");
-    this.createPanel(fourierModulePanel, null, null);				// "Fourier Parameters");
+    this.createPanel(functionModulePanel, null, null);				// "Fourier Parameters");
+    // this.createPanel(fourierModulePanel, null, null);				// "Fourier Parameters");
+    // this.createPanel(displayModulePanel, null, null);				// "Fourier Parameters");
   }
 
   /**

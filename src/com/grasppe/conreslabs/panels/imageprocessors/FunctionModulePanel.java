@@ -46,7 +46,7 @@ public class FunctionModulePanel extends JiveModulePanel {
   protected void createFields() {
 	  
     addField(DefaultJiveFieldFactory().createTextField("ID", "ID", getTitle(), ""));
-    addField(LongJiveFieldFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
+    addField(LongJiveFieldFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)", "fourier(0);", ""));
 //    addField(DefaultFactory().createTextField(getTitle() + "-ID", "ID", getTitle(), ""));
 //    addField(LongFactory().createTextField(getTitle() + "-Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
 

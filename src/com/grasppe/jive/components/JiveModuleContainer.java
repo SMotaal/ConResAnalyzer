@@ -12,6 +12,7 @@
 package com.grasppe.jive.components;
 
 import com.grasppe.conres.framework.imagej.newFrame;
+import com.grasppe.conreslabs.panels.imageprocessors.DisplayModulePanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FourierModulePanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FunctionModulePanel;
 import com.grasppe.conreslabs.panels.patchgenerator.PatchModulePanel;
@@ -38,6 +39,7 @@ import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
@@ -51,6 +53,7 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.lang.reflect.Method;
 import java.text.ParseException;
 
 import java.util.Arrays;
@@ -153,7 +156,8 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 		     @Override
 		     public void run() {
 		    	 component.grabFocus();
-		    	 component.requestFocus();          
+		    	 component.requestFocus(); 
+		    	 component.transferFocus();
 		     }
 		});
 	  
@@ -230,12 +234,14 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   /**
    */
   protected void addNewPanel() {
-    String[] panelTypes = { "Function", "Fourier" };
+    String[] panelTypes = { "Function", "Fourier", "Display" };
 
     String   panelType  = ListDialog.showDialog(null, null, "Available Components", "Create New Component", panelTypes, "Function",
                                              "Function         ");
 
     createNewPanel(panelType, null);
+    
+    firePropertyChange("Panel.Layout", null, null);
 
   }
 
@@ -385,22 +391,29 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
     addButton = this.createButton("+", "Add",
             KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.META_DOWN_MASK));		// KeyEvent.VK_A,0)); // KeyEvent.META_DOWN_MASK));
+    addButton.setName("AddPanelButton");
 
     removeButton = this.createButton("Ñ", "Remove",
             KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
               KeyEvent.META_DOWN_MASK));		// KeyEvent.VK_A,0)); // KeyEvent.META_DOWN_MASK));
+    removeButton.setName("RemovePanelButton");
 
     upButton    = this.createButton("\u2191", "MoveUp", KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.META_DOWN_MASK));
+    upButton.setName("MovePanelUpButton");
 
     downButton  = this.createButton("\u2193", "MoveDown", KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.META_DOWN_MASK));
+    downButton.setName("MovePanelDownButton");
 
     applyButton = this.createButton("\u23ce", "Apply", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+    applyButton.setName("ApplySettingsButton");
 
     copyButton  = this.createButton("\u2397", "Copy",
                                    KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
+    copyButton.setName("CopySettingsButton");
 
     pasteButton = this.createButton("\u2398", "Paste",
                                     KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
+    pasteButton.setName("PasteSettingsButton");
 
 //  //applyButton.setIcon(new Icon)
 //  try {
@@ -497,6 +510,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
     if (panelType.equals("Function")) newPanel = new FunctionModulePanel();
     else if (panelType.equals("Fourier")) newPanel = new FourierModulePanel();
+    else if (panelType.equals("Display")) newPanel = new DisplayModulePanel();
     else if (panelType.equals("Patch")) newPanel = new PatchModulePanel();
     else if (panelType.equals("Screening")) newPanel = new ScreeningModulePanel();
     else if (panelType.equals("Printing")) newPanel = new PrintingModulePanel();
@@ -809,7 +823,11 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
     updatePanels();
 
-    focusOwner.requestFocus();
+    try {
+    	focusOwner.requestFocus();
+    } catch (Exception exception) {
+    	GrasppeKit.debugError("ContainerPanel>Move>Focus", exception, 2);
+    }
   }
 
   /**
@@ -868,40 +886,6 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
   }
 
-///**
-// *    @param args
-// */
-//public static void main(String[] args) {
-//
-//  // Schedule a job for the event dispatch thread:
-//  // creating and showing this application's GUI.
-//  SwingUtilities.invokeLater(new Runnable() {
-//
-//    public void run() {
-//
-//      JFrame frame = new JFrame("PatchGeneratorParametersPanel Demo");
-//
-//      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//      // Add contents to the window.
-//      frame.getContentPane().setLayout(new BorderLayout());
-//      frame.getContentPane().add(new JiveModuleContainer(), BorderLayout.EAST);
-//
-//      // Display the window.
-//      frame.pack();
-//
-////      Dimension  preferredSize = frame.getPreferredSize();
-////      Dimension  maximumSize   = frame.getMaximumSize();        // getPreferredSize();
-////      Dimension  newSize       = new Dimension(maximumSize.width, preferredSize.height);
-////      
-////      frame.setMaximumSize(maximumSize);
-//
-//      frame.setVisible(true);
-//    }
-//
-//  });
-//}
-
   /**
    * @param arg0
    * @see java.util.LinkedList#remove(int)
@@ -937,6 +921,13 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     modules.remove(currentIndex);
 
     updatePanels();
+    
+    currentIndex = Math.min(currentIndex, modules.size()-1);
+    
+    if (currentIndex>-1)
+    	modules.get(currentIndex).requestFocus();
+    
+    firePropertyChange("Panel.Layout", null, null);
 
   }
   
@@ -960,6 +951,8 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     modules.clear(); //(currentIndex);
 
     updatePanels();
+    
+    firePropertyChange("Panel.Layout", null, null);
 
   }
   
@@ -996,8 +989,9 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 //    
 //    target.setSize(new Dimension(500, containerPanel.getHeight()));
     try {
-    getParent().invalidate();
-    getParent().validate();
+    	getParent().validate();
+    	getParent().invalidate();
+    	getParent().validate();
     } catch (Exception exception) {
     	GrasppeKit.debugError("ContainerPanel>Revalidate>Parent", exception, 2);
     }
@@ -1014,6 +1008,9 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
    */
   protected void updatePanels() {
     contentPanel.removeAll();
+    
+    contentPanel.validate();
+    contentPanel.repaint();    
 
     contentPanel.setFont(listFont);
 
@@ -1047,7 +1044,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 //    updateGrid();
 
 //    
-      panel.revalidate();
+      // panel.revalidate();
 
       panel.flowResize();
 
@@ -1060,10 +1057,15 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     // contentPanel.add(Box.createVerticalGlue());
 
 //  setSize(new Dimension(500, getHeight()));
+    
+    contentPanel.revalidate();
+    contentPanel.repaint();
 
     revalidate();
-
     updateGrid();
+    
+    contentPanel.validate();
+    contentPanel.repaint();
 
 //    
 
@@ -1077,6 +1079,26 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   public JiveModulePanel get(int arg0) {
     return modules.get(arg0);
   }
+  
+  
+  public void enableFullScreenMode(Window window) {
+      String className = "com.apple.eawt.FullScreenUtilities";
+      String methodName = "setWindowCanFullScreen";
+
+      try {
+          Class<?> clazz = Class.forName(className);
+          Method method = clazz.getMethod(methodName, new Class<?>[] {
+                  Window.class, boolean.class });
+          method.invoke(null, window, true);
+      } catch (Throwable t) {
+          System.err.println("Full screen mode is not supported");
+          t.printStackTrace();
+      }
+  }
+  
+  private static boolean isMacOSX() {
+      return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
+  }  
 
 ///**
 // * @param scanningParametersPanel the scanningParametersPanel to set
