@@ -11,10 +11,13 @@
 
 package com.grasppe.conreslabs.panels.imageprocessors;
 
+import com.grasppe.jive.components.JiveField;
+import com.grasppe.jive.components.JiveModulePanel;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
-import com.grasppe.jive.components.JiveModulePanel;
 
 /**
  * Class description
@@ -22,16 +25,8 @@ import com.grasppe.jive.components.JiveModulePanel;
  *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class FunctionModulePanel extends JiveModulePanel {
-	
-	/**
-	 * @param name
-	 * @param title
-	 */
-	public FunctionModulePanel(String name, String title) {
-		super(name, title);
-	}
 
-	protected static int instances = 0;
+  protected static int instances = 0;
 
   /**
    * Create the panel.
@@ -41,28 +36,27 @@ public class FunctionModulePanel extends JiveModulePanel {
   }
 
   /**
+   * @param name
+   * @param title
+   */
+  public FunctionModulePanel(String name, String title) {
+    super(name, title);
+  }
+
+  /**
    */
   @Override
   protected void createFields() {
-	  
-    addField(DefaultJiveFieldFactory().createTextField("ID", "ID", getTitle(), ""));
-    addField(LongJiveFieldFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)", "fourier(0);", ""));
-//    addField(DefaultFactory().createTextField(getTitle() + "-ID", "ID", getTitle(), ""));
-//    addField(LongFactory().createTextField(getTitle() + "-Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
+    JiveField idField = DefaultJiveFieldFactory().createTextField("ID", "ID", getTitle(), "");
 
+    addField(idField);
+    addField(LongJiveFieldFactory().createTextField("Expression", "\u0192(\uD835\uDCCD)",
+                                                    "subtract(patchFFT,subtract(patchFFT,idealFFT));", ""));
+
+    // addField(DefaultFactory().createTextField(getTitle() + "-ID", "ID", getTitle(), ""));
+    // addField(LongFactory().createTextField(getTitle() + "-Expression", "\u0192(\uD835\uDCCD)", "x;", ""));
+    idField.setVisible(false);
   }
-  
-
-  /* (non-Javadoc)
-	 * @see com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel#setValue(java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void setValue(String name, Object newValue) {
-		super.setValue(name, newValue);
-		
-		if (name.equals("ID")) setTitle((String) newValue);
-		
-	}  
 
   /**
    *    @param args
@@ -88,5 +82,22 @@ public class FunctionModulePanel extends JiveModulePanel {
       }
 
     });
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conreslabs.panels.imageprocessors.JiveParametersPanel#setValue(java.lang.String, java.lang.Object)
+   */
+
+  /**
+   * 	@param name
+   * 	@param newValue
+   */
+  @Override
+  public void setValue(String name, Object newValue) {
+    super.setValue(name, newValue);
+
+    if (name.equals("ID")) setTitle((String)newValue);
+
   }
 }

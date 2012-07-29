@@ -236,10 +236,11 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   protected void addNewPanel() {
     String[] panelTypes = { "Function", "Fourier", "Display" };
 
-    String   panelType  = ListDialog.showDialog(null, null, "Available Components", "Create New Component", panelTypes, "Function",
-                                             "Function         ");
-
-    createNewPanel(panelType, null);
+//    String   panelType  = ListDialog.showDialog(null, null, "Available Components", "Create New Component", panelTypes, "Function",
+//                                             "Function         ");
+//    createNewPanel(panelType, null);
+    
+    createNewPanel("Function", null);
     
     firePropertyChange("Panel.Layout", null, null);
 
