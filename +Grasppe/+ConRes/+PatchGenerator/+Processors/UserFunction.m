@@ -23,66 +23,117 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     end
     
     function sandbox(obj, params, output)
-      fourier       = @(varargin) obj.fourier(varargin{:});
-      forwardFFT    = @(varargin) obj.forwardFFT(varargin{:});
-      inverseFFT    = @(varargin) obj.inverseFFT(varargin{:});
-      
-      display       = @(varargin) obj.display(varargin{:});
-      
-      add           = @(varargin) obj.algebra('add', varargin{:});
-      subtract      = @(varargin) obj.algebra('subtract', varargin{:});
-      multiply      = @(varargin) obj.algebra('multiply', varargin{:});
-      divide        = @(varargin) obj.algebra('divide', varargin{:});
-      
-      processData = output.ProcessData;
-      %resolution = @
-      
-      % fx = varargin{1};
-      
-      structVars(obj.Variables);
-      
-      structVars(params);
-      
-      s = processData.getDataStruct();
-      
-      % Patch   = s.Patch1;
-      % Screen  = s.Screen1;
-      % Print   = s.Screen1.PrintParameters;
-      % Scan    = s.Scan1;
-      
-      structVars(s);
-      clear s;
-      
-      image = output.Image;
-      
       try
-        image = eval(findField(params, 'expression'));
-      catch err
+        fourier       = @(varargin) obj.fourier(varargin{:});
+        forwardFFT    = @(varargin) obj.forwardFFT(varargin{:});
+        inverseFFT    = @(varargin) obj.inverseFFT(varargin{:});
+        
+        display       = @(varargin) obj.display(varargin{:});
+        
+        add           = @(varargin) obj.algebra('add', varargin{:});
+        subtract      = @(varargin) obj.algebra('subtract', varargin{:});
+        multiply      = @(varargin) obj.algebra('multiply', varargin{:});
+        divide        = @(varargin) obj.algebra('divide', varargin{:});
+        
+        % store         = @(varargin) obj.store(varargin{:});
+        
+        processData   = output.ProcessData;
+        
+        structVars(obj.Variables);
+        
+        structVars(params);
+        
+        s = processData.getDataStruct();
+        
+        structVars(s);
+        clear s;
+        
+        image = output.Image;
+        
+        patchImage    = PatchImage.Image;
+        patchFFT      = PatchImage.Fourier;
+        idealImage    = ReferenceImage.Image;
+        idealFFT      = ReferenceImage.Fourier;
+        screenImage   = HalftoneImage.Image;
+        screenFFT     = HalftoneImage.Fourier;
+        
+        err = [];
+        coreVars = [];
+        expression = [];
+        
         try
-          eval(findField(params, 'expression'));
+          expression  = findField(params, 'expression');
+          expression  = strrep(expression, '/', ',');
         end
+        
+        coreVars = who;
+        
+        try
+          image = eval(expression);
+        catch err
+          try
+            eval(expression);
+          end
+        end
+        
+        allVars = who;
+        newVars = {};
+        
+        for m = 1:numel(allVars)
+          try
+            n = allVars{m};
+            v = eval(n);
+            c = any(strcmpi(coreVars, n));
+            if c==0
+              disp([n ' = ' toString(v) ' (' class(v) ')']);
+              output.Variables.(n) = v;
+              newVars{end+1} = n;
+            end
+          catch err
+            disp(err);
+          end
+        end
+        
+        output.Image = image;
+        
+        if ~isreal(image)
+          output.Domain = 'frequency';
+        end
+        
+        return;
+      catch err
+        disp(err);
       end
-      
-      output.Image = image;
-      
-      return;
+    end
+    
+    function image = store(obj, varargin)
+      output  = evalin('caller', 'output');
+      image   = evalin('caller', 'image');
     end
     
     function image = algebra(obj, operation, varargin)
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
       
-      switch lower(operation)
-        case 'add'
-          disp('Adding...');
-        case 'subtract'
-          disp('Subtracting...');
-        case 'multiply'
-          disp('Multiplying...');
-        case 'divide'
-          disp('Dividing...');
-        otherwise
-          warning('Cannot perform %s operation because it is not support.', toString(operation));
+      try
+        switch lower(operation)
+          case 'add'
+            disp('Adding...');
+            image = varargin{1}+varargin{2};
+          case 'subtract'
+            disp('Subtracting...');
+            image = varargin{1}-varargin{2};
+          case 'multiply'
+            disp('Multiplying...');
+            image = varargin{1}.*varargin{2};
+          case 'divide'
+            disp('Dividing...');
+            image = varargin{1}./varargin{2};
+          otherwise
+            warning('Cannot perform %s operation because it is not support.', toString(operation));
+        end
+      catch err
+        disp(err);
       end
     end
     

@@ -16,11 +16,11 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     
     function obj = PatchGeneratorProcessor()
       obj = obj@Grasppe.Occam.Process;
-%       obj.PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
-%       obj.ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
-%       obj.PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
-%       obj.ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
-%       obj.UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
+      %       obj.PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
+      %       obj.ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
+      %       obj.PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
+      %       obj.ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
+      %       obj.UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
       obj.permanent = true;
       obj.addProcess(obj.PatchProcessor);
       obj.addProcess(obj.ScreenProcessor);
@@ -34,12 +34,13 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       obj.addProcess@Grasppe.Occam.Process(process);
       process.Controller  = obj;
       process.View        = obj.View;
-    end    
+    end
     
     function output = Run(obj)
       output      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
       reference   = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
       patch       = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      screen      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
       
       panel       = obj.View;
       
@@ -91,7 +92,9 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         parameters.Screen.PrintParameters = parameters.Print;
         
         screenProcessor.Execute(parameters.Screen);
+        
         screenedImage = output.Image;
+        screenImage = screenProcessor.HalftoneImage;
         
         %% Scan Patch
         scanProcessor.Execute(parameters.Scan);
@@ -99,14 +102,19 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         %% Patch & Reference Images
         referenceImage = imresize(patchImage, size(scannedImage));
-        reference.setImage(referenceImage, output.Resolution);
+        screenImage = imresize(screenImage, size(scannedImage));
         
         patch.setImage(scannedImage, output.Resolution);
+        reference.setImage(referenceImage, output.Resolution);
+        screen.setImage(screenImage, output.Resolution);        
         
         output.Variables.PatchImage     = patch;
         output.Variables.ReferenceImage = reference;
+        output.Variables.HalftoneImage  = screen;
+        
+        output.snap('GeneratedPatch');
       catch err
-        disp(err);        
+        disp(err);
       end
       
       try
@@ -120,6 +128,9 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           fxProcessor.Parameters = fx;
           fxProcessor.Execute;
           disp(fx);
+          id = char(fxName);
+          try id = char(fx.Expression); end
+          output.snap(id);
         end
         
       end
@@ -127,19 +138,76 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       try
         
-        image = output.Image;
+        images  = output.Snapshots(:,1);
+        ids     = output.Snapshots(:,2);
         
+        images{end+1} = output.Image;
+        ids{end+1}    = 'FinalOutput';
         
-        if isequal(output.Domain,'frequency')
-          image     = real(log(1+abs(image)));
-          imageMin  = min(image(:)); imageMax = max(image(:));
-          image     = (image-imageMin) / (imageMax-imageMin);
+        images{end+1} = output.Fourier;
+        ids{end+1}    = 'FinalFFT';
+        
+        tXY = {0.5, 0.95};
+        tOp = {'Units', 'normalized', ...
+          'HorizontalAlignment', 'center', ...
+          'VerticalAlignment', 'middle', ...
+          'BackgroundColor', [1 1 1], ...
+          'FontSize', 6, 'FontName', 'DIN', 'FontUnits', 'points'};
+        
+        for m = 1:numel(images)-2
+          image = images{m};
+          
+          fftMode = ~isreal(image);
+          
+          if fftMode
+            panel.setImage(output.inverseFFT(image));
+            try
+              T   = [ids{m} ' inv'];
+              hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
+              alpha(hT, 0.75);
+            end
+            image     = real(log(1+abs(image)));
+            imageMin  = min(image(:)); imageMax = max(image(:));
+            image     = (image-imageMin) / (imageMax-imageMin);
+          end
+          panel.setImage(image);
+          
+          try
+            T   = [ids{m}];
+            hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
+            alpha(hT, 0.75);
+          end
+          
+          
+          if ~fftMode
+            image     = output.forwardFFT(image);
+            image     = real(log(1+abs(image)));
+            imageMin  = min(image(:)); imageMax = max(image(:));
+            image     = (image-imageMin) / (imageMax-imageMin);
+            
+            panel.setImage(image);
+            try
+              T   = [ids{m} ' fwd'];
+              hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
+              alpha(hT, 0.75);
+            end
+          end
+          %ti(ids{m});
         end
+        
+        %         image = output.Image;
+        %
+        %
+        %         if isequal(output.Domain,'frequency')
+        %           image     = real(log(1+abs(image)));
+        %           imageMin  = min(image(:)); imageMax = max(image(:));
+        %           image     = (image-imageMin) / (imageMax-imageMin);
+        %         end
         %elseif output.Domain = 'spatial'
         
-        panel.setImage(image);
-%         panel.setImage(image);
-%         panel.setImage(image);
+        %panel.setImage(image);
+        %         panel.setImage(image);
+        %         panel.setImage(image);
         
         set(gcf,'Name','ConRes');
       catch err

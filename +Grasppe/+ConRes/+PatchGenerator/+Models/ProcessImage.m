@@ -18,6 +18,7 @@ classdef ProcessImage < handle
   
   properties
     Variables = struct;
+    Snapshots = {};
   end
   
   properties (Access=private)
@@ -150,12 +151,28 @@ classdef ProcessImage < handle
       image = fftshift(fft2(image, fP, fQ));
     end
     
+    function image = inverseFFT(obj, image)
+      % Unpadding
+      sP  = size(image,1);
+      sQ  = size(image,2);
+      fP  = ceil(sP/2);
+      fQ  = ceil(sQ/2);
+      image = ifft2(ifftshift(image)); %, fP, fQ);
+      image = image(1:fP, 1:fQ);
+    end
+    
+    
     
     function set.Image(obj, image)
       if ~isequal(obj.image, image)
         obj.image = image;
         obj.updateMetadata();
       end
+    end
+    
+    function snap(obj, id)
+      obj.Snapshots{end+1,1} = obj.Image;
+      obj.Snapshots{end,2} = id;
     end
     
     function updateMetadata(obj)
