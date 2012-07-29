@@ -16,17 +16,32 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     
     function obj = PatchGeneratorProcessor()
       obj = obj@Grasppe.Occam.Process;
+%       obj.PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
+%       obj.ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
+%       obj.PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
+%       obj.ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
+%       obj.UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
       obj.permanent = true;
       obj.addProcess(obj.PatchProcessor);
       obj.addProcess(obj.ScreenProcessor);
       obj.addProcess(obj.PrintProcessor);
       obj.addProcess(obj.ScanProcessor);
+      obj.addProcess(obj.UserProcessor);
       % obj.addProcess(obj.DisplayProcessor);
     end
     
+    function addProcess(obj, process)
+      obj.addProcess@Grasppe.Occam.Process(process);
+      process.Controller  = obj;
+      process.View        = obj.View;
+    end    
+    
     function output = Run(obj)
-      output  = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-      panel   = obj.View;
+      output      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      reference   = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      patch       = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      
+      panel       = obj.View;
       
       patchProcessor    = obj.PatchProcessor;
       screenProcessor   = obj.ScreenProcessor;
@@ -81,6 +96,15 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         %% Scan Patch
         scanProcessor.Execute(parameters.Scan);
         scannedImage = output.Image;
+        
+        %% Patch & Reference Images
+        referenceImage = imresize(patchImage, size(scannedImage));
+        reference.setImage(referenceImage, output.Resolution);
+        
+        patch.setImage(scannedImage, output.Resolution);
+        
+        output.Variables.PatchImage     = patch;
+        output.Variables.ReferenceImage = reference;
       catch err
         disp(err);        
       end

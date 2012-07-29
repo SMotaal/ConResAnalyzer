@@ -12,6 +12,7 @@ classdef ProcessImage < handle
     Process
     ProcessData
     Image
+    Fourier
     Domain
   end
   
@@ -125,6 +126,30 @@ classdef ProcessImage < handle
     function image = get.Image(obj)
       image = obj.image;
     end
+    
+    function image = get.Fourier(obj)
+      image = obj.Image;
+      switch (obj.Domain)
+        case 'frequency'
+        otherwise
+          image = obj.forwardFFT(image);
+      end
+    end
+    
+    function image = forwardFFT(obj, image)
+      % Sizing & Padding
+      sP  = size(image,1);
+      sQ  = size(image,2);
+      nP  = 1-mod(sP,2);
+      nQ  = 1-mod(sQ,2);
+      fP  = ceil(2*(sP-nP));
+      fQ  = ceil(2*(sQ-nQ));
+      
+      image = image(1:end-(nP),1:end-(nQ));
+      
+      image = fftshift(fft2(image, fP, fQ));
+    end
+    
     
     function set.Image(obj, image)
       if ~isequal(obj.image, image)

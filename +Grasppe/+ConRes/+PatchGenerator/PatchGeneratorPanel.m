@@ -6,7 +6,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     jParametersPanel, hParametersPanel
     jApplyButton, hApplyButton
     jFrame, hFrame;
-    jPane;
     
     jReferences = {'jParametersPanel', 'hParametersPanel', ...
       'jApplyButton', 'hApplyButton', ...
@@ -17,13 +16,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     hAxes={};
     
     jComponents={};
-        
-    % jPatchParametersPanel, hPatchParametersPanel
-    % jScreenParametersPanel, hScreenParametersPanel
-    % jPrintParametersPanel, hPrintParametersPanel
-    % jScanParametersPanel, hScanParametersPanel
-    % jImagePanel, hImagePanel
-    % hScrollPane;
 
   end
   
@@ -86,7 +78,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       [jPanel hPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel','East');
       
       obj.jParametersPanel    = jPanel;
-      obj.hParametersPanel    = hPanel;
+      obj.hParametersPanel    = handle(jPanel,'CallbackProperties');
       
       obj.jComponents{end+1}  = jPanel;
             
@@ -132,8 +124,8 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
               drawnow expose update;      
               obj.jParametersPanel.repaint;
               try obj.jFrame.fHG1Client.toFront(); end
-              obj.jParametersPanel.grabFocus();
-              obj.jParametersPanel.transferFocus();
+              %obj.jParametersPanel.grabFocus();
+              %obj.jParametersPanel.transferFocus();
 %               obj.jParametersPanel.grabFocus();
 %               obj.jParametersPanel.transferFocus();
             end

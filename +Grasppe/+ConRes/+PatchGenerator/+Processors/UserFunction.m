@@ -23,10 +23,16 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     end
     
     function sandbox(obj, params, output)
-      fourier   = @(varargin) obj.fourier(varargin{:});
-      forwardFFT   = @(varargin) obj.forwardFFT(varargin{:});
-      inverseFFT   = @(varargin) obj.inverseFFT(varargin{:});
-      display   = @(varargin) obj.display(varargin{:});
+      fourier       = @(varargin) obj.fourier(varargin{:});
+      forwardFFT    = @(varargin) obj.forwardFFT(varargin{:});
+      inverseFFT    = @(varargin) obj.inverseFFT(varargin{:});
+      
+      display       = @(varargin) obj.display(varargin{:});
+      
+      add           = @(varargin) obj.algebra('add', varargin{:});
+      subtract      = @(varargin) obj.algebra('subtract', varargin{:});
+      multiply      = @(varargin) obj.algebra('multiply', varargin{:});
+      divide        = @(varargin) obj.algebra('divide', varargin{:});
       
       processData = output.ProcessData;
       %resolution = @
@@ -60,6 +66,24 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       output.Image = image;
       
       return;
+    end
+    
+    function image = algebra(obj, operation, varargin)
+      output  = evalin('caller', 'output');
+      image   = evalin('caller', 'image');
+      
+      switch lower(operation)
+        case 'add'
+          disp('Adding...');
+        case 'subtract'
+          disp('Subtracting...');
+        case 'multiply'
+          disp('Multiplying...');
+        case 'divide'
+          disp('Dividing...');
+        otherwise
+          warning('Cannot perform %s operation because it is not support.', toString(operation));
+      end
     end
     
     function image = display(obj, varargin)

@@ -1,4 +1,4 @@
-classdef Process < Grasppe.Occam.ProcessData % handle & matlab.mixin.Heterogeneous
+classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle & matlab.mixin.Heterogeneous
   %GENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
@@ -43,6 +43,7 @@ classdef Process < Grasppe.Occam.ProcessData % handle & matlab.mixin.Heterogeneo
     
     function obj = Process()
       obj = obj@Grasppe.Occam.ProcessData();
+      obj = obj@Grasppe.Core.Prototype();
       obj.Type = class(obj);
       try
         typeName  = char(regexp(obj.Type, '(?=.)\w*$', 'match'));

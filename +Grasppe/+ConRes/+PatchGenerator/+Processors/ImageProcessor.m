@@ -3,9 +3,17 @@ classdef ImageProcessor < Grasppe.Occam.Process
   %   Detailed explanation goes here
   
   properties
+    View
+    Controller
   end
   
   methods
+    
+%     function obj = ImageProcessor(view)
+%       obj = obj@Grasppe.Occam.Process();
+%       obj.View = view;
+%     end
+    
     
     function input = InitializeProcess(obj, input)
       
@@ -41,8 +49,8 @@ classdef ImageProcessor < Grasppe.Occam.Process
       %         obj.TerminateProcess@Grasppe.Occam.Process(output);
       %       elseif nargout > 0
       output.Variables = obj.Variables;
-        output = obj.TerminateProcess@Grasppe.Occam.Process(output);
-%       end
+      output = obj.TerminateProcess@Grasppe.Occam.Process(output);
+      %       end
     end
     
     
