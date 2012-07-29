@@ -25,7 +25,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     end
     
     function output = Run(obj)
-      output = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      output  = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      panel   = obj.View;
       
       patchProcessor    = obj.PatchProcessor;
       screenProcessor   = obj.ScreenProcessor;
@@ -41,33 +42,29 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       % ffScreening( contone, resolution, title, spi, lpi, dpi, angles, noise)
       
-      try
-        %         % Screening
-        %         addressability  = findField(parameters.Screen, 'addressability');
-        %         screenlpi       = findField(parameters.Screen, 'resolution');
-        %         screenangle     = findField(parameters.Screen, 'angle');
-        
-        % Printing
-        tvi             = findField(parameters.Print, 'gain');
-        noise           = findField(parameters.Print, 'noise');
-        blur            = findField(parameters.Print, 'blur');
-        spread          = findField(parameters.Print, 'radius');
-        
-        % Scanning
-        scanpdi         = findField(parameters.Scan, 'resolution');
-        scanscale       = findField(parameters.Scan, 'scale');
-        
-        
-        % Overloads
-        width           = 256;
-        
-      end
+      % try
+      %   % Printing
+      %   tvi             = findField(parameters.Print, 'gain');
+      %   noise           = findField(parameters.Print, 'noise');
+      %   blur            = findField(parameters.Print, 'blur');
+      %   spread          = findField(parameters.Print, 'radius');
+      %
+      %   % Scanning
+      %   scanpdi         = findField(parameters.Scan, 'resolution');
+      %   scanscale       = findField(parameters.Scan, 'scale');
+      %
+      %
+      %   % Overloads
+      %   width           = 256;
+      % end
+      
+      panel.clearAxes();
       
       try
         
         %% Fix size
         % parameters.Patch.Size = parameters.Patch.Size/
-      
+        
         %% Generate Patch
         patchProcessor.Execute(parameters.Patch);
         patchImage = output.Image;
@@ -84,7 +81,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         %% Scan Patch
         scanProcessor.Execute(parameters.Scan);
         scannedImage = output.Image;
-        
+      catch err
+        disp(err);        
       end
       
       try
@@ -99,7 +97,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           fxProcessor.Execute;
           disp(fx);
         end
-
+        
       end
       
       
@@ -107,19 +105,22 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         image = output.Image;
         
-
+        
         if isequal(output.Domain,'frequency')
           image     = real(log(1+abs(image)));
           imageMin  = min(image(:)); imageMax = max(image(:));
           image     = (image-imageMin) / (imageMax-imageMin);
         end
         %elseif output.Domain = 'spatial'
-
-        obj.View.setImage(image);
-                
-        set(gcf,'Name','ConRes');
         
-      end      
+        panel.setImage(image);
+%         panel.setImage(image);
+%         panel.setImage(image);
+        
+        set(gcf,'Name','ConRes');
+      catch err
+        disp(err);
+      end
       
       drawnow expose update;
       % imshow(imfilter(im2double(grasppeScreen3(img, addressability)), H),'InitialMagnification', 100); set(gcf,'Name',toString(s)); drawnow expose update;

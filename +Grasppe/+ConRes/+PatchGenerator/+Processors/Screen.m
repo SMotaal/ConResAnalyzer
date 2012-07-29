@@ -25,15 +25,15 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image   = grasppeScreen3(image, ppi, spi, lpi, theta, print);
       
-      parameters.(CONRES.PPI')      = ppi;
-      parameters.(CONRES.SPI')      = spi;
-      parameters.(CONRES.LPI')      = lpi;
-      parameters.(CONRES.Angle')    = theta;      
+      parameters.(Grasppe.ConRes.Enumerations.PPI')      = ppi;
+      parameters.(Grasppe.ConRes.Enumerations.SPI')      = spi;
+      parameters.(Grasppe.ConRes.Enumerations.LPI')      = lpi;
+      parameters.(Grasppe.ConRes.Enumerations.Angle')    = theta;      
       
-      printParams.(CONRES.TVI')     = print.Gain;
-      printParams.(CONRES.Noise')   = print.Noise;
-      printParams.(CONRES.Radius')  = print.Radius;
-      printParams.(CONRES.Blur')    = print.Blur;
+      printParams.(Grasppe.ConRes.Enumerations.TVI')     = print.Gain;
+      printParams.(Grasppe.ConRes.Enumerations.Noise')   = print.Noise;
+      printParams.(Grasppe.ConRes.Enumerations.Radius')  = print.Radius;
+      printParams.(Grasppe.ConRes.Enumerations.Blur')    = print.Blur;
       
       output.setImage(im2double(image), spi);
       

@@ -5,18 +5,29 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
   properties
     jParametersPanel, hParametersPanel
     jApplyButton, hApplyButton
-    jPatchParametersPanel, hPatchParametersPanel
-    jScreenParametersPanel, hScreenParametersPanel
-    jPrintParametersPanel, hPrintParametersPanel
-    jScanParametersPanel, hScanParametersPanel
-    jImagePanel, hImagePanel
-    hScrollPane;
-    hFrame;
+    jFrame, hFrame;
+    jPane;
     
+    jReferences = {'jParametersPanel', 'hParametersPanel', ...
+      'jApplyButton', 'hApplyButton', ...
+      'jFrame', 'hFrame', ...
+      'jPane'...
+      };
+
+    hAxes={};
+    
+    jComponents={};
+        
+    % jPatchParametersPanel, hPatchParametersPanel
+    % jScreenParametersPanel, hScreenParametersPanel
+    % jPrintParametersPanel, hPrintParametersPanel
+    % jScanParametersPanel, hScanParametersPanel
+    % jImagePanel, hImagePanel
+    % hScrollPane;
+
   end
   
   events
-    % ParametersChanged
     ParametersApplied
   end
   
@@ -35,18 +46,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       obj.initializePanel;
       
     end
-    %
-    %     function onResize(obj, source, event,hAx)
-    %       %# get axes limits in pixels
-    %       oldUnits = get(hAx, 'Units');    %# backup normalized units
-    %       set(hAx, 'Units','pixels')
-    %       pos = get(hAx, 'Position');
-    %       set(hAx, 'Units',oldUnits)       %# restore units (so it auto-resize)
-    %
-    %       %# display the top left part of the image at magnification 100%
-    %       xlim(hAx, [0 pos(3)]+0.5)
-    %       ylim(hAx, [0 pos(4)]+0.5)
-    %     end
     
     
     function parameters = getParameters(obj)
@@ -59,59 +58,91 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     end
     
     function createPanel(obj)
-      % mjLink
       
       disp('Creating Panel');
       
-      cFigure = get(0,'CurrentFigure');
+      cFrame = get(0,'CurrentFigure');
       
-      oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', 'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL'};
-      
-      if ~isempty(cFigure) && ishandle(cFigure) && isvalid(cFigure)
-        hFrame = figure(cFigure, oFrame{:});
+      oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', ...
+        'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL', ...
+         'CloseRequestFcn', @(src, event) delete(obj) ...
+         };
+            
+      if ~isempty(cFrame) && ishandle(cFrame) && isvalid(cFrame)
+        hFrame = figure(cFrame, oFrame{:});
       else
         hFrame = figure(oFrame{:});
       end
       
-      set(hFrame, 'CloseRequestFcn', @(src, event) delete(obj) );
-      
-      obj.hFrame      = hFrame;     
-      
       jFrame = get(handle(hFrame),'JavaFrame');
       
-      jPane = jFrame.fHG1Client.getContentPane;      
+      obj.jFrame  = jFrame;
+      obj.hFrame  = hFrame;
       
-      obj.jParametersPanel = com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel;
-      jPane.add(obj.jParametersPanel, java.awt.BorderLayout.EAST);
+      jPane = jFrame.fHG1Client.getContentPane;
       
-      obj.jImagePanel = com.grasppe.jive.components.ImagePanel;
-      jPane.add(obj.jImagePanel, java.awt.BorderLayout.CENTER);
+      obj.jPane = jPane;
       
-      obj.jApplyButton = handle(obj.jParametersPanel.getApplyButton(),'CallbackProperties');
+      [jPanel hPanel] = javacomponent('com.grasppe.conreslabs.panels.PatchGeneratorParametersPanel','East');
       
-      set(obj.jApplyButton, 'actionPerformedCallback', @(src, event)obj.applyChanges);
+      obj.jParametersPanel    = jPanel;
+      obj.hParametersPanel    = hPanel;
       
+      obj.jComponents{end+1}  = jPanel;
+            
+      obj.hParametersPanel.PropertyChangeCallback = @(src, e)obj.eventCallback(src, e, 'updatePanel');
+            
+      obj.jApplyButton = obj.jParametersPanel.getApplyButton();
+      obj.hApplyButton = handle(obj.jApplyButton,'CallbackProperties');
+      
+      obj.hApplyButton.ActionPerformedCallback = @(src, e)obj.eventCallback(src, e, 'applyChanges');
       
       drawnow expose update;
       
-      jFrame.fHG1Client.toFront();
-%       
-%       obj.jParametersPanel.grabFocus();
-
+      try obj.jParametersPanel.enableFullScreenMode(jFrame.fHG1Client.getWindow); end
       
+      try jFrame.fHG1Client.toFront(); end
       try jFrame.setMaximized(true); end
       
-      tic; 
-        frame = handle(frame);
-%         set(frame, 'Visible', 'off')
-%         set(frame, 'Visible', 'on');
-        obj.jParametersPanel.grabFocus();
-        obj.jParametersPanel.transferFocus();
-      toc;
+      % frame = handle(frame);
+      obj.jParametersPanel.grabFocus();
+      obj.jParametersPanel.transferFocus();
       
       drawnow expose update;
       
-      % obj.jParametersPanel.transferFocus();      
+    end
+    
+    function eventCallback(obj, source, event, id)
+      
+      e     = get(handle(event));
+      e.id  = id;
+      
+      try e.SourceName  = char(source.getName);   end
+      try e.ToolTipText = source.ToolTipText;     end
+      
+      %structdisp(e);
+      
+      switch id
+        case 'applyChanges'
+          obj.applyChanges;
+        case 'updateImage'
+        case 'updatePanel'
+          try
+            if isequal(e.PropertyName, 'Panel.Layout')
+              drawnow expose update;      
+              obj.jParametersPanel.repaint;
+              try obj.jFrame.fHG1Client.toFront(); end
+              obj.jParametersPanel.grabFocus();
+              obj.jParametersPanel.transferFocus();
+%               obj.jParametersPanel.grabFocus();
+%               obj.jParametersPanel.transferFocus();
+            end
+          catch err
+            disp(err);
+            beep;
+          end
+      end
+      return;
     end
     
     function applyChanges(obj)
@@ -121,14 +152,15 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       parameters = obj.jParametersPanel.getValues();
       
-      try parameters = hashmap2struct(parameters); end %, true); end
-      
+      try parameters = hashmap2struct(parameters); end
       
       try
-        Patch     = parameters.Patch; % Parameters.PatchParameters;
-        Screen    = parameters.Screening; %Parameters.ScreenParameters;
-        Print     = parameters.Printing; % Parameters.PrintParameters;
-        Scan      = parameters.Scanning; % Parameters.ScanParameters;
+        Patch         = parameters.Patch; 
+        Screen        = parameters.Screening; 
+        Print         = parameters.Printing; 
+        Scan          = parameters.Scanning; 
+        
+        Processors    = struct;
         
         for fn = fieldnames(parameters)'
           % fn iterates through the field names of S
@@ -156,6 +188,8 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         obj.PatchGeneratorParameters.Print  = Print;
         obj.PatchGeneratorParameters.Scan   = Scan;
         obj.PatchGeneratorParameters.Processors = Processors;
+      catch err
+        disp(err);
       end
       
       % beep;
@@ -164,53 +198,165 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     function setImage(obj, img)
       disp('Setting Image');
-      if isempty(img)
-        obj.jImagePanel.setPreviewImage(null);
-      else
-        obj.jImagePanel.setPreviewImage(im2java2d(img));
-      end
-        % clf;
-        % hIm = imshow(image); % ,'InitialMagnification', 100, 'Border', 'loose');
-        % hSP = imscrollpanel(gcf,hIm);
-        % obj.hFrame      = hFrame;
-%         obj.jParametersPanel.getWidth
-%         
-%         hScrollpane = obj.hScrollPane;
-% 
-%         hAxes  = axes('Visible', 'off', 'Parent', obj.hFrame);
-%         hImage = image(img,'Visible', 'off', 'Parent', hAxes); %imshow(img, 'Parent', hAxes);
-%         
-%         delete(hAxes);
-%                 
-%         if ~(~isempty(hScrollpane) && ishandle(hScrollpane)) % && isvalid(hScrollpane))
-%           hScrollpane = imscrollpanel(obj.hFrame, hImage);
-%           obj.hScrollPane = hScrollpane;
-%           api = iptgetapi(hScrollpane);
-%         else
-%           api = iptgetapi(hScrollpane);
-%           api.replaceImage(hImage);
-%         end
-%                 
-%         
-        
-%         if ~isempty(hImage)
-%           
-%         end
-        
-%         api.setMagnification(1.0);
-%         
-%         set(hScrollpane, 'Unit', ' pixels', 'Position', get(0,'Screensize') - [0 0 obj.jParametersPanel.getWidth 0]);
-%         
-        % set(hScrollpane, 'ResizeFcn', []);
-        
+      hFrame      = obj.hFrame;
+      
+      set(hFrame, 'ResizeFcn', @(src, e) obj.resizeCallback(src, e));   
 
+      hAxis  = obj.newAxes('xtick',[],'ytick',[]);
+      
+      imgd = im2double(img);
+      
+      hImage = imshow(imgd, 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
+      
+      set(hAxis,'xtick',[],'ytick',[], 'LooseInset', [0,0,0,0], 'Clipping','on', 'Box', 'off', 'color', [1 1 1] * 0.45); %, 'DataAspectRatio', [1 1 1]);
+      
+      obj.layoutAxes;
+      
+    end
+    
+    function resizeImageAxis(obj, hAxis)
+      try
+        aP    = pixelPosition(hAxis);
+        aW    = aP(3);
+        aH    = aP(4);
+
+        hImg  = findobj('Parent', hAxis, 'Type', 'image');%get(hAxis, 'Children');
+
+        iW    = max(get(hImg, 'XData'));
+        iH    = max(get(hImg, 'YData'));
+
+        % Centering Around
+        aF    = [0 1];
+        aX    = aW*aF - (aW-iW)/2;
+        aY    = aH*aF - (aH-iH)/2;
+        
+        set(hAxis,'XLim', aX + 0.5, 'YLim', aY + 0.5);
+      catch err
+        disp(err);
+      end
+    end
+    
+    function clearAxes(obj)
+      for hAxis = obj.hAxes
+        try delete(hAxis); end
+      end
+      obj.hAxes = {};
+      clf(obj.hFrame);
+    end
+    
+    function hAxis = newAxes(obj, varargin)
+      hFrame  = obj.hFrame;
+      hAxis   = axes('Visible', 'off', 'Parent', hFrame, varargin{:});
+      
+      obj.hAxes{end+1} = hAxis;
+    end
+    
+    function resizeCallback(obj, source, event)
+      obj.layoutAxes();
+    end
+    
+    function resizeAxis(obj, h, m)
+      hFrame    = obj.hFrame;
+      childAxes = findobj('Parent', hFrame, 'Type', 'axes'); %findobj(hFrame, 'Children', 'Type', 'axes');
+      
+      nA      = numel(obj.hAxes);
+      nC      = ceil(nA ^ 0.5);
+      nR      = ceil(nA/nC);
+      
+      fP      = pixelPosition(hFrame);
+      pX      = obj.jParametersPanel.getX;
+      
+      nW      = ceil((pX-1)/nC);
+      nH      = ceil(fP(4)/nC);
+      
+      try
+        
+        if ~exist('m','var') || ~isnumeric(m)
+          if isnumeric(h) && ishandle(h)
+            m = find(childAxes==h);
+          else
+            m = find(cellfun(@(x) isequal(x,h), obj.hAxes),1,'first');
+          end
+        end
+        
+        mC  = mod(m-1,nC)+1;
+        mR  = ceil(m/nC);
+        mH  = 1;
+        mW  = 1; ...
+          if m==nA, mW = 1+nC-mC; end
+        
+        %[left bottom width height]
+        mP  = [ (mC-1)*nW,    (mR-1)*nH,    mW*nW,    mH*nH ];
+        
+        try
+          % disp([m nA mC mR mP]);
+          if isnumeric(h) && ishandle(h)
+            mP(2) = fP(4)-mP(2)-mP(4);
+            set(h, 'Units', 'pixels', 'Position', mP, 'Visible', 'on');
+          else
+            b = h.getBounds;            
+            mP = int16([mP(1),fP(4)-mP(2),mP(3),mP(4)]);
+            oP = int16([b.x, b.y, b.width, b.height]);
+            if any(mP~=oP)
+              h.setBounds(mP(1), mP(2), mP(3), mP(4));
+            end
+          end
+        catch err
+          disp(err)
+        end
+        
+      end
+    end
+    
+    function layoutAxes(obj)
+      obj.validateAxes();
+      
+      hFrame  = obj.hFrame;
+      
+      hAxes   = obj.hAxes;
+      nA      = numel(hAxes);
+      
+      for m = 1:nA
+        hAxis   = hAxes{m};
+        if isnumeric(hAxis) && ishandle(hAxis)
+          hImg = []; hChd = [];
+          try hImg = findobj('Parent', hAxis, 'Type', 'image'); end
+          try hChd = findobj('Parent', hAxis); end
+          
+          obj.resizeAxis(hAxis, m);
+          
+          if numel(hImg)==1 && ishandle(hImg)
+            obj.resizeImageAxis(hAxis);
+          end
+        end
+      end      
 
     end
     
+    function validateAxes(obj)
+%       newAxes = {};
+%       childAxes = get(obj.hFrame, 'Children');
+%       for hAxis = obj.hAxes
+%         validHandle   = false;
+%         
+%         try validHandle = ishandle(hAxis); end
+%         
+%         if validHandle && any(childAxes==hAxis)
+%           newAxes{end+1} = hAxis;
+%         end
+%       end
+%       obj.hAxes = newAxes;
+    end
+    
     function delete(obj)
-      % try delete(obj.jApplyButton); end %hApplyButton
       
-      jComponents = {obj.jPatchParametersPanel, obj.jScreenParametersPanel, obj.jPrintParametersPanel, obj.jScanParametersPanel, obj.jParametersPanel};
+      jReferences = obj.jReferences;
+      
+      for m = 1:numel(jReferences)
+        try obj.(jReferences{m}) = []; end
+      end      
+      
+      jComponents = obj.jComponents;
       
       for j = 1:numel(jComponents)
         jObject = jComponents{j};
@@ -220,11 +366,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       try delete(gcf); end
       
-      %       try delete(obj.jPatchParametersPanel);  end % hPatchParametersPanel
-      %       try delete(obj.jScreenParametersPanel); end % hScreenParametersPanel
-      %       try delete(obj.jPrintParametersPanel);  end % hPrintParametersPanel
-      %       try delete(obj.jScanParametersPanel);   end % hScanParametersPanel
-      %       try delete(obj.jParametersPanel);       end %hParametersPanel
     end
     
   end

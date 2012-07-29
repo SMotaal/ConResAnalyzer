@@ -19,8 +19,8 @@ classdef Scan < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image   = imresize(image, (scale/100) * (dpi/spi), 'bicubic');
       
-      parameters.(CONRES.DPI')    = dpi;
-      parameters.(CONRES.Scale')  = scale;
+      parameters.(Grasppe.ConRes.Enumerations.DPI')    = dpi;
+      parameters.(Grasppe.ConRes.Enumerations.Scale')  = scale;
       
       output.setImage(im2double(image), dpi);
       

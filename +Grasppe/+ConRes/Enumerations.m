@@ -1,43 +1,43 @@
-classdef CONRES
+classdef Enumerations < Grasppe.Core.ValueEnumeration
   %ENUM Summary of this function goes here
   %   Detailed explanation goes here
   
-  properties
-    Value;
-  end
-  
-  methods (Access = private)
-    function obj=CONRES(value)
-      persistent lastValue;
-      if nargin==0, value = lastValue; end
-      obj.Value = value;
-      lastValue = value;
-    end
-  end
-  
-  methods
-    function b = ctranspose(a)
-      b = a.Value;
-      try
-        b  = char(regexp(b, '(?=.)\w*$', 'match'));
-      end
-    end
-    
-    function b = transpose(a)
-      b = a.Value;
-    end
-    
-    
-    function c = eq(a,b)
-      c = isequal(a.Value, b.Value);
-    end
-    
-    function c = ne(a,b)
-      c = ~isequal(a.Value, b.Value);
-    end
-    
-  end
-  
+%   properties
+%     Value;
+%   end
+%   
+%   methods (Access = private)
+%     function obj=CONRES(value)
+%       persistent lastValue;
+%       if nargin==0, value = lastValue; end
+%       obj.Value = value;
+%       lastValue = value;
+%     end
+%   end
+%   
+%   methods
+%     function b = ctranspose(a)
+%       b = a.Value;
+%       try
+%         b  = char(regexp(b, '(?=.)\w*$', 'match'));
+%       end
+%     end
+%     
+%     function b = transpose(a)
+%       b = a.Value;
+%     end
+%     
+%     
+%     function c = eq(a,b)
+%       c = isequal(a.Value, b.Value);
+%     end
+%     
+%     function c = ne(a,b)
+%       c = ~isequal(a.Value, b.Value);
+%     end
+%     
+%   end
+%   
   enumeration
     
     %% Patch
