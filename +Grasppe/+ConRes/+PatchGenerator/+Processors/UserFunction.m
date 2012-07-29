@@ -35,7 +35,11 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         multiply      = @(varargin) obj.algebra('multiply', varargin{:});
         divide        = @(varargin) obj.algebra('divide', varargin{:});
         
-        % store         = @(varargin) obj.store(varargin{:});
+        normalize     = @(x)        x/nanmax(x(:));
+        invert        = @(x)        1-im2double(x);
+        binarize      = @(x,y)      im2bw(real(x),y);
+        
+        store         = @(n,v)      assignin('caller', n, v); %eval('assignin(''''caller'''', n, v), v'); %evalin('caller', 'obj.Variables.(' n ') = v;');
         
         processData   = output.ProcessData;
         
@@ -115,20 +119,22 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
       
+      v = varargin;
+      
       try
         switch lower(operation)
           case 'add'
             disp('Adding...');
-            image = varargin{1}+varargin{2};
+            image = v{1}+v{2};
           case 'subtract'
             disp('Subtracting...');
-            image = varargin{1}-varargin{2};
+            image = v{1}-v{2};
           case 'multiply'
             disp('Multiplying...');
-            image = varargin{1}.*varargin{2};
+            image = v{1}.*v{2};
           case 'divide'
             disp('Dividing...');
-            image = varargin{1}./varargin{2};
+            image = v{1}./v{2};
           otherwise
             warning('Cannot perform %s operation because it is not support.', toString(operation));
         end
