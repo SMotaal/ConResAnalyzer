@@ -18,6 +18,18 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     jComponents={}
     
+    panelCode = { ...
+      'Patch={Resolution=0.625, Contrast=5, Mean=50, Size=5.3},'
+      'Screening={Angle=37.5, Resolution=175.0, Addressability=2450.0},'
+      'Printing={Blur=100.0, Radius=1.0, Gain=0.0, Noise=0},'
+      'Scanning={Resolution=1200, Scale=100},'
+      'Function-0-PatchFFT={ID=Function-0-PatchFFT, Expression=I:PFFT;},'
+      'Function-1-ScreenImage={ID=Function-1-ScreenImage, Expression=I:SIMG;},'
+      'Function-2-ScreenFilterI={ID=Function-2-ScreenFilterI, Expression=I:iFFTL(PFFT.*norverse(logabs(SFFT)));},'
+      'Function-3-ScreenPassFilter={ID=Function-3-ScreenPassFilter, Expression=I:iFFTL(1-binor(logabs(SFFT)/0.779));},'
+      'Function-4-ScreenFilterII={ID=Function-4-ScreenFilterII, Expression=I:iFFTL(PFFT.*binorverse(logabs(SFFT)/0.24));},'
+      'Function-5-IdealImage={ID=Function-5-IdealImage, Expression=I:CIMG;},'
+      'Function-6-IdealFilterII={ID=Function-6-IdealFilterII, Expression=I:iFFTL(PFFT.*binor(logabs(CFFT)/0.4));}'      };
   end
   
   events
@@ -80,6 +92,10 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       obj.jParametersPanel    = jPanel;
       obj.hParametersPanel    = handle(jPanel,'CallbackProperties');
+      
+      panelCode = strcat(obj.panelCode{:});
+      
+      obj.jParametersPanel.setValues(panelCode);  %'Patch={Resolution=0.625, Contrast=50, Mean=30, Size=5.3}, Screening={Angle=37.5, Resolution=175.0, Addressability=2450}, Printing={Blur=100.0, Radius=5.0, Gain=0.0, Noise=0.0}, Scanning={Resolution=1200.0, Scale=100.0}, Function-0-PatchFFT={ID=Function-0-PatchFFT, Expression=patchFFT;}, Function-1-ScreenImage={ID=Function-1-ScreenImage, Expression=screenImage;}, Function-2-ScreenPassFilter={ID=Function-2-ScreenPassFilter, Expression=imadjust(inverseFFT(1-binarize(normalize(log(abs(screenFFT)))/0.779)));}, Function-3-ScreenFilterI={ID=Function-3-ScreenFilterI, Expression=imadjust(inverseFFT(multiply(patchFFT/1-normalize(log(abs(screenFFT))))));}, Function-4-ScreenFilterII={ID=Function-4-ScreenFilterII, Expression=imadjust(inverseFFT(multiply(patchFFT/binarize(1-normalize(log(abs(screenFFT)))/0.24))));}, Function-5-IdealImage={ID=Function-5-IdealImage, Expression=idealImage;}, Function-6-IdealFilterII={ID=Function-6-IdealFilterII, Expression=imadjust(inverseFFT(multiply(patchFFT/binarize(normalize(log(abs(idealFFT)))/0.4))));}');
       
       obj.jComponents{end+1}  = jPanel;
       
@@ -190,19 +206,22 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     end
     
     function setImage(obj, img)
-      disp('Setting Image');
+      % disp('Setting Image');
       hFrame      = obj.hFrame;
       
       set(hFrame, 'ResizeFcn', @(src, e) obj.resizeCallback(src, e));
       
-      hAxis  = obj.newAxes('xtick',[],'ytick',[]);
-      
+      hAxis  = obj.newAxes('xtick',[],'ytick',[], 'Visible', 'off');
+          
       imgd = im2double(img);
+      if ~isreal(imgd)
+        disp('wait a second');
+      end      
       
       hold on;
       hImage = imshow(imgd, 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
       
-      set(hAxis,'xtick',[],'ytick',[], 'LooseInset', [0,0,0,0], 'Clipping','on', 'Box', 'off', 'color', [1 1 1] * 0.45); %, 'DataAspectRatio', [1 1 1]);
+      set(hAxis,'xtick',[],'ytick',[], 'LooseInset', [0,0,0,0], 'Clipping','on', 'Box', 'on', 'color', [1 1 1] * 0.15, 'Visible', 'off'); %, 'DataAspectRatio', [1 1 1]);
       
       obj.layoutAxes;
       
@@ -240,7 +259,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     function hAxis = newAxes(obj, varargin)
       hFrame  = obj.hFrame;
-      hAxis   = axes('Visible', 'off', 'Parent', hFrame, varargin{:});
+      hAxis   = axes('Visible', 'off', 'Parent', hFrame, varargin{:}, 'box', 'on');
       
       obj.hAxes{end+1} = hAxis;
     end
@@ -284,7 +303,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         mP  = [ (mC-1)*nW,    (mR-1)*nH,    mW*nW,    mH*nH ];
         
         try
-          disp([m nA mC mR mP]);
+          %disp([m nA mC mR mP]);
           if isnumeric(h) && ishandle(h)
             mP(2) = fP(4)-mP(2)-mP(4);
             set(h, 'Units', 'pixels', 'Position', mP, 'Visible', 'on');

@@ -94,28 +94,33 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         screenProcessor.Execute(parameters.Screen);
         
         screenedImage = output.Image;
-        screenImage = screenProcessor.HalftoneImage;
+        screen        = screenProcessor.HalftoneImage;
+        screenImage   = screen.Image;
         
         %% Scan Patch
         scanProcessor.Execute(parameters.Scan);
         scannedImage = output.Image;
         
+        %output.Snap('GeneratedPatch');
+        
         %% Patch & Reference Images
-        referenceImage = imresize(patchImage, size(scannedImage));
-        screenImage = imresize(screenImage, size(scannedImage));
+        referenceImage  = imresize(patchImage,  size(scannedImage));
+        screenImage     = imresize(screenImage, size(scannedImage));
         
         patch.setImage(scannedImage, output.Resolution);
         reference.setImage(referenceImage, output.Resolution);
-        screen.setImage(screenImage, output.Resolution);        
+        screen.setImage(screenImage, output.Resolution);
         
         output.Variables.PatchImage     = patch;
         output.Variables.ReferenceImage = reference;
         output.Variables.HalftoneImage  = screen;
-        
-        output.snap('GeneratedPatch');
+
       catch err
         disp(err);
       end
+      
+      output = copy(output);
+      output.Snap('GeneratedPatch');
       
       try
         %% Functions
@@ -130,7 +135,12 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           disp(fx);
           id = char(fxName);
           try id = char(fx.Expression); end
-          output.snap(id);
+          
+          try
+            output.Snap(id);
+          catch err
+            disp(err)
+          end
         end
         
       end
@@ -141,60 +151,86 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         images  = output.Snapshots(:,1);
         ids     = output.Snapshots(:,2);
         
-        images{end+1} = output.Image;
+        images{end+1} = output;
         ids{end+1}    = 'FinalOutput';
         
-        images{end+1} = output.Fourier;
-        ids{end+1}    = 'FinalFFT';
+        % images{end+1} = output.Fourier;
+        % ids{end+1}    = 'FinalFFT';
         
-        tXY = {0.5, 0.95};
-        tOp = {'Units', 'normalized', ...
-          'HorizontalAlignment', 'center', ...
-          'VerticalAlignment', 'middle', ...
-          'BackgroundColor', [1 1 1], ...
+        tXY   = {0.01, 0.99};
+        tXY2  = {0.01, 0.01};
+        tOp   = {'Units', 'normalized', ...
+          'HorizontalAlignment', 'left', ...
+          'VerticalAlignment', 'top', ...
+          'BackgroundColor', [0 0 0], 'Color', [1 1 1], ...
           'FontSize', 6, 'FontName', 'DIN', 'FontUnits', 'points'};
         
-        for m = 1:numel(images)-2
-          image = images{m};
+        tOp2   = {'Units', 'normalized', ...
+          'HorizontalAlignment', 'left', ...
+          'VerticalAlignment', 'bottom', ...
+          'BackgroundColor', [0 0 0], 'Color', [1 1 1], ... % 'BackgroundColor', [1 1 1], ...
+          'FontSize', 6, 'FontName', 'DIN', 'FontUnits', 'points'};
+        
+        
+        tSize = @(x) [int2str(size(x,1)), 'x', ...
+          int2str(size(x,2)), 'x', ...
+          int2str(size(x,3))];
+        
+        
+        for m = 1:numel(images)-1
+          snapshot = images{m};
+          image = snapshot.Image;
+          %snapshot.generatePlotFFT();
+          fftimage = snapshot.FourierImage;
           
           fftMode = ~isreal(image);
           
           if fftMode
+                        
             panel.setImage(output.inverseFFT(image));
+            
             try
               T   = [ids{m} ' inv'];
-              hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
-              alpha(hT, 0.75);
+              text(tXY{:}, T, 'Parent', gca, tOp{:});
+              text(tXY2{:}, tSize(image), 'Parent', gca, tOp2{:});
             end
-            image     = real(log(1+abs(image)));
-            imageMin  = min(image(:)); imageMax = max(image(:));
-            image     = (image-imageMin) / (imageMax-imageMin);
+            
+            %bandImage = output.bandPlotFFT(
+            
+            %             image     = real(log(1+abs(image)));
+            %             imageMin  = min(image(:)); imageMax = max(image(:));
+            %             image     = (image-imageMin) / (imageMax-imageMin);
+            
+            image = fftimage; %snapshot.FourierImage; %.bandPlotFFT(image);
+            
           end
           panel.setImage(image);
           
           try
             T   = [ids{m}];
-            hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
-            alpha(hT, 0.75);
+            text(tXY{:}, T, 'Parent', gca, tOp{:});
+            text(tXY2{:}, tSize(image), 'Parent', gca, tOp2{:});
           end
           
           
           if ~fftMode
-            image     = output.forwardFFT(image);
-            image     = real(log(1+abs(image)));
-            imageMin  = min(image(:)); imageMax = max(image(:));
-            image     = (image-imageMin) / (imageMax-imageMin);
+            image     = fftimage; %snapshot.FourierImage; %output.bandPlotFFT(output.forwardFFT(image));
+            %image     = real(log(1+abs(image)));
+            %imageMin  = min(image(:)); imageMax = max(image(:));
+            %image     = (image-imageMin) / (imageMax-imageMin);
             
-            panel.setImage(image);
+            panel.setImage(fftimage); %output.inverseFFT(image));
+            
             try
               T   = [ids{m} ' fwd'];
-              hT  = text(tXY{:}, T, 'Parent', gca, tOp{:});
-              alpha(hT, 0.75);
+              text(tXY{:}, T, 'Parent', gca, tOp{:});
+              text(tXY2{:}, tSize(image), 'Parent', gca, tOp2{:});
             end
           end
           %ti(ids{m});
         end
         
+        panel.layoutAxes;
         %         image = output.Image;
         %
         %

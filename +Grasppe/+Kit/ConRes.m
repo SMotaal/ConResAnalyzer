@@ -27,7 +27,7 @@ classdef ConRes
   methods (Static)
     
     function [image spec] = GeneratePatchImage(reference, contrast, resolution, width, addressibility)
-           
+      
       Grasppe.Kit.ConRes.GetImports;...
         import(Imports{:}); ...
         ConRes.GetInstance;
@@ -38,7 +38,7 @@ classdef ConRes
       
       if ~exist('contrast', 'var') || isempty(contrast)
         contrast = 100;
-      end      
+      end
       if ~exist('width', 'var') || isempty(width)
         width = Instance.DEFAULT_PATCH_WIDTH; % mm
       end
@@ -50,7 +50,7 @@ classdef ConRes
       if ~exist('resolution') || isempty(width)
         resolution = Instance.DEFAULT_RESOLUTION; % lppmm
       end
-           
+      
       cpmm    = resolution;
       cpin    = cpmm * 25.4;
       cppx    = cpin / addressibility;
@@ -58,11 +58,11 @@ classdef ConRes
       cycles  = width * cpmm;
       pixels  = cycles / cppx;
       
-
+      
       [image rg ct rtv]   = ConcentricCircles(cppx*100, reference, contrast, ceil(pixels));
       
       spec = [100*(1-rtv) 100*ct resolution];
-
+      
       %image = []; %Grasppe.Patterns.ConcentricCircles(cycles, );
     end
     
@@ -78,12 +78,12 @@ classdef ConRes
     function value = ResolutionRange()
       Grasppe.Kit.ConRes.GetInstance;
       value     = Instance.RESOLUTION_RANGE;
-    end 
+    end
     
     function value = ToneRange()
       Grasppe.Kit.ConRes.GetInstance;
       value     = Instance.TONE_RANGE;
-    end    
+    end
     
     function rexp = LogSeries(a, b, c)
       
@@ -117,8 +117,57 @@ classdef ConRes
       % evalin('caller', 'import(''Imports{:}'');');
     end
     
-  end    
+    function fQ = CalculateBandIntensity(fImg)
+      
+      persistent bandFilters bandSize bandSums;
+            
+      s = warning('off', 'all');
+      
+      try
+        fH = size(fImg,1);
+        fW = size(fImg,2);
+        nBands = floor(min(size(fImg))/2);
+        fQ = zeros(1, nBands);
+        
+        if ~isequal(bandSize, nBands)
+          bandFilters=cell(nBands,1);
+          bandSums=cell(nBands,1);
+          bandSize=nBands;
+        end
+        
+        filters = bandFilters;
+        sums    = bandSums;
+        
+        parfor m = 1:nBands
+          try
+          if isempty(filters{m})
+            bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
+            bSum        = sum(bFilter(:));
+            filters{m}  = bFilter;
+            sums{m}     = bSum;
+          else
+            bFilter = filters{m};
+            bSum    = sums{m};
+          end
+          bImage  = abs(fImg).*bFilter;
+          fQ(m)   = sum(bImage(:))/bSum;
+          catch err
+            disp(err);
+          end
+        end
+        
+        bandFilters = filters;
+        bandSums    = sums;
+        
+      catch err
+        disp(err);
+      end
+      
+      warning(s);
+    end
     
+  end
+  
   
 end
 

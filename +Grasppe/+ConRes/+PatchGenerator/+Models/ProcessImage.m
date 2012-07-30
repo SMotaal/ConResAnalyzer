@@ -1,4 +1,4 @@
-classdef ProcessImage < handle
+classdef ProcessImage < matlab.mixin.Copyable
   %IMAGEPARAMETERS Summary of this class goes here
   %   Detailed explanation goes here
   
@@ -13,12 +13,16 @@ classdef ProcessImage < handle
     ProcessData
     Image
     Fourier
+    FourierImage
     Domain
   end
   
   properties
     Variables = struct;
     Snapshots = {};
+    PlotFFT = true;
+    fftimage;
+    ffttimer;
   end
   
   properties (Access=private)
@@ -36,6 +40,16 @@ classdef ProcessImage < handle
   end
   
   methods
+    
+    function obj = ProcessImage()
+      obj.ffttimer = timer('Tag','ImageProcessor', 'StartDelay', 1, ...
+        'TimerFcn', @(x,y) obj.generatePlotFFT);
+    end
+    
+    function delete(obj)
+      try delete(obj.ffttimer); end
+    end
+    
     function width = get.Width(obj)
       width = obj.width;
     end
@@ -100,22 +114,22 @@ classdef ProcessImage < handle
       process = obj.process;
     end
     
-%     function set.Process(obj, process)
-%       if ~isequal(obj.process, process)
-%         obj.process = process;
-%       end
-%     end
-
+    %     function set.Process(obj, process)
+    %       if ~isequal(obj.process, process)
+    %         obj.process = process;
+    %       end
+    %     end
+    
     function setImage(obj, image, resolution)
       obj.Image       = image;
       obj.Resolution  = resolution;
-        
+      
     end
-
+    
     function processData = get.ProcessData(obj)
       processData = obj.processData;
     end
-
+    
     function addProcess(obj, process)
       try
         processData = process.getProcessData;
@@ -129,12 +143,33 @@ classdef ProcessImage < handle
     end
     
     function image = get.Fourier(obj)
-      image = obj.Image;
-      switch (obj.Domain)
-        case 'frequency'
-        otherwise
-          image = obj.forwardFFT(image);
+      image = obj.image;
+      if isreal(image)
+        image = obj.forwardFFT(image);
       end
+%       switch (obj.Domain)
+%         case 'frequency'
+%         otherwise
+%           image = obj.forwardFFT(image);
+%       end
+    end
+    
+    function image = get.FourierImage(obj)
+      obj.generatePlotFFT();
+      image = obj.fftimage;
+      %if isempty(image)
+      %obj.generatePlotFFT;
+      %         image = obj.Image;
+      %         switch (obj.Domain)
+      %           case 'frequency'
+      %           otherwise
+      %             image = obj.forwardFFT(image);
+      %         end
+      %obj.fftimage = image;
+      
+      %image = obj.bandPlotFFT(image);
+      %end
+      
     end
     
     function image = forwardFFT(obj, image)
@@ -149,6 +184,130 @@ classdef ProcessImage < handle
       image = image(1:end-(nP),1:end-(nQ));
       
       image = fftshift(fft2(image, fP, fQ));
+    end
+    
+    function generatePlotFFT(obj)
+      stop(obj.ffttimer);
+      fftdata = obj.Fourier;
+      
+      if isreal(fftdata)
+        fftdata = obj.forwardFFT(fftdata);
+      end
+      
+      if isempty(obj.fftimage)
+        obj.bandPlotFFT([]);
+        fftimage = [];
+        while isempty(fftimage)
+          fftimage = obj.bandPlotFFT(fftdata);
+          pause(0.5);
+        end
+        obj.fftimage = fftimage;
+      end
+    end
+    
+    function image = bandPlotFFT(obj, image)
+      
+      persistent  fxBusy; %hFig hAxis
+      
+      if isempty(image)
+        fxBusy = false;
+        %try delete(hAxis);  end
+        %try delete(hFig);   end
+        %return;
+      end
+      
+      if isequal(fxBusy, true)
+        image = [];
+        return;
+      end
+      
+      try
+        
+        fxBusy=true;
+        disp('Generating Image...');
+        R=tic;
+        try
+          
+          image1 = image;
+          
+          if size(image1,3) > 1
+            image1 = image1(:,:,1);
+            disp('Flattening Image...');
+          end
+          
+          
+          image1     = real(log(1+abs(image1)));
+          imageMin  = min(image1(:)); imageMax = max(image1(:));
+          image1     = (image1-imageMin) / (imageMax-imageMin);
+          
+          if isequal(obj.PlotFFT, true)
+            
+            %if ~isscalar(hFig) || ~ishandle(hFig)
+              hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300]);
+            %  hAxis = [];
+            %end
+            
+            %if ~isscalar(hAxis) || ~ishandle(hAxis)
+              hAxis = axes('Parent', hFig); % 'Visible', 'off'
+            %end
+            
+            disp('Generating Plot...');
+            
+            bFq = Grasppe.Kit.ConRes.CalculateBandIntensity(image1); %hold on; plot(bFq);
+            
+            yR  = bFq/max(bFq(:));
+            xR  = 1:numel(bFq);
+            zR  = ones(size(xR));
+            
+            xF  = 0.75;
+            xD  = (size(image1,2)/4*1.25);            
+            yD  = size(image1,1)/2;
+            
+            %hold on;
+            
+            cla(hAxis);
+            
+            image2 = repmat(image1, [1, 1, 3]);
+            
+            imshow(image2, 'Parent', hAxis);
+            truesize(hFig);
+            
+            hold on;
+            
+            yR = (yR*100)-(max(yR*100)/2);
+                       
+            yN = 1;
+            for m = 1:20:numel(xR) %min(xR):5:max(xR)
+              x = [ 0 0]  + (xD+xR(m)*xF);
+              if yN==1
+                y = [-25 25]  + yD + nanmean(yR); %+yR(m);
+                yN = 0;
+              else
+                y = [-10 10]  + yD + nanmean(yR); % +yR(m);
+                yN = 1;
+              end
+              line(x+0.5, y, [0 0], 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
+            end
+            
+            plot(hAxis, xD+xR*xF,yD+yR, 'g', 'Linewidth', 2,'linesmoothing','on');
+            
+            disp('Exporting Image...');
+            
+            image = export_fig(hFig); %, [1 1 size(image2,2) size(image2,1)]);
+            
+            delete(hAxis);
+            delete(hFig);
+          else
+            image = image1;
+          end
+          
+        catch err
+          disp err
+        end
+        toc(R);
+      end
+      
+      fxBusy=false;
     end
     
     function image = inverseFFT(obj, image)
@@ -170,9 +329,21 @@ classdef ProcessImage < handle
       end
     end
     
-    function snap(obj, id)
-      obj.Snapshots{end+1,1} = obj.Image;
-      obj.Snapshots{end,2} = id;
+    function Snap(obj, id)
+      newObj = copy(obj);
+      
+      obj.Snapshots{end+1,1} = newObj; %.Image;
+      
+      obj.Snapshots{end,2}   = id;
+      
+      width   = obj.Width;
+      height  = obj.Height;
+      
+      if (width*height < 600*600)
+        start(newObj.ffttimer);
+      else
+        dispf('Not generating %d x %d', width, height);
+      end
     end
     
     function updateMetadata(obj)
@@ -202,11 +373,23 @@ classdef ProcessImage < handle
         otherwise
           mode = 'multichannel';
       end
-            
+      
       obj.width   = width;
       obj.height  = height;
       obj.depth   = depth;
       obj.mode    = mode;
+      
+      
+      obj.fftimage = [];
+      
+      %       obj.ffttimer = timer('Tag','ImageProcessor', 'StartDelay', 0.5, ...
+      %         'TimerFcn', @(x,y) obj.generatePlotFFT);
+      %      if (width*height < 600*600)
+      %        start(obj.ffttimer);
+      %      else
+      %        dispf('Not generating %d x %d', width, height);
+      %      end
+      %obj.fftimage = obj.bandPlotFFT(image);
       
     end
     
@@ -231,6 +414,20 @@ classdef ProcessImage < handle
     %   end
     % end
     
+  end
+  
+  methods(Access = protected)
+    % Override copyElement method:
+    function cpObj = copyElement(obj)
+      % Make a shallow copy of all four properties
+      cpObj = copyElement@matlab.mixin.Copyable(obj);
+      cpObj.fftimage = [];
+      cpObj.bandPlotFFT([]);
+      cpObj.ffttimer = timer('Tag','ImageProcessor', 'StartDelay', 1, ...
+        'TimerFcn', @(x,y) obj.generatePlotFFT); %copy(obj.ffttimer);
+      % Make a deep copy of the DeepCp object
+      %cpObj.DeepObj = copy(obj.DeepObj);
+    end
   end
   
 end

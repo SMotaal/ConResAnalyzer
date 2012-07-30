@@ -11,6 +11,8 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       import Grasppe.*;
       
+      screen      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      
       output          = obj.Input;
       variables       = obj.Variables;
       params  = obj.Parameters;
@@ -23,20 +25,23 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image     = output.Image;
       
+      halftone  = ones(size(image));
+      
       image     = grasppeScreen3(image, ppi, spi, lpi, theta, print);
       
-      halftone = [];
+      
       try
         tone      = output.ProcessData.Parameters.Mean;
-        halftone  = ones(size(image)).*tone/100;
+        halftone  = halftone.*(tone/100);
         halftone  = grasppeScreen3(1-halftone, ppi, spi, lpi, theta, print);
       catch err
         warning('Generating 50% halftone image because mean halftone failed to generate');
-        halftone  = grasppeScreen3(ones(size(image)).*0.5, ppi, spi, lpi, theta, print);
+        halftone  = halftone.*(50/100);
+        halftone  = grasppeScreen3(halftone, ppi, spi, lpi, theta, print);
       end
       
-      %output.Variables.HalftoneImage = halftone;
-      obj.HalftoneImage = halftone;
+      screen.setImage(im2double(halftone), spi);
+      obj.HalftoneImage = screen;
       %output.Variables.halftoneImage = halftone;
       
       parameters.(Grasppe.ConRes.Enumerations.PPI')      = ppi;

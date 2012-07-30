@@ -28,6 +28,9 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         forwardFFT    = @(varargin) obj.forwardFFT(varargin{:});
         inverseFFT    = @(varargin) obj.inverseFFT(varargin{:});
         
+        fFFT          = @(varargin) forwardFFT(varargin{:});
+        iFFT          = @(varargin) inverseFFT(varargin{:});
+        
         display       = @(varargin) obj.display(varargin{:});
         
         add           = @(varargin) obj.algebra('add', varargin{:});
@@ -35,11 +38,32 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         multiply      = @(varargin) obj.algebra('multiply', varargin{:});
         divide        = @(varargin) obj.algebra('divide', varargin{:});
         
+        sub           = @(varargin) subtract(varargin{:});
+        mul           = @(varargin) multiply(varargin{:});
+        div           = @(varargin) divide(varargin{:});
+        
         normalize     = @(x)        x/nanmax(x(:));
         invert        = @(x)        1-im2double(x);
         binarize      = @(x,y)      im2bw(real(x),y);
         
-        store         = @(n,v)      assignin('caller', n, v); %eval('assignin(''''caller'''', n, v), v'); %evalin('caller', 'obj.Variables.(' n ') = v;');
+        bin           = @(x,y)      binarize(x, y);
+        nor           = @(x)        normalize(x);
+        normaverse    = @(x)        invert(normalize(x));
+        norverse      = @(x)        normaverse(x);
+        binormalize   = @(x, y)     binarize(normalize(x),y);
+        binor         = @(x, y)     binormalize(x,y);
+        binormaverse  = @(x, y)     binarize(normaverse(x),y);
+        binorverse    = @(x, y)     binormaverse(x,y);
+        
+        store         = @(n,v)      obj.store(n,v); %eval('assignin(''''caller'''', n, v), v'); %evalin('caller', 'obj.Variables.(' n ') = v;');
+        
+        level         = @(varargin) imadjust(varargin{:});
+        levelFFT      = @(varargin) obj.levelFFT(varargin{:});
+        
+        iFFTL         = @(varargin) level(inverseFFT(varargin{:}));
+        
+        logabs        = @(x)        log(abs(x));
+        
         
         processData   = output.ProcessData;
         
@@ -61,6 +85,13 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         screenImage   = HalftoneImage.Image;
         screenFFT     = HalftoneImage.Fourier;
         
+        PIMG          = patchImage;
+        PFFT          = patchFFT;
+        CIMG          = idealImage;
+        CFFT          = idealFFT;
+        SIMG          = screenImage;
+        SFFT          = screenFFT;
+        
         err = [];
         coreVars = [];
         expression = [];
@@ -68,16 +99,22 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         try
           expression  = findField(params, 'expression');
           expression  = strrep(expression, '/', ',');
+          expression  = strrep(expression, ':', '=');
         end
         
         coreVars = who;
         
         try
-          image = eval(expression);
+          eval(expression); %image = eval(expression);
         catch err
           try
             eval(expression);
           end
+        end
+        
+        if exist('I', 'var')
+          image = I;
+          clear I;
         end
         
         allVars = who;
@@ -113,6 +150,8 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     function image = store(obj, varargin)
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
+      
+      output.Variables.(varargin{1}) = varargin{2};
     end
     
     function image = algebra(obj, operation, varargin)
@@ -167,6 +206,13 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         case {3, 'Variables'}
           disp(obj.Variables);
       end
+    end
+    
+    function image = levelFFT(obj, varargin)
+      image     = varargin{1};
+      image     = real(log(1+abs(image)));
+      imageMin  = min(image(:)); imageMax = max(image(:));
+      image     = (image-imageMin) / (imageMax-imageMin);
     end
     
     function saveImage(obj, image)
