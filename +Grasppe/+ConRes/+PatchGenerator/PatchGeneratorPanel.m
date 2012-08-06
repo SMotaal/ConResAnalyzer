@@ -16,6 +16,8 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     hAxes={}
     
+    mAxes;
+    
     jComponents={}
     
     panelCode = { ...
@@ -319,6 +321,27 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
           disp(err)
         end
         
+        % hFrame  = obj.hFrame;
+        
+        hAxes   = obj.hAxes;
+        nA      = numel(hAxes);
+        
+        pFrame  = pixelPosition(hFrame);
+        axesMap = zeros(pFrame([3 4])+1);
+        
+        for m = 1:nA
+          hAxis = hAxes{m};
+          pAxis = round(pixelPosition(hAxis))+1;
+          try
+            axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
+          catch err
+            disp(err);
+          end
+        end
+        
+        obj.mAxes = axesMap;
+        
+        
       catch err
         disp(err)
       end
@@ -347,6 +370,25 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         end
       end
       
+%       hFrame  = obj.hFrame;
+%       
+%       hAxes   = obj.hAxes;
+%       nA      = numel(hAxes);      
+%       
+%       pFrame  = pixelPosition(hFrame);
+%       axesMap = zeros(pFrame([3 4])+1);
+%       
+%       for m = 1:nA
+%         hAxis = hAxes{m};
+%         pAxis = round(pixelPosition(hAxis))+1;
+%         try
+%           axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
+%         catch err
+%           disp(err);
+%         end
+%       end
+%       
+%       obj.mAxes = axesMap;
     end
     
     function validateAxes(obj)

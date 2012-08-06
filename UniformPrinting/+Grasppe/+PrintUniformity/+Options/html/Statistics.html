@@ -1,0 +1,207 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Statistics</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-26"><meta name="DC.source" content="Statistics.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">General Definitions</a></li><li><a href="#3">Patch Statistics Definitions</a></li><li><a href="#4">Region Statistics Definitions</a></li><li><a href="#5">Sheet Statistics Definitions</a></li><li><a href="#6">Run Statistics Definitions</a></li></ul></div><pre class="codeinput"><span class="keyword">classdef</span> Statistics &lt; Grasppe.Core.ValueEnumeration
+  <span class="keyword">enumeration</span>
+</pre><h2>General Definitions<a name="2"></a></h2><pre class="codeinput">    ReferenceValue(<span class="string">'Statistics.ReferenceValue'</span>)
+</pre><h2>Patch Statistics Definitions<a name="3"></a></h2><p>A patch is repeated across sheets. Patch uniformity includes repeatability and does not include evenness. Patches are a spatial subdivision which implies variability on the temporal domain. Since patches are singluar, there can not be variability on the spatial domain.</p><pre class="codeinput">    <span class="comment">% Mean of a patch in all sheets (T)</span>
+    PatchNorm(<span class="string">'Statistics.Patch.Norm'</span>)
+
+    <span class="comment">% Accuracy of a patch against patch norm (T)</span>
+    PatchAccuracy(<span class="string">'Statistics.Patch.Accuracy'</span>)
+
+    <span class="comment">% Variance of a patch in all sheets (T)</span>
+    PatchRepeatability(<span class="string">'Statistics.Patch.Repeatability'</span>)
+</pre><h2>Region Statistics Definitions<a name="4"></a></h2><p>A region contains a number of patches across sheets. Region uniformity includes both evenness and repeatability. Regions are a spatial subdivision which implies variability on the temporal domain. Since regions also include a number of patches, there can also be variability on the spatial domain.</p><pre class="codeinput">    <span class="comment">% Mean of all patches in a region in all sheets (S-T)</span>
+    RegionNorm(<span class="string">'Statistics.Region.Norm'</span>)
+
+    <span class="comment">% Mean of all patches in a region in a single sheet (S)</span>
+    RegionMean(<span class="string">'Statistics.Region.Mean'</span>)
+
+    <span class="comment">% Accuracy of region mean against region norm (S)</span>
+    RegionAccuracy(<span class="string">'Statistics.Region.Accuracy'</span>)
+
+    <span class="comment">% Variance of all patches in a region in all sheets (S)</span>
+    RegionUniformity(<span class="string">'Statistics.Region.Uniformity'</span>)
+
+    <span class="comment">% Variance of all patches in a region in a single sheet (S)</span>
+    RegionEvenness(<span class="string">'Statistics.Region.Evenness'</span>)
+
+    <span class="comment">% Variance of region mean in one region in all sheets (T)</span>
+    RegionRepeatability(<span class="string">'Statistics.Region.Repeatability'</span>)
+</pre><h2>Sheet Statistics Definitions<a name="5"></a></h2><p>A sheet contains a number regions (1 or more). Sheet uniformity includes evenness and does not include repeatability. Sheets are a temporal subdivision which implies variability on the spatial domain. Since sheets are singluar, there can not be variability on the temporal domain.</p><pre class="codeinput">    <span class="comment">% Mean of all pataches in all regions in a single sheet (S)</span>
+    SheetMean(<span class="string">'Statistics.Sheet.Mean'</span>)
+
+    <span class="comment">% Accuracy of sheet mean against run mean (S)</span>
+    SheetAccuracy(<span class="string">'Statistics.Sheet.Accuracy'</span>)
+
+    <span class="comment">% Variance of all patches in all regions in a single sheet (S)</span>
+    SheetEvenness(<span class="string">'Statistics.Sheet.Evenness'</span>)
+</pre><h2>Run Statistics Definitions<a name="6"></a></h2><p>A run contains a number of sheets (more than 1). Run uniformity includes both evenness and repeatability. Runs are the combination of both spatial (region) and temporal (sheet) subdivisions which implies variability on both spatial and temporal domains</p><pre class="codeinput">    <span class="comment">% Mean of all patches in all regions in all sheets (S-T)</span>
+    RunMean(<span class="string">'Statistics.Run.Mean'</span>)
+
+    <span class="comment">% Accuracy of run mean against reference (S-T)</span>
+    RunAccuracy(<span class="string">'Statistics.Run.Accuracy'</span>)
+
+    <span class="comment">% Variance of all patches in all regions in all sheets (S-T)</span>
+    RunUniformity(<span class="string">'Statistics.Run.Uniformity'</span>)
+
+    <span class="comment">% Variance of sheet evenness in all sheets (S)</span>
+    RunEvenness(<span class="string">'Statistics.Run.Evenness'</span>)
+
+    <span class="comment">% Variance of region repeatability in all sheets (T)</span>
+    RunRepeatability(<span class="string">'Statistics.Run.Repeatability'</span>)
+</pre><pre class="codeinput">  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Error using Grasppe.PrintUniformity.Options.Statistics
+Cannot call the constructor of 'Grasppe.PrintUniformity.Options.Statistics' outside of its enumeration block.</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+classdef Statistics < Grasppe.Core.ValueEnumeration
+  enumeration
+    %% General Definitions
+    ReferenceValue('Statistics.ReferenceValue')
+    
+    %% Patch Statistics Definitions
+    % A patch is repeated across sheets. Patch uniformity includes
+    % repeatability and does not include evenness. Patches are a
+    % spatial subdivision which implies variability on the temporal domain.
+    % Since patches are singluar, there can not be variability on the
+    % spatial domain.
+    %
+    
+    % Mean of a patch in all sheets (T)
+    PatchNorm('Statistics.Patch.Norm')
+    
+    % Accuracy of a patch against patch norm (T)
+    PatchAccuracy('Statistics.Patch.Accuracy')
+    
+    % Variance of a patch in all sheets (T)
+    PatchRepeatability('Statistics.Patch.Repeatability')
+    
+    
+    %% Region Statistics Definitions
+    % A region contains a number of patches across sheets. Region
+    % uniformity includes both evenness and repeatability. Regions are a
+    % spatial subdivision which implies variability on the temporal domain.
+    % Since regions also include a number of patches, there can also be
+    % variability on the spatial domain.
+    %
+    
+    % Mean of all patches in a region in all sheets (S-T)
+    RegionNorm('Statistics.Region.Norm')
+    
+    % Mean of all patches in a region in a single sheet (S)
+    RegionMean('Statistics.Region.Mean')
+    
+    % Accuracy of region mean against region norm (S)
+    RegionAccuracy('Statistics.Region.Accuracy')
+    
+    % Variance of all patches in a region in all sheets (S)
+    RegionUniformity('Statistics.Region.Uniformity')
+    
+    % Variance of all patches in a region in a single sheet (S)
+    RegionEvenness('Statistics.Region.Evenness')
+    
+    % Variance of region mean in one region in all sheets (T)
+    RegionRepeatability('Statistics.Region.Repeatability')
+    
+    %% Sheet Statistics Definitions
+    % A sheet contains a number regions (1 or more). Sheet uniformity
+    % includes evenness and does not include repeatability. Sheets are a
+    % temporal subdivision which implies variability on the spatial domain.
+    % Since sheets are singluar, there can not be variability on the
+    % temporal domain.
+    %
+    
+    % Mean of all pataches in all regions in a single sheet (S)
+    SheetMean('Statistics.Sheet.Mean')
+    
+    % Accuracy of sheet mean against run mean (S)
+    SheetAccuracy('Statistics.Sheet.Accuracy')
+    
+    % Variance of all patches in all regions in a single sheet (S)
+    SheetEvenness('Statistics.Sheet.Evenness')
+    
+    %%% Run Statistics Definitions
+    % A run contains a number of sheets (more than 1). Run uniformity
+    % includes both evenness and repeatability. Runs are the combination of
+    % both spatial (region) and temporal (sheet) subdivisions which implies
+    % variability on both spatial and temporal domains
+    %
+    
+    % Mean of all patches in all regions in all sheets (S-T)
+    RunMean('Statistics.Run.Mean')
+    
+    % Accuracy of run mean against reference (S-T)
+    RunAccuracy('Statistics.Run.Accuracy')
+    
+    % Variance of all patches in all regions in all sheets (S-T)
+    RunUniformity('Statistics.Run.Uniformity')
+    
+    % Variance of sheet evenness in all sheets (S)
+    RunEvenness('Statistics.Run.Evenness')
+    
+    % Variance of region repeatability in all sheets (T)
+    RunRepeatability('Statistics.Run.Repeatability')
+    
+  end
+end
+
+
+##### SOURCE END #####
+--></body></html>

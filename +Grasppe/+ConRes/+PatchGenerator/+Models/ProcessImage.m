@@ -187,8 +187,13 @@ classdef ProcessImage < matlab.mixin.Copyable
     end
     
     function generatePlotFFT(obj)
+      try 
       stop(obj.ffttimer);
       fftdata = obj.Fourier;
+      
+      if isempty(fftdata)
+        fftdata = obj.image;
+      end
       
       if isreal(fftdata)
         fftdata = obj.forwardFFT(fftdata);
@@ -197,11 +202,29 @@ classdef ProcessImage < matlab.mixin.Copyable
       if isempty(obj.fftimage)
         obj.bandPlotFFT([]);
         fftimage = [];
-        while isempty(fftimage)
-          fftimage = obj.bandPlotFFT(fftdata);
-          pause(0.5);
+        if prod(size(fftdata)) < 768*768
+          while isempty(fftimage)
+            fftimage = obj.bandPlotFFT(fftdata);
+            pause(0.1);
+          end
+        else
+          fftimage = fftdata;
+          
+          if size(fftimage,3) > 1
+            fftimage = fftimage(:,:,1);
+            disp('Flattening Image...');
+          end
+          
+          fftimage     = real(log(1+abs(fftimage)));
+          imageMin     = min(fftimage(:)); imageMax = max(fftimage(:));
+          fftimage     = (fftimage-imageMin) / (imageMax-imageMin);
         end
+        
         obj.fftimage = fftimage;
+      end
+      catch err
+        disp(err);
+        return;
       end
     end
     
@@ -213,7 +236,7 @@ classdef ProcessImage < matlab.mixin.Copyable
         fxBusy = false;
         %try delete(hAxis);  end
         %try delete(hFig);   end
-        %return;
+        return;
       end
       
       if isequal(fxBusy, true)
@@ -277,17 +300,23 @@ classdef ProcessImage < matlab.mixin.Copyable
             yR = (yR*100)-(max(yR*100)/2);
                        
             yN = 1;
+            
+            x  = []; y = [];
             for m = 1:20:numel(xR) %min(xR):5:max(xR)
-              x = [ 0 0]  + (xD+xR(m)*xF);
+              xv = [ 0 0]  + (xD+xR(m)*xF);
               if yN==1
-                y = [-25 25]  + yD + nanmean(yR); %+yR(m);
+                yv = [-25 25]  + yD + nanmean(yR); %+yR(m);
                 yN = 0;
               else
-                y = [-10 10]  + yD + nanmean(yR); % +yR(m);
+                yv = [-10 10]  + yD + nanmean(yR); % +yR(m);
                 yN = 1;
               end
-              line(x+0.5, y, [0 0], 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
+              %x = [x xv];
+              %y = [y yv];
+              line(xv+0.5, yv, [0 0], 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
             end
+%           % line(x+0.5, y, zeros(size(x)), 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
+            
             
             plot(hAxis, xD+xR*xF,yD+yR, 'g', 'Linewidth', 2,'linesmoothing','on');
             

@@ -1,0 +1,3 @@
+isQuitting(true);
+
+PersistentSources('save');

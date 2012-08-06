@@ -27,7 +27,12 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       halftone  = ones(size(image));
       
-      image     = grasppeScreen3(image, ppi, spi, lpi, theta, print);
+      try
+        image     = grasppeScreen3(image, ppi, spi, lpi, theta, print);
+      catch err
+        disp(err);
+        rethrow(err);
+      end
       
       
       try

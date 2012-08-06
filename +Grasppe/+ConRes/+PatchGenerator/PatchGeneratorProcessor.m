@@ -53,8 +53,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       
       % try screenProcessor.Parameters = parameters.Screen; end
-      try printProcessor.Parameters = parameters.Print; end
-      try scanProcessor.Parameters = parameters.Scan; end
+      printProcessor.Parameters = parameters.Print;
+      scanProcessor.Parameters = parameters.Scan;
       
       % ffScreening( contone, resolution, title, spi, lpi, dpi, angles, noise)
       
