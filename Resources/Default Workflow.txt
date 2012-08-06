@@ -1,0 +1,7 @@
+Patch={Resolution=0.625, Contrast=5.0, Mean=50, Size=5.3},
+Screening={Angle=37.5, Resolution=175.0, Addressability=2450.0},
+Printing={Blur=100.0, Radius=1.0, Gain=0.0, Noise=0.0},
+Scanning={Resolution=1200.0, Scale=100.0},
+Function-0={ID=Function-0-HalftoneFFT, Expression=I:PFFT;},
+Function-1={ID=Function-1-ContoneImage, Expression=I:CIMG;},
+Function-2={ID=Function-2-ScreeningImage, Expression=I:SIMG;}

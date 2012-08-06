@@ -43,8 +43,17 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
   end
   
   methods
-    function obj = PatchGeneratorPanel()
+    function obj = PatchGeneratorPanel(varargin)
       obj=obj@Grasppe.Occam.Process();
+      if numel(varargin)==1
+        v = varargin{1};
+        if exist(v, 'file')>0
+          v = char(importdata(v));
+        end
+        obj.panelCode = v;
+      else
+        obj.panelCode = importdata('./Resources/Default Workflow.txt');
+      end
       obj.permanent = true;
     end
     
@@ -95,7 +104,10 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       obj.jParametersPanel    = jPanel;
       obj.hParametersPanel    = handle(jPanel,'CallbackProperties');
       
-      panelCode = strcat(obj.panelCode{:});
+      panelCode = obj.panelCode;
+      if iscellstr(panelCode)
+        panelCode = strcat(panelCode{:});
+      end
       
       obj.jParametersPanel.setValues(panelCode);  %'Patch={Resolution=0.625, Contrast=50, Mean=30, Size=5.3}, Screening={Angle=37.5, Resolution=175.0, Addressability=2450}, Printing={Blur=100.0, Radius=5.0, Gain=0.0, Noise=0.0}, Scanning={Resolution=1200.0, Scale=100.0}, Function-0-PatchFFT={ID=Function-0-PatchFFT, Expression=patchFFT;}, Function-1-ScreenImage={ID=Function-1-ScreenImage, Expression=screenImage;}, Function-2-ScreenPassFilter={ID=Function-2-ScreenPassFilter, Expression=imadjust(inverseFFT(1-binarize(normalize(log(abs(screenFFT)))/0.779)));}, Function-3-ScreenFilterI={ID=Function-3-ScreenFilterI, Expression=imadjust(inverseFFT(multiply(patchFFT/1-normalize(log(abs(screenFFT))))));}, Function-4-ScreenFilterII={ID=Function-4-ScreenFilterII, Expression=imadjust(inverseFFT(multiply(patchFFT/binarize(1-normalize(log(abs(screenFFT)))/0.24))));}, Function-5-IdealImage={ID=Function-5-IdealImage, Expression=idealImage;}, Function-6-IdealFilterII={ID=Function-6-IdealFilterII, Expression=imadjust(inverseFFT(multiply(patchFFT/binarize(normalize(log(abs(idealFFT)))/0.4))));}');
       
