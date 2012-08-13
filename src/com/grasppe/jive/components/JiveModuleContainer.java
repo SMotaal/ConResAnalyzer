@@ -61,6 +61,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -282,7 +284,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
    */
   protected void copyValues() {
 
-    String valueString = getValues().toString().trim();
+    String valueString = getValueString().toString().trim();
     
     valueString = valueString.substring(1, valueString.length()-1);
 
@@ -857,7 +859,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   protected void editValues() {
 	    //String valueString = new TextTransfer().getClipboardContents().replaceAll("}, ", "},\n");
 	  
-	    String valueString = getValues().toString().trim().replaceAll("}, ", "},\n");
+	    String valueString = getValueString().trim().replaceAll("}, ", "},\n");
 	    
 	    valueString = valueString.substring(1, valueString.length()-1);
 
@@ -1174,6 +1176,36 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
     return values;
   }
+  
+  public String getValueString() {
+	  LinkedHashMap<String, HashMap> values = getValues();
+	  String valueString = "{";
+	  int m = 0;
+	  for (String moduleKey : values.keySet()) {
+		  if (m++ > 0)
+			  valueString = valueString + "\n"; // ", ";
+		  valueString = valueString + moduleKey + "={";
+		  
+		  HashMap<String, Object> moduleValues = values.get(moduleKey);
+		  
+		  int n = 0;
+		  for (String fieldKey : moduleValues.keySet()) {
+			  Object fieldValue = moduleValues.get(fieldKey);
+			  if (n++ > 0)
+				  valueString = valueString + " | ";
+			  valueString = valueString + fieldKey + "=" + fieldValue.toString();
+		  }
+		  
+		  valueString = valueString + "}";
+	  }
+//	  for (Object moduleValues : values.values()) {
+//		  System.out.println((HashMap)moduleValues);
+//		  
+//	  }
+	  //String string = "";
+	  valueString = valueString + "}";
+	  return valueString;
+  }
 
   /**
    * @return
@@ -1220,7 +1252,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   }
   
   public void setValues(String valueString) {
-	  String[] sourceString = new String[8];
+	  String[] sourceStrings = new String[8];
 	  
 	  LinkedList<JiveModulePanel> previousModules = (LinkedList<JiveModulePanel>) modules.clone(); //new LinkedList<JiveModulePanel>();
 	  
@@ -1228,19 +1260,24 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 	  
 	  int n = 0;
 	  
-	  sourceString[n++] = valueString.replaceAll("\\s", "");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\{\\{", "\\{");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\}\\}", "\\}");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\=\\{", "\\|");
-	  //sourceString[n++] = sourceString[n-2].replaceAll("\\=", "\\|");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\},", "###");
-	  sourceString[n++] = sourceString[n-2].replaceAll(",", "\\|");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\{", "");
-	  sourceString[n++] = sourceString[n-2].replaceAll("\\}", "");
 	  
-	  GrasppeKit.debugText("SetValues>SourceStrings", arrayString(sourceString), 2);	  
+	  sourceStrings[n++] = valueString.replaceAll("\\n", "");
+//	  sourceString[n++] = sourceString[n-2].replaceAll("\\{\\{", "\\{");
+//	  sourceString[n++] = sourceString[n-2].replaceAll("\\}\\}", "\\}");
+//	  sourceString[n++] = sourceString[n-2].replaceAll("\\=\\{", "\\|");
+//	  sourceString[n++] = sourceString[n-2].replaceAll("\\=", "\\|");
+	  //sourceStrings[n++] = sourceStrings[n-2].replaceAll("\\;\\}\\{", "###{");
+	  sourceStrings[n++] = sourceStrings[n-2].replaceAll("\\},", "###");
+	  sourceStrings[n++] = sourceStrings[n-2].replaceAll("\\}", "###");
+	  //sourceString[n++] = sourceString[n-2].replaceAll(",", "\\|");
+	  sourceStrings[n++] = sourceStrings[n-2].replaceAll("\\{", "");
+	  // sourceStrings[n++] = sourceStrings[n-2].replaceAll("\\}", "");
 	  
-	  String[] processStrings = sourceString[sourceString.length-1].split("###");
+	  GrasppeKit.debugText("SetValues>SourceStrings", arrayString(sourceStrings), 2);
+	  
+	  String sourceString = sourceStrings[n-1];
+	  
+	  String[] processStrings = sourceString.split("###");
 	  
 	  GrasppeKit.debugText("SetValues>ProcessStrings", arrayString(processStrings), 2);
 	  
@@ -1249,17 +1286,18 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 	  for (String processString : processStrings){
 		  try {
 			  // LinkedHashMap<String, HashMap> moduleValues = new LinkedHashMap<String, HashMap>();
-			  String[] moduleStrings = processString.split("\\|");
+			  
+			  String moduleName = processString.split("=")[0];
+			  String moduleType = moduleName.split("-")[0];
+			  
+			  String[] moduleStrings = processString.substring(moduleName.length()+1).split(" \\| ");
 			  
 			  GrasppeKit.debugText("SetValues>ModuleStrings", arrayString(moduleStrings), 2);
-			  
-			  String moduleName = moduleStrings[0];
-			  String moduleType = moduleName.split("-")[0];
 			  
 			  GrasppeKit.debugText("SetValues>ModuleName", moduleName, 2);
 			  GrasppeKit.debugText("SetValues>ModuleType", moduleType, 2);
 			  
-			  String[] valuePairs = Arrays.copyOfRange(moduleStrings, 1, moduleStrings.length);
+			  String[] valuePairs = moduleStrings; // Arrays.copyOfRange(moduleStrings, 1, moduleStrings.length);
 			  
 //			  Arrays.asList(moduleStrings).toString();
 			  
@@ -1268,18 +1306,27 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 			  JiveModulePanel newPanel = createNewPanel(moduleType, null);
 			  
 			  for (String valuePair : valuePairs) {
-				  String[] pairStrings = valuePair.split("\\=");
+				  String[] pairStrings = valuePair.split("\\="); //"(?=[\\w-])\\="
 				  
-				  GrasppeKit.debugText("SetValues>PairStrings", arrayString(pairStrings), 2);
+				  String field = pairStrings[0];
+				  String value = valuePair.substring(field.length()+1);
+				  
+				  // Pattern p = Pattern.compile("[\\w-]*[(;\\s|}");
+				  // Matcher m = p.matcher("aaaaab");
+				  // System.out.println();
+				  // System.out.println(valuePair);
+				  // System.out.println(pairStrings);
+				  
+				  GrasppeKit.debugText("SetValues>PairStrings", field + "  =  " + value + ";", 2);
 				  try {
-					  Object value = newPanel.getValue(pairStrings[0]);
+					  Object currentValue = newPanel.getValue(field);
 					  
-					  if (value instanceof Double)
-						  newPanel.setValue(pairStrings[0], new Double(pairStrings[1]).doubleValue());
-					  if (value instanceof Integer)
-						  newPanel.setValue(pairStrings[0], new Double(pairStrings[1]).intValue());
+					  if (currentValue instanceof Double)
+						  newPanel.setValue(field, new Double(value).doubleValue());
+					  else if (currentValue instanceof Integer)
+						  newPanel.setValue(field, new Double(value).intValue());
 					  else
-						  newPanel.setValue(pairStrings[0], pairStrings[1]);
+						  newPanel.setValue(field, value);
 				  } catch (Exception exception) {
 					  GrasppeKit.debugError("SetValues>Pairs", exception, 1);
 				  }
