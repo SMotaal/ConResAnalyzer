@@ -37,7 +37,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     end
     
     
-    function output = RunSeries(obj, CRange, RRange)
+    function output = RunSeries(obj, varargin) %CRange, RRange)
       
       delete(timerfindall);
       
@@ -116,9 +116,52 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       ImageIndex = 0;
       
       % bands = 71;
+      
+      runData = [];
 
-      for rvalue = RRange
-        for cvalue = CRange
+      %for rvalue = RRange
+      %for cvalue = CRange
+      
+      SRange = varargin;
+      
+      if numel(SRange)==2
+        SRange = [50, SRange];
+      end
+      
+      if numel(SRange)==3
+        trange = SRange{1};
+        crange = SRange{2};
+        rrange = SRange{3};
+        
+        newRange = zeros(numel(trange)*numel(crange)*numel(rrange),3);
+        m = 1;
+        for t = trange
+          for c = crange
+            for r = rrange
+              newRange(m,:) = [t c r];
+              m = m +1;
+            end
+          end
+        end
+        
+        SRange = newRange;
+      end
+        
+      if ~iscell(SRange) && isnumeric(SRange)
+        newRange = cell(1,size(SRange,1));
+        
+        for s = 1:size(SRange,1)
+          newRange{s} = SRange(s, :);
+        end
+        
+        SRange = newRange;
+      end
+        
+      for s = 1:numel(SRange)
+        svalue = SRange{s};
+        tvalue = svalue(1);
+        cvalue = svalue(2);
+        rvalue = svalue(3);
 
           output      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
           % try screenProcessor.Parameters = parameters.Screen; end
@@ -198,17 +241,34 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               '-F' num2str(round(FQ*10),  '%0.3d')]);
             processImages = {screen, patch, reference, hiContrast};
             
+            
+            fxImages{1} = patch.copy;
+            fxImages{1}.Image = crossRFFT(screen.Image, hiContrast.Image);            
+            
+            fxImages{2} = patch.copy;
+            fxImages{2}.Image = crossRFFT(patch.Image, hiContrast.Image);
+            
+            fxImages{3} = patch.copy;
+            fxImages{3}.Image = crossRFFT(reference.Image, hiContrast.Image);
+            
+            fxImages{4} = patch.copy;
+            fxImages{4}.Image = crossRFFT(hiContrast.Image, hiContrast.Image);
+            
             seriesData  = [];
             seriesRData  = [];
+            seriesCData  = [];
             seriesImage = [];
             seriesRmg   = [];
+            seriesCmg = [];
             
             seriesFqs = {};
             seriesRFqs = {};
+            seriesCFqs = {};
             seriesIms = {};
             seriesRms = {};
+            seriesCms = {};
             
-            dataColumn = 4;
+            dataColumn = 2;
             
             parfor m = 1:numel(processImages)
               processImage = processImages{m};
@@ -230,19 +290,48 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               seriesRms{m} = rmage; %retina(image);
             end
             
+            parfor m = 1:numel(fxImages)
+              fxImage = fxImages{m};
+              
+              cdata   = fxImage.Fourier;
+              %cmage   = fxImage.FourierImage;
+              
+              [bFq fqCData] = Grasppe.Kit.ConRes.CalculateBandIntensity(cdata);
+              
+              seriesCFqs{m} = fqCData(:,dataColumn);
+              %seriesCms{m} = cmage; %retina(image);
+            end
+
+            
             seriesData = [1:size(seriesFqs{1},1)]';
             for m = 1:numel(processImages)
-              seriesData  = [seriesData seriesRFqs{m} seriesFqs{m}];
+              seriesData  = [seriesData seriesRFqs{m}]; % seriesFqs{m}];
               seriesImage = [seriesImage seriesIms{m}];
               seriesRmg   = [seriesRmg seriesRms{m}];
             end
             
-            seriesData = [seriesData(:,1) seriesData(:,2:2:end) seriesData(:,3:2:end)];
+            %seriesData = [seriesData(:,1) seriesData(:,2:2:end) seriesData(:,3:2:end)];
+            
+            for m = 1:numel(fxImages)
+              seriesData  = [seriesData seriesCFqs{m}];
+              %seriesCmg   = [seriesCmg seriesCms{m}];
+            end
+
             
             seriesImage = [seriesImage; seriesRmg];
             
+            zv = seriesData([-1:1]+floor(FQ),:);
+            [zc zi] = max(zv(:,end)); % yR(ceil(m))]);
+            zv = zv(zi,:);
+            zv(1) = FQ;
+            
+            runData = [runData; [RTV CON RES zv]];
+            
+            seriesData = [zv; seriesData];
+            
             dlmwrite([filename '.txt'], seriesData, '\t');
             imwrite(seriesImage, [filename '.png']);
+            %imwrite(seriesCmg, [filename '-cross.png']);
 
             %imwrite(, [filename '.png']);
             
@@ -283,10 +372,10 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
 %           ImageIndex = ImageIndex + 1;
 %           imwrite(scannedImage, ['Output/image' int2str(ImageIndex) '.png']);
           
-        end
+        %end
       end
       
-      %mat2clip(Tally);
+      dlmwrite(fullfile('Output', 'series-data.txt'), runData, '\t');
       
       parameters.Patch.Contrast     = csetting;
       parameters.Patch.Resolution   = rsetting;

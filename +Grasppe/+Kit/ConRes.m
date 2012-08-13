@@ -204,7 +204,7 @@ classdef ConRes
         fsum  = sum(flt(:));
       end
       
-      fimg    = abs(img.*flt);
+      fimg    = abs(img).*flt;
       
       isum    = sum(fimg(:));
       

@@ -1,4 +1,4 @@
-Patch={Resolution=4.386 | Contrast=1.0 | Mean=50 | Size=5.3}
+Patch={Resolution=4.386 | Contrast=25 | Mean=50 | Size=5.3}
 Screening={Angle=37.5 | Resolution=175.0 | Addressability=2450.0}
 Printing={Blur=100.0 | Radius=0.0 | Gain=0.0 | Noise=0.0}
 Scanning={Resolution=1200.0 | Scale=100.0}
@@ -7,6 +7,6 @@ Function-1-ContoneImage={ID=Function-1-ContoneImage | Expression=I=retina(CIMG);
 Function-2-ScreeningImage={ID=Function-2-ScreeningImage | Expression=I=retina(SIMG);}
 Function-3={ID=Function-3 | Expression=I=retina(HIMG);}
 Function-4={ID=Function-4 | Expression=I=crossRFFT(PIMG, HIMG);}
-Function-5={ID=Function-5 | Expression=I=crossRFFT(HIMG, HIMG);}
-Function-6={ID=Function-6 | Expression=I=crossRFFT(CIMG, HIMG);}
-Function-7={ID=Function-7 | Expression=I=crossRFFT(CIMG, CIMG);}
+Function-5={ID=Function-5 | Expression=I=crossRFFT(CIMG, HIMG);}
+Function-6={ID=Function-6 | Expression=I=crossRFFT(HIMG, HIMG);}
+Function-7={ID=Function-7 | Expression=I=crossRFFT(SIMG, HIMG);}

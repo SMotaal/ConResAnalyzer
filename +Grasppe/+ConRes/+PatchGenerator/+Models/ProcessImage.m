@@ -292,24 +292,26 @@ classdef ProcessImage < matlab.mixin.Copyable
             
             dispdbg('Generating Plot...');
             
-            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(image1b); %image1
+            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(image1b)); %image1
             
-            baseData  = [];
-            baseRow   = 1;
+            %             baseData  = [];
+            %             baseRow   = 1;
+            %
+            %             fqData(2:end+1, :)  = fqData;
+            %             fqData(1, :)        = idx;
+            %
+            %             nBands = size(fqData, 1);
+            %
+            %             try
+            %               baseData  = evalin('base', 'BandIntensityData');
+            %               baseRow   = size(baseData,1)+1;
+            %             end
+            %
+            %             baseData(baseRow:baseRow+nBands-1, :) = fqData;
+            %
+            %             assignin('base', 'BandIntensityData', baseData);
             
-            fqData(2:end+1, :)  = fqData;
-            fqData(1, :)        = idx;
-            
-            nBands = size(fqData, 1);
-            
-            try
-              baseData  = evalin('base', 'BandIntensityData');
-              baseRow   = size(baseData,1)+1;
-            end
-            
-            baseData(baseRow:baseRow+nBands-1, :) = fqData;
-            
-            assignin('base', 'BandIntensityData', baseData);
+            bFq = fqData(:,2);
             
             yR  = bFq/max(bFq(:));
             xR  = 1:numel(bFq);
@@ -368,7 +370,7 @@ classdef ProcessImage < matlab.mixin.Copyable
                 xv = [0 0] + xD + m*xF;
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
                 
-                zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
+                % zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
                 
                 % text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' num2str(zv,'%3.1f') ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
                 text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f')], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
@@ -376,14 +378,14 @@ classdef ProcessImage < matlab.mixin.Copyable
             end
                        
             if isnumeric(fQ) %&& ~isempty(fQ)
-              fQ2 = fQ(1) * [0.25 0.5 0.75 1 1.25 1.5];
+              fQ2 = fQ(1) * [0.25 0.5 1 1.5]; %[0.25 0.5 0.75 1 1.25 1.5];
               for m = fQ2
                 yv = [-20 20]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
-                zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
+                zv = max(bFq([-1:1]+floor(m))); % yR(ceil(m))]);
                 
-                text(mean(xv), min(yv)-15, 0, num2str(zv,'%2.0f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
+                text(mean(xv), min(yv)-15, 0, num2str(zv,'%3.2f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7); %, 'FontWeight', 'bold');
                 
                 %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
               end
@@ -401,7 +403,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           end
           
         catch err
-          disp err
+          disp(err);
         end
         tocdbg(R);
       end

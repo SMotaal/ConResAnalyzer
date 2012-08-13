@@ -122,7 +122,7 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
       h = obj.Window;
       if isempty(h), h = 0; end
       
-      status('', h);
+      try status('', h); end
     end
     
     function parameters = getParameters(obj)
