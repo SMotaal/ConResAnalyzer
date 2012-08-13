@@ -19,6 +19,7 @@ function [ output_args ] = cleardebug( input_args )
     evalin('base', 'delete(timerfindall());');  
     try delete(findobj(findall(0),'type','figure')); catch err, end
     delete(timerfindall);
+    evalin('base', 'clear java;');
     assignin('base', 'dbstate', dbstate);
     evalin('base', 'dbstop(dbstate)');
     evalin('base', 'clear dbstate;');

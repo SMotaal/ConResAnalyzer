@@ -21,17 +21,14 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     jComponents={}
     
     panelCode = { ...
-      'Patch={Resolution=0.625, Contrast=5, Mean=50, Size=5.3},'
-      'Screening={Angle=37.5, Resolution=175.0, Addressability=2450.0},'
-      'Printing={Blur=100.0, Radius=1.0, Gain=0.0, Noise=0},'
-      'Scanning={Resolution=1200, Scale=100},'
-      'Function-0-PatchFFT={ID=Function-0-PatchFFT, Expression=I:PFFT;},'
-      'Function-1-ScreenImage={ID=Function-1-ScreenImage, Expression=I:SIMG;},'
-      'Function-2-ScreenFilterI={ID=Function-2-ScreenFilterI, Expression=I:iFFTL(PFFT.*norverse(logabs(SFFT)));},'
-      'Function-3-ScreenPassFilter={ID=Function-3-ScreenPassFilter, Expression=I:iFFTL(1-binor(logabs(SFFT)/0.779));},'
-      'Function-4-ScreenFilterII={ID=Function-4-ScreenFilterII, Expression=I:iFFTL(PFFT.*binorverse(logabs(SFFT)/0.24));},'
-      'Function-5-IdealImage={ID=Function-5-IdealImage, Expression=I:CIMG;},'
-      'Function-6-IdealFilterII={ID=Function-6-IdealFilterII, Expression=I:iFFTL(PFFT.*binor(logabs(CFFT)/0.4));}'      };
+      'Patch={Resolution=0.625 | Contrast=5.0 | Mean=50 | Size=5.3}'
+      'Screening={Angle=37.5 | Resolution=175.0 | Addressability=2450.0}'
+      'Printing={Blur=100.0 | Radius=1.0 | Gain=0.0 | Noise=0.0}'
+      'Scanning={Resolution=1200.0 | Scale=100.0}'
+      'Function-0={ID=Function-0-HalftoneFFT | Expression=I=PFFT;}'
+      'Function-1={ID=Function-1-ContoneImage | Expression=I=CIMG;}'
+      'Function-2={ID=Function-2-ScreeningImage | Expression=I=SIMG;}'
+      };
   end
   
   events
@@ -77,18 +74,38 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       disp('Creating Panel');
       
-      cFrame = get(0,'CurrentFigure');
+      cFrame    = get(0,'CurrentFigure');
+      
+      sPosition = get(0,'Screensize');
+      
+      try
+        sDevices  = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices;
+
+        if numel(sDevices) > 1
+          sDevice = sDevices(2);
+          
+          sBounds   = sDevice.getDefaultConfiguration.getBounds;
+          s1Bounds  = sDevices(1).getDefaultConfiguration.getBounds;
+          sPosition = [1+sBounds.x 1+s1Bounds.height+sBounds.y sBounds.width sBounds.height];
+        else
+          sDevice = sDevices(1);
+          sBounds   = sDevice.getDefaultConfiguration.getBounds;
+          sPosition = [1 1 sBounds.width sBounds.height];     
+        end
+      end
       
       oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', ...
         'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL', ...
-        'CloseRequestFcn', @(src, event) delete(obj) ...
-        };
+        'CloseRequestFcn', @(src, event) delete(obj), ...
+        'Visible', 'off'};
       
       if ~isempty(cFrame) && ishandle(cFrame) && isvalid(cFrame)
         hFrame = figure(cFrame, oFrame{:});
       else
         hFrame = figure(oFrame{:});
       end
+      
+      %set(hFrame, 'Position', sPosition);
       
       jFrame = get(handle(hFrame),'JavaFrame');
       
@@ -120,11 +137,17 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       obj.hApplyButton.ActionPerformedCallback = @(src, e)obj.eventCallback(src, e, 'applyChanges');
       
+      set(hFrame, 'Visible', 'on');
+      
       drawnow expose update;
       
-      try obj.jParametersPanel.enableFullScreenMode(jFrame.fHG1Client.getWindow); end
+      %try jFrame.fHG1Client.getWindow.setBounds(sBounds); end
+      %drawnow expose update;
       
+      % try obj.jParametersPanel.enableFullScreenMode(jFrame.fHG1Client.getWindow); end
+      %try jFrame.setVisible(true); end
       try jFrame.fHG1Client.toFront(); end
+      try jFrame.fHG1Client.getWindow.setBounds(sBounds); end
       try jFrame.setMaximized(true); end
       
       % frame = handle(frame);
@@ -132,6 +155,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       obj.jParametersPanel.transferFocus();
       
       drawnow expose update;
+      %try jFrame.fHG1Client.getWindow.setBounds(sBounds); end
       
     end
     
@@ -226,11 +250,11 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       set(hFrame, 'ResizeFcn', @(src, e) obj.resizeCallback(src, e));
       
       hAxis  = obj.newAxes('xtick',[],'ytick',[], 'Visible', 'off');
-          
+      
       imgd = im2double(img);
       if ~isreal(imgd)
         disp('wait a second');
-      end      
+      end
       
       hold on;
       hImage = imshow(imgd, 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
@@ -347,7 +371,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
           try
             axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
           catch err
-            disp(err);
+            % disp(err);
           end
         end
         
@@ -382,25 +406,25 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         end
       end
       
-%       hFrame  = obj.hFrame;
-%       
-%       hAxes   = obj.hAxes;
-%       nA      = numel(hAxes);      
-%       
-%       pFrame  = pixelPosition(hFrame);
-%       axesMap = zeros(pFrame([3 4])+1);
-%       
-%       for m = 1:nA
-%         hAxis = hAxes{m};
-%         pAxis = round(pixelPosition(hAxis))+1;
-%         try
-%           axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
-%         catch err
-%           disp(err);
-%         end
-%       end
-%       
-%       obj.mAxes = axesMap;
+      %       hFrame  = obj.hFrame;
+      %
+      %       hAxes   = obj.hAxes;
+      %       nA      = numel(hAxes);
+      %
+      %       pFrame  = pixelPosition(hFrame);
+      %       axesMap = zeros(pFrame([3 4])+1);
+      %
+      %       for m = 1:nA
+      %         hAxis = hAxes{m};
+      %         pAxis = round(pixelPosition(hAxis))+1;
+      %         try
+      %           axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
+      %         catch err
+      %           disp(err);
+      %         end
+      %       end
+      %
+      %       obj.mAxes = axesMap;
     end
     
     function validateAxes(obj)

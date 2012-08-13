@@ -12,6 +12,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       variables = obj.Variables;
       params  = obj.Parameters;
       
+      output.Variables = variables;
       try
         obj.sandbox(params, output);
       catch err
@@ -19,10 +20,13 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         disp(err);
       end
       
-      obj.Variables = variables;
+      obj.Variables = output.Variables;
     end
     
     function sandbox(obj, params, output)
+      
+      %debugging = true;
+      
       try
         fourier       = @(varargin) obj.fourier(varargin{:});
         forwardFFT    = @(varargin) obj.forwardFFT(varargin{:});
@@ -55,6 +59,15 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         binormaverse  = @(x, y)     binarize(normaverse(x),y);
         binorverse    = @(x, y)     binormaverse(x,y);
         
+        disk          = @(x, y)     imfilter(x,fspecial('disk',y),'replicate');
+        
+        HR            = 10;
+        retina        = @(x)        disk(x, HR);
+        
+        retinaFFT     = @(x)        fFFT(retina(x));
+        
+        crossRFFT     = @(x, y)     mul(retinaFFT(x), retinaFFT(y));
+        
         store         = @(n,v)      obj.store(n,v); %eval('assignin(''''caller'''', n, v), v'); %evalin('caller', 'obj.Variables.(' n ') = v;');
         
         level         = @(varargin) imadjust(varargin{:});
@@ -64,33 +77,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         
         logabs        = @(x)        log(abs(x));
         
-        
         processData   = output.ProcessData;
-        
-        structVars(obj.Variables);
-        
-        structVars(params);
-        
-        s = processData.getDataStruct();
-        
-        structVars(s);
-        clear s;
-        
-        image = output.Image;
-        
-        patchImage    = PatchImage.Image;
-        patchFFT      = PatchImage.Fourier;
-        idealImage    = ReferenceImage.Image;
-        idealFFT      = ReferenceImage.Fourier;
-        screenImage   = HalftoneImage.Image;
-        screenFFT     = HalftoneImage.Fourier;
-        
-        PIMG          = patchImage;
-        PFFT          = patchFFT;
-        CIMG          = idealImage;
-        CFFT          = idealFFT;
-        SIMG          = screenImage;
-        SFFT          = screenFFT;
         
         err = [];
         coreVars = [];
@@ -102,8 +89,59 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
           expression  = strrep(expression, ':', '=');
         end
         
-        coreVars = who;
         
+        s = processData.getDataStruct();
+        
+        structVars(s);
+        clear s;
+        
+        image = output.Image;        
+        
+        structVars(params);        
+        
+        coreVars = who;
+                
+        structVars(output.Variables);
+        
+        hiContrast    = ReferenceImage.copy;
+        hiContrast.Image = imadjust(hiContrast.Image);
+        
+        patchImage    = PatchImage.Image;
+        patchFFT      = PatchImage.Fourier;
+        idealImage    = ReferenceImage.Image;
+        idealFFT      = ReferenceImage.Fourier;
+        contrastImage = hiContrast.Image;
+        contrastFFT   = hiContrast.Fourier;
+        idealFFT      = ReferenceImage.Fourier;
+        screenImage   = HalftoneImage.Image;
+        screenFFT     = HalftoneImage.Fourier;
+        
+        PIMG          = patchImage;
+        PFFT          = patchFFT;
+        CIMG          = idealImage;
+        CFFT          = idealFFT;
+        HIMG          = contrastImage;
+        HFFT          = contrastFFT;        
+        SIMG          = screenImage;
+        SFFT          = screenFFT;
+        
+        %coreVars = who;
+        
+        RES           = Patch.Resolution;
+        CON           = Patch.Contrast;
+        RTV           = Patch.Mean;      
+        
+        SR            = ScanFactor;
+        HR            = HumanFactor;
+        
+        PS            = ceil(Patch.Size*(SR/25.4));
+        
+        FQ            = RES / (SR/25.4) * PS * 2;
+        
+        %FQ            = Patch.Resolution / (ScanFactor/25.4) * ceil(Patch.Size*(ScanFactor/25.4)) * 2;
+        
+        output.FundamentalFrequencies = unique([FQ output.FundamentalFrequencies]);
+                        
         try
           eval(expression); %image = eval(expression);
         catch err
@@ -115,10 +153,71 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         if exist('I', 'var')
           image = I;
           clear I;
+          
+          if ~isreal(image)
+            
+            cpixel = round(size(image)./2);
+
+            cmod = @(x) sqrt((real(x)^2) + (imag(x)^2));
+
+            cval = image(cpixel(1),cpixel(2));
+            mod1 = abs(cval);
+            mod2 = cmod(cval);
+
+            %disp(['Modulus ' num2str(mod2) ' (' num2str(mod1) ')']);
+            % disp(['Modulus ' num2str(cmod(image(cpixel(1),cpixel(2)))) ]);
+
+            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FQ, 1); %, filters{m}, sums{m});
+
+            %disp(['Fundamental ' num2str(FR) ' px ~ ' num2str(rat)]);
+            
+            if ~exist('Modulus','var') || ~isnumeric(Modulus)
+              Modulus = [];
+            end
+            
+            if ~exist('Intensity','var') || ~isnumeric(Intensity)
+              Intensity = [];
+            end
+            
+            if ~exist('Labels','var') || ~iscellstr(Labels)
+              Labels = {};
+            end 
+            
+            if ~exist('Tally','var') || ~iscell(Tally)
+              Tally = {'ID', 'TV', 'CV', 'RV', 'FQ', 'F-Sum', 'F-Area', 'F-Modulus', 'C-Modulus', 'Function'};
+            else
+              %disp(Tally);
+            end 
+            
+            Modulus(end+1) = mod1;
+            Intensity(end+1) = rat;
+            Labels{end+1} = Expression;
+            
+            Tally(size(Tally,1)+1, :) = {ID, RTV, CON, RES, FQ, isum, fsum, rat, mod1, Expression};
+            
+            %output.Variables.Tally = Tally;
+            
+            mat2clip(Tally);
+            
+%             tallyString = '';
+%             
+%             for m = 1:size(Tally,1)
+%               %tallyString = strcat(tallyString, sprintf('%s\n',sprintf('%s\t', Tally{m,:})));
+%               tallyString = strvcat(tallyString, sprintf('%s\t', Tally{m,:}));
+%             end
+%             
+%             clipboard('copy', tallyString(:));
+            
+            clear cpixel cmod cval flt fimg mod1 mod2 isum fsum rat;
+            
+          end
+          
         end
         
         allVars = who;
         newVars = {};
+        
+        variables = output.Variables;
         
         for m = 1:numel(allVars)
           try
@@ -126,8 +225,8 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
             v = eval(n);
             c = any(strcmpi(coreVars, n));
             if c==0
-              disp([n ' = ' toString(v) ' (' class(v) ')']);
-              output.Variables.(n) = v;
+              %disp([n ' = ' toString(v) ' (' class(v) ')']);
+              variables.(n) = v;
               newVars{end+1} = n;
             end
           catch err
@@ -137,8 +236,24 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         
         output.Image = image;
         
+        output.Variables = variables;
+        
         if ~isreal(image)
           output.Domain = 'frequency';
+%           cpixel = round(size(image)./2);
+%           
+%           cmod = @(x) sqrt((real(x)^2) + (imag(x)^2));
+%           
+%           cval = image(cpixel(1),cpixel(2));
+%           mod1 = abs(cval);
+%           mod2 = cmod(cval);
+%           
+%           disp(['Modulus ' num2str(mod2) ' (' num2str(mod1) ')']);
+%           % disp(['Modulus ' num2str(cmod(image(cpixel(1),cpixel(2)))) ]);
+%           
+%           [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FR, 1); %, filters{m}, sums{m});
+%           
+%           disp(['Fundamental ' num2str(FR) ' px ~ ' num2str(rat)]);
         end
         
         return;
@@ -158,21 +273,23 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
       
+      %debugging = true;
+      
       v = varargin;
       
       try
         switch lower(operation)
           case 'add'
-            disp('Adding...');
+            dispdbg('Adding...');
             image = v{1}+v{2};
           case 'subtract'
-            disp('Subtracting...');
+            dispdbg('Subtracting...');
             image = v{1}-v{2};
           case 'multiply'
-            disp('Multiplying...');
+            dispdbg('Multiplying...');
             image = v{1}.*v{2};
           case 'divide'
-            disp('Dividing...');
+            dispdbg('Dividing...');
             image = v{1}./v{2};
           otherwise
             warning('Cannot perform %s operation because it is not support.', toString(operation));
@@ -248,6 +365,8 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       output  = evalin('caller', 'output');
       image   = evalin('caller', 'image');
       
+      %debugging = true;
+      
       method  = 1;
       
       
@@ -262,7 +381,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
           output.Domain = 'frequency';
       end
       
-      disp([method varargin{1}]);
+      dispdbg([method varargin{1}]);
     end
   end
 end

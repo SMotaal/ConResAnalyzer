@@ -118,6 +118,11 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
           notify(obj, 'ExecutionFailed');
           obj.Status = obj.FAILED_STATUS;
       end
+      
+      h = obj.Window;
+      if isempty(h), h = 0; end
+      
+      status('', h);
     end
     
     function parameters = getParameters(obj)

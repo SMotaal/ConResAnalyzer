@@ -11,7 +11,7 @@ function [ image range contrast reference] = ConcentricCircles( cycles, referenc
   
   contrast  = min(contrast, (50-abs(50-reference))* 2);
   
-  contrast  = contrastRange(find(contrastRange <= contrast, 1, 'first'));  
+  % contrast  = contrastRange(find(contrastRange <= contrast, 1, 'first'));  
   
   cycles    = abs(cycles);
   reference = (100 - abs(reference)) / 100.0;

@@ -117,7 +117,7 @@ classdef ConRes
       % evalin('caller', 'import(''Imports{:}'');');
     end
     
-    function fQ = CalculateBandIntensity(fImg)
+    function [fQ currentData] = CalculateBandIntensity(fImg)
       
       persistent bandFilters bandSize bandSums;
             
@@ -126,7 +126,7 @@ classdef ConRes
       try
         fH = size(fImg,1);
         fW = size(fImg,2);
-        nBands = floor(min(size(fImg))/2);
+        nBands = floor(min(size(fImg))/7);
         fQ = zeros(1, nBands);
         
         if ~isequal(bandSize, nBands)
@@ -138,19 +138,31 @@ classdef ConRes
         filters = bandFilters;
         sums    = bandSums;
         
+        currentData = zeros(nBands, 4);
+        
         parfor m = 1:nBands
           try
-          if isempty(filters{m})
-            bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
-            bSum        = sum(bFilter(:));
-            filters{m}  = bFilter;
-            sums{m}     = bSum;
-          else
-            bFilter = filters{m};
-            bSum    = sums{m};
-          end
-          bImage  = abs(fImg).*bFilter;
-          fQ(m)   = sum(bImage(:))/bSum;
+            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 1, filters{m}, sums{m});
+            
+%           if isempty(filters{m})
+%             bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
+%             bSum        = sum(bFilter(:));
+%             filters{m}  = bFilter;
+%             sums{m}     = bSum;
+%           else
+%             bFilter = filters{m};
+%             bSum    = sums{m};
+%           end
+%           bImage  = abs(fImg).*bFilter;
+%           fQ(m)   = sum(bImage(:))/bSum;
+
+            filters{m} = flt;
+            sums{m} = fsum;
+            
+            fQ(m) = rat;
+            
+            currentData(m,:) = [m isum fsum rat];
+            
           catch err
             disp(err);
           end
@@ -159,6 +171,17 @@ classdef ConRes
         bandFilters = filters;
         bandSums    = sums;
         
+        % baseData  = [];
+        % baseRow   = 1;
+        % try
+        %   baseData  = evalin('base', 'BandIntensityData');
+        %   baseRow   = size(baseData,1)+1;
+        % end
+        %
+        % baseData(baseRow:baseRow+nBands-1, :) = currentData;
+        %
+        % assignin('base', 'BandIntensityData', baseData);
+        
       catch err
         disp(err);
       end
@@ -166,6 +189,31 @@ classdef ConRes
       warning(s);
     end
     
+    function [isum fsum rat flt fimg] = BandIntensityValue(img, sz, bnd, wd, flt, fsum)
+      
+      if nargin<4 || ~isscalar(wd) || ~isnumeric(wd)
+        wd    = 1;
+      end
+      
+      if nargin<5 || isempty(flt) || ~isnumeric(flt);
+        flt   = bandfilter('gaussian', 'pass', sz, sz, bnd, wd);
+        fsum  = [];
+      end
+      
+      if nargin<6 || isempty(fsum) || ~isscalar(fsum) || ~isnumeric(fsum);
+        fsum  = sum(flt(:));
+      end
+      
+      fimg    = abs(img.*flt);
+      
+      isum    = sum(fimg(:));
+      
+      rat     = isum / fsum;
+      
+      %disp([bnd isum fsum rat]);
+      
+    end
+          
   end
   
   

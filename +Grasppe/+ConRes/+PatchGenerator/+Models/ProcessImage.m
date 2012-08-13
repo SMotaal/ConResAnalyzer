@@ -23,6 +23,7 @@ classdef ProcessImage < matlab.mixin.Copyable
     PlotFFT = true;
     fftimage;
     ffttimer;
+    FundamentalFrequencies
   end
   
   properties (Access=private)
@@ -147,11 +148,11 @@ classdef ProcessImage < matlab.mixin.Copyable
       if isreal(image)
         image = obj.forwardFFT(image);
       end
-%       switch (obj.Domain)
-%         case 'frequency'
-%         otherwise
-%           image = obj.forwardFFT(image);
-%       end
+      %       switch (obj.Domain)
+      %         case 'frequency'
+      %         otherwise
+      %           image = obj.forwardFFT(image);
+      %       end
     end
     
     function image = get.FourierImage(obj)
@@ -187,41 +188,44 @@ classdef ProcessImage < matlab.mixin.Copyable
     end
     
     function generatePlotFFT(obj)
-      try 
-      stop(obj.ffttimer);
-      fftdata = obj.Fourier;
       
-      if isempty(fftdata)
-        fftdata = obj.image;
-      end
+      %debugging = true;
       
-      if isreal(fftdata)
-        fftdata = obj.forwardFFT(fftdata);
-      end
-      
-      if isempty(obj.fftimage)
-        obj.bandPlotFFT([]);
-        fftimage = [];
-        if prod(size(fftdata)) < 768*768
-          while isempty(fftimage)
-            fftimage = obj.bandPlotFFT(fftdata);
-            pause(0.1);
-          end
-        else
-          fftimage = fftdata;
-          
-          if size(fftimage,3) > 1
-            fftimage = fftimage(:,:,1);
-            disp('Flattening Image...');
-          end
-          
-          fftimage     = real(log(1+abs(fftimage)));
-          imageMin     = min(fftimage(:)); imageMax = max(fftimage(:));
-          fftimage     = (fftimage-imageMin) / (imageMax-imageMin);
+      try
+        stop(obj.ffttimer);
+        fftdata = obj.Fourier;
+        
+        if isempty(fftdata)
+          fftdata = obj.image;
         end
         
-        obj.fftimage = fftimage;
-      end
+        if isreal(fftdata)
+          fftdata = obj.forwardFFT(fftdata);
+        end
+        
+        if isempty(obj.fftimage)
+          obj.bandPlotFFT([]);
+          fftimage = [];
+          if prod(size(fftdata)) < 768*768
+            while isempty(fftimage)
+              fftimage = obj.bandPlotFFT(fftdata);
+              pause(0.1);
+            end
+          else
+            fftimage = fftdata;
+            
+            if size(fftimage,3) > 1
+              fftimage = fftimage(:,:,1);
+              dispdbg('Flattening Image...');
+            end
+            
+            fftimage     = real(log(1+abs(fftimage)));
+            imageMin     = min(fftimage(:)); imageMax = max(fftimage(:));
+            fftimage     = (fftimage-imageMin) / (imageMax-imageMin);
+          end
+          
+          obj.fftimage = fftimage;
+        end
       catch err
         disp(err);
         return;
@@ -230,7 +234,9 @@ classdef ProcessImage < matlab.mixin.Copyable
     
     function image = bandPlotFFT(obj, image)
       
-      persistent  fxBusy; %hFig hAxis
+      persistent  fxBusy idx; %hFig hAxis
+      
+      %debugging = true;
       
       if isempty(image)
         fxBusy = false;
@@ -247,17 +253,27 @@ classdef ProcessImage < matlab.mixin.Copyable
       try
         
         fxBusy=true;
-        disp('Generating Image...');
+        dispdbg('Generating Image...');
         R=tic;
         try
+          
+          if isempty(idx), idx = 1; 
+          else idx = idx + 1; end
+          
+          try
+            idx = evalin('base', 'BandIDX')+1;
+          end
+          
+          assignin('base', 'BandIDX', idx);     
           
           image1 = image;
           
           if size(image1,3) > 1
             image1 = image1(:,:,1);
-            disp('Flattening Image...');
+            dispdbg('Flattening Image...');
           end
           
+          image1b = image1;
           
           image1     = real(log(1+abs(image1)));
           imageMin  = min(image1(:)); imageMax = max(image1(:));
@@ -266,25 +282,49 @@ classdef ProcessImage < matlab.mixin.Copyable
           if isequal(obj.PlotFFT, true)
             
             %if ~isscalar(hFig) || ~ishandle(hFig)
-              hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300]);
+            hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300]);
             %  hAxis = [];
             %end
             
             %if ~isscalar(hAxis) || ~ishandle(hAxis)
-              hAxis = axes('Parent', hFig); % 'Visible', 'off'
+            hAxis = axes('Parent', hFig); % 'Visible', 'off'
             %end
             
-            disp('Generating Plot...');
+            dispdbg('Generating Plot...');
             
-            bFq = Grasppe.Kit.ConRes.CalculateBandIntensity(image1); %hold on; plot(bFq);
+            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(image1b); %image1
+            
+            baseData  = [];
+            baseRow   = 1;
+            
+            fqData(2:end+1, :)  = fqData;
+            fqData(1, :)        = idx;
+            
+            nBands = size(fqData, 1);
+            
+            try
+              baseData  = evalin('base', 'BandIntensityData');
+              baseRow   = size(baseData,1)+1;
+            end
+            
+            baseData(baseRow:baseRow+nBands-1, :) = fqData;
+            
+            assignin('base', 'BandIntensityData', baseData);
             
             yR  = bFq/max(bFq(:));
             xR  = 1:numel(bFq);
             zR  = ones(size(xR));
             
-            xF  = 0.75;
-            xD  = (size(image1,2)/4*1.25);            
-            yD  = size(image1,1)/2;
+            xF  = (7/2);
+            xD  = 0.5 + floor((size(image1,2)/4));
+            yD  = 0.5 + floor(size(image1,1)/2);
+            
+            yZ = 3;
+            %yM = [max(yR) max(yR(yZ:end))]
+            %yR = yR
+            yR = (yR*100)-(max(yR(yZ:end)*100)/2);
+            yM = nanmean(yR(yZ:end));
+            yS = 5; %yM; %*2;            
             
             %hold on;
             
@@ -295,32 +335,62 @@ classdef ProcessImage < matlab.mixin.Copyable
             imshow(image2, 'Parent', hAxis);
             truesize(hFig);
             
+            lOp = {'Parent', hAxis, 'LineWidth', 0.5, 'linesmoothing','on'};
+            
             hold on;
             
-            yR = (yR*100)-(max(yR*100)/2);
-                       
             yN = 1;
-            
             x  = []; y = [];
-            for m = 1:20:numel(xR) %min(xR):5:max(xR)
+            for m = 1:5:numel(xR) %min(xR):5:max(xR)
               xv = [ 0 0]  + (xD+xR(m)*xF);
               if yN==1
-                yv = [-25 25]  + yD + nanmean(yR); %+yR(m);
+                yv = [-35 35]  + yD + yM + yS; %+yR(m);
                 yN = 0;
               else
-                yv = [-10 10]  + yD + nanmean(yR); % +yR(m);
+                yv = [-25 25]  + yD + yM + yS; % +yR(m);
                 yN = 1;
               end
               %x = [x xv];
               %y = [y yv];
-              line(xv+0.5, yv, [0 0], 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
+              line(xv, yv, [0 0], 'Color', 'w', 'LineStyle', '-',   lOp{:}, 'LineWidth', 0.25);
+              line(xv, yv, [0 0], 'Color', 'k', 'LineStyle', ':',  lOp{:});
             end
-%           % line(x+0.5, y, zeros(size(x)), 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');
+            %           % line(x+0.5, y, zeros(size(x)), 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');            
             
             
-            plot(hAxis, xD+xR*xF,yD+yR, 'g', 'Linewidth', 2,'linesmoothing','on');
+            plot(hAxis, xD+xR*xF, yD+yR+yS, 'g', lOp{:}, 'Linewidth', 0.5);            
+                        
+            fQ = [obj.FundamentalFrequencies];
             
-            disp('Exporting Image...');
+            if isnumeric(fQ) %&& ~isempty(fQ)
+              for m = fQ
+                yv = [-35 35]  + yD + yM + yS; %+yR(m);
+                xv = [0 0] + xD + m*xF;
+                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
+                
+                zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
+                
+                % text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' num2str(zv,'%3.1f') ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
+                text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f')], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
+              end
+            end
+                       
+            if isnumeric(fQ) %&& ~isempty(fQ)
+              fQ2 = fQ(1) * [0.25 0.5 0.75 1 1.25 1.5];
+              for m = fQ2
+                yv = [-20 20]  + yD + yM + yS; %+yR(m);
+                xv = [0 0] + xD + m*xF;
+                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
+                zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
+                
+                text(mean(xv), min(yv)-15, 0, num2str(zv,'%2.0f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
+                
+                %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
+              end
+            end
+            
+            
+            dispdbg('Exporting Image...');
             
             image = export_fig(hFig); %, [1 1 size(image2,2) size(image2,1)]);
             
@@ -333,7 +403,7 @@ classdef ProcessImage < matlab.mixin.Copyable
         catch err
           disp err
         end
-        toc(R);
+        tocdbg(R);
       end
       
       fxBusy=false;
