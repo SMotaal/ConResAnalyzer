@@ -16,18 +16,13 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     
     function obj = PatchGeneratorProcessor()
       obj = obj@Grasppe.Occam.Process;
-      %       obj.PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
-      %       obj.ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
-      %       obj.PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
-      %       obj.ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
-      %       obj.UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
+
       obj.permanent = true;
       obj.addProcess(obj.PatchProcessor);
       obj.addProcess(obj.ScreenProcessor);
       obj.addProcess(obj.PrintProcessor);
       obj.addProcess(obj.ScanProcessor);
       obj.addProcess(obj.UserProcessor);
-      % obj.addProcess(obj.DisplayProcessor);
     end
     
     function addProcess(obj, process)
@@ -37,109 +32,53 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     end
     
     
-    function output = RunSeries(obj, varargin) %CRange, RRange)
+    function output = RunSeries(obj, varargin)
       
       delete(timerfindall);
       
+      %% Progress Initialization
       obj.UpdateProgressComponents;
       
-      %jProgressBar = javax.swing.JProgressBar;
-      %jProgressBar.setIndeterminate(true);
-      %[jhProgressBar, hContainer] = javacomponent(jProgressBar,[20,20,200,40]);
+      obj.ProcessProgress.resetTasks;
       
-      %stages    = [3 10];
-      
-      %progress  = 0;
-      %stage     = 5;
-      
+      %% Prep Tasks Load Estimation
+      obj.ProcessProgress.Maximum = 25;
+      prepTasks = obj.ProcessProgress.addTask('Prepare Process Components', 3);
+            
       drawnow expose update;
+      
+      CHECK(prepTasks); %1
       
       try
         
-        fxProcessor = obj.UserProcessor;
+        conresfx;
         
-        fourier       = @(varargin) fxProcessor.fourier(varargin{:});
-        forwardFFT    = @(varargin) fxProcessor.forwardFFT(varargin{:});
-        inverseFFT    = @(varargin) fxProcessor.inverseFFT(varargin{:});
+        output            = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+        reference         = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+        patch             = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+        screen            = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
         
-        fFFT          = @(varargin) forwardFFT(varargin{:});
-        iFFT          = @(varargin) inverseFFT(varargin{:});
-        
-        display       = @(varargin) fxProcessor.display(varargin{:});
-        
-        add           = @(varargin) fxProcessor.algebra('add', varargin{:});
-        subtract      = @(varargin) fxProcessor.algebra('subtract', varargin{:});
-        multiply      = @(varargin) fxProcessor.algebra('multiply', varargin{:});
-        divide        = @(varargin) fxProcessor.algebra('divide', varargin{:});
-        
-        sub           = @(varargin) subtract(varargin{:});
-        mul           = @(varargin) multiply(varargin{:});
-        div           = @(varargin) divide(varargin{:});
-        
-        normalize     = @(x)        x/nanmax(x(:));
-        invert        = @(x)        1-im2double(x);
-        binarize      = @(x,y)      im2bw(real(x),y);
-        
-        bin           = @(x,y)      binarize(x, y);
-        nor           = @(x)        normalize(x);
-        normaverse    = @(x)        invert(normalize(x));
-        norverse      = @(x)        normaverse(x);
-        binormalize   = @(x, y)     binarize(normalize(x),y);
-        binor         = @(x, y)     binormalize(x,y);
-        binormaverse  = @(x, y)     binarize(normaverse(x),y);
-        binorverse    = @(x, y)     binormaverse(x,y);
-        
-        
-        disk          = @(x, y)     imfilter(x,fspecial('disk',y),'replicate');
-        
-        HR            = 10;
-        retina        = @(x)        disk(x, HR);
-        
-        retinaFFT     = @(x)        fFFT(retina(x));
-        
-        crossRFFT     = @(x, y)     mul(retinaFFT(x), retinaFFT(y));
-        
-        level         = @(varargin) imadjust(varargin{:});
-        levelFFT      = @(varargin) fxProcessor.levelFFT(varargin{:});
-        
-        iFFTL         = @(varargin) level(inverseFFT(varargin{:}));
-        
-        logabs        = @(x)        log(abs(x));
-        
-        
-        
-        output      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        reference   = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        % hireference = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        patch       = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        screen      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        
-        panel       = obj.View;
+        panel             = obj.View;
         
         patchProcessor    = obj.PatchProcessor;
         screenProcessor   = obj.ScreenProcessor;
         printProcessor    = obj.PrintProcessor;
         scanProcessor     = obj.ScanProcessor;
         
-        parameters  = obj.Parameters;
+        parameters        = obj.Parameters;
         
-        csetting    = parameters.Patch.Contrast;
-        rsetting    = parameters.Patch.Resolution;
+        tsetting          = parameters.Patch.Mean;
+        csetting          = parameters.Patch.Contrast;
+        rsetting          = parameters.Patch.Resolution;
         
-        Tally = {'ID', 'TV', 'CV', 'RV', 'FQ', 'F-Sum', 'F-Area', 'F-Modulus', 'C-Modulus', 'Function'};
+        % Tally = {'ID', 'TV', 'CV', 'RV', 'FQ', 'F-Sum', 'F-Area', 'F-Modulus', 'C-Modulus', 'Function'};
         
-        ImageIndex = 0;
+        CHECK(prepTasks); %2
         
-        % bands = 71;
+        runData     = [];
+        imagefiles  = {};        
         
-        runData = [];
-        
-        prefix        = fullfile('Output', 'series-');
-        
-        imagefiles = {};
-        
-        %for rvalue = RRange
-        %for cvalue = CRange
+        outpath     = fullfile('Output');
         
         SRange = varargin;
         
@@ -151,6 +90,14 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           trange = SRange{1};
           crange = SRange{2};
           rrange = SRange{3};
+          
+          if numel(trange)==1 && numel(crange)~=1 && numel(rrange)~=1
+              outpath     = fullfile('Output', ['RTV-' int2str(trange)]);
+          elseif numel(crange)==1 && numel(trange)~=1 && numel(rrange)~=1
+              outpath     = fullfile('Output', ['CON-' int2str(trange)]);
+          elseif numel(rrange)==1 && numel(crange)~=1 && numel(trange)~=1
+              outpath     = fullfile('Output', ['RES-' int2str(trange)]);              
+          end            
           
           newRange = zeros(numel(trange)*numel(crange)*numel(rrange),3);
           m = 1;
@@ -176,35 +123,56 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           SRange = newRange;
         end
         
-        ms2 = 1/numel(SRange);
+        prefix      = fullfile(outpath , 'series-');
+        
+        try mkdir(outpath); end
+        
+        %% Fixed Tasks Load Estimation
+        procTasks = obj.ProcessProgress.addTask('Executing Processes', 7);
+        
+        %% Variable Tasks Load Estimation
+        nV        = 10;
+        nI        = numel(SRange); %numel(fieldnames(obj.Parameters.Processors));
+        nT        = nI*nV;  % Patch Rendering
+        
+        varTasks  = obj.ProcessProgress.addTask('Executing Processes', nT);
+        
+        obj.ProcessProgress.Maximum = [];
+        prepTasks.Factor = round(min(1, 10/3));
+        SEAL(prepTasks); %3        
+           
+        
+        CHECK(procTasks); % 1
         
         for s = 1:numel(SRange)
           
-          % jProgressBar.setIndeterminate(true);
+          nv      = nV;
           
           svalue = SRange{s};
           tvalue = svalue(1);
           cvalue = svalue(2);
           rvalue = svalue(3);
           
-          output                    = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-          % try screenProcessor.Parameters = parameters.Screen; end
-          printProcessor.Parameters = parameters.Print;
-          scanProcessor.Parameters  = parameters.Scan;
+          if tvalue+(cvalue)>100 || tvalue-(cvalue/2)<0          
+            CHECK(varTasks, nv); % n(v)
+            continue;
+          end
+          
+          output                      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+          printProcessor.Parameters   = parameters.Print;
+          scanProcessor.Parameters    = parameters.Scan;
           
           parameters.Patch.Mean       = tvalue;
           parameters.Patch.Contrast   = cvalue;
           parameters.Patch.Resolution = rvalue;
           
           try
-            
-            %% Fix size
-            % parameters.Patch.Size = parameters.Patch.Size/
-            
+                        
             %% Generate Patch
             patchProcessor.Execute(parameters.Patch);
             patchImage = output.Image;
             
+            CHECK(varTasks); nv = nv -1; %1
             
             %% Screen & Print Patch
             parameters.Screen.PrintProcessor  = printProcessor;
@@ -213,15 +181,17 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             
             screenProcessor.Execute(parameters.Screen);
             
-            screenedImage = output.Image;
-            screen        = screenProcessor.HalftoneImage;
-            screenImage   = screen.Image;
+            screenedImage   = output.Image;
+            screen          = screenProcessor.HalftoneImage;
+            screenImage     = screen.Image;
+            
+            CHECK(varTasks); nv = nv -1; %2
             
             %% Scan Patch
             scanProcessor.Execute(parameters.Scan);
-            scannedImage = output.Image;
+            scannedImage    = output.Image;
             
-            %output.Snap('GeneratedPatch');
+            CHECK(varTasks); nv = nv -1; %3
             
             %% Patch & Reference Images
             referenceImage  = imresize(patchImage,  size(scannedImage));
@@ -229,36 +199,31 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             
             patch.setImage(scannedImage, output.Resolution);
             reference.setImage(referenceImage, output.Resolution);
-            % hireference.setImage(imadjust(referenceImage), output.Resolution);
             screen.setImage(screenImage, output.Resolution);
             
             output.Variables.PatchImage     = patch;
             output.Variables.ReferenceImage = reference;
             output.Variables.HalftoneImage  = screen;
             
-            %parameters.Scan.Resolution
-            
             output.Variables.ScanFactor     = parameters.Scan.Resolution*parameters.Scan.Scale/100;
-            
             output.Variables.HumanFactor    = (output.Variables.ScanFactor/25.4) *0.3;
             
+            CHECK(varTasks); nv = nv -1; %4
+            
+            %% Retina Images
             
             RES           = parameters.Patch.Resolution;
             CON           = parameters.Patch.Contrast;
             RTV           = parameters.Patch.Mean;
-            
             SR            = output.Variables.ScanFactor;
             HR            = output.Variables.HumanFactor;
-            
             PS            = ceil(parameters.Patch.Size*(SR/25.4));
-            
             FQ            = RES / (SR/25.4) * PS * 2;
-            
             
             hiContrast                      = reference.copy;
             hiContrast.Image                = imadjust(hiContrast.Image);
             
-            imageIds      = {'S', 'P', 'R', 'C'};
+            imageIds      = {'SC', 'AP', 'CT', 'HC'};
             
             suffix        = [ ...
               '-V' num2str(round(RTV),    '%0.3d') ...
@@ -266,112 +231,82 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               '-C' num2str(round(CON),    '%0.3d') ...
               '-F' num2str(round(FQ*10),  '%0.3d')];
             
-            
-            
-            %           filename       = fullfile('Output', ['series' ...
-            %             '-V' num2str(round(RTV),    '%0.3d') ...
-            %             '-R' num2str(round(RES*100),'%0.3d') ...
-            %             '-C' num2str(round(CON),    '%0.3d') ...
-            %             '-F' num2str(round(FQ*10),  '%0.3d')]);
             processImages = {screen, patch, reference, hiContrast};
             
             
-            fxImages{1} = patch.copy;
-            fxFFT{1} = crossRFFT(screen.Image, hiContrast.Image);
-            fxImages{1}.Image = fxFFT{1}; %crossRFFT(screen.Image, hiContrast.Image);
+            fxFFT{1}      = crossRFFT(screen.Image, hiContrast.Image);      % fxImages{1}.Image = fxFFT{1};
+            fxFFT{2}      = crossRFFT(patch.Image, hiContrast.Image);       % fxImages{2}.Image = fxFFT{2};
+            fxFFT{3}      = crossRFFT(reference.Image, hiContrast.Image);   % fxImages{3}.Image = fxFFT{3};
+            fxFFT{4}      = crossRFFT(hiContrast.Image, hiContrast.Image);  % fxImages{4}.Image = fxFFT{4};
             
-            fxImages{2} = patch.copy;
-            fxFFT{2} = crossRFFT(patch.Image, hiContrast.Image);
-            fxImages{2}.Image = fxFFT{2}; %crossRFFT(patch.Image, hiContrast.Image);
+            for m = 1:numel(fxFFT)
+              fxImages{m}       = patch.copy;
+              fxImages{m}.Image = fxFFT{m};
+            end
             
-            fxImages{3} = patch.copy;
-            fxFFT{3} = crossRFFT(reference.Image, hiContrast.Image);
-            fxImages{3}.Image = fxFFT{3}; %crossRFFT(reference.Image, hiContrast.Image);
+            CHECK(varTasks); nv = nv -1; %5
             
-            fxImages{4} = patch.copy;
-            fxFFT{4} = crossRFFT(hiContrast.Image, hiContrast.Image);
-            fxImages{4}.Image = fxFFT{4}; %crossRFFT(hiContrast.Image, hiContrast.Image);
+            %% Image Processing
             
-            seriesData  = [];
-            seriesRData  = [];
-            seriesCData  = [];
-            seriesImage = [];
-            seriesRmg   = [];
-            seriesCmg = [];
+            seriesData    = [];
+            seriesRData   = [];
+            seriesCData   = [];
+            seriesImage   = [];
+            seriesRmg     = [];
+            seriesCmg     = [];
             
-            seriesFqs = {};
-            seriesRFqs = {};
-            seriesCFqs = {};
-            seriesIms = {};
-            seriesRms = {};
-            seriesCms = {};
+            seriesFqs     = {};
+            seriesRFqs    = {};
+            seriesCFqs    = {};
+            seriesIms     = {};
+            seriesRms     = {};
+            seriesCms     = {};
             
             dataColumn = 4;
             
-            %jProgressBar.setIndeterminate(false);
+            fFFT    = @(varargin) forwardFFT(varargin{:});
+            retina  = @(x) disk(x, HR);
             
-            %progress = progress+stage;
-            %stage     = 40*ms2;
-            
-            %ms = numel(processImages);
-            %qprogress = progress;
+            %% Patch Images Processing            
             
             parfor m = 1:numel(processImages)
               processImage = processImages{m};
               
               data    = processImage.Fourier;
               image   = processImage.Image;
-              
               rmage   = retina(image);
-              
               rdata   = fFFT(rmage);
               
-              [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(data));
-              
+              [bFq fqData]  = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(data));
               [bFq fqRData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(rdata));
               
-              seriesFqs{m} = fqData(:,dataColumn);
+              seriesFqs{m}  = fqData(:,dataColumn);
               seriesRFqs{m} = fqRData(:,dataColumn);
-              seriesIms{m} = image;
-              seriesRms{m} = rmage; %retina(image);
-              
-              %qprogress = jProgressBar.getValue + stage/ms;
-              %jProgressBar.setValue(qprogress);
-              
+              seriesIms{m}  = image;
+              seriesRms{m}  = rmage;
             end
             
-            %progress = qprogress;
+            CHECK(varTasks); nv = nv -1; %6
             
-            %jProgressBar.setValue(progress + stage);
+            %% Retina Images Processing            
             
-            %progress = progress+stage;
-            %stage     = 40*ms2;
-            
-            %ms = numel(fxImages);
-            %qprogress = progress;
             parfor m = 1:numel(fxImages)
               fxImage = fxImages{m};
-              
-              cdata   = fxFFT{m}; %fxImage.Fourier;
-              %cmage   = levelFFT(cdata); %fxImage.FourierImage;
+              cdata   = fxFFT{m};
+              %cmage   = levelFFT(cdata);
               
               [bFq fqCData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(cdata));
               
               seriesCFqs{m} = fqCData(:,dataColumn);
               %seriesCms{m}  = cmage; %retina(image);
               
-              %jProgressBar.setValue(progress + stage * m/ms); %setString([int2str(round(progress + stage * m/ms)) '%']);
-              %qprogress = jProgressBar.getValue + stage/ms;
-              %jProgressBar.setValue(qprogress);             
-              %jProgressBar.setIndeterminate(false);
+              delete(fxImage);
             end
             
-            % progress = qprogress;
+            CHECK(varTasks); nv = nv -1; %7
+                    
+            %% Image & Data Consolidation
             
-            %jProgressBar.setValue(progress + stage);
-            
-            % jProgressBar.setIndeterminate(true);
-                        
             seriesData = [1:size(seriesFqs{1},1)]';
             for m = 1:numel(processImages)
               seriesData  = [seriesData seriesRFqs{m}]; % seriesFqs{m}];
@@ -379,88 +314,52 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               seriesRmg   = [seriesRmg seriesRms{m}];
             end
             
-            %seriesData = [seriesData(:,1) seriesData(:,2:2:end) seriesData(:,3:2:end)];
-            
+            clear seriesRFqs seriesIms seriesRms;
+                        
             for m = 1:numel(fxImages)
-              seriesData  = [seriesData seriesCFqs{m}];
-              %seriesCmg   = [seriesCmg seriesCms{m}];
+              seriesData      = [seriesData seriesCFqs{m}];
+              %seriesCmg      = [seriesCmg seriesCms{m}];
             end
             
-            
-            seriesImage = [seriesImage; seriesRmg];
+            seriesImage       = [seriesImage; seriesRmg];
             
             zv = seriesData([-1:1]+floor(FQ),:);
             [zc zi] = max(zv(:,end)); % yR(ceil(m))]);
             zv = zv(zi,:);
             zv(1) = FQ;
             
-            runData = [runData; [RTV CON RES zv]];
+            seriesData        = [zv; seriesData];
+            runData           = [runData; [RTV CON RES zv]];
             
-            imagefile   = [prefix 'image' suffix '.png'];
-            
+            imagefile         = [prefix 'image' suffix '.png'];
             imagefiles{end+1} = imagefile;
             
-            seriesData  = [zv; seriesData];
+            CHECK(varTasks); nv = nv -1; %8
             
-            %stage     = 5*ms2;
-            %progress = progress+stage;
-            %jProgressBar.setValue(progress);
+            %% Image & Data Output
             
             dlmwrite([prefix 'data' suffix '.txt'], seriesData, '\t');
             imwrite(seriesImage, imagefile); %[prefix 'image' suffix '.png']);
             
-            %stage     = 5*ms2;
-            %progress = progress+stage;
-            %jProgressBar.setValue(progress);
-            %imwrite(seriesCmg, [prefix 'fftcr' suffix '.png']);
-            %imwrite(seriesCmg, [filename '-cross.png']);
+            CHECK(varTasks); nv = nv -1; %9
             
-            %imwrite(, [filename '.png']);
+            delete(hiContrast); %fxImages
+            clear seriesImage seriesData seriesRMG;            
             
           catch err
             disp(err);
           end
           
-          %           try
-          %             %% Functions
-          %
-          %             fxNames     = fieldnames(parameters.Processors);
-          %             fxProcessor = obj.UserProcessor;
-          %
-          %             for fxName = fxNames'
-          %               fx = parameters.Processors.(char(fxName));
-          %               fxProcessor.Parameters = fx;
-          %               fxProcessor.Execute;
-          %
-          %               % disp(fxProcessor.Output.Variables);
-          %
-          %               %disp(fx);
-          %               id = char(fxName);
-          %               try id = char(fx.Expression); end
-          %
-          %               try
-          %                 % output.Snap(id);
-          %               catch err
-          %                 disp(err)
-          %               end
-          %             end
-          %
-          %           end
-          
-          %           tRow = size(Tally,1)+1;
-          %
-          %           Tally(tRow:tRow+3, :) = output.Variables.Tally(2:end,:);
-          %
-          %           ImageIndex = ImageIndex + 1;
-          %           imwrite(scannedImage, ['Output/image' int2str(ImageIndex) '.png']);
-          
-          %end
+          if nv>0
+            CHECK(varTasks, nv);
+          end
         end
         
-        %summaryData = runData;
+        SEAL(varTasks);
         
-        jProgressBar.setValue(99);
-        jProgressBar.setIndeterminate(false);
+        CHECK(procTasks); % 2
+
+        %% Series Data Consolidation
         
         lData = runData(:, 9);
         aData = runData(:, 10);
@@ -475,46 +374,64 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         summaryData = [runData lzData azData rzData arData];
         
+        CHECK(procTasks); % 3
+        
+        %% Series Image & Data Output
+        
         dlmwrite([prefix 'data-summary.txt'], runData, '\t');
+        
+        CHECK(procTasks); % 4
+        
+        %% Series HTML Output
         
         htmlcode{1} = ['<html>' ...
           '<style>' ...
-          'table {border: 1px solid; border-collapse: collapse} ' ...
-          'td, th {border: 1px solid; width: 3%; text-align: center}  ' ...
-          'td:nth-of-type(odd), th:nth-of-type(odd) {background-color: #aaa;} ' ...
+          'body{font-family: Sans-Serif;} ' ...
+          'table {border: #ccc 1px solid; border-collapse: collapse; -webkit-text-size-adjust: none; ' ...
+          '     font-size: 16px; line-height: 1.5 !important; vertical-align:baseline;} ' ...
+          '.blank {background-color: #fff !important; visibility:hidden; width:1% !important;  } ' ...
+          'td, th {border: #aaa 1px solid; width: 3%; text-align: center} ' ...
+          'td:nth-of-type(odd)  {background-color: #eee;} ' ...
+          '/*th:nth-of-type(odd) {background-color: #aaa;} */' ...
+          'th {background-color: #999; font-size:12px;} ' ...
           'img {height: 175 px; width: auto;} ' ...
+          'td>b{font-size: 11 px; font-weight: lighter;} ' ...
+          'sup{line-height: 0 px} ' ...
           '</style>' ...
           '<table>'];
         
-        
         htmlcode{2} = ['<thead><tr>' ...
-          '<th>Image</th>' ...
-          '<th>T</th> <th>C</th> <th>R</th> <th>F</th>' ...
-          '<th>S</th> <th>P</th> <th>C</th> <th>H</th>' ...
-          '<th>SH</th> <th>PH</th> <th>CH</th> <th>HH</th>' ...
+          '<th>IMAGE</th> <th class="blank"></th>' ...
+          '<th>TV</th> <th>CON</th> <th>RES</th> <th>FF</th>  <th class="blank"></th>' ...
+          '<th>SCF</th> <th>APF</th> <th>CTF</th> <th>HCF</th>  <th class="blank"></th>' ...
+          '<th>SC&#x2a2f;HC</th> <th>AP&#x2a2f;HC</th> <th>CT&#x2a2f;HC</th> <th>HC&#x2a2f;HC</th>' ...
           ... % '<th>SH/HH</th> <th>PH/HH</th> <th>CH/HH</th> <th>PH/CH</th>' ...
           '</tr></thead>'];
         
         for m = 1:size(runData,1)
-          imagefile = imagefiles{m};
           
-          [pth fname ext] = fileparts(imagefile);
+          tvalue = runData(m,1);
+          cvalue = runData(m,2);
+          rvalue = runData(m,3);
           
-          imagefile = [fname ext];
+          imagefile = imagefiles{m}; ...
+            [pth fname ext] = fileparts(imagefiles{m});
           
-          %data = summaryData(m,:);
-          
+          imagefile = [fname ext];         
           imgcode   = sprintf('<td><img src="%s" /></td>', imagefile);
           
-          datacode  = sprintf([ ...
-            '<td>%0.0f</td><td>%0.0f</td><td>%4.3f</td><td>%2.1f</td>' ...
-            '<td>%3.3f</td><td>%3.3f</td><td>%3.3f</td><td>%3.3f</td>' ...
-            '<td>%3.3f</td><td>%3.3f</td><td>%3.3f</td><td>%3.3f</td>' ...
-            ... % '<td>%3.3f</td><td>%3.3f</td><td>%3.3f</td><td>%3.3f</td>' ...
+          datacode  = sprintf([ '<td class="blank"></td>' ...
+            '<td>TV<br/>%0.0f</td>  <td>CON<br/>%0.0f</td>  <td>RES<br/>%4.3f</td>  <td>FF<br/>%2.1f</td> <td class="blank"></td>' ...
+            '<td>SCF<br/>%3.2e</td>  <td>APF<br/>%3.2e</td>  <td>CTF<br/>%3.2e</td>  <td>HCF<br/>%3.2e</td> <td class="blank"></td>' ...
+            '<td>SC&#x2a2f;HC<br/>%3.2e</td> <td>AP&#x2a2f;HC<br/>%3.2e</td> <td>CT&#x2a2f;HC<br/>%3.2e</td> <td>HC&#x2a2f;HC<br/>%3.2e</td> ' ...
+            ... % '<td>%3.2e</td><td>%3.2e</td><td>%3.2e</td><td>%3.2e</td>' ...
             ], ...
             runData(m,:) ... %runData(m,1:4), runData(m,9:12), lData, aData, rData, zData, ...
             ... %lzData(m), azData(m), rzData(m), arData(m) ...
             );
+          
+          datacode  = regexprep(datacode, '(<td>)([^\<]*)(<br/>)', '$1<b>$2</b>$3');
+          datacode  = regexprep(datacode, '(\d\.\d+)(e)([-+])(0?)([1-9]+)', '$1<sup>$3$5</sup>');
           
           rowcode   = ['<tr>' imgcode datacode '</tr>'];
           
@@ -523,16 +440,27 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         htmlcode{end+1} = '</table></html>';
         
+        CHECK(procTasks); % 5
+        
         dlmwrite([prefix 'data-summary.html'], strvcat(htmlcode),'');
         
-        uiopen([prefix 'data-summary.html'],1);
+        CHECK(procTasks); % 6
         
-        parameters.Patch.Contrast     = csetting;
-        parameters.Patch.Resolution   = rsetting;
-        
+      catch err
+        disp(err);
       end
-      delete(jhProgressBar);
+      
+      %% Series Finalization
+      
+      % try uiopen([prefix 'data-summary.html'],1); end
+              
+      parameters.Patch.Mean         = tsetting;
+      parameters.Patch.Contrast     = csetting;
+      parameters.Patch.Resolution   = rsetting;
+        
       drawnow expose update;
+      
+      SEAL(procTasks);
       
     end
     
@@ -542,25 +470,17 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       delete(timerfindall);
       
+      %% Progress Initialization
       obj.UpdateProgressComponents;
       
+      %% Fixed Tasks Load Estimation
       prepTasks = obj.ProcessProgress.addTask('Prepare Process Components', 4);
+      procTasks = obj.ProcessProgress.addTask('Executing Processes', 4);
       
-      % procTasks = obj.addTask('Executing Processes', 4);
-      
-      %% varTask Estimation
-      processors  =   obj.Parameters.Processors;
-      
-      n = numel(fieldnames(processors));
-      
-      n = n + 2*(n-5) + 2;  % Patch Rendering
-      
+      %% Variable Tasks Load Estimation      
+      n         = numel(fieldnames(obj.Parameters.Processors));
+      n         = n + 2*(n-5) + 2;  % Patch Rendering
       varTasks  = obj.ProcessProgress.addTask('Executing Processes', n);
-      
-      
-      %jProgressBar = javax.swing.JProgressBar;
-      %jProgressBar.setIndeterminate(true);
-      %[jhProgressBar, hContainer] = javacomponent(jProgressBar,[20,20,200,40]);      
       
       panel       = obj.View;
       panel.clearAxes();

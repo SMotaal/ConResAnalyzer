@@ -35,7 +35,7 @@ classdef ProcessTask < Grasppe.Core.Prototype
       check = 1;
       load  = obj.Load;
       
-      if nargin>=1, check = varargin{1}; end
+      if nargin>=2, check = varargin{1}; end
       
       progress  = obj.Progress + check;
       
@@ -45,9 +45,13 @@ classdef ProcessTask < Grasppe.Core.Prototype
       
       obj.Progress = progress;
       
-      %try 
-      obj.Process.notify('ProgressChange');
-      %end
+      try
+        obj.Process.updateProgress;
+      end
+      
+      try 
+        notify(obj.Process, 'ProgressChange');
+      end
     end
     
     function CHECK(obj, varargin)

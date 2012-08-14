@@ -198,6 +198,13 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     function applyChanges(obj)
       import Grasppe.ConRes.PatchGenerator.*;
       
+      try
+        %progressBar = obj.ProgressBar;
+        disp('Progress Bar');
+        disp(obj.ProgressProcess.ProgressBar);
+        disp('Progress Bar');
+      end
+      
       disp('Applying Changes');
       
       parameters = obj.jParametersPanel.getValues();

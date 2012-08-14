@@ -66,27 +66,39 @@ classdef ProgressBar < Grasppe.Core.Prototype
     
     function progressUpdate(obj, src, evt)
       process = [];
+      
+      try
       if isempty(process) && ...
           (isa(obj.Process, 'Grasppe.Occam.Process') || isa(obj.Process, 'Grasppe.Occam.ProcessProgress'))
         process = obj.Process;
       end
       
+      end
+      
+      try
       if isempty(process) && ...
           (isa(src, 'Grasppe.Occam.Process') || isa(src, 'Grasppe.Occam.ProcessProgress'))
         process = src;
       end
+      end
       
+      try
       if isempty(process)
         obj.Progress = [];
         return;
       end      
+      end
       
+      try
       if isa(process, 'Grasppe.Occam.Process')
         process = src.ProcessProgress;
       end
+      end
       
+      try
       if isa(process, 'Grasppe.Occam.ProcessProgress')
-        obj.Progress = OverallProgress;
+        obj.Progress = obj.process.OverallProgress;
+      end
       end
     end
   end

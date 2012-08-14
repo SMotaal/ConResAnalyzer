@@ -4,6 +4,7 @@ classdef ProcessProgress < Grasppe.Core.Prototype
   
   properties
     Tasks       = Grasppe.Occam.ProcessTask.empty();
+    Maximum     = [];
   end
   
   properties (Dependent)
@@ -36,6 +37,10 @@ classdef ProcessProgress < Grasppe.Core.Prototype
       % end
       
       progress  = progress / load;
+      
+      if isscalar(obj.Maximum) && isnumeric(obj.Maximum)
+        progress = progress * obj.Maximum/100;
+      end
     end
     
     function addProgressListener(obj, listener)
@@ -45,16 +50,31 @@ classdef ProcessProgress < Grasppe.Core.Prototype
       progressListeners = obj.progressListeners;
       
       if ~any(cellfun(@(x)isequal(x, listener), progressListeners))
-        hListener  = addlistener(obj, 'ProgressChanged', callback);
+        hListener  = addlistener(obj, 'ProgressChange', callback);
         progressListeners{end+1}  = listener;
         
         obj.progressListeners     = progressListeners;
       end
     end
     
+    function resetTasks(obj)
+      
+      tasks     = obj.Tasks;
+      ntasks    = numel(tasks);      
+      
+      for m = 1:ntasks
+        try delete(tasks(m)); end
+      end
+      
+      obj.Tasks = Grasppe.Occam.ProcessTask.empty();
+      obj.updateProgress;
+    end
+    
     function task = addTask(obj, title, load, varargin)
       %obj.UpdateProgressComponents;
       task = Grasppe.Occam.ProcessTask(obj, title, load, varargin{:});
+      
+      obj.Tasks(end+1) = task;
     end
   end
   
@@ -79,7 +99,9 @@ classdef ProcessProgress < Grasppe.Core.Prototype
       obj.progress  = progress;
       
       if progressChange
-          dispf('Progress: %0.0f (%0.0f / %0.0f)', obj.OverallProgress, progress, load);
+        s = sprintf('Progress: %0.0f (%0.0f / %0.0f)', obj.OverallProgress*100, progress, load);
+        status(s, 0);
+          %dispf('Progress: %0.0f (%0.0f / %0.0f)', obj.OverallProgress*100, progress, load);
       end
     end
   end
