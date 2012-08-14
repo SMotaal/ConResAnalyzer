@@ -9,6 +9,11 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
     Results
     Processes = {};%Grasppe.Occam.Process.empty; %eval([CLASS '.empty()']);
     Window = [];
+    ProgressBars      = Grasppe.Occam.ProgressBar.empty();    
+  end
+  
+  properties %(Transient, SetAccess=)
+    ProcessProgress   = Grasppe.Occam.ProcessProgress.empty();
   end
   
   properties (Hidden)
@@ -44,6 +49,9 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
     function obj = Process()
       obj = obj@Grasppe.Occam.ProcessData();
       obj = obj@Grasppe.Core.Prototype();
+      
+      obj.ProcessProgress = Grasppe.Occam.ProcessProgress();
+      
       obj.Type = class(obj);
       try
         typeName  = char(regexp(obj.Type, '(?=.)\w*$', 'match'));
@@ -54,7 +62,6 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
       Grasppe.Occam.Singleton.Get.Names.(typeName) = instanceNumber + 1;
       
       obj.Name = [typeName int2str(instanceNumber)];
-      
     end
     
     function set.Status(obj, value)
@@ -174,7 +181,6 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
         
         status(string, h);
         
-        
       end
     end
     
@@ -185,6 +191,40 @@ classdef Process < Grasppe.Occam.ProcessData & Grasppe.Core.Prototype % handle &
       end
     end
     
+  end
+  
+  
+  %% Process Progress
+  methods
+    function UpdateProgressComponents(obj)
+      if isempty(obj.ProcessProgress) || ~isa(obj.ProcessProgress, 'Grasppe.Occam.ProcessProgress') %isempty(obj.ProcessProgress)
+        obj.ProcessProgress   = Grasppe.Occam.ProcessProgress;
+      end
+      
+      if ~isempty(obj.View) && isa(obj.View, 'Grasppe.Occam.Process')
+        
+        if isempty(obj.View.ProgressBars) || ~isa(obj.View.ProgressBars, 'Grasppe.Occam.ProgressBar') %isempty(obj.ProcessProgress)
+          obj.View.ProgressBars = Grasppe.Occam.ProgressBar;
+        end
+        
+        progressBars = obj.View.ProgressBars;
+        
+        for m = 1:numel(progressBars)
+          progressBar = progressBars(m);
+          
+          if isempty(progressBar.Parent) || ~ishandle(progressBar.Parent)
+            progressBar.Parent  = obj.View.Window;
+          end
+          
+          obj.ProcessProgress.addProgressListener(progressBar);          
+          
+          % callback = @(source, data) progressBar.progressUpdate(source, data);
+          
+          % progressListener    = addlistener(obj.ProcessProgress, 'ProgressChanged', callback);
+        end
+        
+      end
+    end
   end
   
 end

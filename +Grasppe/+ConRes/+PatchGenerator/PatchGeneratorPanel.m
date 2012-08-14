@@ -137,6 +137,9 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       obj.hApplyButton.ActionPerformedCallback = @(src, e)obj.eventCallback(src, e, 'applyChanges');
       
+      
+      % obj.ProgressBar = Grasppe.Occam.ProgressBar;
+      
       set(hFrame, 'Visible', 'on');
       
       drawnow expose update;
@@ -249,7 +252,13 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       set(hFrame, 'ResizeFcn', @(src, e) obj.resizeCallback(src, e));
       
-      hAxis  = obj.newAxes('xtick',[],'ytick',[], 'Visible', 'off');
+      % jProgressBar = javax.swing.JProgressBar;
+      % jProgressBar.setIndeterminate(true);
+      % [jhProgressBar, hContainer] = javacomponent(jProgressBar,[20,20,200,40]);
+      
+      %set(hFrame, 'Color', [1 1 1] * 0.2);
+      
+      hAxis  = obj.newAxes('position', [1 1 1 1], 'xtick',[],'ytick',[], 'Visible', 'off');
       
       imgd = im2double(img);
       if ~isreal(imgd)
@@ -261,7 +270,11 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       set(hAxis,'xtick',[],'ytick',[], 'LooseInset', [0,0,0,0], 'Clipping','on', 'Box', 'on', 'color', [1 1 1] * 0.15, 'Visible', 'off'); %, 'DataAspectRatio', [1 1 1]);
       
-      obj.layoutAxes;
+      % delete(jhProgressBar); %hContainer jProgressBar;
+      
+      % obj.layoutAxes;
+      
+      %set(hFrame, 'Color', [1 1 1] * 0.45);
       
     end
     
@@ -448,8 +461,6 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       
       for j = 1:numel(jComponents)
         jObject = jComponents{j};
-        %try jObject.dispose; end
-        % try jObject = 0; end
         try delete(jObject); end
       end
       

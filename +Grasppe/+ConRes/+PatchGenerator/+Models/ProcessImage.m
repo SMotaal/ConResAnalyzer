@@ -238,6 +238,8 @@ classdef ProcessImage < matlab.mixin.Copyable
       
       %debugging = true;
       
+      dataColumn = 4;
+      
       if isempty(image)
         fxBusy = false;
         %try delete(hAxis);  end
@@ -292,7 +294,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             
             dispdbg('Generating Plot...');
             
-            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(image1b)); %image1
+            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(image1b); %image1
             
             %             baseData  = [];
             %             baseRow   = 1;
@@ -311,7 +313,15 @@ classdef ProcessImage < matlab.mixin.Copyable
             %
             %             assignin('base', 'BandIntensityData', baseData);
             
-            bFq = fqData(:,2);
+            bFq = fqData(:,dataColumn);
+            
+            % while (max(bFq)<1)
+            %   bFq = bFq * 10;
+            % end
+            %
+            % while (min(bFq)>1)
+            %   bFq = bFq / 10;
+            % end
             
             yR  = bFq/max(bFq(:));
             xR  = 1:numel(bFq);
@@ -378,14 +388,14 @@ classdef ProcessImage < matlab.mixin.Copyable
             end
                        
             if isnumeric(fQ) %&& ~isempty(fQ)
-              fQ2 = fQ(1) * [0.25 0.5 1 1.5]; %[0.25 0.5 0.75 1 1.25 1.5];
+              fQ2 = fQ(1); % * [0.25 0.5 1 1.5]; %[0.25 0.5 0.75 1 1.25 1.5];
               for m = fQ2
                 yv = [-20 20]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
                 zv = max(bFq([-1:1]+floor(m))); % yR(ceil(m))]);
                 
-                text(mean(xv), min(yv)-15, 0, num2str(zv,'%3.2f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7); %, 'FontWeight', 'bold');
+                text(mean(xv), min(yv)-15, 0, num2str(zv,'%3.2f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7, 'FontWeight', 'bold');
                 
                 %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
               end

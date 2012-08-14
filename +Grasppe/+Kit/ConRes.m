@@ -140,9 +140,11 @@ classdef ConRes
         
         currentData = zeros(nBands, 4);
         
+        fImg = abs(fImg);
+        
         parfor m = 1:nBands
           try
-            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 1, filters{m}, sums{m});
+            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3, filters{m}, sums{m});
             
 %           if isempty(filters{m})
 %             bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
@@ -204,7 +206,7 @@ classdef ConRes
         fsum  = sum(flt(:));
       end
       
-      fimg    = abs(img).*flt;
+      fimg    = img.*flt;
       
       isum    = sum(fimg(:));
       

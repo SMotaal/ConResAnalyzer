@@ -197,7 +197,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
             
             %output.Variables.Tally = Tally;
             
-            mat2clip(Tally);
+            % mat2clip(Tally);
             
 %             tallyString = '';
 %             
