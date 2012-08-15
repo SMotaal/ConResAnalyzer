@@ -198,7 +198,7 @@ classdef ConRes
       end
       
       if nargin<5 || isempty(flt) || ~isnumeric(flt);
-        flt   = bandfilter('gaussian', 'pass', sz, sz, bnd, wd);
+        flt   = fftshift(bandfilter('gaussian', 'pass', sz, sz, bnd, wd));
         fsum  = [];
       end
       

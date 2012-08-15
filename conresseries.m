@@ -1,8 +1,12 @@
 try
-  if ~(exist('patchGenerator', 'var') || ~isscalar(patchGenerator) ...
-      && isa(patchGenerator, 'Grasppe.ConRes.PatchGenerator'))
+  if ~(exist('patchGenerator', 'var') && isscalar(patchGenerator)) ...
+      || ~isa(patchGenerator, 'Grasppe.ConRes.PatchGenerator')
     conreslab;
   end
+  
+  set(gcf,'Visible', 'off');
+  
+  commandwindow;
   
   r = Grasppe.Kit.ConRes.ResolutionRange,
   c = Grasppe.Kit.ConRes.ContrastRange,
