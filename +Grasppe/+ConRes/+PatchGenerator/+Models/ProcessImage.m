@@ -238,7 +238,7 @@ classdef ProcessImage < matlab.mixin.Copyable
       
       %debugging = true;
       
-      dataColumn = 4;
+      dataColumn = 2;
       
       if isempty(image)
         fxBusy = false;
@@ -284,7 +284,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           if isequal(obj.PlotFFT, true)
             
             %if ~isscalar(hFig) || ~ishandle(hFig)
-            hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300]);
+            hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300], 'HandleVisibility','callback');
             %  hAxis = [];
             %end
             
@@ -294,7 +294,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             
             dispdbg('Generating Plot...');
             
-            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(image1b); %image1
+            [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(image1b)); %image1
             
             %             baseData  = [];
             %             baseRow   = 1;
@@ -324,6 +324,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             % end
             
             yR  = bFq/max(bFq(:));
+            yR2 = (1-yR)*0.5;
             xR  = 1:numel(bFq);
             zR  = ones(size(xR));
             
@@ -331,25 +332,26 @@ classdef ProcessImage < matlab.mixin.Copyable
             xD  = 0.5 + floor((size(image1,2)/4));
             yD  = 0.5 + floor(size(image1,1)/2);
             
-            yZ = 3;
+            yZ  = 3;
             %yM = [max(yR) max(yR(yZ:end))]
             %yR = yR
-            yR = (yR*100)-(max(yR(yZ:end)*100)/2);
-            yM = nanmean(yR(yZ:end));
-            yS = 5; %yM; %*2;            
+            yR  = (yR*100)-(max(yR(yZ:end)*100)/2);
+            yR2 = (yR2*100)-(max(yR2(yZ:end)*100)/2);
+            yM  = nanmean(yR(yZ:end));
+            yM2 = nanmean(yR2(yZ:end));
+            yS  = 5; %yM; %*2;            
             
             %hold on;
-            
-            cla(hAxis);
-            
+                        
             image2 = repmat(image1, [1, 1, 3]);
             
+            cla(hAxis); hold(hAxis, 'on');
             imshow(image2, 'Parent', hAxis);
             truesize(hFig);
             
             lOp = {'Parent', hAxis, 'LineWidth', 0.5, 'linesmoothing','on'};
             
-            hold on;
+            
             
             yN = 1;
             x  = []; y = [];
@@ -370,7 +372,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             %           % line(x+0.5, y, zeros(size(x)), 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');            
             
             
-            plot(hAxis, xD+xR*xF, yD+yR+yS, 'g', lOp{:}, 'Linewidth', 0.5);            
+            plot(hAxis, xD+xR*xF, yD+yR2+yS, 'g', lOp{:}, 'Linewidth', 0.5);            
                         
             fQ = [obj.FundamentalFrequencies];
             
@@ -383,7 +385,7 @@ classdef ProcessImage < matlab.mixin.Copyable
                 % zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
                 
                 % text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' num2str(zv,'%3.1f') ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
-                text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f')], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
+                text(mean(xv), max(yv)+1, 0, [num2str(m,'%3.1f')], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 7);
               end
             end
                        
@@ -395,7 +397,7 @@ classdef ProcessImage < matlab.mixin.Copyable
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
                 zv = max(bFq([-1:1]+floor(m))); % yR(ceil(m))]);
                 
-                text(mean(xv), min(yv)-15, 0, num2str(zv,'%3.2f'), 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7, 'FontWeight', 'bold');
+                text(mean(xv), min(yv)-15, 0, regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3'), 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7, 'FontWeight', 'bold');
                 
                 %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
               end

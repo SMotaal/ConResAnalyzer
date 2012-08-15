@@ -97,7 +97,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', ...
         'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL', ...
         'CloseRequestFcn', @(src, event) delete(obj), ...
-        'Visible', 'off'};
+        'Visible', 'off'}; %, 'HandleVisibility', 'callback'};
       
       if ~isempty(cFrame) && ishandle(cFrame) && isvalid(cFrame)
         hFrame = figure(cFrame, oFrame{:});
@@ -301,7 +301,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         aX    = aW*aF - (aW-iW)/2;
         aY    = aH*aF - (aH-iH)/2;
         
-        set(hAxis,'XLim', aX + 0.5, 'YLim', aY + 0.5);
+        set(hAxis,'XLim', floor(aX) + 0.5, 'YLim', floor(aY) + 0.5);
       catch err
         disp(err);
       end

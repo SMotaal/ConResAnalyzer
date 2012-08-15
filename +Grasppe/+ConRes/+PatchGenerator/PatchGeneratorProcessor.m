@@ -41,11 +41,16 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       %% Progress Initialization
       obj.UpdateProgressComponents;
       
+      obj.ProcessProgress.Window = obj.View.Window;
+      
       obj.ProcessProgress.resetTasks;
       
       %% Prep Tasks Load Estimation
       obj.ProcessProgress.Maximum = 25;
-      prepTasks = obj.ProcessProgress.addTask('Prepare Process Components', 3);
+      
+      prepTasks = obj.ProcessProgress.addTask('Prepare Process', 3);
+      
+      obj.ProcessProgress.activateTask(prepTasks);
             
       drawnow expose update;
       
@@ -80,6 +85,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         runData     = [];
         imagefiles  = {};        
         
+        outset      = 'data';
+        outseries   = ['Series-' num2str(3,'%03d')];        
         outpath     = fullfile('Output');
         
         SRange = varargin;
@@ -94,13 +101,16 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           rrange = SRange{3};
           
           if numel(trange)==1 && numel(crange)~=1 && numel(rrange)~=1
-              outpath     = fullfile('Output', ['RTV-' int2str(trange)]);
+              outset      = ['rtv-' num2str(trange,'%03d')];            
+              outpath     = fullfile('Output', outseries, ['RTV-' int2str(trange)]);
               dispf('Exporting Series: Reference Tone Value %2.1f%%', trange);
           elseif numel(crange)==1 && numel(trange)~=1 && numel(rrange)~=1
-              outpath     = fullfile('Output', ['CON-' int2str(trange)]);
+              outset      = ['con-' num2str(crange,'%03d')];            
+              outpath     = fullfile('Output', outseries, ['CON-' int2str(trange)]);
               dispf('Exporting Series: Contrast Value %2.1f%%', crange);
           elseif numel(rrange)==1 && numel(crange)~=1 && numel(trange)~=1
-              outpath     = fullfile('Output', ['RES-' int2str(trange)]);           
+              outset      = ['res-' num2str(rrange*100,'%03d')];            
+              outpath     = fullfile('Output', outseries, ['RES-' int2str(trange)]);
               dispf('Exporting Series: Resolution Value %3.2f lp/mm', rrange);
           end            
           
@@ -128,7 +138,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           SRange = newRange;
         end
         
-        prefix      = fullfile(outpath , 'series-');
+        prefix      = fullfile(outpath , [lower(outseries) '-']);
         
         try mkdir(outpath); end
         
@@ -140,12 +150,13 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         nI        = numel(SRange); %numel(fieldnames(obj.Parameters.Processors));
         nT        = nI*nV;  % Patch Rendering
         
-        varTasks  = obj.ProcessProgress.addTask('Executing Processes', nT);
+        varTasks  = obj.ProcessProgress.addTask('Rendering', nT);
         
         obj.ProcessProgress.Maximum = [];
         prepTasks.Factor = round(min(1, 10/3));
         SEAL(prepTasks); %3        
-           
+        
+        obj.ProcessProgress.activateTask(varTasks);
         
         CHECK(procTasks); % 1
         
@@ -383,7 +394,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         %% Series Image & Data Output
         
-        dlmwrite([prefix 'data-summary.txt'], runData, '\t');
+        dlmwrite([prefix outset '-summary.txt'], runData, '\t');
         
         CHECK(procTasks); % 4
         
@@ -449,7 +460,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         CHECK(procTasks); % 5
         
-        dlmwrite([prefix 'data-summary.html'], strvcat(htmlcode),'');
+        dlmwrite([prefix outset '-summary.html'], strvcat(htmlcode),'');
         
         CHECK(procTasks); % 6
         
@@ -480,9 +491,16 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       %% Progress Initialization
       obj.UpdateProgressComponents;
       
+      obj.ProcessProgress.Window = obj.View.Window;
+            
+      obj.ProcessProgress.resetTasks;
+      
+      
       %% Fixed Tasks Load Estimation
       prepTasks = obj.ProcessProgress.addTask('Prepare Process Components', 4);
       procTasks = obj.ProcessProgress.addTask('Executing Processes', 4);
+      
+      obj.ProcessProgress.activateTask(prepTasks);
       
       %% Variable Tasks Load Estimation      
       n         = numel(fieldnames(obj.Parameters.Processors));
@@ -525,6 +543,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         CHECK(prepTasks); % 4
         
         SEAL(prepTasks); % 4
+        
+        obj.ProcessProgress.activateTask(varTasks);
         
         try
                     
@@ -701,6 +721,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           end
           
           SEAL(varTasks);
+          
+          obj.ProcessProgress.activateTask([]);
           
           panel.layoutAxes;
           

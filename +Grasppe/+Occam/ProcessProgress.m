@@ -5,6 +5,8 @@ classdef ProcessProgress < Grasppe.Core.Prototype
   properties
     Tasks       = Grasppe.Occam.ProcessTask.empty();
     Maximum     = [];
+    Window      = [];
+    ActiveTask  = [];
   end
   
   properties (Dependent)
@@ -57,6 +59,10 @@ classdef ProcessProgress < Grasppe.Core.Prototype
       end
     end
     
+    function activateTask(obj, task)
+      obj.ActiveTask = task;
+    end
+    
     function resetTasks(obj)
       
       tasks     = obj.Tasks;
@@ -82,6 +88,7 @@ classdef ProcessProgress < Grasppe.Core.Prototype
     function updateProgress(obj)
       tasks     = obj.Tasks;
       ntasks    = numel(tasks);
+      active    = obj.ActiveTask;
       
       load      = 0;
       progress  = 0;
@@ -98,9 +105,45 @@ classdef ProcessProgress < Grasppe.Core.Prototype
       obj.load      = load;
       obj.progress  = progress;
       
+      overall = obj.OverallProgress*100;
+      
       if progressChange
-        s = sprintf('Progress: %0.0f (%0.0f / %0.0f)', obj.OverallProgress*100, progress, load);
-        status(s, 0);
+        
+        %dsc = 'Running';
+        
+        %cnt = sprintf('%0.0f', ;
+        
+        if load==0
+          s = '';
+          overall = [];
+        elseif round(progress)==round(load)
+          s = '';
+          overall = [];
+        else          
+          s = sprintf('Processing: %d of %d', round([progress, load])); %overall*100
+          
+          try
+            s = sprintf('%s: %d of %d', active.Title, round([active.Progress, active.Load])); %overall*100
+            % disp(s);
+%           catch err
+%             %disp(err);
+%             x=1;
+          end
+        end
+        
+        
+        
+        h=obj.Window;
+        if ~isscalar(h) || ~ishandle(h)
+          h = 0;
+        end
+          
+        try
+          status(s, h, overall);
+          %status('', 0, []);
+        catch err
+          status(s, 0);
+        end
           %dispf('Progress: %0.0f (%0.0f / %0.0f)', obj.OverallProgress*100, progress, load);
       end
     end
