@@ -138,11 +138,19 @@ classdef ConRes
         filters = bandFilters;
         sums    = bandSums;
         
+        if isempty(filters)
+          filters   = cell(1,nBands);
+        end
+        
+        if isempty(sums)
+          sums    = cell(1,nBands);
+        end
+        
         currentData = zeros(nBands, 4);
         
         fImg = abs(fImg);
         
-        parfor m = 1:nBands
+        parfor m = 1:nBands %min(nBands, 70)
           try
             [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3, filters{m}, sums{m});
             

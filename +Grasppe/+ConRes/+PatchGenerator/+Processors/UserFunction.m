@@ -67,6 +67,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         retinaFFT     = @(x)        fFFT(retina(x));
         
         crossRFFT     = @(x, y)     mul(retinaFFT(x), retinaFFT(y));
+        dotRFFT       = @(x, y)     retinaFFT(x).*retinaFFT(y);
         
         store         = @(n,v)      obj.store(n,v); %eval('assignin(''''caller'''', n, v), v'); %evalin('caller', 'obj.Variables.(' n ') = v;');
         
@@ -124,6 +125,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         HFFT          = contrastFFT;        
         SIMG          = screenImage;
         SFFT          = screenFFT;
+        MFFT          = ones(size(SFFT)).*0.5;
         
         %coreVars = who;
         

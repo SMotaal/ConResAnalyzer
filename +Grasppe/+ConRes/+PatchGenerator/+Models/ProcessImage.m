@@ -37,6 +37,7 @@ classdef ProcessImage < matlab.mixin.Copyable
     processData = Grasppe.Occam.ProcessData.empty;
     image
     domain      = 'spatial';
+    fftdata;
     % variables   = struct;
   end
   
@@ -123,8 +124,7 @@ classdef ProcessImage < matlab.mixin.Copyable
     
     function setImage(obj, image, resolution)
       obj.Image       = image;
-      obj.Resolution  = resolution;
-      
+      obj.Resolution  = resolution;      
     end
     
     function processData = get.ProcessData(obj)
@@ -143,16 +143,19 @@ classdef ProcessImage < matlab.mixin.Copyable
       image = obj.image;
     end
     
-    function image = get.Fourier(obj)
-      image = obj.image;
-      if isreal(image)
-        image = obj.forwardFFT(image);
+    function fftdata = get.Fourier(obj)
+      
+      fftdata = obj.fftdata;
+      image   = obj.image;
+      
+      if isempty(fftdata) 
+        if isreal(image)
+          fftdata = obj.forwardFFT(image);
+        else
+          fftdata = image;
+        end
       end
-      %       switch (obj.Domain)
-      %         case 'frequency'
-      %         otherwise
-      %           image = obj.forwardFFT(image);
-      %       end
+      
     end
     
     function image = get.FourierImage(obj)
@@ -232,7 +235,7 @@ classdef ProcessImage < matlab.mixin.Copyable
       end
     end
     
-    function image = bandPlotFFT(obj, image)
+    function img = bandPlotFFT(obj, img)
       
       persistent  fxBusy idx; %hFig hAxis
       
@@ -240,7 +243,9 @@ classdef ProcessImage < matlab.mixin.Copyable
       
       dataColumn = 2;
       
-      if isempty(image)
+      renderer = 'opengl'; %'zbuffer';
+      
+      if isempty(img)
         fxBusy = false;
         %try delete(hAxis);  end
         %try delete(hFig);   end
@@ -248,7 +253,7 @@ classdef ProcessImage < matlab.mixin.Copyable
       end
       
       if isequal(fxBusy, true)
-        image = [];
+        img = [];
         return;
       end
       
@@ -268,7 +273,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           
           assignin('base', 'BandIDX', idx);     
           
-          image1 = image;
+          image1 = img;
           
           if size(image1,3) > 1
             image1 = image1(:,:,1);
@@ -284,7 +289,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           if isequal(obj.PlotFFT, true)
             
             %if ~isscalar(hFig) || ~ishandle(hFig)
-            hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300], 'HandleVisibility','callback');
+            hFig  = figure('Visible', 'off', 'Position',[-1000 -1000 300 300], 'HandleVisibility','callback', 'Renderer', renderer);
             %  hAxis = [];
             %end
             
@@ -349,7 +354,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             imshow(image2, 'Parent', hAxis);
             truesize(hFig);
             
-            lOp = {'Parent', hAxis, 'LineWidth', 0.5, 'linesmoothing','on'};
+            lOp = {'Parent', hAxis, 'LineWidth', 1, 'linesmoothing','on'};
             
             
             
@@ -366,8 +371,8 @@ classdef ProcessImage < matlab.mixin.Copyable
               end
               %x = [x xv];
               %y = [y yv];
-              line(xv, yv, [0 0], 'Color', 'w', 'LineStyle', '-',   lOp{:}, 'LineWidth', 0.25);
-              line(xv, yv, [0 0], 'Color', 'k', 'LineStyle', ':',  lOp{:});
+              line(xv, yv, [0 0], 'Color', 'w', 'LineStyle', ':',   lOp{:}, 'LineWidth', 0.5);
+              %line(xv, yv, [0 0], 'Color', 'k', 'LineStyle', ':',  lOp{:}, 'LineWidth', 1);
             end
             %           % line(x+0.5, y, zeros(size(x)), 'Parent', hAxis, 'Color', 'w', 'Linewidth', 0.25, 'linesmoothing','on');            
             
@@ -380,12 +385,12 @@ classdef ProcessImage < matlab.mixin.Copyable
               for m = fQ
                 yv = [-35 35]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
-                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
+                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 1);
                 
                 % zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
                 
                 % text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' num2str(zv,'%3.1f') ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
-                text(mean(xv), max(yv)+1, 0, [num2str(m,'%3.1f')], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 7);
+                text(mean(xv), max(yv)+1, 0, [num2str(m,'%3.1f')], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
               end
             end
                        
@@ -394,10 +399,10 @@ classdef ProcessImage < matlab.mixin.Copyable
               for m = fQ2
                 yv = [-20 20]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
-                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 4);
+                line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 1);
                 zv = max(bFq([-1:1]+floor(m))); % yR(ceil(m))]);
                 
-                text(mean(xv), min(yv)-15, 0, regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3'), 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 7, 'FontWeight', 'bold');
+                text(mean(xv), min(yv)-15, 0, regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3'), 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
                 
                 %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
               end
@@ -406,12 +411,19 @@ classdef ProcessImage < matlab.mixin.Copyable
             
             dispdbg('Exporting Image...');
             
-            image = export_fig(hFig); %, [1 1 size(image2,2) size(image2,1)]);
+            
+            %truesize(hFig);
+            %frm = getframe(hFig);
+            %img = frm.cdata;
+            img = export_fig(hFig, '-a2', ['-' renderer]);
+            %img = print2array(hFig); % export_fig(hFig); %, [1 1 size(image2,2);
+            
+            %img = imresize(img, 0.5);
             
             delete(hAxis);
             delete(hFig);
           else
-            image = image1;
+            img = image1;
           end
           
         catch err
@@ -439,6 +451,8 @@ classdef ProcessImage < matlab.mixin.Copyable
       if ~isequal(obj.image, image)
         obj.image = image;
         obj.updateMetadata();
+        obj.fftdata     = [];
+        obj.fftdata     = obj.Fourier;
       end
     end
     

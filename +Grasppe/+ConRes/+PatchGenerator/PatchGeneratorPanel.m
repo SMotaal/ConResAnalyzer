@@ -273,7 +273,11 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       end
       
       hold on;
-      hImage = imshow(imgd, 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
+      if max(imgd(:))>1 || min(imgd(:))<0
+        hImage = imshow(imgd, [], 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
+      else
+        hImage = imshow(imgd, 'Parent', hAxis, 'InitialMagnification','fit'); %'Border','loose');
+      end
       
       set(hAxis,'xtick',[],'ytick',[], 'LooseInset', [0,0,0,0], 'Clipping','on', 'Box', 'on', 'color', [1 1 1] * 0.15, 'Visible', 'off'); %, 'DataAspectRatio', [1 1 1]);
       
