@@ -1,0 +1,59 @@
+function H = bandfilter(type, band, M, N, D0, W, n)
+  %BANDFILTER Computes frequency domain band filters.
+  %  Reference: Gonzalez, et al. Digital Image Processing using MatLab, 2e, p. 199 (220)
+  
+  % Use function dftuv to set up the meshgrid arrays needed for
+  % computing the required distances.
+  [U, V] = dftuv(M,N)
+  
+  % Compute the distance D(U, V).
+  D  = hypot(U,V)
+  
+  % Determine if need to use default n.
+  if narin < 7
+    n = 1; % Default BTW filter order.
+  end
+  
+  % Begin filter computations. All filters are computed as band reject
+  % filters. At the end, they are converted to bandpass if so
+  % specified. Use lower(type) to protect against input being
+  % capitalized.
+  switch lower(type)
+    case 'ideal'
+      H = idealReject(D, D0, W);
+    case 'btw'
+      H = btwReject(D, D0, W, n);
+    case 'gaussian'
+      H = gaussReject(D, D0, W);
+    otherwise
+      error('Unknown filter type.');
+  end
+  
+  % Generate a bandpass filter if one was specified.
+  if strcmpi(band, 'pass')
+    H= 1 - H;
+  end
+  
+end
+
+function H = idealReject(D, D0, W)
+  RI = D <= D0 - (W/2);
+  % Points of region inside the inner
+  % boundary of the reject band are labeled 1.
+  % All other points are labeled 0.
+  
+  R0 = D >= D0 + (W/2);
+  % Points of region inside the outside
+  % boundary of the reject band are labeled 1.
+  % All other points are labeled 0.
+  
+  H = tofloat(R0|RI); % Ideal bandreject filter.
+end
+
+function H = btwReject(D, D0, W, n)
+  H = 1./(1 + (((D*W)./(D.^2 - D0^2)).^2*n));
+end
+
+function H = gaussReject(D, D0, W)
+  H = 1 - exp(-((D.^2 - D0^2)./(D.*W + eps)).^2);
+end

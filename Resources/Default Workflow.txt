@@ -6,7 +6,7 @@ Function-0-HalftoneFFT={ID=Function-0-HalftoneFFT | Expression=I=retina(PIMG);}
 Function-1-ContoneImage={ID=Function-1-ContoneImage | Expression=I=retina(CIMG);}
 Function-2-ScreeningImage={ID=Function-2-ScreeningImage | Expression=I=retina(SIMG);}
 Function-3={ID=Function-3 | Expression=I=retina(HIMG);}
-Function-4={ID=Function-4 | Expression=I=crossRFFT(PIMG, HIMG);}
-Function-5={ID=Function-5 | Expression=I=crossRFFT(CIMG, HIMG);}
-Function-6={ID=Function-6 | Expression=I=crossRFFT(SIMG, HIMG);}
-Function-7={ID=Function-7 | Expression=I=crossRFFT(HIMG, HIMG);}
+Function-4={ID=Function-4 | Expression=I=dotRFFT(PIMG, HIMG);}
+Function-5={ID=Function-5 | Expression=I=dotRFFT(CIMG, HIMG);}
+Function-6={ID=Function-6 | Expression=I=dotRFFT(SIMG, HIMG);}
+Function-7={ID=Function-7 | Expression=I=dotRFFT(HIMG, HIMG);}

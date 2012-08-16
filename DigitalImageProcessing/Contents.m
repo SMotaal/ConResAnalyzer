@@ -164,3 +164,10 @@
 %   percentile2i   - Computes an intensity value given a percentile.
 %   twomodegauss   - Generates a two-mode Gaussian function.
 
+%   Copyright 2002-2009 R. C. Gonzalez, R. E. Woods, and S. L. Eddins
+%   From the book Digital Image Processing Using MATLAB, 2nd ed.,
+%   Gatesmark Publishing, 2009.
+%
+%   Book web site: http://www.imageprocessingplace.com
+%   Publisher web site: http://www.gatesmark.com/DIPUM2e.htm
+

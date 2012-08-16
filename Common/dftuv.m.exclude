@@ -1,0 +1,29 @@
+function [U, V] = dftuv(M, N)
+  %DFTUV Computes meshgrid frequency matrices.
+  %  Reference: Gonzalez, et al. Digital Image Processing using MatLab, 2e, p. 186 (205)
+  
+  % Set up range of variables.
+  u = single(0:(M-1));
+  v = single(0:(N-1));
+  
+  % Compute the indices for use in meshgrid.
+  idx     = find(u > M/2);
+  u(idx) 	= u(idx) - M;
+  idy     = find(v > N/2);
+  v(idy)	= v(idy) - N;
+  
+  % Compute the mesh grid arrays.
+  [V, U] = meshgrid(v, u);
+  
+end
+
+% [U, V] = dftuv(8,5); U.^2 + V.^2
+%
+%      0     1     4     4     1
+%      1     2     5     5     2
+%      4     5     8     8     5
+%      9    10    13    13    10
+%     16    17    20    20    17
+%      9    10    13    13    10
+%      4     5     8     8     5
+%      1     2     5     5     2
