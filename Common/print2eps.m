@@ -38,7 +38,7 @@ elseif nargin > 2
 end
 % Construct the filename
 ext = char(regexpi(options,'(?<=-d)(\S{2,3})(?=.*)', 'match', 'once'));
-if ~isempty(ext) && (numel(name) < 5 || ~strcmpi(name(end-3:end), ['.' ext]))
+if ~isempty(ext) && (numel(name) < 5 || ~strcmpi(name(end-3:end), ['.' ext(1,1:min(3,numel(ext)))]))
     name = [name '.' ext]; % Add the missing extension
 end
 % Set paper size
