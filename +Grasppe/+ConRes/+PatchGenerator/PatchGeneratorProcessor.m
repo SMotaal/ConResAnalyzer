@@ -83,7 +83,9 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         CHECK(prepTasks); %2
         
         runData     = [];
-        imagefiles  = {};        
+        imagefiles  = {};
+        hifiles  = {};
+        scrfiles = {};
         
         outset      = 'data';
         outseries   = ['Series-' num2str(3,'%03d')];        
@@ -160,14 +162,46 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         CHECK(procTasks); % 1
         
+        strSettings     = {'RTV', 'CON', 'RES'};
+        numSettings     = numel(strSettings);
+        runSettings     = [0, 0, 0];
+        
+        fxFFT           = cell(1,4);
+        fxImages        = cell(1,4);
+        sharpImages     = cell(1,4);
+        
+        screen          = [];
+        hiContrast      = [];
+        
+        sharpSpectra    = cell(1,4);
+        sharpPixels     = cell(1,4);
+        retinaSpectra   = cell(1,4);
+        retinaPixels    = cell(1,4);
+        fxSpectra       = cell(1,4);
+        fxPixels        = cell(1,4);
+        
         for s = 1:numel(SRange)
           
           nv      = nV;
           
-          svalue = SRange{s};
-          tvalue = svalue(1);
-          cvalue = svalue(2);
-          rvalue = svalue(3);
+          svalue  = SRange{s};
+          tvalue  = svalue(1);
+          cvalue  = svalue(2);
+          rvalue  = svalue(3);
+          
+          if ~isnumeric(runSettings) || numel(runSettings)~=numSettings
+            currentSettings = zeros(1, numSettings);
+          end
+          
+          newRTV  = ~isequal(runSettings(1), tvalue);
+          newCON  = ~isequal(runSettings(2), cvalue);
+          newRES  = ~isequal(runSettings(3), rvalue);
+          
+          if newRTV || newRES
+            patchRange                = 1:4;
+          else
+            patchRange                = 2:3;
+          end          
           
           if tvalue+(cvalue)>100 || tvalue-(cvalue/2)<0          
             CHECK(varTasks, nv); % n(v)
@@ -198,7 +232,10 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             screenProcessor.Execute(parameters.Screen);
             
             screenedImage   = output.Image;
-            screen          = screenProcessor.HalftoneImage;
+            
+            if newRTV || newRES || ~isscalar(screen) || ~isobject(screen) || ~isvalid(screen)
+              screen        = screenProcessor.HalftoneImage;
+            end            
             screenImage     = screen.Image;
             
             CHECK(varTasks); nv = nv -1; %2
@@ -236,26 +273,39 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             PS            = ceil(parameters.Patch.Size*(SR/25.4));
             FQ            = RES / (SR/25.4) * PS * 2;
             
-            hiContrast                      = reference.copy;
-            hiContrast.Image                = imadjust(hiContrast.Image);
+            if newRTV || newRES || ~isscalar(hiContrast) || ~isobject(hiContrast) || ~isvalid(hiContrast)
+              hiContrast                      = reference.copy;
+              hiContrast.Image                = imadjust(hiContrast.Image);
+            end
+            % end
             
             imageIds      = {'SC', 'AP', 'CT', 'HC'};
             
             suffix        = [ ...
               '-V' num2str(round(RTV),    '%0.3d') ...
               '-R' num2str(round(RES*100),'%0.3d') ...
-              '-C' num2str(round(CON),    '%0.3d') ...
+              '-C' num2str(round(CON*10), '%0.4d') ...
               '-F' num2str(round(FQ*10),  '%0.3d')];
             
-            processImages = {screen, patch, reference, hiContrast};
+            hisuffix        = [ ...
+              '-V' num2str(round(RTV),    '%0.3d') ...
+              '-R' num2str(round(RES*100),'%0.3d') ...
+              '-F' num2str(round(FQ*10),  '%0.3d')];
             
+            scrsuffix = hisuffix;
             
-            fxFFT{1}      = crossRFFT(screen.Image, hiContrast.Image);      % fxImages{1}.Image = fxFFT{1};
-            fxFFT{2}      = crossRFFT(patch.Image, hiContrast.Image);       % fxImages{2}.Image = fxFFT{2};
-            fxFFT{3}      = crossRFFT(reference.Image, hiContrast.Image);   % fxImages{3}.Image = fxFFT{3};
-            fxFFT{4}      = crossRFFT(hiContrast.Image, hiContrast.Image);  % fxImages{4}.Image = fxFFT{4};
+%             if newRTV || newRES
+%               sharpImages{1}  = screen;
+%               sharpImages{4}  = hiContrast;
+%             end
+
+            fxFFT{1}            = crossRFFT(screen.Image, hiContrast.Image);      % fxImages{1}.Image = fxFFT{1};
+            fxFFT{4}            = crossRFFT(hiContrast.Image, hiContrast.Image);  % fxImages{4}.Image = fxFFT{4};
+            fxFFT{2}            = crossRFFT(patch.Image, hiContrast.Image);       % fxImages{2}.Image = fxFFT{2};
+            fxFFT{3}            = crossRFFT(reference.Image, hiContrast.Image);   % fxImages{3}.Image = fxFFT{3};
             
-            for m = 1:numel(fxFFT)
+            for m = patchRange
+              try delete(fxImages{m}); end
               fxImages{m}       = patch.copy;
               fxImages{m}.Image = fxFFT{m};
             end
@@ -283,23 +333,33 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             fFFT    = @(varargin) forwardFFT(varargin{:});
             retina  = @(x) disk(x, HR);
             
-            %% Patch Images Processing            
+            %% Patch Images Processing  
             
-            parfor m = 1:numel(processImages)
-              processImage = processImages{m};
+            
+            sharpImages = {screen, patch, reference, hiContrast};
+            
+            parfor m = 1:numel(sharpImages)
+              processImage = sharpImages{m};
               
-              data    = processImage.Fourier;
-              image   = processImage.Image;
-              rmage   = retina(image);
-              rdata   = fFFT(rmage);
-              
-              [bFq fqData]  = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(data));
-              [bFq fqRData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(rdata));
-              
-              seriesFqs{m}  = fqData(:,dataColumn);
-              seriesRFqs{m} = fqRData(:,dataColumn);
-              seriesIms{m}  = image;
-              seriesRms{m}  = rmage;
+              if any(patchRange==m)
+                data    = processImage.Fourier;
+                image   = processImage.Image;
+                rmage   = retina(image);
+                rdata   = fFFT(rmage);
+
+                [bFq fqData]  = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(data));
+                [bFq fqRData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(rdata));
+                
+                sharpSpectra{m}   = fqData(:,dataColumn);
+                retinaSpectra{m}  = fqRData(:,dataColumn);
+                sharpPixels{m}    = image;
+                retinaPixels{m}   = rmage;
+              end
+
+              seriesFqs{m}    = sharpSpectra{m}; % fqData(:,dataColumn);
+              seriesRFqs{m}   = retinaSpectra{m}; %fqRData(:,dataColumn);
+              seriesIms{m}    = sharpPixels{m}; % image;
+              seriesRms{m}    = retinaPixels{m}; %rmage;
             end
             
             CHECK(varTasks); nv = nv -1; %6
@@ -307,34 +367,49 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             %% Retina Images Processing            
             
             parfor m = 1:numel(fxImages)
-              fxImage = fxImages{m};
-              cdata   = fxFFT{m};
+              if any(patchRange==m)
+                fxImage   = fxImages{m};
+                cdata     = fxFFT{m};
               %cmage   = levelFFT(cdata);
               
-              [bFq fqCData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(cdata));
+                [bFq fqCData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(cdata));
+                
+                fxSpectra{m}  = fqCData(:,dataColumn);
               
-              seriesCFqs{m} = fqCData(:,dataColumn);
+              end
+              
+              seriesCFqs{m} = fxSpectra{m}; %fqCData(:,dataColumn);
               %seriesCms{m}  = cmage; %retina(image);
-              
-              delete(fxImage);
+              %try delete(fxImages{m}); end
             end
+            
+            try delete(fxImages{2}); end
+            try delete(fxImages{3}); end
             
             CHECK(varTasks); nv = nv -1; %7
                     
             %% Image & Data Consolidation
             
             seriesData = [1:size(seriesFqs{1},1)]';
-            for m = 1:numel(processImages)
-              seriesData  = [seriesData seriesRFqs{m}]; % seriesFqs{m}];
-              seriesImage = [seriesImage seriesIms{m}];
-              seriesRmg   = [seriesRmg seriesRms{m}];
+            for m = 1:numel(sharpImages)
+              seriesData  = [seriesData   seriesRFqs{m} ]; % seriesFqs{m}];
+            end
+            
+            for m = 2:3
+              seriesImage = [seriesImage  seriesIms{m}  ];
+              seriesRmg   = [seriesRmg    seriesRms{m}  ];              
+            end
+            
+            if newRTV || newRES
+              scrImage    = [seriesIms{1}; seriesRms{1}];
+              hiImage     = [seriesIms{4}; seriesRms{4}];
             end
             
             clear seriesRFqs seriesIms seriesRms;
                         
             for m = 1:numel(fxImages)
-              seriesData      = [seriesData seriesCFqs{m}];
-              %seriesCmg      = [seriesCmg seriesCms{m}];
+              seriesData 	= [seriesData seriesCFqs{m}];
+              %seriesCmg  = [seriesCmg seriesCms{m}];
             end
             
             seriesImage       = [seriesImage; seriesRmg];
@@ -347,8 +422,13 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             seriesData        = [zv; seriesData];
             runData           = [runData; [RTV CON RES zv]];
             
-            imagefile         = [prefix 'image' suffix '.png'];
+            imagefile         = [prefix 'image'   suffix '.png'];
+            hiFile            = [prefix 'hitone'  hisuffix '.png'];
+            scrFile           = [prefix 'screen'  scrsuffix '.png'];
+            
             imagefiles{end+1} = imagefile;
+            hifiles{end+1}    = hiFile;
+            scrfiles{end+1}   = scrFile;
             
             CHECK(varTasks); nv = nv -1; %8
             
@@ -356,6 +436,12 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             
             dlmwrite([prefix 'data' suffix '.txt'], seriesData, '\t');
             imwrite(seriesImage, imagefile); %[prefix 'image' suffix '.png']);
+            
+            if newRTV || newRES
+              imwrite(hiImage,  hiFile);
+              imwrite(scrImage, scrFile);
+            end
+
             
             CHECK(varTasks); nv = nv -1; %9
             
@@ -369,6 +455,11 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           if nv>0
             CHECK(varTasks, nv);
           end
+        end
+
+        for m = 1:4
+          try delete(fxImages{m});    end
+          try delete(sharpImages{m}); end
         end
         
         SEAL(varTasks);
@@ -406,7 +497,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           'table {border: #ccc 1px solid; border-collapse: collapse; -webkit-text-size-adjust: none; ' ...
           '     font-size: 16px; line-height: 1.5 !important; vertical-align:baseline;} ' ...
           '.blank {background-color: #fff !important; visibility:hidden; width:1% !important;  } ' ...
-          'td, th {border: #aaa 1px solid; width: 3%; text-align: center} ' ...
+          'td, th {border: #aaa 1px solid; width: 3%; text-align: center; white-space: nowrap;} ' ...
           'td:nth-of-type(odd)  {background-color: #eee;} ' ...
           '/*th:nth-of-type(odd) {background-color: #aaa;} */' ...
           'th {background-color: #999; font-size:12px;} ' ...
@@ -430,14 +521,20 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           cvalue = runData(m,2);
           rvalue = runData(m,3);
           
-          imagefile = imagefiles{m}; ...
-            [pth fname ext] = fileparts(imagefiles{m});
+          %imagefile = imagefiles{m}; ...
+          [pth fname ext] = fileparts(imagefiles{m});
+          imagefile = [fname ext];
           
-          imagefile = [fname ext];         
-          imgcode   = sprintf('<td><img src="%s" /></td>', imagefile);            
+          [pth fname ext] = fileparts(hifiles{m});
+          hifile = [fname ext];
+          
+          [pth fname ext] = fileparts(scrfiles{m});
+          scrfile = [fname ext];          
+                   
+          imgcode   = sprintf('<td><img src="%s" /><img src="%s" /><img src="%s" /></td>', scrfile, imagefile, hifile);
           
           datacode  = sprintf([ ...
-            '<td>TV<br/>%0.0fe+0</td>  <td>CON<br/>%0.0fe+0</td>  <td>RES<br/>%4.3fe+0</td>  <td>FF<br/>%2.1fe+0</td> <td class="blank"></td>' ...
+            '<td>TV<br/>%0.0fe+0</td>  <td>CON<br/>%2.1fe+0</td>  <td>RES<br/>%4.3fe+0</td>  <td>FF<br/>%2.1fe+0</td> <td class="blank"></td>' ...
             '<td>SCF<br/>%3.2fe%+d</td>  <td>APF<br/>%3.2fe%+d</td>  <td>CTF<br/>%3.2fe%+d</td>  <td>HCF<br/>%3.2fe%+d</td> <td class="blank"></td>' ...
             '<td>SC&#x2a2f;HC<br/>%3.2fe%+d</td> <td>AP&#x2a2f;HC<br/>%3.2fe%+d</td> <td>CT&#x2a2f;HC<br/>%3.2fe%+d</td> <td>HC&#x2a2f;HC<br/>%3.2fe%+d</td> ' ...
             ... % '<td>%3.2fe%+d</td><td>%3.2fe%+d</td><td>%3.2fe%+d</td><td>%3.2fe%+d</td>' ...
@@ -481,6 +578,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       SEAL(procTasks);
       
     end
+    
     
     function output = Run(obj)
       
@@ -758,6 +856,132 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       drawnow expose update;
       
       SEAL(procTasks);
+    end
+    
+  end
+  
+  methods (Static)
+    function output = GenerateHTML(runData, filename, prefix)
+      
+      if ~exist('prefix', 'var')
+        prefix = '';
+      end
+      
+      if ~exist('filename', 'var')
+        filename = '';
+      end
+      if exist(runData, 'file')>0
+        if isempty(prefix) && ~isempty(filename) %~exist('prefix', 'var') && nargin==2
+          prefix = filename;
+        end
+        filename = runData;
+        runData = dlmread(filename, '\t');
+      else
+        if isempty(filename)
+          filename = fullfile('Output', 'series-summary.txt');
+        end
+      end
+      
+      [pth fname ext] = fileparts(filename);
+      
+      if isempty(prefix)
+        prefix = regexprep(fname, '[-]?summary', '');
+      end
+      
+      outset = regexprep(regexprep(fname, '[-]?summary', ''), 'series-\d+-', '');
+      
+      
+        htmlcode{1} = ['<html>' ...
+          '<style>' ...
+          'body{font-family: Sans-Serif;} ' ...
+          'table {border: #ccc 1px solid; border-collapse: collapse; -webkit-text-size-adjust: none; ' ...
+          '     font-size: 16px; line-height: 1.5 !important; vertical-align:baseline;} ' ...
+          '.blank {background-color: #fff !important; visibility:hidden; width:1% !important;  } ' ...
+          'td, th {border: #aaa 1px solid; width: 3%; text-align: center; white-space: nowrap;} ' ...
+          'td:nth-of-type(odd)  {background-color: #eee;} ' ...
+          '/*th:nth-of-type(odd) {background-color: #aaa;} */' ...
+          'th {background-color: #999; font-size:12px;} ' ...
+          'img {height: 175 px; width: auto;} ' ...
+          'td>b{font-size: 11 px; font-weight: lighter;} ' ...
+          'td>span{font-size: 11 px; } ' ... %line-height: 0 px; baseline-shift: baseline;
+          '</style>' ...
+          '<table>'];
+        
+        htmlcode{2} = ['<thead><tr>' ...
+          '<th>TV</th> <th>CON</th> <th>RES</th> <th>FF</th>  <th class="blank"></th>' ...
+          '<th>SCF</th> <th>APF</th> <th>CTF</th> <th>HCF</th>  <th class="blank"></th>' ...
+          '<th>SC&#x2a2f;HC</th> <th>AP&#x2a2f;HC</th> <th>CT&#x2a2f;HC</th> <th>HC&#x2a2f;HC</th>' ...
+          ' <th class="blank"></th>' ... % '<th>SH/HH</th> <th>PH/HH</th> <th>CH/HH</th> <th>PH/CH</th>' ...
+          '<th>IMAGE</th>' ...          
+          '</tr></thead>'];
+        
+        for m = 1:size(runData,1)
+          
+          RTV = runData(m,1);
+          CON = runData(m,2);
+          RES = runData(m,3);
+          FQ  = runData(m,4);
+          
+            suffix        = [ ...
+              '-V' num2str(round(RTV),    '%0.3d') ...
+              '-R' num2str(round(RES*100),'%0.3d') ...
+              '-C' num2str(round(CON*10), '%0.4d') ...
+              '-F' num2str(round(FQ*10),  '%0.3d')];
+            
+            hisuffix        = [ ...
+              '-V' num2str(round(RTV),    '%0.3d') ...
+              '-R' num2str(round(RES*100),'%0.3d') ...
+              '-F' num2str(round(FQ*10),  '%0.3d')];
+            
+            scrsuffix        = [ ...
+              '-V' num2str(round(RTV),    '%0.3d')]; % ...
+              %'-R' num2str(round(RES*100),'%0.3d') ...
+              %'-F' num2str(round(FQ*10),  '%0.3d')];
+          
+            imagefile         = [prefix '-image'   suffix '.png'];
+            hifile            = [prefix '-hitone'  hisuffix '.png'];
+            scrfile           = [prefix '-screen'  scrsuffix '.png'];
+          
+%           %imagefile = imagefiles{m}; ...
+%           [pth fname ext] = fileparts(imagefiles{m});
+%           imagefile = [fname ext];
+%           
+%           [pth fname ext] = fileparts(hifiles{m});
+%           hifile = [fname ext];
+%           
+%           [pth fname ext] = fileparts(scrfiles{m});
+%           scrfile = [fname ext];          
+                   
+          imgcode   = sprintf('<td><img src="%s" /><img src="%s" /><img src="%s" /></td>', scrfile, imagefile, hifile);
+          
+          datacode  = sprintf([ ...
+            '<td>TV<br/>%0.0fe+0</td>  <td>CON<br/>%2.1fe+0</td>  <td>RES<br/>%4.3fe+0</td>  <td>FF<br/>%2.1fe+0</td> <td class="blank"></td>' ...
+            '<td>SCF<br/>%3.2fe%+d</td>  <td>APF<br/>%3.2fe%+d</td>  <td>CTF<br/>%3.2fe%+d</td>  <td>HCF<br/>%3.2fe%+d</td> <td class="blank"></td>' ...
+            '<td>SC&#x2a2f;HC<br/>%3.2fe%+d</td> <td>AP&#x2a2f;HC<br/>%3.2fe%+d</td> <td>CT&#x2a2f;HC<br/>%3.2fe%+d</td> <td>HC&#x2a2f;HC<br/>%3.2fe%+d</td> ' ...
+            ... % '<td>%3.2fe%+d</td><td>%3.2fe%+d</td><td>%3.2fe%+d</td><td>%3.2fe%+d</td>' ...
+            ], ...
+            runData(m,1:4), sciparts(runData(m, 5:8)), sciparts(runData(m, 9:12)) ... %runData(m,1:4), runData(m,9:12), lData, aData, rData, zData, ...
+            ... %lzData(m), azData(m), rzData(m), arData(m) ...
+            );
+          
+          
+          datacode  = regexprep(datacode, '(<td>)([^\<]*)(<br/>)', '$1<b>$2</b>$3');
+          datacode  = regexprep(datacode, '(\d\.\d+)(e)([-+])(0?)([1-9]+)', '$1<br/><span>e$3$5</span>');
+          datacode  = regexprep(datacode, '([\d\.]+)(e)([-+])(0)', '$1<br/><span>&nbsp;</span>');
+          
+          rowcode   = ['<tr>' datacode '<td class="blank"></td>' imgcode '</tr>'];
+          
+          htmlcode{end+1} = rowcode;
+        end
+        
+        htmlcode{end+1} = '</table></html>';
+        
+        %CHECK(procTasks); % 5
+        
+        dlmwrite(fullfile(pth, [prefix '-' outset '-summary.html']), strvcat(htmlcode),'');
+        
+        %CHECK(procTasks); % 6
+      
     end
     
   end
