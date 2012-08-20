@@ -97,7 +97,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       oFrame  = {'Position', get(0,'Screensize'), 'ToolBar','none', ...
         'color', [1 1 1] * 0.45, 'Renderer', 'OpenGL', ...
         'CloseRequestFcn', @(src, event) delete(obj), ...
-        'Visible', 'off'}; %, 'HandleVisibility', 'callback'};
+        'Visible', 'off', 'NumberTitle', 'off', 'Name', 'ConResLab'}; %, 'HandleVisibility', 'callback'};
       
       if ~isempty(cFrame) && ishandle(cFrame) && isvalid(cFrame)
         hFrame = figure(cFrame, oFrame{:});
@@ -197,6 +197,11 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     function applyChanges(obj)
       import Grasppe.ConRes.PatchGenerator.*;
+      
+      try
+        obj.ProgressProcess.resetTasks;
+        %beep();
+      end      
       
       try
         %progressBar = obj.ProgressBar;

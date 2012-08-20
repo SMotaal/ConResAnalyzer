@@ -47,6 +47,10 @@ classdef PatchGenerator < Grasppe.Occam.Module
     end
     
     function ApplyParameters(obj, source, event)
+      try
+        obj.Processor.ProcessProgress.resetTasks;
+        %beep();
+      end
       obj.Parameters = source.getParameters;
       
       output = obj.Execute;

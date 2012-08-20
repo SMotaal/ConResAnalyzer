@@ -31,6 +31,12 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       process.View        = obj.View;
     end
     
+    function UpdateProgressComponents(obj)
+      obj.UpdateProgressComponents@Grasppe.Occam.Process();
+      obj.ProcessProgress.Window  = obj.View.Window;
+      obj.View.ProcessProgress    = obj.ProcessProgress;
+    end
+    
     
     function output = RunSeries(obj, varargin)
       
@@ -40,8 +46,6 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       %% Progress Initialization
       obj.UpdateProgressComponents;
-      
-      obj.ProcessProgress.Window = obj.View.Window;
       
       obj.ProcessProgress.resetTasks;
       
@@ -770,13 +774,19 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             
             fftMode = ~isreal(image);
             
+            imean = [];
+            istd  = [];
+            
             if fftMode
               
               invimg = output.inverseFFT(image);
               panel.setImage(invimg);
               
+              imean = 1-mean(invimg(:));
+              istd  = std(invimg(:));
+              
               try
-                T   = [ids{m} ' inv'];
+                T   = [ids{m} ' inv (' int2str(imean*100) '% - ' num2str(istd)  ')'];
                 text(tXY{:}, T, 'Parent', gca, tOp{:});
                 text(tXY2{:}, tSize(invimg), 'Parent', gca, tOp2{:});
               end
@@ -788,12 +798,18 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               %             image     = (image-imageMin) / (imageMax-imageMin);
               
               image = fftimage; %snapshot.FourierImage; %.bandPlotFFT(image);
-              
+            else
+              imean = 1-mean(image(:));
+              istd  = std(image(:));
             end
             panel.setImage(image);
             
             try
-              T   = [ids{m}];
+              if ~fftMode
+                T   = [ids{m} ' (' int2str(imean*100) '% - ' num2str(istd)  ')'];
+              else
+                T   = [ids{m}];
+              end
               text(tXY{:}, T, 'Parent', gca, tOp{:});
               text(tXY2{:}, tSize(image), 'Parent', gca, tOp2{:});
             end
@@ -839,7 +855,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           %         panel.setImage(image);
           %         panel.setImage(image);
           
-          set(gcf,'Name','ConRes');
+          %set(gcf,'Name','ConRes');
           
           CHECK(procTasks); % 3
         catch err
