@@ -1,0 +1,12 @@
+Patch={Resolution=4.386 | Contrast=25 | Mean=50 | Size=5.3}
+Screening={Angle=37.5 | Resolution=175.0 | Addressability=2450.0}
+Printing={Blur=100.0 | Radius=0.0 | Gain=0.0 | Noise=0.0}
+Scanning={Resolution=1200.0 | Scale=100.0}
+Function-0={ID=Function-0 | Expression=I=retina(PIMG);}
+Function-1={ID=Function-1 | Expression=I=PIMG;}
+Function-2={ID=Function-2 | Expression=I=retina(CIMG);}
+Function-3={ID=Function-3 | Expression=I=CIMG;}
+Function-4={ID=Function-4 | Expression=I=retina(SIMG);}
+Function-5={ID=Function-5 | Expression=I=SIMG;}
+Function-6={ID=Function-6 | Expression=I=retina(HIMG);}
+Function-7={ID=Function-7 | Expression=I=HIMG;}

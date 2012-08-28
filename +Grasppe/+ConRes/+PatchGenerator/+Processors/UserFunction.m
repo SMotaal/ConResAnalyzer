@@ -169,7 +169,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
             %disp(['Modulus ' num2str(mod2) ' (' num2str(mod1) ')']);
             % disp(['Modulus ' num2str(cmod(image(cpixel(1),cpixel(2)))) ]);
 
-            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FQ, 1); %, filters{m}, sums{m});
+            [isum fsum rat flt istd fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FQ, 1); %, filters{m}, sums{m});
 
             %disp(['Fundamental ' num2str(FR) ' px ~ ' num2str(rat)]);
             
@@ -253,7 +253,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
 %           disp(['Modulus ' num2str(mod2) ' (' num2str(mod1) ')']);
 %           % disp(['Modulus ' num2str(cmod(image(cpixel(1),cpixel(2)))) ]);
 %           
-%           [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FR, 1); %, filters{m}, sums{m});
+%           [isum fsum rat flt istd fimg] = Grasppe.Kit.ConRes.BandIntensityValue(image, size(image,1), FR, 1); %, filters{m}, sums{m});
 %           
 %           disp(['Fundamental ' num2str(FR) ' px ~ ' num2str(rat)]);
         end
@@ -282,16 +282,16 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       try
         switch lower(operation)
           case 'add'
-            dispdbg('Adding...');
+            DBG.dispdbg('Adding...');
             image = v{1}+v{2};
           case 'subtract'
-            dispdbg('Subtracting...');
+            DBG.dispdbg('Subtracting...');
             image = v{1}-v{2};
           case 'multiply'
-            dispdbg('Multiplying...');
+            DBG.dispdbg('Multiplying...');
             image = v{1}.*v{2};
           case 'divide'
-            dispdbg('Dividing...');
+            DBG.dispdbg('Dividing...');
             image = v{1}./v{2};
           otherwise
             warning('Cannot perform %s operation because it is not support.', toString(operation));
@@ -383,7 +383,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
           output.Domain = 'frequency';
       end
       
-      dispdbg([method varargin{1}]);
+      DBG.dispdbg([method varargin{1}]);
     end
   end
 end

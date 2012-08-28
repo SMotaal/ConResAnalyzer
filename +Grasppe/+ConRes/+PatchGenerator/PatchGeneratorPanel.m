@@ -49,7 +49,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         end
         obj.panelCode = v;
       else
-        obj.panelCode = importdata('./Resources/Default Workflow.txt');
+        obj.panelCode = importdata('@ConResLab/Resources/Default Workflow.txt');
       end
       obj.permanent = true;
     end
@@ -197,30 +197,32 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     function applyChanges(obj)
       import Grasppe.ConRes.PatchGenerator.*;
+      import Grasppe.ConRes.PatchGenerator.Processors.*;
       
       try
         obj.ProgressProcess.resetTasks;
         %beep();
       end      
       
-      try
-        %progressBar = obj.ProgressBar;
-        disp('Progress Bar');
-        disp(obj.ProgressProcess.ProgressBar);
-        disp('Progress Bar');
-      end
+      % try
+      %   %progressBar = obj.ProgressBar;
+      %   disp('Progress Bar');
+      %   disp(obj.ProgressProcess.ProgressBar);
+      %   disp('Progress Bar');
+      % end
       
-      disp('Applying Changes');
+      % debugStamp('Applying Changes');
       
       parameters = obj.jParametersPanel.getValues();
       
       try parameters = hashmap2struct(parameters); end
       
       try
-        Patch         = parameters.Patch;
-        Screen        = parameters.Screening;
-        Print         = parameters.Printing;
-        Scan          = parameters.Scanning;
+        %% Print Parameters
+        parameters.Screening.(Screen.TVI)      = parameters.Printing.Gain;
+        parameters.Screening.(Screen.NOISE)    = parameters.Printing.Noise;
+        parameters.Screening.(Screen.RADIUS)   = parameters.Printing.Radius;
+        parameters.Screening.(Screen.BLUR)     = parameters.Printing.Blur;
         
         Processors    = struct;
         
@@ -230,25 +232,24 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
           fn = char(fn);
           fnl = lower(fn);
           
-          if strfind(fnl, 'fourier')==1;
-            disp(fn);
+%           if strfind(fnl, 'fourier')==1;
+%             disp(fn);
+%             Processors.(fnl) = parameters.(fn);
+%           elseif strfind(fnl, 'display')==1;
+%             disp(fn);
+%             Processors.(fnl) = parameters.(fn);
+          if strfind(fnl, 'function')==1;
             Processors.(fnl) = parameters.(fn);
-          elseif strfind(fnl, 'function')==1;
-            disp(fn);
-            Processors.(fnl) = parameters.(fn);
-          elseif strfind(fnl, 'display')==1;
-            disp(fn);
-            Processors.(fnl) = parameters.(fn);
-          else
+%          else
             % beep;
           end
         end
         
         
-        obj.PatchGeneratorParameters.Patch  = Patch;
-        obj.PatchGeneratorParameters.Screen = Screen;
-        obj.PatchGeneratorParameters.Print  = Print;
-        obj.PatchGeneratorParameters.Scan   = Scan;
+        obj.PatchGeneratorParameters.Patch  = parameters.Patch;
+        obj.PatchGeneratorParameters.Screen = parameters.Screening;
+        % obj.PatchGeneratorParameters.Print  = [];
+        obj.PatchGeneratorParameters.Scan   = parameters.Scanning;
         obj.PatchGeneratorParameters.Processors = Processors;
       catch err
         disp(err);
@@ -296,7 +297,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
     
     function resizeImageAxis(obj, hAxis)
       try
-        aP    = pixelPosition(hAxis);
+        aP    = HG.pixelPosition(hAxis);
         aW    = aP(3);
         aH    = aP(4);
         
@@ -344,7 +345,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         nC = nC + mod(nC,2);
       nR      = ceil(nA/nC); %max(1, ceil(nA/nC)-1);
       
-      fP      = pixelPosition(hFrame);
+      fP      = HG.pixelPosition(hFrame);
       pX      = obj.jParametersPanel.getX;
       
       nW      = ceil((pX-1)/nC);
@@ -391,12 +392,12 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         hAxes   = obj.hAxes;
         nA      = numel(hAxes);
         
-        pFrame  = pixelPosition(hFrame);
+        pFrame  = HG.pixelPosition(hFrame);
         axesMap = zeros(pFrame([3 4])+1);
         
         for m = 1:nA
           hAxis = hAxes{m};
-          pAxis = round(pixelPosition(hAxis))+1;
+          pAxis = round(HG.pixelPosition(hAxis))+1;
           try
             axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
           catch err
@@ -440,12 +441,12 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
       %       hAxes   = obj.hAxes;
       %       nA      = numel(hAxes);
       %
-      %       pFrame  = pixelPosition(hFrame);
+      %       pFrame  = HG.pixelPosition(hFrame);
       %       axesMap = zeros(pFrame([3 4])+1);
       %
       %       for m = 1:nA
       %         hAxis = hAxes{m};
-      %         pAxis = round(pixelPosition(hAxis))+1;
+      %         pAxis = round(HG.pixelPosition(hAxis))+1;
       %         try
       %           axesMap(pAxis(1):pAxis(1)+pAxis(3), pAxis(2):pAxis(2)+pAxis(4)) = m;
       %         catch err

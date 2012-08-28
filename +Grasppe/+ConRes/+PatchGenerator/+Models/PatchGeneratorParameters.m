@@ -5,7 +5,7 @@ classdef PatchGeneratorParameters < handle
   properties
     Patch   = Grasppe.ConRes.PatchGenerator.Models.PatchParameters;
     Screen  = Grasppe.ConRes.PatchGenerator.Models.ScreenParameters;
-    Print   = Grasppe.ConRes.PatchGenerator.Models.PrintParameters;
+    % Print   = Grasppe.ConRes.PatchGenerator.Models.PrintParameters;
     Scan    = Grasppe.ConRes.PatchGenerator.Models.ScanParameters;
     Processors = [];
   end

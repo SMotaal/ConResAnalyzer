@@ -3,7 +3,7 @@ classdef Syntax
   %   Detailed explanation goes here
   
   properties
-    IMPORTS = {'Grasppe.Patterns.*' , 'Grasppe.Kit.*'};
+    IMPORTS = {'Grasppe.Imaging.Patterns.*' , 'Grasppe.Kit.*'};
 
 %     CONTRAST_RANGE    = [100 70.17 49.239 34.551 24.245 17.013 11.938 8.377 5.878 4.125 2.894 2.031 1.425 1.0];
 
@@ -46,7 +46,7 @@ classdef Syntax
       
       s = warning('off', 'all');      
       
-      [filePath fileName fileExt] = fileparts(eval(FILE));
+      [filePath fileName fileExt] = fileparts(eval(FS.FILE));
       
       %% Read Input
       try
@@ -115,7 +115,7 @@ classdef Syntax
     
     function [instance class] = GetInstance()
       persistent Instance; ...
-        Class = eval(CLASS);
+        Class = eval(NS.CLASS);
       
       Instance = eval(Grasppe.Kit.GetInstance); ...
         instance = Instance; ...
@@ -127,7 +127,7 @@ classdef Syntax
     end
     
     function [imports] = GetImports
-      eval([eval(CLASS) '.GetInstance;']);
+      eval([eval(NS.CLASS) '.GetInstance;']);
       
       imports = Instance.IMPORTS;
       

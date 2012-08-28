@@ -1,3 +1,0 @@
-isQuitting(true);
-
-PersistentSources('save');

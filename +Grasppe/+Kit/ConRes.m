@@ -3,7 +3,7 @@ classdef ConRes
   %   Detailed explanation goes here
   
   properties
-    IMPORTS = {'Grasppe.Patterns.*' , 'Grasppe.Kit.*'};
+    IMPORTS = {'Grasppe.Imaging.Patterns.*' , 'Grasppe.Kit.*'};
     
     TONE_RANGE        = 5:5:95;
     CONTRAST_RANGE    = [100 70.17 49.239 34.551 24.245 17.013 11.938 8.377 5.878 4.125 2.894 2.031 1.425 1.0];
@@ -63,7 +63,7 @@ classdef ConRes
       
       spec = [100*(1-rtv) 100*ct resolution];
       
-      %image = []; %Grasppe.Patterns.ConcentricCircles(cycles, );
+      %image = []; %Grasppe.Imaging.Patterns.ConcentricCircles(cycles, );
     end
     
   end
@@ -93,7 +93,7 @@ classdef ConRes
     
     function [instance class] = GetInstance()
       persistent Instance; ...
-        Class = eval(CLASS);
+        Class = eval(NS.CLASS);
       
       Instance = eval(Grasppe.Kit.GetInstance); ...
         instance = Instance; ...
@@ -105,7 +105,7 @@ classdef ConRes
     end
     
     function [imports] = GetImports
-      eval([eval(CLASS) '.GetInstance;']);
+      eval([eval(NS.CLASS) '.GetInstance;']);
       
       imports = Instance.IMPORTS;
       
@@ -146,13 +146,13 @@ classdef ConRes
           sums    = cell(1,nBands);
         end
         
-        currentData = zeros(nBands, 4);
+        currentData = zeros(nBands, 5);
         
         fImg = abs(fImg);
         
         parfor m = 1:nBands %min(nBands, 70)
           try
-            [isum fsum rat flt fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3, filters{m}, sums{m});
+            [isum fsum rat flt istd fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3, filters{m}, sums{m});
             
 %           if isempty(filters{m})
 %             bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
@@ -171,10 +171,10 @@ classdef ConRes
             
             fQ(m) = rat;
             
-            currentData(m,:) = [m isum fsum rat];
+            currentData(m,:) = [m isum fsum rat istd];
             
           catch err
-            disp(err);
+            debugStamp(err, 1);
           end
         end
         
@@ -193,13 +193,13 @@ classdef ConRes
         % assignin('base', 'BandIntensityData', baseData);
         
       catch err
-        disp(err);
+        debugStamp(err, 1); %disp(err);
       end
       
       warning(s);
     end
     
-    function [isum fsum rat flt fimg] = BandIntensityValue(img, sz, bnd, wd, flt, fsum)
+    function [isum fsum rat flt istd fimg] = BandIntensityValue(img, sz, bnd, wd, flt, fsum)
       
       if nargin<4 || ~isscalar(wd) || ~isnumeric(wd)
         wd    = 1;
@@ -217,6 +217,8 @@ classdef ConRes
       fimg    = img.*flt;
       
       isum    = sum(fimg(:));
+      
+      istd    = std(fimg(flt~=0));
       
       rat     = isum / fsum;
       

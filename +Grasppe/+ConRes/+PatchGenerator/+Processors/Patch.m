@@ -7,9 +7,18 @@ classdef Patch < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     Scale          = 1.0;
   end
   
+  properties (Constant)
+    MEANTONE    = Grasppe.ConRes.Enumerations.Mean';
+    CONTRAST    = Grasppe.ConRes.Enumerations.Contrast';
+    RESOLUTION  = Grasppe.ConRes.Enumerations.Resolution';
+    SIZE        = Grasppe.ConRes.Enumerations.Size';
+  end
+  
   methods
     
     function output = Run(obj)
+      
+      import(eval(NS.CLASS));
       
       output          = obj.Input;
       variables       = obj.Variables;
@@ -18,21 +27,21 @@ classdef Patch < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       addressibility  = obj.Addressability;
       
-      reference       = findField(parameters, 'mean');
+      meantone        = findField(parameters, 'mean');
       contrast        = findField(parameters, 'contrast');
       resolution      = findField(parameters, 'resolution');
       size            = findField(parameters, 'size');
       
-      [image spec] = Grasppe.Kit.ConRes.GeneratePatchImage(reference, contrast, resolution, size, obj.Addressability*obj.Scale); %, width, addressability);
+      [image spec] = Grasppe.Kit.ConRes.GeneratePatchImage(meantone, contrast, resolution, size, obj.Addressability*obj.Scale); %, width, addressability);
       
       if obj.Scale~=1.0
         image= imresize(image,1/obj.Scale);
       end
       
-      parameters.(Grasppe.ConRes.Enumerations.Mean')       = spec(1);
-      parameters.(Grasppe.ConRes.Enumerations.Contrast')   = spec(2);
-      parameters.(Grasppe.ConRes.Enumerations.Resolution') = spec(3);
-      parameters.(Grasppe.ConRes.Enumerations.Size')       = size;
+      parameters.(Patch.MEANTONE)   = spec(1);
+      parameters.(Patch.CONTRAST)   = spec(2);
+      parameters.(Patch.RESOLUTION) = spec(3);
+      parameters.(Patch.SIZE)       = size;
       
       output.setImage(im2double(image), obj.Addressability);
       
@@ -40,7 +49,7 @@ classdef Patch < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       obj.Variables   = variables;
     end
     
-  end
+  end  
   
 end
 

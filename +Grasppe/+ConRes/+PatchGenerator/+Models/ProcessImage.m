@@ -219,7 +219,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             
             if size(fftimage,3) > 1
               fftimage = fftimage(:,:,1);
-              dispdbg('Flattening Image...');
+              DBG.dispdbg('Flattening Image...');
             end
             
             fftimage     = real(log(1+abs(fftimage)));
@@ -230,7 +230,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           obj.fftimage = fftimage;
         end
       catch err
-        disp(err);
+        debugStamp(err, 1); % disp(err);
         return;
       end
     end
@@ -260,7 +260,7 @@ classdef ProcessImage < matlab.mixin.Copyable
       try
         
         fxBusy=true;
-        dispdbg('Generating Image...');
+        DBG.dispdbg('Generating Image...');
         R=tic;
         try
           
@@ -277,7 +277,7 @@ classdef ProcessImage < matlab.mixin.Copyable
           
           if size(image1,3) > 1
             image1 = image1(:,:,1);
-            dispdbg('Flattening Image...');
+            DBG.dispdbg('Flattening Image...');
           end
           
           image1b = image1;
@@ -297,7 +297,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             hAxis = axes('Parent', hFig); % 'Visible', 'off'
             %end
             
-            dispdbg('Generating Plot...');
+            DBG.dispdbg('Generating Plot...');
             
             [bFq fqData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(image1b)); %image1
             
@@ -342,7 +342,7 @@ classdef ProcessImage < matlab.mixin.Copyable
             %yR = yR
             yR  = (yR*100)-(max(yR(yZ:end)*100)/2);
             yR2 = (yR2*100)-(max(yR2(yZ:end)*100)/2);
-            yM  = nanmean(yR(yZ:end));
+            yM  = 0; %nanmean(yR(yZ:end));
             yM2 = nanmean(yR2(yZ:end));
             yS  = 5; %yM; %*2;            
             
@@ -385,12 +385,13 @@ classdef ProcessImage < matlab.mixin.Copyable
               for m = fQ
                 yv = [-35 35]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
+                xv2 = [0 0] + xD*2;
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 1);
                 
                 % zv = max([-1 0 1] + yR(floor(m))); % yR(ceil(m))]);
                 
                 % text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' num2str(zv,'%3.1f') ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 7);
-                text(mean(xv), max(yv)+1, 0, [num2str(m,'%3.1f')], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
+                text(mean(xv2), max(yv)+1, 0, [num2str(m,'%3.1f')], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
               end
             end
                        
@@ -399,17 +400,23 @@ classdef ProcessImage < matlab.mixin.Copyable
               for m = fQ2
                 yv = [-20 20]  + yD + yM + yS; %+yR(m);
                 xv = [0 0] + xD + m*xF;
+                xv2 = [0 0] + xD*2;
                 line(xv, yv, [0 0], 'Color', 'r', lOp{:}, 'LineWidth', 1);
-                zv = max(bFq([-1:1]+floor(m))); % yR(ceil(m))]);
+                zi = [-1:1]+floor(m);
+                zv = max(bFq(zi)); % yR(ceil(m))]);
+                zs = max(fqData(zi,5));
                 
-                text(mean(xv), min(yv)-15, 0, regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3'), 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
+                tVal = regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3');
+                tStd = num2str(zs, '%1.1f');
+                
+                text(mean(xv2), min(yv)-15, 0, [tVal ' (' tStd ')'], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
                 
                 %text(mean(xv), max(yv)-1, 0, [num2str(m,'%3.1f') ' [' int2str(idx) ']'], 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'Color', 'r', 'FontSize', 6);
               end
             end
             
             
-            dispdbg('Exporting Image...');
+            DBG.dispdbg('Exporting Image...');
             
             
             %truesize(hFig);
@@ -427,9 +434,9 @@ classdef ProcessImage < matlab.mixin.Copyable
           end
           
         catch err
-          disp(err);
+          debugStamp(err, 1); % disp(err);
         end
-        tocdbg(R);
+        DBG.toc(R);
       end
       
       fxBusy=false;

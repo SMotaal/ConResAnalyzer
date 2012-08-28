@@ -1,728 +1,0 @@
-10
-
-dir
-0
-https://daflair@github.com/daflair/ConResAnalyzer/branches/lab-03/matlab/Common/+Halftoning
-https://daflair@github.com/daflair/ConResAnalyzer
-add
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-bc83a6c6-aa7b-b92b-09df-ce57b7db7bff
-
-crt_char.m
-file
-
-
-
-add
-
-errdiffdemo.m
-file
-
-
-
-add
-
-edgerrfixed.m
-file
-
-
-
-add
-
-screen_19c.m
-file
-
-
-
-add
-
-screen_9u.m
-file
-
-
-
-add
-
-testadaptive.m
-file
-
-
-
-add
-
-halftoningdemo.m
-file
-
-
-
-add
-
-color_model.m
-file
-
-
-
-add
-
-blockerrdiffdemo.m
-file
-
-
-
-add
-
-stucki.m
-file
-
-
-
-add
-
-greennoisedemo.m
-file
-
-
-
-add
-
-lenacolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-floyd_serp.m
-file
-
-
-
-add
-
-vecdiff.m
-file
-
-
-
-add
-
-treescolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-trees.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-boat.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-mbvqerrdiffdemo.m
-file
-
-
-
-add
-
-edgerrdiff_l.m
-file
-
-
-
-add
-
-colordither.m
-file
-
-
-
-add
-
-testcolor.m
-file
-
-
-
-add
-
-testpeppers.m
-file
-
-
-
-add
-
-green_fixed.m
-file
-
-
-
-add
-
-grayscaledemo.m
-file
-
-
-
-add
-
-colerrdiffdemo.m
-file
-
-
-
-add
-
-screendemo.m
-file
-
-
-
-add
-
-green_adap.m
-file
-
-
-
-add
-
-jarvis_serp.m
-file
-
-
-
-add
-
-noisevsf.asv
-file
-
-
-
-add
-
-block_color_demo.asv
-file
-
-
-
-add
-
-edgeenhancedemo.m
-file
-
-
-
-add
-
-README.rtf
-file
-
-
-
-add
-
-runVecFiltOpt.asv
-file
-
-
-
-add
-
-green_color_demo.m
-file
-
-
-
-add
-
-convert.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-Ofun.m
-file
-
-
-
-add
-
-screen_64u.m
-file
-
-
-
-add
-
-DisplayCMY.m
-file
-
-
-
-add
-
-ESPLogo.gif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-errdiff.m
-file
-
-
-
-add
-
-edgerrdiff_l_h.m
-file
-
-
-
-add
-
-screen_halftone.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-clip.m
-file
-
-
-
-add
-
-wsnr.m
-file
-
-
-
-add
-
-color_model.asv
-file
-
-
-
-add
-
-NLcons.m
-file
-
-
-
-add
-
-jarvis.m
-file
-
-
-
-add
-
-mat_gain_model.m
-file
-
-
-
-add
-
-edge_color_demo.m
-file
-
-
-
-add
-
-housecolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-vecterrdiffdemo.m
-file
-
-
-
-add
-
-colordither.asv
-file
-
-
-
-add
-
-ldm.m
-file
-
-
-
-add
-
-floyd.m
-file
-
-
-
-add
-
-res_corr.M
-file
-
-
-
-add
-
-bnoise.m
-file
-
-
-
-add
-
-ColorErrorDiff.m
-file
-
-
-
-add
-
-psnr.m
-file
-
-
-
-add
-
-tsnr.m
-file
-
-
-
-add
-
-bed.m
-file
-
-
-
-add
-
-COPYRIGHT.txt
-file
-
-
-
-add
-
-stucki_serp.m
-file
-
-
-
-add
-
-noisevsf.m
-file
-
-
-
-add
-
-block_color_demo.m
-file
-
-
-
-add
-
-bnoisepredist.mat
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-spectrum.m
-file
-
-
-
-add
-
-pepperscolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-peppers.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-runVecFiltOpt.m
-file
-
-
-
-add
-
-lena.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-img_qi.m
-file
-
-
-
-add
-
-disp_err.m
-file
-
-
-
-add
-
-genscreen.m
-file
-
-
-
-add
-
-boatcolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-screen_16u.m
-file
-
-
-
-add
-
-screen_9c.m
-file
-
-
-
-add
-
-userdither.m
-file
-
-
-
-add
-
-index.html
-file
-
-
-
-add
-
-colordemo.asv
-file
-
-
-
-add
-
-barbara.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-clock.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-girlcolor.tif
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-colscreendemo.m
-file
-
-
-
-add
-
-colordemo.m
-file
-
-
-
-add
-

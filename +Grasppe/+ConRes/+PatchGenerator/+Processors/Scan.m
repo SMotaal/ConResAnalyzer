@@ -5,8 +5,17 @@ classdef Scan < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   properties
   end
   
+  properties (Constant)
+    DPI     = Grasppe.ConRes.Enumerations.ScanResolution';
+    SCALE   = Grasppe.ConRes.Enumerations.ScanScale';
+  end
+  
+  
   methods
     function output = Run(obj)
+      
+      import(eval(NS.CLASS));
+      
       output  = obj.Input;
       variables       = obj.Variables;
       params  = obj.Parameters;
@@ -19,8 +28,8 @@ classdef Scan < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       image   = imresize(image, (scale/100) * (dpi/spi), 'bicubic');
       
-      parameters.(Grasppe.ConRes.Enumerations.DPI')    = dpi;
-      parameters.(Grasppe.ConRes.Enumerations.Scale')  = scale;
+      parameters.(Scan.DPI)   = dpi;
+      parameters.(Scan.SCALE) = scale;
       
       output.setImage(im2double(image), dpi);
       
