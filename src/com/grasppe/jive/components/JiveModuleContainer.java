@@ -11,6 +11,7 @@
 
 package com.grasppe.jive.components;
 
+import com.google.common.base.Preconditions;
 import com.grasppe.conres.framework.imagej.newFrame;
 import com.grasppe.conreslabs.panels.imageprocessors.DisplayModulePanel;
 import com.grasppe.conreslabs.panels.imageprocessors.FourierModulePanel;
@@ -61,6 +62,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,6 +85,8 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import sun.awt.datatransfer.TransferableProxy;
 
@@ -130,16 +135,11 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   
   protected boolean debugBorders = false;
 
+  private static Logger logger = Logger.getLogger("com.grasppe.Jive.JiveModuleContainer");  
   /**
    * Create the panel.
    */
   public JiveModuleContainer() {
-
-//  GraphicsEnvironment e           = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//
-//  
-//
-//  Border              panelBorder = new EtchedBorder(EtchedBorder.LOWERED, null, null);         // new LineBorder(SystemColor.controlShadow, 1, true);
 
     initializePanel();
 
@@ -756,6 +756,22 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
   /**
    */
   protected void initializePanel() {
+	this.addAncestorListener(new AncestorListener() {
+		
+		@Override
+		public void ancestorRemoved(AncestorEvent e) {
+		}
+		
+		@Override
+		public void ancestorMoved(AncestorEvent e) {
+		}
+		
+		@Override
+		public void ancestorAdded(AncestorEvent e) {
+			 ((JiveModuleContainer)e.getComponent()).enableFullScreenForAncestor();	
+		}
+	});
+	  
     this.addComponentListener(new ComponentAdapter() {
 
       /*
@@ -766,9 +782,6 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
       public void componentShown(ComponentEvent e) {
         super.componentShown(e);
         revalidate();
-
-//      getParent().validate();
-//      setSize(500,(int)getSize().getHeight());
       }
 
       /*
@@ -778,13 +791,6 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
       @Override
       public void componentResized(ComponentEvent e) {
         JComponent component = (JComponent)e.getComponent();
-
-//      Dimension  preferredSize = component.getPreferredSize();
-//      Dimension  maximumSize   = component.getMaximumSize();        // getPreferredSize();
-//      Dimension  newSize       = new Dimension(500, maximumSize.height); //preferredSize.width
-//      component.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
-//      component.setSize(new Dimension(500, component.getHeight()));
-//      component.setMaximumSize(newSize);
       }
     });
 
@@ -985,12 +991,6 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     containerPanel.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
         
     
-//    JComponent target = contentPanel;
-//    target.setSize(new Dimension(499, containerPanel.getHeight()));
-//    
-//    target.setSize(new Dimension(501, containerPanel.getHeight()));
-//    
-//    target.setSize(new Dimension(500, containerPanel.getHeight()));
     try {
     	getParent().validate();
     	getParent().invalidate();
@@ -1061,6 +1061,8 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 
 //  setSize(new Dimension(500, getHeight()));
     
+    this.enableFullScreenForAncestor();    
+    
     contentPanel.revalidate();
     contentPanel.repaint();
 
@@ -1083,8 +1085,33 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
     return modules.get(arg0);
   }
   
+  public void enableFullScreenForAncestor() {
+	  Window window = (Window)SwingUtilities.getAncestorOfClass(Window.class, this);
+	  //JiveModuleContainer.enableFullScreenMode(window);
+	  JiveModuleContainer.enableOSXFullscreen(window);
+	  
+	  com.apple.eawt.Application.getApplication().requestToggleFullScreen(window);
+  }
   
-  public void enableFullScreenMode(Window window) {
+  /**
+   * @param window
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public static void enableOSXFullscreen(Window window) {
+      Preconditions.checkNotNull(window);
+      try {
+          Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+          Class params[] = new Class[]{Window.class, Boolean.TYPE};
+          Method method = util.getMethod("setWindowCanFullScreen", params);
+          method.invoke(util, window, true);
+      } catch (ClassNotFoundException e1) {
+      } catch (Exception e) {
+    	  logger.log(Level.WARNING, "OS X Fullscreen FAIL", e);
+      }
+  }
+  
+  
+  public static void enableFullScreenMode(Window window) {
       String className = "com.apple.eawt.FullScreenUtilities";
       String methodName = "setWindowCanFullScreen";
 
@@ -1095,7 +1122,7 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
           method.invoke(null, window, true);
       } catch (Throwable t) {
           System.err.println("Full screen mode is not supported");
-          t.printStackTrace();
+          //t.printStackTrace();
       }
   }
   
