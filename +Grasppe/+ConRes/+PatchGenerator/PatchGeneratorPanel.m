@@ -188,7 +188,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
               %               obj.jParametersPanel.transferFocus();
             end
           catch err
-            disp(err);
+            debugStamp(err,1);
             beep;
           end
       end
@@ -252,7 +252,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         obj.PatchGeneratorParameters.Scan   = parameters.Scanning;
         obj.PatchGeneratorParameters.Processors = Processors;
       catch err
-        disp(err);
+        debugStamp(err,1);
       end
       
       % beep;
@@ -313,7 +313,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         
         set(hAxis,'XLim', floor(aX) + 0.5, 'YLim', floor(aY) + 0.5);
       catch err
-        disp(err);
+        debugStamp(err,1);
       end
     end
     
@@ -384,7 +384,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
             end
           end
         catch err
-          disp(err)
+          debugStamp(err,1);
         end
         
         % hFrame  = obj.hFrame;
@@ -409,7 +409,7 @@ classdef PatchGeneratorPanel < Grasppe.Occam.Process
         
         
       catch err
-        disp(err)
+        debugStamp(err,1);
       end
     end
     

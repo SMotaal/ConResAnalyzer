@@ -1,4 +1,4 @@
-classdef PatchParameters < handle
+classdef PatchParameters < handle & matlab.mixin.Copyable
   %PATCHPARAMETERS Summary of this class goes here
   %   Detailed explanation goes here
   

@@ -5,12 +5,11 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
   properties
     PatchProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Patch;
     ScreenProcessor   = Grasppe.ConRes.PatchGenerator.Processors.Screen;
-    % PrintProcessor    = Grasppe.ConRes.PatchGenerator.Processors.Print;
     ScanProcessor     = Grasppe.ConRes.PatchGenerator.Processors.Scan;
     UserProcessor     = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
     View
     
-    Tasks             = struct('Prep', [], 'Process', [], 'Variable', []);    
+    Tasks             = struct('Prep', [], 'Process', [], 'Variable', []);
   end
   
   methods
@@ -21,7 +20,6 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       obj.permanent = true;
       obj.addProcess(obj.PatchProcessor);
       obj.addProcess(obj.ScreenProcessor);
-      % obj.addProcess(obj.PrintProcessor);
       obj.addProcess(obj.ScanProcessor);
       obj.addProcess(obj.UserProcessor);
     end
@@ -41,10 +39,10 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     end
     
     function ResetProcess(obj, numtask, taskmax)
-      s = warning('off', 'all');
-      try stop(timerfindall);   end
-      try delete(timerfindall); end
-      s = warning(s);
+      %       s = warning('off', 'all');
+      %       try stop(timerfindall);   end
+      %       try delete(timerfindall); end
+      %       s = warning(s);
       
       tasks = fieldnames(obj.Tasks);
       for m = 1:numel(tasks)
@@ -56,7 +54,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       obj.UpdateProgressComponents;
       
       obj.ProcessProgress.resetTasks;
-            
+      
     end
     
     function prepareTasks(obj, title, numprep, numvar)
@@ -96,12 +94,13 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       import(eval(NS.CLASS));
       import Grasppe.ConRes.PatchGenerator.Processors.*;
+      import Grasppe.ConRes.PatchGenerator.Models.*;
       
       %debugging = true;
       
       obj.ResetProcess();
       obj.prepareTasks('Patch Generation');
-            
+      
       if isa(obj.View, 'Grasppe.Occam.Process')
         panel = obj.View;
       else
@@ -116,31 +115,25 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       try
         
-        evalin('base', 'clear BandIntensityData;');
-        
-        assignin('base', 'BandIDX', 0);
-        
-        output      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        reference   = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        patch       = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        screen      = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+        output                    = FourierImage;
+        reference                 = FourierImage;
+        patch                     = FourierImage;
+        screen                    = FourierImage;
         
         CHECK(obj.Tasks.Prep); % 2
         
-        patchProcessor    = obj.PatchProcessor;
-        screenProcessor   = obj.ScreenProcessor;
-        % printProcessor    = obj.PrintProcessor;
-        scanProcessor     = obj.ScanProcessor;
+        patchProcessor            = obj.PatchProcessor;
+        screenProcessor           = obj.ScreenProcessor;
+        scanProcessor             = obj.ScanProcessor;
         
-        parameters        = obj.Parameters;
+        parameters                = obj.Parameters;
         
-        % printProcessor.Parameters = parameters.Print;
         scanProcessor.Parameters  = parameters.Scan;
         
       catch err
-        try debugStamp(err, 1, obj); catch, debugStamp(); end;
+        debugStamp(err, 1, obj);
       end
-            
+      
       %% Variable Tasks Load Estimation
       n         = numel(fieldnames(obj.Parameters.Processors));
       n         = n + 2*(n-5) + 2;
@@ -157,15 +150,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         CHECK(obj.Tasks.Variable); % 1
         
         %% Screen & Print Patch
-        %parameters.Screen.PrintProcessor  = printProcessor;
         parameters.Screen.(Screen.PPI)  = patchProcessor.Addressability;
-        
-        % printFields = fieldnames(parameters.Print);
-        % for m = 1:numel(printFields)
-        %   parameters.Screen.(printFields{m}) = parameters.Print.(printFields{m});
-        % end
-        %parameters.Screen.PrintParameters = parameters.Print;
-        
+                
         screenProcessor.Execute(parameters.Screen);
         
         screenedImage = output.Image;
@@ -205,7 +191,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         
         output = copy(output);
         output.Snap('GeneratedPatch');
-      
+        
       catch err
         try debugStamp(err, 1, obj); catch, debugStamp(); end;
       end
@@ -233,14 +219,14 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           try
             output.Snap(id);
           catch err
-            disp(err)
+            debugStamp(err, 1);
           end
         end
         
         CHECK(obj.Tasks.Variable); % 5 + n
         
       catch err
-        try debugStamp(err, 1, obj); catch, debugStamp(); end;
+        debugStamp(err, 1, obj);
       end
       
       obj.updateTasks('Rendering Output', n);
@@ -278,7 +264,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           for m = 2:numel(images)-1
             snapshot  = images{m};
             image     = snapshot.Image;
-            fftimage  = snapshot.FourierImage;
+            fftimage  = snapshot.FFTImage;
             
             fftMode   = ~isreal(image);
             
@@ -327,7 +313,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         end
         drawnow expose update;
       catch err
-        try debugStamp(err, 1, obj); catch, debugStamp(); end;
+        debugStamp(err, 1, obj);
       end
       
       SEAL(obj.Tasks.Prep);
@@ -342,14 +328,14 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       obj.ResetProcess();
       obj.prepareTasks('Patch Series Export');
-            
+      
       try
         ConResLab.declareFunctions;
         
-        output            = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        reference         = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        patch             = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
-        screen            = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+        output            = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
+        reference         = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
+        patch             = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
+        screen            = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
         
         panel             = obj.View;
         
@@ -641,7 +627,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
               processImage = sharpImages{m};
               
               if any(patchRange==m)
-                data    = processImage.Fourier;
+                data    = processImage.FFTData;
                 image   = processImage.Image;
                 rmage   = retina(image);
                 rdata   = fFFT(rmage);
@@ -792,7 +778,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         %CHECK(obj.Tasks.Variable); % Post 2
         obj.updateTasks('Exporting HTML Summary');
         
-        %% Series HTML Output        
+        %% Series HTML Output
         PatchGeneratorProcessor.GenerateHTML(runFile);
         
       catch err
@@ -891,7 +877,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
           '-F' num2str(round(FQ*10),  '%0.3d')];
         
         scrsuffix       = hisuffix; %[ ...
-          %'-V' num2str(round(RTV),    '%0.3d')]; % ...
+        %'-V' num2str(round(RTV),    '%0.3d')]; % ...
         %'-R' num2str(round(RES*100),'%0.3d') ...
         %'-F' num2str(round(FQ*10),  '%0.3d')];
         

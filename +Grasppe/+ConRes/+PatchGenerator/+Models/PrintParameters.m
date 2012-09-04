@@ -1,4 +1,4 @@
-classdef PrintParameters < handle
+classdef PrintParameters < handle & matlab.mixin.Copyable
   %PRINTPARAMETERS Summary of this class goes here
   %   Detailed explanation goes here
   

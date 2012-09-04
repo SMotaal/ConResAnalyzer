@@ -1,4 +1,4 @@
-classdef ScreenParameters < handle
+classdef ScreenParameters < handle & matlab.mixin.Copyable
   %SCREENPARAMETERS Summary of this class goes here
   %   Detailed explanation goes here
   

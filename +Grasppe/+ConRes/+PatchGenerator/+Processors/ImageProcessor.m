@@ -41,8 +41,8 @@ classdef ImageProcessor < Grasppe.Occam.Process
           output.addProcess(obj);
         end
       catch err
-        disp(err);
-        beep;
+        debugStamp(err,1);
+        %beep;
       end
       
       %       if nargout == 0
@@ -56,7 +56,7 @@ classdef ImageProcessor < Grasppe.Occam.Process
     
     
     function createProcessImage(obj, image, process, mode)
-      processImage = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      processImage = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
       
       if exist('image', 'var') && ~isempty(mode)
         processImage.Image  = image;

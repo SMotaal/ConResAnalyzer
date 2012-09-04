@@ -17,7 +17,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         obj.sandbox(params, output);
       catch err
         disp('Failed to execute function');
-        disp(err);
+        debugStamp(err,1);
       end
       
       obj.Variables = output.Variables;
@@ -108,14 +108,14 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         hiContrast.Image = imadjust(hiContrast.Image);
         
         patchImage    = PatchImage.Image;
-        patchFFT      = PatchImage.Fourier;
+        patchFFT      = PatchImage.FFTData;
         idealImage    = ReferenceImage.Image;
-        idealFFT      = ReferenceImage.Fourier;
+        idealFFT      = ReferenceImage.FFTData;
         contrastImage = hiContrast.Image;
-        contrastFFT   = hiContrast.Fourier;
-        idealFFT      = ReferenceImage.Fourier;
+        contrastFFT   = hiContrast.FFTData;
+        idealFFT      = ReferenceImage.FFTData;
         screenImage   = HalftoneImage.Image;
-        screenFFT     = HalftoneImage.Fourier;
+        screenFFT     = HalftoneImage.FFTData;
         
         PIMG          = patchImage;
         PFFT          = patchFFT;
@@ -232,7 +232,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
               newVars{end+1} = n;
             end
           catch err
-            disp(err);
+            debugStamp(err,1);
           end
         end
         
@@ -260,7 +260,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         
         return;
       catch err
-        disp(err);
+        debugStamp(err,1);
       end
     end
     
@@ -297,7 +297,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
             warning('Cannot perform %s operation because it is not support.', toString(operation));
         end
       catch err
-        disp(err);
+        debugStamp(err,1);
       end
     end
     

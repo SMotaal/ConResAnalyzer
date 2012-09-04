@@ -25,7 +25,7 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       import(eval(NS.CLASS));
       
-      screen        = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
+      screen        = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
       
       output        = obj.Input;
       variables     = obj.Variables;
@@ -69,7 +69,7 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         image       = screened;
         %tone  = tone + tonediff;
       catch err
-        disp(err);
+        debugStamp(err,1);
         rethrow(err);
       end
       

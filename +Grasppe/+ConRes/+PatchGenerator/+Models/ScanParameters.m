@@ -1,4 +1,4 @@
-classdef ScanParameters < handle
+classdef ScanParameters < handle & matlab.mixin.Copyable
   %SCREENPARAMETERS Summary of this class goes here
   %   Detailed explanation goes here
   
