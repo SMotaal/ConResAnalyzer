@@ -2,7 +2,7 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
-  properties
+  properties (Transient)
     HalftoneImage
   end
   
@@ -25,11 +25,11 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       import(eval(NS.CLASS));
       
-      screen        = Grasppe.ConRes.PatchGenerator.Models.FourierImage;
-      
       output        = obj.Input;
       variables     = obj.Variables;
       params        = obj.Parameters;
+      
+      screen        = eval(class(output)); %Grasppe.ConRes.PatchGenerator.Models.FourierImage;
       
       ppi           = findField(params, Screen.PPI);    % 'pixelresolution');
       spi           = findField(params, Screen.SPI);    % 'addressability');
@@ -50,9 +50,26 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       halftone      = ones(size(image));
       
-      tone          = output.ProcessData.Parameters.Mean;
+      tone          = [];
+      
+      if isempty(tone)
+        try tone      = output.Variables.Patch.Mean; end;
+      end
+      
+      if isempty(tone)
+        try tone      = output.ProcessData.Parameters.Mean; end;
+      end
+      
+      if isempty(tone)
+        try tone      = output.Variables.Process{1}.Mean; end;
+      end
+      
+      if isempty(tone)
+        error('Grasppe:ConResScreening:InvalidTone', 'Unable to locate the tone parameter in the input.');
+      end
       
       try
+        %% Generate Tone-Corrected Halftone Image
         screened    = [];
         meantone    = tone;
         tonestep    = -1;
@@ -60,14 +77,10 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         while isempty(screened) || (abs(meantone-tone)>0.5 && tonestep<=5)
           tonestep  = tonestep+1;          
           tonediff  = tonediff + tone - meantone;
-          %disp([tonestep tone meantone tonediff]);      
           screened  = grasppeScreen3(image-(tonediff/100), ppi, spi, lpi, theta, print);
           meantone  = 100-mean(screened(:))*100;
         end
-        %disp([tonestep tone meantone tonediff]);
-        disp(['ToneCorrection: ' num2str([tonestep tone meantone tonediff]) ]);
-        image       = screened;
-        %tone  = tone + tonediff;
+        image       = screened; %disp(['ToneCorrection: ' num2str([tonestep tone meantone tonediff]) ]);
       catch err
         debugStamp(err,1);
         rethrow(err);
@@ -75,13 +88,15 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       
       
       try
-        %        tone      = output.ProcessData.Parameters.Mean;
+        %% Generate Screen Image (Not Tone-Corrected)
         halftone  = halftone.*(tone/100);
-        halftone  = grasppeScreen3(1-halftone-(tonediff/100), ppi, spi, lpi, theta, print);
+        halftone  = grasppeScreen3(1-halftone, ppi, spi, lpi, theta, print);
+        %halftone  = grasppeScreen3(1-halftone-(tonediff/100), ppi, spi, lpi, theta, print);
       catch err
         warning('Generating 50% halftone image because mean halftone failed to generate');
         halftone  = halftone.*(50/100);
-        halftone  = grasppeScreen3(halftone-(tonediff/100), ppi, spi, lpi, theta, print);
+        halftone  = grasppeScreen3(halftone, ppi, spi, lpi, theta, print);
+        %halftone  = grasppeScreen3(halftone-(tonediff/100), ppi, spi, lpi, theta, print);
       end
       
       screen.setImage(im2double(halftone), spi);
@@ -101,6 +116,9 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
       output.setImage(im2double(image), spi);
       
       %variables.Print   = printParams;
+      parameters.TrueMean           = meantone;
+      parameters.MeanOffset         = tonediff;
+      
       variables.Screen  = parameters;
       
       obj.Variables = variables;

@@ -39,8 +39,8 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
         
     function fftData = get.FFTData(obj)
       
-      fftData = obj.fftData;
-      image   = obj.image;
+      fftData   = obj.fftData;
+      image     = obj.image;
       
       if isempty(fftData) 
         if isreal(image)
@@ -48,13 +48,16 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
         else
           fftData = image;
         end
+        obj.fftData = fftData;
       end
       
     end
     
     function image = get.FFTImage(obj)
-      obj.renderDataPlot();
-      image = obj.fftImage;      
+      if isempty(obj.fftImage)
+        obj.renderDataPlot();
+      end
+      image = obj.fftImage;
     end
     
     function img = forwardFFT(obj, img)
@@ -101,7 +104,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
         if isempty(obj.fftImage)
           obj.bandPlotFFT([]);
           fftImage = [];
-          if prod(size(fftData)) < 768*768
+          if prod(size(fftData)) < 768*768*2
             while isempty(fftImage)
               fftImage = obj.bandPlotFFT(fftData);
               pause(0.1);
@@ -166,7 +169,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
           
           if isequal(obj.PLOTFFT, true)
             
-            hFig  = figure('Visible', 'off', 'Position', [-1000 -1000 width height], 'HandleVisibility','callback', 'Renderer', renderer);
+            hFig  = figure('Visible', 'off', 'Position', [-1000 -1000 width height], 'HandleVisibility','callback', 'Renderer', 'painters');
 
             hAxis = axes('Parent', hFig);
             
@@ -239,9 +242,11 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
                 zi = [-1:1]+floor(m);
                 zv = max(bFq(zi)); 
                 zs = max(fqData(zi,5));
+                %zs2 = max(fqData(zi,6));
                 
                 tVal = regexprep(num2str(zv,'%3.2e'),'([\d\.]+)(e[+-])[0]?(\d+)','$1$2$3');
-                tStd = num2str(zs, '%1.1f');
+                tStd = num2str(zs, '%1.2f');
+                %tStd = [num2str(zs, '%1.2f') ' ' num2str(zs2, '%1.2f')];
                 
                 text(mean(xv2), min(yv)-15, 0, [tVal ' (' tStd ')'], 'Parent', hAxis, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom', 'Color', 'g', 'FontSize', 8, 'FontWeight', 'bold');
 
@@ -250,7 +255,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
             
             DBG.dispdbg('Exporting Image...');
             
-            img = export_fig(hFig, '-a2', ['-' renderer]);
+            img = export_fig(hFig, '-native', '-a2', ['-' renderer]);
             
             delete(hAxis);
             delete(hFig);

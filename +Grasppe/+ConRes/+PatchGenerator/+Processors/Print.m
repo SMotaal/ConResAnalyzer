@@ -2,7 +2,7 @@ classdef Print < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
-  properties
+  properties (Transient)
   end
   
   methods

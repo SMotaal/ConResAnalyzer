@@ -2,7 +2,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
-  properties
+  properties(Transient)
     ImageIndex = 0;
   end
   
@@ -62,7 +62,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         disk          = @(x, y)     imfilter(x,fspecial('disk',y),'replicate');
         
         HR            = 10;
-        retina        = @(x)        disk(x, HR);
+        retina        = @(x)        disk(x, evalin('caller', 'HumanFactor'));
         
         retinaFFT     = @(x)        fFFT(retina(x));
         

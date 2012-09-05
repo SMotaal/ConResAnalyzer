@@ -135,8 +135,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       end
       
       %% Variable Tasks Load Estimation
-      n         = numel(fieldnames(obj.Parameters.Processors));
-      n         = n + 2*(n-5) + 2;
+      n         = 1+ numel(fieldnames(obj.Parameters.Processors));
+      n         = n + 2*(n-5) + 2
       
       SEAL(obj.Tasks.Prep); % 3
       obj.updateTasks('Generating Patch', n);
@@ -186,8 +186,21 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
         %parameters.Scan.Resolution
         
         output.Variables.ScanFactor     = parameters.Scan.Resolution*parameters.Scan.Scale/100;
+        output.Variables.ScanDPMM       = output.Variables.ScanFactor/25.4;
         
-        output.Variables.HumanFactor    = (output.Variables.ScanFactor/25.4) *0.3;
+        DPMM                            = output.Variables.ScanDPMM;
+        
+        VD                              = 30*10; % mm
+        VA                              = 1/60 * pi/180;
+        VR                              = VD*(tan(VA/2));
+        
+        PR                              = DPMM*VR*7;
+        
+        output.Variables.ViewerDistance = VD;
+        output.Variables.EyeAcuity      = VA;
+        output.Variables.EyeResolution  = VR;
+        %=D8*10*(TAN(RADIANS(1/E8/2)))
+        output.Variables.HumanFactor    = PR; %output.Variables.ScanFactor %(output.Variables.ScanFactor/25.4) *0.3;
         
         output = copy(output);
         output.Snap('GeneratedPatch');

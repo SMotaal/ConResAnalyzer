@@ -26,7 +26,7 @@ classdef ConRes
   
   methods (Static)
     
-    function [image spec] = GeneratePatchImage(reference, contrast, resolution, width, addressibility)
+    function [img spec] = GeneratePatchImage(reference, contrast, resolution, width, addressibility)
       
       Grasppe.Kit.ConRes.GetImports;...
         import(Imports{:}); ...
@@ -59,7 +59,7 @@ classdef ConRes
       pixels  = cycles / cppx;
       
       
-      [image rg ct rtv]   = ConcentricCircles(cppx*100, reference, contrast, ceil(pixels));
+      [img rg ct rtv]   = ConcentricCircles(cppx*100, reference, contrast, ceil(pixels));
       
       spec = [100*(1-rtv) 100*ct resolution];
       
@@ -117,86 +117,217 @@ classdef ConRes
       % evalin('caller', 'import(''Imports{:}'');');
     end
     
+%     function [fQ currentData] = CalculateBandIntensity(fImg)
+%       
+% %       persistent bandFilters bandSize bandSums;
+%             
+%       s = warning('off', 'all');
+%       
+%       try
+%         M = size(fImg,1);
+%         N = size(fImg,2);
+%         nBands = floor(min(size(fImg))/7);
+%         fQ = zeros(1, nBands);
+%         
+%         
+%         currentData = zeros(nBands, 5);
+%         
+%         aImg = abs(fImg);
+%         
+%         parfor m = 1:nBands %min(nBands, 70)
+%             %[isum fsum rat flt istd fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3); %, filters{m}, sums{m});
+%             
+%             [flt  fsum] = Grasppe.Kit.ConRes.GaussianBandfilter(m, 3, M, N);
+%             
+%             img         = aImg.*flt;
+%             isum        = sum(img(:));
+%             istd        = std(img(flt~=0));
+%             rat         = isum / fsum;
+%             
+%             fQ(m)   = rat;
+%             
+%             currentData(m,:) = [m isum fsum rat istd];
+%         end
+%                 
+%       catch err
+%         debugStamp(err, 1); %disp(err);
+%       end
+%       
+%       warning(s);
+%     end
+    
     function [fQ currentData] = CalculateBandIntensity(fImg)
       
-      persistent bandFilters bandSize bandSums;
+      persistent Filters Sums;
             
       s = warning('off', 'all');
       
       try
-        fH = size(fImg,1);
-        fW = size(fImg,2);
+        M = size(fImg,1);
+        N = size(fImg,2);
         nBands = floor(min(size(fImg))/7);
         fQ = zeros(1, nBands);
         
-        if ~isequal(bandSize, nBands)
-          bandFilters=cell(nBands,1);
-          bandSums=cell(nBands,1);
-          bandSize=nBands;
-        end
         
-        filters = bandFilters;
-        sums    = bandSums;
+        currentData = zeros(nBands, 6);
+        
+        aImg    = fImg;
+        aImg    = abs(aImg);
+        %if ~isreal(aImg), aImg = abs(aImg); end
+        
+        BL      = 0;
+        filters = Filters;
+        sums    = Sums;
         
         if isempty(filters)
-          filters   = cell(1,nBands);
+          filters = cell(1, nBands);
+          sums    = cell(1, nBands);
         end
         
-        if isempty(sums)
-          sums    = cell(1,nBands);
-        end
-        
-        currentData = zeros(nBands, 5);
-        
-        fImg = abs(fImg);
-        
-        parfor m = 1:nBands %min(nBands, 70)
-          try
-            [isum fsum rat flt istd fimg] = Grasppe.Kit.ConRes.BandIntensityValue(fImg, fH, m, 3, filters{m}, sums{m});
-            
-%           if isempty(filters{m})
-%             bFilter     = bandfilter('gaussian', 'pass', fH, fW, m, 1);
-%             bSum        = sum(bFilter(:));
-%             filters{m}  = bFilter;
-%             sums{m}     = bSum;
-%           else
-%             bFilter = filters{m};
-%             bSum    = sums{m};
-%           end
-%           bImage  = abs(fImg).*bFilter;
-%           fQ(m)   = sum(bImage(:))/bSum;
+        for B = 1:nBands         
 
-            filters{m} = flt;
-            sums{m} = fsum;
+            W               = 3;
+            Q               = 2*(B+W+2);
             
-            fQ(m) = rat;
+            F               = [];
+            S               = [];            
+
+            try
+              if B>BL
+                F           = filters{B};
+                S           = sums{B};
+              end
+            end
+            %end
             
-            currentData(m,:) = [m isum fsum rat istd];
+            if isempty(F) %|| force
+              F             = fftshift(bandfilter('gaussian', 'pass', Q, Q, B, W));
+              if B>BL
+                filters{B}  = F; %{W,B}  = F;
+              end
+            end
             
-          catch err
-            debugStamp(err, 1);
-          end
+            if ~isscalar(S) %|| force
+              S             = sum(F(:));
+              if B>BL
+                sums{B}     = S;
+              end
+            end
+            
+            ry            = [1:Q] + ceil((M-Q)/2);
+            rx            = [1:Q] + ceil((N-Q)/2);
+            
+            f = F~=0;
+            img         = aImg;
+            img         = img(ry, rx);
+            img         = img(f).*F(f);
+            
+            isum        = sum(img);
+            
+            nimg       	= S;%numel(img);
+            imean       = isum/nimg;
+            %n           = S-1;
+            % if n > 0 % avoid divide-by-zero
+            %     xbar = sum(x, dim) ./ n;
+            %     x = bsxfun(@minus, x, xbar);
+            % end
+            % y = sum(abs(x).^2, dim) ./ denom; % abs guarantees a real result
+            
+            istd        = sqrt(sum((img-(isum/nimg)).^2)./nimg); %sqrt(sum((img-(isum/nimg)).^2)./nimg); %sum(img.^2)./S; %std(img,1)%
+            mstd        = istd; %std(img,1);
+            
+            %istd        = 1/(S-1)*sqrt(sum(img.^2)-S*imean^2);
+            
+            currentData(B,:) = [B isum S imean istd mstd];
         end
         
-        bandFilters = filters;
-        bandSums    = sums;
+        fQ = currentData(:,5);
         
-        % baseData  = [];
-        % baseRow   = 1;
-        % try
-        %   baseData  = evalin('base', 'BandIntensityData');
-        %   baseRow   = size(baseData,1)+1;
-        % end
-        %
-        % baseData(baseRow:baseRow+nBands-1, :) = currentData;
-        %
-        % assignin('base', 'BandIntensityData', baseData);
-        
+        Filters = filters;
+        Sums    = sums;
+                
       catch err
-        debugStamp(err, 1); %disp(err);
+        debugStamp(err, 1);
       end
       
       warning(s);
+    end
+    
+    
+    
+    function [F S] = GaussianBandfilter(B, W, M, N, force)
+      
+      persistent indices filters sums;
+      
+      try
+
+      I         = [];
+      F         = [];
+      S         = [];
+      
+      force     = exist('force', 'var') && isequal(force, true);
+      Q         = 2*(B+W+2);
+      
+      w = ['W' int2str(W*100)];
+      b = ['B' int2str(B*100)];
+      
+      t = [w b];
+
+      %% Look for the filter
+      try
+        %[c I]   = intersect(indices, [B W], 'rows');
+        %I       = I(1);
+        %F       = filters{I};
+        %S       = sums(I);
+        F        = filters.(t);%filters{W,B};
+        S        = sums.(t); %{W,B};
+      end
+      
+      %% Generate the filter
+      if isempty(F) || force
+        
+        F     = fftshift(bandfilter('gaussian', 'pass', Q, Q, B, W));
+        
+%         if ~isscalar(I) || ~isnumeric(I)
+%           I 	= size(indices, 1)+1;
+%         end
+        if Q>15
+          filters.(t) = F; %{W,B}  = F;
+        end
+        %filters{I}    = F;
+        %indices(I, :) = [B W];
+        
+%         nFilters        = indices;
+%         if size(indices,1) > 1000
+%           indices       = indices(2:nFilters, :);
+%           filters       = filters(2:nFilters);
+%           sums          = sums(2:nFilters);
+%         end
+      end
+      
+      if ~isscalar(S) || force
+        S             = sum(F(:));
+        if Q>15
+          sums.(t) = S; %filters.(t) = F; %{W,B}  = F;
+        end        
+        %{W,B}     = S;
+%         sums(I)       = S;
+      end
+      
+      %% Pad the filter
+      G             = zeros(M, N);
+      ry            = [1:Q] + ceil((M-Q)/2);
+      rx            = [1:Q] + ceil((N-Q)/2);
+      G(rx, ry)     = F;
+            
+      if nargout>0, F = G; end
+      %if nargout>1, S = S; end
+      
+    
+      catch err
+        debugStamp(err,1);
+        rethrow(err);
+      end
     end
     
     function [isum fsum rat flt istd fimg] = BandIntensityValue(img, sz, bnd, wd, flt, fsum)
@@ -205,26 +336,26 @@ classdef ConRes
         wd    = 1;
       end
       
-      if nargin<5 || isempty(flt) || ~isnumeric(flt);
-        flt   = fftshift(bandfilter('gaussian', 'pass', sz, sz, bnd, wd));
-        fsum  = [];
-      end
-      
-      if nargin<6 || isempty(fsum) || ~isscalar(fsum) || ~isnumeric(fsum);
-        fsum  = sum(flt(:));
-      end
+%       if nargin<5 || isempty(flt) || ~isnumeric(flt);
+%         flt   = fftshift(bandfilter('gaussian', 'pass', sz, sz, bnd, wd));
+%         fsum  = [];
+%       end
+%       
+%       if nargin<6 || isempty(fsum) || ~isscalar(fsum) || ~isnumeric(fsum);
+%         fsum  = sum(flt(:));
+%       end
+
+      [flt, fsum] = Grasppe.Kit.ConRes.GaussianBandfilter(bnd, wd, sz, sz);
       
       fimg    = img.*flt;
-      
       isum    = sum(fimg(:));
-      
       istd    = std(fimg(flt~=0));
-      
       rat     = isum / fsum;
       
       %disp([bnd isum fsum rat]);
       
     end
+    
           
   end
   

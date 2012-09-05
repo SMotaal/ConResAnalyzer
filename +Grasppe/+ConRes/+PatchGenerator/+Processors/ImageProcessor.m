@@ -2,35 +2,38 @@ classdef ImageProcessor < Grasppe.Occam.Process
   %PATCHGENERATOR Summary of this class goes here
   %   Detailed explanation goes here
   
-  properties
+  properties (Transient)
     View
     Controller
   end
   
   methods
     
-%     function obj = ImageProcessor(view)
-%       obj = obj@Grasppe.Occam.Process();
-%       obj.View = view;
-%     end
+    %     function obj = ImageProcessor(view)
+    %       obj = obj@Grasppe.Occam.Process();
+    %       obj.View = view;
+    %     end
     
     
     function input = InitializeProcess(obj, input)
-      
-      if isnumeric(input) && ndims(input) <= 3;
-        input = obj.createProcessImage(input, obj);
-      end
-      
-      if ~isa(input, 'Grasppe.ConRes.PatchGenerator.Models.ProcessImage')
-        input = obj.createProcessImage([], obj);
-      else
-        obj.Variables = input.Variables;
-      end
-      
-      if nargout == 0
-        obj.InitializeProcess@Grasppe.Occam.Process(input);
-      elseif nargout > 0
-        input = obj.InitializeProcess@Grasppe.Occam.Process(input);
+      try
+        if isnumeric(input) && ndims(input) <= 3;
+          input = obj.createProcessImage(input, obj);
+        end
+        
+        if ~isa(input, 'Grasppe.ConRes.PatchGenerator.Models.ProcessImage')
+          input = obj.createProcessImage([], obj);
+        else
+          obj.Variables = input.Variables;
+        end
+        
+        if nargout == 0
+          obj.InitializeProcess@Grasppe.Occam.Process(input);
+        elseif nargout > 0
+          input = obj.InitializeProcess@Grasppe.Occam.Process(input);
+        end
+      catch err
+        debugStamp(err, 5);
       end
     end
     
