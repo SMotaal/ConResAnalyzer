@@ -67,7 +67,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   
   parfor m = 1:seriesRows
     
-    if rem(m, 100)==0,
+    if rem(m, 50)==0,
       dispf('Generating Series Images... %d of %d', m, seriesRows);
     end
     

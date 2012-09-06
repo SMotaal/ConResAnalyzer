@@ -42,7 +42,7 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
       parentFolder  = 'Resources';
   end
   
-  folder            = fullfile('Output', seriesFolder, parentFolder, groupFolder, subFolder);
+  folder            = fullfile('/Volumes', 'daflairsStore 3.0', 'Output', seriesFolder, parentFolder, groupFolder, subFolder);
 
   pth               = fullfile(folder, [id ext]);
   
