@@ -1,4 +1,7 @@
-function series = GenerateSeriesImages(obj, grids, fields, processors, parameters, task)
+function series = GenerateSeriesImages(grids, fields, processors, parameters, task)
+  
+  import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; %regexprep(eval(NS.CLASS), '\.\w+$', '.*'));
+  import Grasppe.ConRes.Math;
   
   forceGenerate       = false;
   imageTypes          = {'halftone', 'screen', 'contone', 'monotone'};
@@ -60,14 +63,20 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
   seriesStruct                  = cell(numel(fieldNames)*2, 1);
   seriesStruct(1:2:end)         = fieldNames;
   seriesParameters(seriesRange) = struct(seriesStruct{:});
+  seriesVariables(seriesRange)  = struct('Metrics', [], 'Process', []);
   
   parfor m = 1:seriesRows
+    
+    if rem(m, 100)==0,
+      dispf('Generating Series Images... %d of %d', m, seriesRows);
+    end
     
     patchProcessor            = [];
     screenProcessor           = [];
     scanProcessor             = [];
     output                    = [];
     referenceImage            = [];
+    metrics                   = [];
     
     %% Outputs
     screenOutput              = any(m==screenIdxs);
@@ -89,51 +98,72 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
       parameters.(fieldTable{n,1}).(fieldTable{n,2}) = v;
     end
     
-    parameters.Screen.PixelResolution = obj.PatchProcessor.Addressability;
+    parameters.Screen.PixelResolution = 3600;
     
     seriesParameters(m)       = parameters;
     
-    %% Retina Filter Calculation
-    pixelResolution           = parameters.Scan.Resolution*parameters.Scan.Scale/100/25.4;
-    viewingDistance           = 30*10; % mm
-    retinalAccuity            = 1/60 * pi/180;
-    retinalResolution         = viewingDistance*(tan(retinalAccuity/2));
-    pixelAccuity              = pixelResolution*retinalResolution*7;
+    %% Variables & Calculations
+    variables                 = seriesVariables(m);
+    try metrics               = variables.Metrics; end
+    
+    patchResolution           = parameters.Patch.Resolution;
+    patchSize                 = parameters.Patch.Size;
+    imageResolution           = parameters.Scan.Resolution*parameters.Scan.Scale/100;
+    
+    pixelAcuity               = Math.VisualResolution(imageResolution) * 7;
+    fundamentalFrequency      = Math.FundamentalFrequency(patchResolution, patchSize , imageResolution)
+    [B W]                     = Math.FrequencyRange(patchSize, imageResolution);
+
+    metrics.BandParameters    = [B W];
+    metrics.PixelAcuity       = pixelAcuity;
+    metrics.Fundamental       = fundamentalFrequency;
+    
+    variables.Metrics         = metrics;
+    
+    %     pixelResolution           = parameters.Scan.Resolution*parameters.Scan.Scale/100/25.4;
+    %     viewingDistance           = 30*10; % mm
+    %     retinalAcuity             = 1/60 * pi/180;
+    %     retinalResolution         = viewingDistance*(tan(retinalAcuity/2));
+    %     pixelAcuity               = pixelResolution*retinalResolution*7;
     
     %% Detemine IDs
-    halftoneID                = obj.ParameterID(parameters);
+    halftoneID                = PatchSeriesProcessor.GetParameterID(parameters);
     screenID                  = [];
     contoneID                 = [];
     monotoneID                = [];
+    
     if screenOutput
-      screenID                = obj.ParameterID(parameters, 'screen');    end
+      screenID                = PatchSeriesProcessor.GetParameterID(parameters, 'screen');    end
     if contoneOutput
-      contoneID               = obj.ParameterID(parameters, 'contone');   end
+      contoneID               = PatchSeriesProcessor.GetParameterID(parameters, 'contone');   end
     if monotoneOutput
-      monotoneID              = obj.ParameterID(parameters, 'monotone');  end
+      monotoneID              = PatchSeriesProcessor.GetParameterID(parameters, 'monotone');  end
     
     
     %% Load Images
     generateImages            = true;
     
     try
-      halftoneImage           = obj.LoadImage('halftone', halftoneID);
+      halftoneImage           = PatchSeriesProcessor.LoadImage('halftone', halftoneID);
       
-      if screenOutput || ~forceGenerate
-        screenImage           = obj.LoadImage('screen', screenID);
-        screenRetina          = obj.LoadImage('screen retinaImage', screenID);
+      if ~forceGenerate && screenOutput
+        screenImage           = PatchSeriesProcessor.LoadImage('screen', screenID);
+        screenRetina          = PatchSeriesProcessor.LoadImage('screen retinaImage', screenID);
       end
       
-      if contoneOutput || ~forceGenerate
-        contoneImage          = obj.LoadImage('contone', contoneID);
-        contoneRetina         = obj.LoadImage('contone retinaImage', contoneID);
+      if ~forceGenerate && contoneOutput
+        contoneImage          = PatchSeriesProcessor.LoadImage('contone', contoneID);
+        contoneRetina         = PatchSeriesProcessor.LoadImage('contone retinaImage', contoneID);
       end
-      if monotoneOutput || ~forceGenerate
-        monotoneImage         = obj.LoadImage('monotone', monotoneID);
-        monotoneRetina        = obj.LoadImage('monotone retinaImage', monotoneID);
+      if ~forceGenerate && monotoneOutput
+        monotoneImage         = PatchSeriesProcessor.LoadImage('monotone', monotoneID);
+        monotoneRetina        = PatchSeriesProcessor.LoadImage('monotone retinaImage', monotoneID);
       end
       
-      generateImages          = false;
+      if ~forceGenerate
+        generateImages          = false;
+      end
+      
     catch err
       debugStamp(err,5);
     end
@@ -147,9 +177,8 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
       %% Image Models
       output                  = Grasppe.ConRes.PatchGenerator.Models.ProcessImage;
       
-      if retinaOutput
-        output.Variables.PixelAccuity   = pixelAccuity; % Pixels per mm for theta 1/60
-      end
+      output.Variables.PixelAcuity  = pixelAcuity;
+      output.Variables.Fundamental  = fundamentalFrequency;
       
       %% Generate Patch Image
       patchProcessor.Execute(parameters.Patch, output);
@@ -177,33 +206,39 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
     end
     
     typeID                    = '';
-    outFlags                  = {pixelAccuity, generateImages};
+    outFlags                  = {pixelAcuity, generateImages};
     
     %% Output Halftone, Screen, Contone, Monotone (or use reference)
     if halftoneOutput
       typeID                  = [typeID 'H'];
       halftoneIDs{m}          = halftoneID;
-      [pths imgs]             = obj.OutputImages(scanImage, 'halftone', halftoneID, outFlags{:});
-      halftonePaths(m,:)      = pths;
+      [pths imgs]             = processImages(scanImage, 'halftone', halftoneID, outFlags{:});
+      halftonePaths(m,:)      = pths(:);
     end
     if screenOutput
       typeID                  = [typeID 'S'];
       screenIDs{m}            = screenID;
-      [pths imgs]             = obj.OutputImages(screenImage, 'screen', screenID, outFlags{:});
-      screenPaths(m,:)        = pths;
+      [pths imgs]             = processImages(screenImage, 'screen', screenID, outFlags{:});
+      screenPaths(m,:)        = pths(:);
     end
     if contoneOutput
       typeID                  = [typeID 'C'];
       contoneIDs{m}           = contoneID;
-      [pths imgs]             = obj.OutputImages(referenceImage, 'contone', contoneID, outFlags{:});
-      contonePaths(m,:)       = pths;
+      [pths imgs]             = processImages(referenceImage, 'contone', contoneID, outFlags{:});
+      contonePaths(m,:)       = pths(:);
     end
     if monotoneOutput
       typeID                  = [typeID 'M'];
       monotoneIDs{m}          = monotoneID;
-      [pths imgs]             = obj.OutputImages(referenceImage, 'monotone', monotoneID, outFlags{:});
-      monotonePaths(m,:)      = pths;
+      [pths imgs]             = processImages(referenceImage, 'monotone', monotoneID, outFlags{:});
+      monotonePaths(m,:)      = pths(:);
     end
+        
+    
+    try variables.Process     = output.Variables; end
+    seriesVariables(m)        = variables;
+    
+    seriesTable(m,:)          = {numel(typeID), typeID, [], halftoneID, [], []};
     
     if generateImages
       try delete(patchProcessor);   end
@@ -211,9 +246,7 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
       try delete(scanProcessor);    end
       try delete(output);           end
       try delete(screenImage);      end
-    end
-    
-    seriesTable(m,:)          = {numel(typeID), typeID, [], halftoneID, [], []};
+    end    
   end
   
   %% References
@@ -221,9 +254,9 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
   contoneIDs                  = contoneIDs(contoneIdxs);
   monotoneIDs                 = monotoneIDs(monotoneIdxs);
   
-  screenPaths                 = screenPaths(screenIdxs);
-  contonePaths                = contonePaths(contoneIdxs);
-  monotonePaths               = monotonePaths(monotoneIdxs);
+  screenPaths                 = screenPaths(screenIdxs, :);
+  contonePaths                = contonePaths(contoneIdxs, :);
+  monotonePaths               = monotonePaths(monotoneIdxs, :);
   
   seriesTable(:, 3)           = screenIDs(screenRefs);
   seriesTable(:, 4)           = halftoneIDs;
@@ -232,13 +265,51 @@ function series = GenerateSeriesImages(obj, grids, fields, processors, parameter
   
   series.Table                = seriesTable;
   series.Parameters           = seriesParameters;
+  series.Variables            = seriesVariables;
   series.Paths.Halftone       = halftonePaths;
   series.Paths.Screen         = screenPaths;
   series.Paths.Contone        = contonePaths;
   series.Paths.Monotone       = monotonePaths;
   
   if setOuput || nargout==0
-    OUPUT.Series              = series;
-    assignin('caller', 'output', OUPUT);
+    OUTPUT.Series              = series;
+    assignin('caller', 'output', OUTPUT);
+  end
+end
+
+function [pths imgs] = processImages(src, type, id, retinalAccuity, imageOut)
+  
+  import(eval(NS.CLASS)); % PatchSeriesProcessor
+
+  try
+    pths                    = cell(1, 2);
+    imgs                    = cell(1, 2);
+    
+    retinaOut = exist('retinalAccuity', 'var') & isscalar(retinalAccuity) & isnumeric(retinalAccuity);
+    imageOut  = ~exist('imageOut',  'var') | isequal(imageOut , true);
+    
+    if ~imageOut
+      pths(1)               = {PatchSeriesProcessor.GetResourcePath([type ' image'], id, 'png')};
+      if retinaOut, pths(2) = {PatchSeriesProcessor.GetResourcePath([type ' retinaImage'], id, 'png')}; end
+      return;
+    end
+    
+    if isnumeric(src)
+      imgs(1)               = {src};
+    elseif isobject(src)
+      imgs(1)               = {src.Image};
+    end
+    
+    pths(1)                 = {PatchSeriesProcessor.SaveImage(imgs{1}, type, id)};
+    
+    if ~retinaOut, return; end
+    
+    disk                    = @(x, y) imfilter(x,fspecial('disk',y),'replicate');
+    
+    imgs(2)                 = {disk(imgs{1}, retinalAccuity)};
+    pths(2)                 = {PatchSeriesProcessor.SaveImage(imgs{2}, [type ' retinaImage'], id)};
+  catch err
+    debugStamp(err, 1);
+    return;
   end
 end

@@ -156,7 +156,7 @@ classdef ConRes
 %       warning(s);
 %     end
     
-    function [fQ currentData] = CalculateBandIntensity(fImg)
+    function [fQ currentData] = CalculateBandIntensity(fImg, nBands, W)
       
       persistent Filters Sums;
             
@@ -165,7 +165,17 @@ classdef ConRes
       try
         M = size(fImg,1);
         N = size(fImg,2);
-        nBands = floor(min(size(fImg))/7);
+        if ~exist('nBands', 'var') || ~isscalar(nBands) || ~isnumeric(nBands) || nBands>min(M, N)/2
+          nBands = floor(min(size(fImg))/7);
+        else
+          nBands = floor(nBands);
+          debugStamp('Using custom nBands!', 5);
+        end
+        
+        if ~exist('W', 'var') || ~isscalar(W) || ~isnumeric(W) || W<0 || W*10>min(M, N)/2 %min(M, N)/2
+          W = 3;
+        end
+        
         fQ = zeros(1, nBands);
         
         
@@ -245,6 +255,8 @@ classdef ConRes
         
         Filters = filters;
         Sums    = sums;
+        
+        if nargout==1, fQ = currentData; end
                 
       catch err
         debugStamp(err, 1);

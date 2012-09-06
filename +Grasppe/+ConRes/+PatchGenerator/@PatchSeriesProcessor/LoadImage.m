@@ -1,7 +1,13 @@
-function img = LoadImage(obj, type, id)
-  if isempty(strfind(lower(type), 'image'))
-    type = [strtrim(type) ' image'];
+function img = LoadImage(type, id)
+  import(eval(NS.CLASS));   % PatchSeriesProcessor
+  
+  if ~exist('id', 'var') && exist(type, 'file')>0
+    try img = imread(type); end
+  else
+    if isempty(strfind(lower(type), 'image'))
+      type = [strtrim(type) ' image'];
+    end
+    pth = PatchSeriesProcessor.GetResourcePath(type, id, 'png');
+    try img = imread(pth); end
   end
-  pth = obj.GetPath(type, id, 'png');
-  try img = imread(pth); end
 end

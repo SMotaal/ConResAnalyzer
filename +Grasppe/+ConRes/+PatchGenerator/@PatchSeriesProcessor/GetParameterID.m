@@ -1,4 +1,4 @@
-function str = ParameterID(obj, parameters, type)
+function str = GetParameterID(parameters, type)
   
   import Grasppe.ConRes.PatchGenerator.Processors.*;
   
@@ -57,7 +57,7 @@ function str = ParameterID(obj, parameters, type)
       codes.Scan.(Scan.SCALE)         = {'X',   3,  4,  1,    100 };
   end
   
-  obj.Codes                       = codes;
+  % obj.Codes                       = codes;
   
   
   parameterGroups = fieldnames(parameters);
@@ -85,7 +85,6 @@ function str = ParameterID(obj, parameters, type)
           if isnumeric(fieldValue)
             if isscalar(fieldFactor), fieldValue  = fieldValue.*fieldFactor; end
             fieldString     = sprintf('%.0f', fieldValue);
-            % fieldString   = int2str(fieldValue); %strrep(num2str(fieldValue, ['%0' int2str(fieldSize(1)) '.0f' ]), '.', '');  %'%03.2f'),
             
             while numel(fieldString)<fieldSize(1)
               fieldString = ['0' fieldString];
@@ -102,7 +101,6 @@ function str = ParameterID(obj, parameters, type)
           end
           
           str             = [str '-' fieldLabel fieldString]; %'-'
-          % end
         end
       end
     end

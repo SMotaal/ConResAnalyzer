@@ -1,6 +1,6 @@
 function output = Run(obj)
   
-  import(eval(NS.CLASS));
+  import(eval(NS.CLASS));   % PatchSeriesProcessor
   %debugging = true;
   
   obj.ResetProcess();
@@ -8,13 +8,12 @@ function output = Run(obj)
   
   drawnow expose update;
   
-  updateFields        = {'Series', 'Fields', 'Grids'};
+  updateFields        = {'Series'}; % 'Series', 'Fields', 'Grids'};
   overwriteFields     = {'Processors', 'Parameters', updateFields{:}};
   output              = struct;
-  %obj.LoadOutput;
   
   try
-    processors  = obj.GetOutputField('Processors', overwriteFields, output);
+    processors  = PatchSeriesProcessor.GetFieldData('Processors', overwriteFields, output);
     if isempty(processors)
       
       %% Prepare Processors
@@ -24,7 +23,7 @@ function output = Run(obj)
       processors.Scan     = obj.ScanProcessor;
     end
     
-    parameters  = obj.GetOutputField('Parameters', overwriteFields, output);
+    parameters  = PatchSeriesProcessor.GetFieldData('Parameters', overwriteFields, output);
     if isempty(parameters)
       parameters          = obj.PrepareParameters;
     end
@@ -41,20 +40,20 @@ function output = Run(obj)
   % PREP 1/4 ***************************************************************
   
   try
-    fields          = obj.GetOutputField('Fields');
-    if isempty(fields), fields  = obj.ProcessFields(parameters);  end
+    fields          = PatchSeriesProcessor.GetFieldData('Fields');
+    if isempty(fields), fields  = PatchSeriesProcessor.ProcessSeriesFields(parameters);  end
     
     output.Fields   = fields;
     
-    grids           = obj.GetOutputField('Grids');
-    if isempty(grids),  grids   = obj.GenerateGrids(fields);      end
+    grids           = PatchSeriesProcessor.GetFieldData('Grids');
+    if isempty(grids),  grids   = PatchSeriesProcessor.GenerateSeriesGrids(fields);      end
     
     output.Grids    = grids;
   catch err
     debugStamp(err, 1);
   end
   
-  % obj.SaveOutput;
+  % obj.SaveData;
   
   CHECK(obj.Tasks.Prep);
   % PREP 2/4 ***************************************************************
@@ -81,26 +80,22 @@ function output = Run(obj)
   SEAL(obj.Tasks.Prep); % 3
   
   % obj.updateTasks('Generating Patch', n);
-  %       try
-  %series  = obj.GetOutputField('Series');
-  %if isempty(series), series = obj.GenerateSeriesImages([], [], [], [], obj.Tasks.Render); end
+
+  series  = PatchSeriesProcessor.GetFieldData('Series');
   
-  series = obj.GenerateSeriesImages([], [], [], [], obj.Tasks.Render);
+  if isempty(series)
+    series = PatchSeriesProcessor.GenerateSeriesImages(grids, fields, processors, parameters, obj.Tasks.Render);
+  end
+  
+  series = PatchSeriesProcessor.GenerateSeriesFFT(series, grids, fields, processors, parameters, obj.Tasks.Render);
   
   output.Series = series;
-  %series  = GeneratePatches(grids, fields, processors, parameters, obj.Tasks.Render);
-  %       catch err
-  %         debugStamp(err, 1);
-  %         rethrow(err);
-  %       end
   
-  T = tic;
   seriesStr             = output.Series.Table;
   seriesStr(:, 3:end)   = strrep(lower(seriesStr(:,3:end)), '-', '  ');
   output.Series.Report  = mat2clip(seriesStr);
-  toc(T);
-  
-  obj.SaveOutput;
+
+  PatchSeriesProcessor.SaveData();
   
   %output = seriesStr; %[]; %{output{:}, strvcat(seriesStr)};
   

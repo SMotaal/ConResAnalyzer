@@ -142,7 +142,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         
         %FQ            = Patch.Resolution / (ScanFactor/25.4) * ceil(Patch.Size*(ScanFactor/25.4)) * 2;
         
-        output.FundamentalFrequencies = unique([FQ output.FundamentalFrequencies]);
+        output.Fundamental  = unique([FQ output.FundamentalFrequencies]);
                         
         try
           eval(expression); %image = eval(expression);

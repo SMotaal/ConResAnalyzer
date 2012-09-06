@@ -1,9 +1,12 @@
-function [pth exists folder] = GetPath(obj, type, id, ext)
+function [pth exists folder] = GetResourcePath(type, id, ext)
+  
+  import(eval(NS.CLASS)); % PatchSeriesProcessor
+  
   seriesFolder = 'Series101';
   
   if exist('id', 'var')
     if isstruct(id)
-      id = obj.ParameterID(id, type);
+      id = PatchSeriesProcessor.GetParameterID(id, type);
     end
   else
     id = [];
@@ -22,8 +25,9 @@ function [pth exists folder] = GetPath(obj, type, id, ext)
   else
     groupFolder     = []; %'Others';
   end
+   
+  subFolder         = regexpi(type, '\<(image|fftdata|fftimage|retinaimage|retinafftimage|data|output|report)\>', 'match');
   
-  subFolder         = regexpi(type, '\<(image|fftimage|retinaimage|data|output|report)\>', 'match');
   if numel(subFolder)==1
     subFolder       = subFolder{1};
     subFolder(1)    = upper(subFolder(1));
@@ -32,7 +36,7 @@ function [pth exists folder] = GetPath(obj, type, id, ext)
   end
   
   switch lower(subFolder)
-    case {'image', 'report', 'retinaimage', 'fftimage'}
+    case {'image', 'report', 'retinaimage'} %, 'fftimage', 'retinafftimage'}
       parentFolder  = [];
     otherwise
       parentFolder  = 'Resources';

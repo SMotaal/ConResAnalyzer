@@ -1,4 +1,4 @@
-function str = ParameterString(obj, parameters)
+function str = GetParameterString(parameters)
   
   parameterGroups = fieldnames(parameters);
   

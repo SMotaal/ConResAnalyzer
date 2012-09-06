@@ -9,7 +9,8 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
   end
   
   properties
-    FundamentalFrequencies
+    Fundamental
+    AUTOFFT = false;
   end
   
   properties (Access=protected)
@@ -219,7 +220,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
             
             plot(hAxis, xD+xR*xF, yD+yR2+yS, 'g', lOp{:}, 'Linewidth', 0.5);            
                         
-            fQ = [obj.FundamentalFrequencies];
+            fQ = [obj.Fundamental];
             
             if isnumeric(fQ) && ~isempty(fQ)
               for m = fQ
@@ -284,7 +285,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
       width         = obj.Width;
       height        = obj.Height;
       
-      if (width*height < 600^2)
+      if obj.AUTOFFT && (width*height < 600^2)
         obj.resetRenderTimer;
       else
         debugStamp(sprintf('Not generating %d x %d', width, height), 5, obj);
@@ -312,7 +313,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
       try stop(obj.renderDelayTimer); end      
       if ~isscalar(obj.renderDelayTimer) || ~isa(obj.renderDelayTimer, 'timer') || ~isvalid(obj.renderDelayTimer)
         try delete(obj.renderDelayTimer); end
-        obj.renderDelayTimer = GrasppeKit.DelayedCall(@(x,y) obj.renderDataPlot, 1.0, 'hold');
+        obj.renderDelayTimer = GrasppeKit.DelayedCall(@(s,e) obj.renderDataPlot, 1.0, 'hold');
       end
       try start(obj.renderDelayTimer);  end
     end

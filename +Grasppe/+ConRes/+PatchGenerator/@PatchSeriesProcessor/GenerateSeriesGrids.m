@@ -1,4 +1,7 @@
-function grids = GenerateGrids(obj, fields)
+function grids = GenerateSeriesGrids(fields)
+  
+  import(eval(NS.CLASS)); % PatchSeriesProcessor
+  
   output        = struct;
   setOuput      = false;
   try

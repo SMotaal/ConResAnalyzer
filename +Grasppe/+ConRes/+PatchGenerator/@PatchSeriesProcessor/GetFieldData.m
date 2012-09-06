@@ -1,4 +1,6 @@
-function fieldOutput = GetOutputField(obj, fieldName, overwriteFields, output)
+function fieldOutput = GetFieldData(fieldName, overwriteFields, output)
+  import(eval(NS.CLASS)); % PatchSeriesProcessor
+  
   try if ~exist('overwriteFields', 'var')
       overwriteFields = evalin('caller', 'overwriteFields'); end;
   end;
@@ -10,10 +12,10 @@ function fieldOutput = GetOutputField(obj, fieldName, overwriteFields, output)
   
   fieldOutput         = [];
   try
-    if isfield(output, fieldName) || any(strcmpi(fieldName, overwriteFields));
+    if isfield(output, fieldName)
       fieldOutput     = output.(fieldName);
-    else
-      fieldOutput     = obj.LoadOutput(fieldName);
+    elseif ~any(strcmpi(fieldName, overwriteFields));
+      fieldOutput     = PatchSeriesProcessor.LoadData(fieldName);
     end
   end
 end
