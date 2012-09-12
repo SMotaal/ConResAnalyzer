@@ -54,7 +54,8 @@ import javax.swing.Timer;
 public class GrasppeKit {
 
     /** Field description */
-    private static int	debugLevel   = 2;		// default level is 3
+    private static int	debugLevel   		= 1;		// default level is 3
+    private static int	debugErrorLevel   	= 2;		// default level is 3
     private static int	debugDefault = 4;		// default level is 3
 
     /** Field description */
@@ -774,6 +775,19 @@ public class GrasppeKit {
 
         debugErrorOut(debugString(headline, text), level);
     }
+    
+    /**
+     * Output debug text with extended StackTraceElement details.
+     * @param headline  the parent component or operation
+     *  @param exception
+     * @param level
+     */
+    public static void debugError(String headline, Throwable throwable, int level) {
+        String	text = throwable.getClass().getSimpleName() + " - " + throwable.getMessage();
+
+        debugErrorOut(debugString(headline, text), level);
+    }
+    
 
     /**
      *  @param text
@@ -781,8 +795,8 @@ public class GrasppeKit {
      */
     private static void debugErrorOut(String text, int level) {
 
-//      if (level==0 && !debugDefaultChecks()) return;
-//        else if (level>0 && !debugLevelChecks(level)) return;
+    	if ((level > 0) &&!debugCheckErrorLevel(level)) return;
+    	
         if (level < 5) debugOutput(text, "E", level);
         else debugOutput(text, "W", level);
     }
@@ -794,6 +808,14 @@ public class GrasppeKit {
     private static boolean debugCheckLevel(int level) {
         return (level <= debugLevel);
     }
+    
+    /**
+     *  @param level
+     *  @return
+     */
+    private static boolean debugCheckErrorLevel(int level) {
+        return (level <= debugLevel);
+    }    
 
     /**
      *  @param text

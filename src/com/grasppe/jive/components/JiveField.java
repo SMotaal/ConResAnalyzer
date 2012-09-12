@@ -51,15 +51,15 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
 
 //Size Variables
   protected static HashMap<String, JiveGroupMetrics> gourpMetricsMap = new HashMap<String, JiveGroupMetrics>();
-  protected String                               fieldLabel;
-  protected String                               fieldSuffix;
-  protected JComponent                           fieldComponent;
-  protected JLabel                               labelComponent;
-  protected JLabel                               suffixComponent;
-  protected JiveField                       fieldPanel;
+  protected String                                   fieldLabel;
+  protected String                                   fieldSuffix;
+  protected JComponent                               fieldComponent;
+  protected JLabel                                   labelComponent;
+  protected JLabel                                   suffixComponent;
+  protected JiveField                                fieldPanel;
   protected JiveGroupMetrics                         groupMetrics;
-  protected String                               groupID      = "default";
-  protected boolean                              debugBorders = false;
+  protected String                                   groupID      = "default";
+  protected boolean                                  debugBorders = false;
 
   // protected static JiveGroupMetrics textGroupOptions = new JiveGroupMetrics(200, 0);
 
@@ -116,7 +116,7 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
   }
 
   /**
-   * 	@param e
+   *    @param e
    */
   @Override
   public void focusGained(FocusEvent e) {
@@ -146,7 +146,7 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
 //}
 
   /**
-   * 	@param e
+   *    @param e
    */
   @Override
   public void focusLost(FocusEvent e) {
@@ -264,13 +264,20 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
 
   /**
    *    @param id
-   * 	@param autoCreate
+   *    @param autoCreate
    *    @return
    */
   public static JiveGroupMetrics getGroupMetrics(String id, boolean autoCreate) {
     if (autoCreate) return getGroupMetrics(id);
     else if (!JiveField.gourpMetricsMap.containsKey(id)) return null;
     else return JiveField.gourpMetricsMap.get(id);
+  }
+
+  /**
+   *    @return
+   */
+  public JiveGroupMetrics getMetrics() {
+    return getGroupMetrics(groupID);
   }
 
 /*(non-Javadoc)
@@ -283,13 +290,6 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
   @Override
   public String getName() {
     return super.getName();
-  }
-
-  /**
-   *    @return
-   */
-  public JiveGroupMetrics getMetrics() {
-    return getGroupMetrics(groupID);
   }
 
   /**
@@ -351,7 +351,12 @@ public class JiveField extends JPanel implements PropertyChangeListener, NamedFi
   @Override
   public void setName(String name) {
     try {
+//      assert name != null;
       getFieldComponent().setName(name);
+//    } catch (AssertionError error) {
+//      GrasppeKit.debugError("JiveField>Component>setName", error, 5);
+    } catch (NullPointerException exception) {
+        GrasppeKit.debugError("JiveField>Component>setName", exception, 5);
     } catch (Exception exception) {
       GrasppeKit.debugError("JiveField>Component>setName", exception, 0);
     }
