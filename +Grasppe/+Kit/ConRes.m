@@ -163,8 +163,9 @@ classdef ConRes
       s = warning('off', 'all');
       
       try
-        M = size(fImg,1);
-        N = size(fImg,2);
+        
+        M = size(fImg,1);   N = size(fImg,2);
+        
         if ~exist('nBands', 'var') || ~isscalar(nBands) || ~isnumeric(nBands) || nBands>min(M, N)/2
           nBands = floor(min(size(fImg))/7);
         else
@@ -178,12 +179,10 @@ classdef ConRes
         
         fQ = zeros(1, nBands);
         
-        
         currentData = zeros(nBands, 6);
         
         aImg    = fImg;
         aImg    = abs(aImg);
-        %if ~isreal(aImg), aImg = abs(aImg); end
         
         BL      = 0;
         filters = Filters;
@@ -202,32 +201,23 @@ classdef ConRes
             F               = [];
             S               = [];            
 
-            try
-              if B>BL
+            try if B>BL, 
                 F           = filters{B};
                 S           = sums{B};
-              end
-            end
-            %end
+              end; end
             
-            if isempty(F) %|| force
-              F             = fftshift(bandfilter('gaussian', 'pass', Q, Q, B, W));
-              if B>BL
-                filters{B}  = F; %{W,B}  = F;
-              end
+            if isempty(F), F      = fftshift(bandfilter('gaussian', 'pass', Q, Q, B, W));
+              if B>BL, filters{B} = F; end
             end
             
-            if ~isscalar(S) %|| force
-              S             = sum(F(:));
-              if B>BL
-                sums{B}     = S;
-              end
+            if ~isscalar(S), S    = sum(F(:));
+              if B>BL, sums{B}    = S; end
             end
             
-            ry            = [1:Q] + ceil((M-Q)/2);
-            rx            = [1:Q] + ceil((N-Q)/2);
+            ry          = [1:Q] + ceil((M-Q)/2);
+            rx          = [1:Q] + ceil((N-Q)/2);
             
-            f = F~=0;
+            f           = F~=0;
             img         = aImg;
             img         = img(ry, rx);
             img         = img(f).*F(f);
@@ -244,7 +234,7 @@ classdef ConRes
             % y = sum(abs(x).^2, dim) ./ denom; % abs guarantees a real result
             
             istd        = sqrt(sum((img-(isum/nimg)).^2)./nimg); %sqrt(sum((img-(isum/nimg)).^2)./nimg); %sum(img.^2)./S; %std(img,1)%
-            mstd        = istd; %std(img,1);
+            mstd        = std(img,1);
             
             %istd        = 1/(S-1)*sqrt(sum(img.^2)-S*imean^2);
             

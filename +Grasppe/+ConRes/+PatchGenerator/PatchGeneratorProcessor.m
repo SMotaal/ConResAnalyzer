@@ -136,7 +136,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
       
       %% Variable Tasks Load Estimation
       n         = 1+ numel(fieldnames(obj.Parameters.Processors));
-      n         = n + 2*(n-5) + 2
+      n         = n + 2*(n-5);
       
       SEAL(obj.Tasks.Prep); % 3
       obj.updateTasks('Generating Patch', n);

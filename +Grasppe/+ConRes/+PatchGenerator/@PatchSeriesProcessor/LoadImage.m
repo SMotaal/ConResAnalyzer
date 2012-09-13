@@ -1,7 +1,8 @@
 function img = LoadImage(type, id)
   import(eval(NS.CLASS));   % PatchSeriesProcessor
   
-  if ~exist('id', 'var') && exist(type, 'file')>0
+  img = [];
+  if ~exist('id', 'var') %|| ~(exist(type, 'file')>0)
     try img = imread(type); end
   else
     if isempty(strfind(lower(type), 'image'))

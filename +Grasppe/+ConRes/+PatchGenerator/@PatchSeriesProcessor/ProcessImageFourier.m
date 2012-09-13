@@ -1,37 +1,43 @@
-function [FFT SRF FIMG IMG]  = ProcessImageFourier(imagePaths, bandParameters)
+function [FFT SRF FIMG IMG]  = ProcessImageFourier(img, bandParameters)
   
   import(eval(NS.CLASS));
+  
+  nout = nargout;
+  out1 = nout > 0;  out2 = nout > 1; 	out3 = nout > 2; 	out4 = nout > 3;
   
   try
     
     if ~exist('bandParameters', 'var'), bandParameters = {[], []}; end
-    if ~iscell(imagePaths), imagePaths = {imagePaths}; end
+    if ~iscell(img), img = {img}; end
     
-    IMG           = cell(size(imagePaths));
-    FFT           = IMG;
-    SRF           = IMG;
-    FIMG          = IMG;
     
-    for m = 1:numel(imagePaths)
+    IMG = cell(size(img));
+    FFT = IMG;  SRF = IMG;  FIMG = IMG;
+    
+    for m = 1:numel(img)
       
-      IMG{m}      = PatchSeriesProcessor.LoadImage(imagePaths{m}); %'screen', screenID);
-      FFT{m}      = forwardFFT(IMG{m});
-      if nargout > 1
-        SRF{m}    = Grasppe.Kit.ConRes.CalculateBandIntensity(FFT{m}, bandParameters{:});
-      end
-      if nargout > 2
-        FIMG{m}   = realImage(FFT{m});
-      end
+      if ischar(img{m}), IMG{m} = PatchSeriesProcessor.LoadImage(img{m});
+      else IMG{m}               = img{m}; end
+      
+      if isreal(IMG{m}), FFT{m} = forwardFFT(IMG{m});
+      else FFT{m}               = IMG{m}; end
+      
+      
+      if out2, SRF{m}           = Grasppe.Kit.ConRes.CalculateBandIntensity(FFT{m}, bandParameters{:}); end
+      if out3, FIMG{m}          = realImage(FFT{m}); end
     end
     
-    if nargout < 4, clear IMG;  end
-    if nargout < 3, clear FIMG; end
-    if nargout < 2, clear SRF;  end
-    if nargout < 1, clear FFT;  end
-        
+    
+    if ~out4, clear IMG;  end
+    if ~out3, clear FIMG; end
+    if ~out2, clear SRF;  end
+    if ~out1, clear FFT;  end
+    
   catch err
     debugStamp(err, 1);
+    rethrow(err);
   end
+  
 end
 
 function img = forwardFFT(img)

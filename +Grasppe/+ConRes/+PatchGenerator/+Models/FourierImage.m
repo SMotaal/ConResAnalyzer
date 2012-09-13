@@ -61,6 +61,14 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
       image = obj.fftImage;
     end
     
+    function fundamental = get.Fundamental(obj)
+      fundamental = obj.fftFundamental;
+    end
+    
+    function set.Fundamental(obj, fundamental)
+      obj.fftFundamental = fundamental;
+    end
+    
     function img = forwardFFT(obj, img)
       sP  = size(img,1);
       sQ  = size(img,2);
@@ -220,7 +228,7 @@ classdef FourierImage < Grasppe.ConRes.PatchGenerator.Models.ProcessImage
             
             plot(hAxis, xD+xR*xF, yD+yR2+yS, 'g', lOp{:}, 'Linewidth', 0.5);            
                         
-            fQ = [obj.Fundamental];
+            fQ = [obj.fftFundamental];
             
             if isnumeric(fQ) && ~isempty(fQ)
               for m = fQ

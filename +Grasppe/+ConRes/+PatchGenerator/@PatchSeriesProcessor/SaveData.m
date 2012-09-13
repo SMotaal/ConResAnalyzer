@@ -27,6 +27,8 @@ function SaveData(output, filename)
         output      = evalin('caller', 'output'); end; end;
     
     save(pth, '-struct', 'output');
+    
+    Grasppe.ConRes.File.UpdateTimeStamp(pth);
   catch err
     debugStamp(err, 1);
     return;

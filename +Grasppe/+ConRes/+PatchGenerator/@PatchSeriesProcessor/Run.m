@@ -80,23 +80,31 @@ function output = Run(obj)
   SEAL(obj.Tasks.Prep); % 3
   
   % obj.updateTasks('Generating Patch', n);
-
-  series  = PatchSeriesProcessor.GetFieldData('Series');
-  
-  if isempty(series)
-    series = PatchSeriesProcessor.GenerateSeriesImages(grids, fields, processors, parameters, obj.Tasks.Render);
+  try
+    
+    series  = PatchSeriesProcessor.GetFieldData('Series');
+    
+    if isempty(series)
+      series = PatchSeriesProcessor.GenerateSeriesImages(grids, fields, processors, parameters, obj.Tasks.Render);
+    end
+    
+    series = PatchSeriesProcessor.GenerateSeriesFFT(series, grids, fields, processors, parameters, obj.Tasks.Render);
+    
+    PatchSeriesProcessor.GenerateSeriesStatistics(series, grids, fields, processors, parameters, obj.Tasks.Render);
+    
+    output.Series = series;
+    
+    seriesStr             = output.Series.Table;
+    seriesStr(:, 3:end)   = strrep(lower(seriesStr(:,3:end)), '-', '  ');
+    output.Series.Report  = mat2clip(seriesStr);
+    
+    PatchSeriesProcessor.SaveData();
+    
+  catch err
+    disp(err.message);
+    debugStamp(err, 1);
+    beep;
   end
   
-  series = PatchSeriesProcessor.GenerateSeriesFFT(series, grids, fields, processors, parameters, obj.Tasks.Render);
-  
-  output.Series = series;
-  
-  seriesStr             = output.Series.Table;
-  seriesStr(:, 3:end)   = strrep(lower(seriesStr(:,3:end)), '-', '  ');
-  output.Series.Report  = mat2clip(seriesStr);
-
-  PatchSeriesProcessor.SaveData();
-  
-  %output = seriesStr; %[]; %{output{:}, strvcat(seriesStr)};
   
 end

@@ -111,7 +111,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     imageResolution           = parameters.Scan.Resolution*parameters.Scan.Scale/100;
     
     pixelAcuity               = Math.VisualResolution(imageResolution) * 7;
-    fundamentalFrequency      = Math.FundamentalFrequency(patchResolution, patchSize , imageResolution)
+    fundamentalFrequency      = Math.FundamentalFrequency(patchResolution, patchSize , imageResolution);
     [B W]                     = Math.FrequencyRange(patchSize, imageResolution);
 
     metrics.BandParameters    = [B W];

@@ -40,13 +40,8 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   end
   
   try
-    if ~exist('series', 'var') || ~isstruct(series) %|| ~all(isfield(series, {'SRF', 'FFT'}))
-      if ~isfield(series, 'SRF')
-        series.SRF            = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
-      end
-      %       if ~isfield(series, 'FFT')
-      %         series.FFT            = PatchSeriesProcessor.LoadData('FFT', 'FFTData');
-      %       end
+    if ~exist('series', 'var') || ~isstruct(series) || ~isfield(series, 'SRF')
+      series.SRF            = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
     end
   catch err
     debugStamp(err, 1);
@@ -112,6 +107,8 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   try
     parfor m = seriesRange
       
+      fdtPath                 = [];
+      
       if rem(m, 50)==0,
         dispf('Generating Series FFT... %d of %d', m, seriesRows);
       end
@@ -148,8 +145,9 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
         if halftoneSRFAvailable
           try SRF             = halftoneSRFs(halftoneIdx, :); end
           [fftPath fftExists] = PatchSeriesProcessor.GetResourcePath('Halftone FFTImage', halftoneID, 'png');
-          % [fdtPath fdtExists] = PatchSeriesProcessor.GetResourcePath('Halftone FFTData', halftoneID, 'mat');
         end
+        
+        % [fdtPath fdtExists] = PatchSeriesProcessor.GetResourcePath('Halftone FFTData', halftoneID, 'mat');
         
         if ~(halftoneSRFAvailable && fftExists && ~isempty(SRF))
           % [FFT SRF]           = processImageFourier(halftonePaths(halftoneIdx,:), bandParameters);
@@ -237,8 +235,9 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
         if monotoneSRFAvailable
           try SRF             = monotoneSRFs(monotoneIdx, :); end
           [fftPath fftExists] = PatchSeriesProcessor.GetResourcePath('Monotone FFTImage', monotoneID, 'png');
-          [fdtPath fdtExists] = PatchSeriesProcessor.GetResourcePath('Monotone FFTData', monotoneID, 'mat');
         end
+        
+        [fdtPath fdtExists] = PatchSeriesProcessor.GetResourcePath('Monotone FFTData', monotoneID, 'mat');
         
         if ~(monotoneSRFAvailable && fftExists && ~isempty(SRF)  && fdtExists)
           [FFT SRF FIMG]      = PatchSeriesProcessor.ProcessImageFourier( ...
@@ -282,22 +281,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
     PatchSeriesProcessor.SaveData(output, 'SRFData');
     % series.SRF                = output.SRF;
   end
-  
-  %   screenFFTData               = screenFFTData(screenIdxs, :);
-  %   contoneFFTData              = contoneFFTData(contoneIdxs, :);
-  %   monotoneFFTData             = monotoneFFTData(monotoneIdxs, :);
-  
-  %   output                      = struct;
-  %   output.FFT.Screen           = screenFFTData;
-  %   output.FFT.Contone          = contoneFFTData;
-  %   output.FFT.Monotone         = monotoneFFTData;
-  %
-  %
-  %   if ~isfield(series, 'FFT') || ~isequal(output.FFT, series.FFT)
-  %     PatchSeriesProcessor.SaveData(output, 'FFTData');
-  %     % series.FFT                = output.FFT;
-  %   end
-  
+    
   if setOuput || nargout==0
     OUTPUT.Series           = series;
     assignin('caller', 'output', OUTPUT);
@@ -307,6 +291,7 @@ end
 
 function saveData(pth, data)
   save(pth, 'data');
+  Grasppe.ConRes.File.UpdateTimeStamp(pth);
 end
 
 function IMG = generateFourierImages(FFT)
