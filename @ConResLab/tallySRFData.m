@@ -239,7 +239,9 @@ function [patchPlot    ] = composePatchPlots(pth, fQ, F, P, L, W, H, varargin)
   hAxes2  = axes(axOpts{:});
   hAxes   = axes('YScale', 'log', axOpts{:});
   
-  colors  = {'c', 'g', [1 0.75 0] , 'r', 'k'}; %
+  % scSRF, htSRF, ctSRF, mtSRF
+  %colors  = {'c', 'g', [1 0.75 0] , 'r', 'k'}; %
+  colors  = {[0 1 1], [0 1 0], [1 0.75 0], [1 0 0], [0 0 0]};
   opts    = {'LineWidth', R*0.85}; %, 'linesmoothing','on'};
   
   data    = varargin;
@@ -309,10 +311,18 @@ function [patchPlot    ] = composePatchPlots(pth, fQ, F, P, L, W, H, varargin)
   fR      = reshape(fR, size(vData));
   fE      = reshape(fE, size(vData));
   
+  %% Prepare formatter
+  fNumF = '%1.2f\t';
+  fStrF = '';
+  for n = 1:size(fR,2)
+    fStrF = [fStrF '\\color[rgb]{' num2str(colors{n}, ' %1.2f ') '}' fNumF];
+  end
+  
   %% Prepare Text
   fStr = {num2str(fQ,'%1.2f\n')};
   for n = 1:size(fR,1)
-    vStr      = num2str(fR(n, :),'%1.2f\t');
+    %vStr      = num2str(fR(n, :),'%1.2f\t');
+    vStr      = num2str(fR(n, :), fStrF);
     vStr      = [vStr sprintf('\te%+1d', fE(n,1))];
     fStr(n+1) = {vStr};
   end
@@ -331,7 +341,8 @@ function [patchPlot    ] = composePatchPlots(pth, fQ, F, P, L, W, H, varargin)
   %fQ-D+20
   
   text(max(xl)*0.95, max(yl)*0.95, 0, fStr, 'Parent', hAxes, 'HorizontalAlignment', 'right', ...
-    'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 8*R, 'FontName', 'DIN-Bold'); % 'FontWeight', 'bold',
+    'VerticalAlignment', 'top', 'Color', 'g', 'FontSize', 8*R, 'FontName', 'DIN-Bold', ... 
+    'Interpreter', 'tex'); % 'FontWeight', 'bold',
   
   %'Units', 'normalized'
 

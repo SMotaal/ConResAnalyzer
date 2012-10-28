@@ -73,12 +73,16 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         screened    = [];
         meantone    = tone;
         tonestep    = -1;
+        steplimit   = 0;
+        tonelimit   = 5;
         tonediff    = 0;
-        while isempty(screened) || (abs(meantone-tone)>0.5 && tonestep<=5)
-          tonestep  = tonestep+1;          
-          tonediff  = tonediff + tone - meantone;
-          screened  = grasppeScreen3(image-(tonediff/100), ppi, spi, lpi, theta, print);
+        while isempty(screened) || (abs(meantone-tone)>tonelimit && tonestep<steplimit)
+          tonestep  = tonestep+1;         
+          screened  = grasppeScreen3(image-(tonediff/100), ppi, spi, lpi, theta, print);          
           meantone  = 100-mean(screened(:))*100;
+          tonediff  = tonediff + tone - meantone;          
+          %disp(['ToneCorrection: ' num2str([tonestep tone meantone tonediff]) ]);          
+          %checks    = [ abs(meantone-tone) tonestep ];
         end
         image       = screened; %disp(['ToneCorrection: ' num2str([tonestep tone meantone tonediff]) ]);
       catch err

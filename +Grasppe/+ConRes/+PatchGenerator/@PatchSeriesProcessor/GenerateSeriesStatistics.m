@@ -4,7 +4,9 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
-  forceGenerate             = false;
+  global forceGenerateStatistics;
+  
+  forceGenerateStatistics   = false;
   imageTypes                = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput            = true;
   retinaOutput              = true;
@@ -111,7 +113,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   %% Process FFT & SRF Data
   try
-    parfor m = seriesRange
+    parfor m = seriesRange % for m = seriesRange
       
       if rem(m, 50)==0,
         dispf('Generating Series Statistics... %d of %d', m, seriesRows);

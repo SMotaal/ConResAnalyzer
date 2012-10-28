@@ -1,5 +1,7 @@
 function img = LoadImage(type, id)
-  import(eval(NS.CLASS));   % PatchSeriesProcessor
+  % import(eval(NS.CLASS));   % PatchSeriesProcessor
+  
+  import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
   img = [];
   if ~exist('id', 'var') %|| ~(exist(type, 'file')>0)

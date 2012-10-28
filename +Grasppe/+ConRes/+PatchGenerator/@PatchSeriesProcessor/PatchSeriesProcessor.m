@@ -40,5 +40,7 @@ classdef PatchSeriesProcessor < Grasppe.ConRes.PatchGenerator.PatchGeneratorProc
     output              = Sandbox(varargin);
     
     [FFT SRF FIMG IMG]  = ProcessImageFourier(imagePaths, bandParameters)
+    
+    seriesID            = SeriesID(seriesID);
   end
 end

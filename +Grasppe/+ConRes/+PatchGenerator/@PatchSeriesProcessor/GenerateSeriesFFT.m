@@ -4,7 +4,9 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
-  forceGenerate             = false;
+  global forceGenerateFFT;
+  
+  forceGenerateFFT          = false;
   imageTypes                = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput            = true;
   retinaOutput              = true;
@@ -105,7 +107,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   
   %% Process FFT & SRF Data
   try
-    parfor m = seriesRange
+    parfor m = seriesRange % for m = seriesRange
       
       fdtPath                 = [];
       
@@ -315,17 +317,11 @@ function [FFT SRF]  = processImageFourier(imagePaths, bandParameters)
   
   try
     
-    patchImage            = PatchSeriesProcessor.LoadImage(imagePaths{1}); %'screen', screenID);
-    retinaImage           = PatchSeriesProcessor.LoadImage(imagePaths{2}); %'screen', screenID);
+    patchImage            = PatchSeriesProcessor.LoadImage(imagePaths{1});
+    retinaImage           = PatchSeriesProcessor.LoadImage(imagePaths{2});
     
     patchImageFFT         = forwardFFT(patchImage);
     retinaImageFFT        = forwardFFT(retinaImage);
-    
-    % unpadDim              = @(f,d) ceil(size(f,d)/4)+[1:size(f,d)/2];
-    % fP                    = unpadDim(patchImageFFT,1);
-    % fQ                    = unpadDim(patchImageFFT,2);
-    % FFT                   = {patchImageFFT(fP, fQ), retinaImageFFT(fP, fQ)}; %patchFFTData, retinaFFTData};
-    % FFT                   = {patchImageFFT, retinaImageFFT}; %patchFFTData, retinaFFTData};
     
     patchImageSRF         = Grasppe.Kit.ConRes.CalculateBandIntensity(patchImageFFT,  bandParameters{:});
     retinaImageSRF        = Grasppe.Kit.ConRes.CalculateBandIntensity(retinaImageFFT, bandParameters{:});

@@ -26,10 +26,10 @@ function parameters = PrepareParameters(obj)
   parameters.Patch.(Patch.SIZE)         = 5.3;
   
   %% Screen Parameters
-  parameters.Screen.(Screen.PPI)        = 3600; %obj.PatchProcessor.Addressability;
+  parameters.Screen.(Screen.PPI)        = 2450; %3600; %obj.PatchProcessor.Addressability;
   parameters.Screen.(Screen.SPI)        = 2450;
-  parameters.Screen.(Screen.LPI)        = [100 175];
-  parameters.Screen.(Screen.ANGLE)      = 37.5; %0:7.5:37.5;
+  parameters.Screen.(Screen.LPI)        = [175 100];
+  parameters.Screen.(Screen.ANGLE)      = 45; %37.5; %0:7.5:37.5;
   
   %% Print Parameters
   parameters.Screen.(Screen.TVI)        = 0;

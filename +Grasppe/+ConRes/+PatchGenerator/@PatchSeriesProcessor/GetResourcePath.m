@@ -6,7 +6,7 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
   %   if isempty(ResourceFolders), ResourceFolders = getResourceFolders; end
   try
     
-    seriesFolder = 'Series102a'; %'Series101';
+    seriesFolder = PatchSeriesProcessor.SeriesID; 'Series103a'; %'Series101';
     
     if exist('id', 'var')
       if isstruct(id)
@@ -31,8 +31,8 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
     end
     
     subFolder         = regexpi(type, [ ...
-      '\<(image|fftdata|fftimage|retinaimage|retinafftimage|' ...
-      'data|output|report|compositeimage|srfplot|prfplot)\>'], 'match');
+      '\<(image|fftdata|fftimage|retinaimage|retinafftimage|blockimage|' ...
+      'data|output|report|compositeimage|hybridimage|srfplot|prfplot)\>'], 'match');
     
     if numel(subFolder)==1
       subFolder       = subFolder{1};

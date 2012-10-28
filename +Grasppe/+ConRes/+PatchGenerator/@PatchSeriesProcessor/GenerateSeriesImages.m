@@ -3,7 +3,9 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; %regexprep(eval(NS.CLASS), '\.\w+$', '.*'));
   import Grasppe.ConRes.Math;
   
-  forceGenerate       = false;
+  global forceGenerateImages;
+  
+  forceGenerateImages = false;
   imageTypes          = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput      = true;
   retinaOutput        = true;
@@ -65,7 +67,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   seriesParameters(seriesRange) = struct(seriesStruct{:});
   seriesVariables(seriesRange)  = struct('Metrics', [], 'Process', []);
   
-  parfor m = 1:seriesRows
+  parfor m = 1:seriesRows % for m = 1:seriesRows
     
     if rem(m, 50)==0,
       dispf('Generating Series Images... %d of %d', m, seriesRows);
@@ -146,22 +148,24 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     try
       halftoneImage           = PatchSeriesProcessor.LoadImage('halftone', halftoneID);
       
-      if ~forceGenerate && screenOutput
-        screenImage           = PatchSeriesProcessor.LoadImage('screen', screenID);
-        screenRetina          = PatchSeriesProcessor.LoadImage('screen retinaImage', screenID);
-      end
-      
-      if ~forceGenerate && contoneOutput
-        contoneImage          = PatchSeriesProcessor.LoadImage('contone', contoneID);
-        contoneRetina         = PatchSeriesProcessor.LoadImage('contone retinaImage', contoneID);
-      end
-      if ~forceGenerate && monotoneOutput
-        monotoneImage         = PatchSeriesProcessor.LoadImage('monotone', monotoneID);
-        monotoneRetina        = PatchSeriesProcessor.LoadImage('monotone retinaImage', monotoneID);
-      end
-      
-      if ~forceGenerate
-        generateImages          = false;
+      if ~isempty(halftoneImage)
+        if ~forceGenerateImages && screenOutput
+          screenImage           = PatchSeriesProcessor.LoadImage('screen', screenID);
+          screenRetina          = PatchSeriesProcessor.LoadImage('screen retinaImage', screenID);
+        end
+
+        if ~forceGenerateImages && contoneOutput
+          contoneImage          = PatchSeriesProcessor.LoadImage('contone', contoneID);
+          contoneRetina         = PatchSeriesProcessor.LoadImage('contone retinaImage', contoneID);
+        end
+        if ~forceGenerateImages && monotoneOutput
+          monotoneImage         = PatchSeriesProcessor.LoadImage('monotone', monotoneID);
+          monotoneRetina        = PatchSeriesProcessor.LoadImage('monotone retinaImage', monotoneID);
+        end
+
+        if ~forceGenerateImages
+          generateImages          = false;
+        end
       end
       
     catch err

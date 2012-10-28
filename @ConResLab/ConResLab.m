@@ -7,9 +7,14 @@ classdef ConResLab
   
   methods (Static)
     openPatchGenerator();
-    exportSeries();
+    runSeries();
     declareFunctions();
     compileProject();
+    tallySRFData(data);
+    exportSeries(data);
+    exportPatches(data);
+    exportBlocks(data);
+    generateSeries(seriesID);
   end
   
 end
