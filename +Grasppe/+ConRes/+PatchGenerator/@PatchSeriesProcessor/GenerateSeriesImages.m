@@ -5,7 +5,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   
   global forceGenerateImages;
   
-  forceGenerateImages = false;
+  forceGenerateImages = isequal(forceGenerateImages, true); %false;
   imageTypes          = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput      = true;
   retinaOutput        = true;
@@ -66,11 +66,17 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   seriesStruct(1:2:end)         = fieldNames;
   seriesParameters(seriesRange) = struct(seriesStruct{:});
   seriesVariables(seriesRange)  = struct('Metrics', [], 'Process', []);
+
+  %% Determine loop and display steps
+  dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
+  mStepper            = Grasppe.Kit.Stepper();
   
-  parfor m = 1:seriesRows % for m = 1:seriesRows
+  parfor m = seriesRange % for m = seriesRange
     
-    if rem(m, 50)==0,
-      dispf('Generating Series Images... %d of %d', m, seriesRows);
+    mStep             = mStepper.step(); %s;
+    
+    if mod(mStep,dSteps)==0
+      dispf('Generating Series Images... %d of %d', mStep, seriesRows);
     end
     
     patchProcessor            = [];
@@ -164,7 +170,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
         end
 
         if ~forceGenerateImages
-          generateImages          = false;
+          generateImages        = false;
         end
       end
       
@@ -253,6 +259,8 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     end    
   end
   
+  try delete(mStepper); end
+  
   %% References
   screenIDs                   = screenIDs(screenIdxs);
   contoneIDs                  = contoneIDs(contoneIdxs);
@@ -280,6 +288,20 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     assignin('caller', 'output', OUTPUT);
   end
 end
+
+% function m = mStep(m)
+%   
+%   persistent M;
+%   
+%   if nargin>0, M = m;
+%   else
+%     if isempty(M), M = 0; end
+%     M = M +1;
+%   end
+%   
+%   m = M;
+%   
+% end
 
 function [pths imgs] = processImages(src, type, id, retinalAccuity, imageOut)
   

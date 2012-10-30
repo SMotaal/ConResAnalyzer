@@ -3,7 +3,9 @@ function parameters = PrepareParameters(obj)
   
   import Grasppe.ConRes.PatchGenerator.Processors.*;
   
-  testing   = false;
+  global testmode;
+    
+  testing                               = isequal(testmode, true); % true;
   
   parameters                            = Grasppe.ConRes.PatchGenerator.Models.PatchGeneratorParameters;
   
@@ -26,10 +28,11 @@ function parameters = PrepareParameters(obj)
   parameters.Patch.(Patch.SIZE)         = 5.3;
   
   %% Screen Parameters
-  parameters.Screen.(Screen.PPI)        = 2450; %3600; %obj.PatchProcessor.Addressability;
-  parameters.Screen.(Screen.SPI)        = 2450;
-  parameters.Screen.(Screen.LPI)        = [175 100];
-  parameters.Screen.(Screen.ANGLE)      = 45; %37.5; %0:7.5:37.5;
+  parameters.Screen.(Screen.PPI)        = 3600; %obj.PatchProcessor.Addressability;
+  parameters.Screen.(Screen.SPI)        = 2540; ... %2540; 
+    parameters.Screen.(Screen.PPI)      = parameters.Screen.(Screen.SPI); %2540; %3600; %obj.PatchProcessor.Addressability;
+  parameters.Screen.(Screen.LPI)        = [175];  %100];
+  parameters.Screen.(Screen.ANGLE)      = 37.5; %0:7.5:37.5; %0; %
   
   %% Print Parameters
   parameters.Screen.(Screen.TVI)        = 0;

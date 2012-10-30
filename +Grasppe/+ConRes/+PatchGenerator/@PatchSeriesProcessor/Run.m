@@ -53,7 +53,7 @@ function output = Run(obj)
     debugStamp(err, 1);
   end
   
-  % obj.SaveData;
+  PatchSeriesProcessor.SaveData();
   
   CHECK(obj.Tasks.Prep);
   % PREP 2/4 ***************************************************************
@@ -86,9 +86,13 @@ function output = Run(obj)
     
     if isempty(series)
       series = PatchSeriesProcessor.GenerateSeriesImages(grids, fields, processors, parameters, obj.Tasks.Render);
+      output.Series = series;
+      PatchSeriesProcessor.SaveData();
     end
     
     series = PatchSeriesProcessor.GenerateSeriesFFT(series, grids, fields, processors, parameters, obj.Tasks.Render);
+    
+    PatchSeriesProcessor.SaveData();
     
     PatchSeriesProcessor.GenerateSeriesStatistics(series, grids, fields, processors, parameters, obj.Tasks.Render);
     

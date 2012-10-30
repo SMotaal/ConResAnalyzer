@@ -2,12 +2,12 @@ function seriesID = SeriesID(seriesID)
   
   persistent SERIESID;
   
-  if isempty(SERIESID) 
-    if nargin>0 && ischar(seriesID)
-      SERIESID  = seriesID;
-    else
-      SERIESID  = 'Series104a';
-    end
+  if nargin>0 && ischar(seriesID)
+    SERIESID  = seriesID;
+  end
+  
+  if isempty(SERIESID)
+    SERIESID  = 'Series104a';
   end
   
   seriesID      = SERIESID;

@@ -11,7 +11,7 @@ function generateSeries( seriesID )
     forceGenerateImages forceGenerateStatistics forceGenerateFFT;
   
   
-  forceAll                = true;
+  forceAll                = false;
   forceRenderComposite    = forceAll;
   forceOutputTable        = forceAll;
   forceRenderPatches      = forceAll;
@@ -24,22 +24,30 @@ function generateSeries( seriesID )
   
   %% Generate Series
   
-  seriesProcessor     = PatchSeriesProcessor();
+  seriesProcessor         = PatchSeriesProcessor();
   
   if exist('seriesID', 'var') && ischar(seriesID)
     seriesProcessor.SeriesID(seriesID);
+    
+    if ~isequal(seriesProcessor.SeriesID, seriesID)
+      error('Grasppe:ConRes:SeriesIDError', ' Failed to set series ID.');
+      return;
+    end
   end
   
-  data                = seriesProcessor.Run;
+  data                    = seriesProcessor.Run;
   
   
   %% Export Blocks
-  ConResLab.exportPatches(data);
+  ConResLab.exportBlocks(data);
   
   %% Export Patches
   ConResLab.exportPatches(data);  
   
   %% Export Series
+  data.SRF                = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
+  data.PRF                = PatchSeriesProcessor.LoadData('PRF', 'PRFData');
+  
   ConResLab.exportSeries(data);
   
   

@@ -7,7 +7,7 @@ function [ output_args ] = exportPatches(data) % SRF, Series )
   
   global forceRenderPatches;
   
-  forceRenderPatches = false;
+  forceRenderPatches        = isequal(forceRenderPatches, true); %false;  
 %   forceOutput = true;
   
 %   INT                       = '%d';
@@ -86,7 +86,7 @@ function [ output_args ] = exportPatches(data) % SRF, Series )
     try
     
     if mRun>=dNext
-      dispf('Generating Series Plots... %d of %d', m, seriesRows);
+      dispf('Generating Series Patches... %d of %d', m, seriesRows);
       dNext = dNext + dStep;
     end
     

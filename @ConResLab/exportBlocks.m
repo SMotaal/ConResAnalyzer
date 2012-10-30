@@ -1,13 +1,15 @@
-function [ output_args ] = exportPatches(data) % SRF, Series )
+function [ output_args ] = exportBlock(data) % SRF, Series )
   %TALLYSRFDATA Summary of this function goes here
   %   Detailed explanation goes here
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   import Grasppe.ConRes.Math;
+  import Grasppe.ConRes.PatchGenerator.Processors.*;
   
   global forceRenderBlocks;
   
-  forceRenderBlocks = false;
+  forceRenderBlocks         = isequal(forceRenderBlocks, true); %false;
+  
   %   forceOutput = true;
   
   %   INT                       = '%d';
@@ -54,12 +56,14 @@ function [ output_args ] = exportPatches(data) % SRF, Series )
   meanToneRange             = data.Parameters.Patch.Mean;
   contrastRange             = data.Parameters.Patch.Contrast;
   resolutionRange           = data.Parameters.Patch.Resolution;
-  baseParameters            = struct(data.Series.Parameters(1))
+  baseParameters            = struct(data.Series.Parameters(1));
   paths                     = htPaths(:,1);
   
   
-  baseParameters.Screen.Resolution = 175;
-  %baseParameters.Patch = rmfield(baseParameters.Patch, {'Mean', 'Contrast', 'Resolution'});
+  try
+    baseParameters.Screen.(Screen.LPI)  = max(data.Parameters.(Screen.LPI));
+    baseParameters.Screen.(Screen.SPI)  = max(data.Parameters.(Screen.SPI));
+  end
   
   meanToneSteps             = numel(meanToneRange);
   
@@ -102,14 +106,8 @@ function blockGrid = generateBlockGrid(meanTone, contrastRange, resolutionRange,
     for m = 1:resolutionSteps
       resolution              = resolutionRange(m);
       params.Patch.Resolution = resolution;
-      
-      % for m = 1:numel(data.Series.Parameters), find(strcmpi(data.Series.Table(:,4), PatchSeriesProcessor.GetParameterID(data.Series.Parameters(m)))), end
-      
+            
       patchID                 = PatchSeriesProcessor.GetParameterID(params);
-      
-      disp(patchID);
-      %patchRow                = find(strcmpi(seriesTable(:,4), patchID));
-      %patchPath               = seriesTable(patchRow, 1);
       
       if ~any(strcmpi(seriesTable(:,4), patchID)), continue; end;
       

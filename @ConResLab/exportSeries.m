@@ -7,8 +7,8 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
   
   global forceRenderComposite forceOutputTable;
   
-  forceRenderComposite  = false;
-  forceOutputTable      = true;
+  forceRenderComposite      = isequal(forceRenderComposite, true); %false;  
+  forceOutputTable          = isequal(forceOutputTable, true); %false;
   
   INT                       = '%d';
   DEC                       = @(x) ['%1.' int2str(x) 'f'];

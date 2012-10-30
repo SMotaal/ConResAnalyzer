@@ -5,8 +5,8 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
   global forceGenerateFFT;
-  
-  forceGenerateFFT          = false;
+
+  forceGenerateFFT          = isequal(forceGenerateFFT, true); %false;
   imageTypes                = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput            = true;
   retinaOutput              = true;
@@ -107,13 +107,19 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   
   %% Process FFT & SRF Data
   try
+    %% Determine loop and display steps
+    dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
+    mStepper            = Grasppe.Kit.Stepper();
+    
     parfor m = seriesRange % for m = seriesRange
       
-      fdtPath                 = [];
+      mStep             = mStepper.step(); %s;
       
-      if rem(m, 50)==0,
-        dispf('Generating Series FFT... %d of %d', m, seriesRows);
+      if mod(mStep,dSteps)==0
+        dispf('Generating Series FFT... %d of %d', mStep, seriesRows);
       end
+      
+      fdtPath                 = [];
       
       %% Outputs
       halftoneOutput          = true;
@@ -268,6 +274,8 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
     beep;
   end
   
+  try delete(mStepper); end
+  
   screenSRFTable              = screenSRFTable(screenIdxs, :);
   contoneSRFTable             = contoneSRFTable(contoneIdxs, :);
   monotoneSRFTable            = monotoneSRFTable(monotoneIdxs, :);
@@ -283,7 +291,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
     PatchSeriesProcessor.SaveData(output, 'SRFData');
     % series.SRF                = output.SRF;
   end
-    
+  
   if setOuput || nargout==0
     OUTPUT.Series           = series;
     assignin('caller', 'output', OUTPUT);

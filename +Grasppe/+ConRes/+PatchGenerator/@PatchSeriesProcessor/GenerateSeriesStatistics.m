@@ -6,7 +6,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   global forceGenerateStatistics;
   
-  forceGenerateStatistics   = false;
+  forceGenerateStatistics   = isequal(forceGenerateStatistics, true); %false;
   imageTypes                = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput            = true;
   retinaOutput              = true;
@@ -45,7 +45,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   try
     if ~exist('series', 'var') || ~isstruct(series) || ~isfield(series, 'SRF')
-        series.SRF          = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
+      series.SRF          = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
     end
   catch err
     debugStamp(err, 1);
@@ -54,11 +54,11 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   try
     if ~exist('series', 'var') || ~isstruct(series) || ~isfield(series, 'PRF')
-        series.PRF          = PatchSeriesProcessor.LoadData('PRF', 'PRFData');
+      series.PRF          = PatchSeriesProcessor.LoadData('PRF', 'PRFData');
     end
   catch err
     debugStamp(err, 1);
-  end  
+  end
   
   setTask                   = exist('task', 'var') && isa(task, 'Grasppe.Occam.ProcessTask');
   
@@ -113,11 +113,24 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   %% Process FFT & SRF Data
   try
+    
+    %% Determine loop and display steps
+    dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
+    mStepper            = Grasppe.Kit.Stepper();
+    
     parfor m = seriesRange % for m = seriesRange
       
-      if rem(m, 50)==0,
-        dispf('Generating Series Statistics... %d of %d', m, seriesRows);
+      mStep             = mStepper.step(); %s;
+      
+      if mod(mStep,dSteps)==0
+        dispf('Generating Series Statistics... %d of %d', mStep, seriesRows);
       end
+      
+      %     parfor m = seriesRange
+      %
+      %       if rem(m, 50)==0,
+      %         dispf('Generating Series Statistics... %d of %d', m, seriesRows);
+      %       end
       
       %% Outputs
       halftoneOutput            = true;
@@ -147,9 +160,9 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
       ctIMGPaths                = contonePaths(contoneIdx,:);
       mtIMGPaths                = monotonePaths(monotoneIdx,:);
       
-       
+      
       % if ~all([htFIMGExists scFIMGPath ctFIMGExists mtFIMGExists])
-      %   continue; end      
+      %   continue; end
       
       %% Check that FFTData Exists (Screen, Contone, Monotone Only)
       [htFFTPath  htFFTExists]  = PatchSeriesProcessor.GetResourcePath('Halftone FFTData',  halftoneID, 'mat');
@@ -159,7 +172,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
       
       if ~all([scFFTExists ctFFTExists mtFFTExists]), continue; end
       
-           
+      
       %% Determine Band Parameters
       bandParameters            = {[], []};
       try
@@ -232,7 +245,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
       
       PFFPath = @(x) [x(1:end-4) '-Monotone' x(end-3:end)];
       %PFFPath = @(x) ['Monotone-' x];
-
+      
       for q = 1:2
         htPFFTs{q}                    = htFFTs{q}.*mtFFTs{q};
         if screenOutput,  scPFFTs{q}  = scFFTs{q}.*mtFFTs{q}; end
@@ -279,7 +292,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
         
         monotonePSRFTable(m, :)     = mtPSRFs;
       end
-              
+      
       %% Generate Statistics
       
     end
@@ -287,6 +300,8 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
     debugStamp(err,1);
     beep;
   end
+  
+  try delete(mStepper); end
   
   screenPSRFTable               = screenPSRFTable(screenIdxs, :);
   contonePSRFTable              = contonePSRFTable(contoneIdxs, :);
@@ -302,7 +317,7 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   if ~isfield(series, 'PRF') || ~isequal(output.PRF, series.PRF)
     PatchSeriesProcessor.SaveData(output, 'PRFData');
   end
-    
+  
   if setOuput || nargout==0
     OUTPUT.Series           = series;
     assignin('caller', 'output', OUTPUT);
@@ -369,16 +384,16 @@ function img = bandPlotFFT(img, fftData, fQ)
   try
     
     image1    = img;
-      
+    
     width     = size(image1,2);
     height    = size(image1,1);
-        
+    
     hFig  = figure('Visible', 'off', 'Position', [-1000 -1000 width height], 'HandleVisibility','callback', 'Renderer', 'painters');
-        
+    
     hAxis = axes('Parent', hFig);
-        
+    
     % [bFq fftData] = Grasppe.Kit.ConRes.CalculateBandIntensity(abs(image1b));
-        
+    
     bFq = fftData(:,dataColumn);
     
     yR  = bFq/max(bFq(:));
@@ -402,7 +417,7 @@ function img = bandPlotFFT(img, fftData, fQ)
     cla(hAxis); hold(hAxis, 'on');
     imshow(image2, 'Parent', hAxis);
     truesize(hFig);
-        
+    
     lOp = {'Parent', hAxis, 'LineWidth', 1, 'linesmoothing','on'};
     
     yN = 1;
@@ -418,9 +433,9 @@ function img = bandPlotFFT(img, fftData, fQ)
       end
       line(xv, yv, [0 0], 'Color', 'w', 'LineStyle', ':',   lOp{:}, 'LineWidth', 0.5);
     end
-        
+    
     plot(hAxis, xD+xR*xF, yD+yR2+yS, 'g', lOp{:}, 'Linewidth', 0.5);
-        
+    
     if isnumeric(fQ) && ~isempty(fQ)
       for m = fQ
         yv = [-35 35]  + yD + yM + yS;
@@ -452,9 +467,9 @@ function img = bandPlotFFT(img, fftData, fQ)
         
       end
     end
-        
+    
     img = export_fig(hFig, '-native', '-a2', ['-' renderer]);
-        
+    
     delete(hAxis);
     delete(hFig);
     
