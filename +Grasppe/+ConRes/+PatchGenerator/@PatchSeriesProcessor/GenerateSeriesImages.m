@@ -71,7 +71,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
   mStepper            = Grasppe.Kit.Stepper();
   
-  parfor m = seriesRange % for m = seriesRange
+  for m = seriesRange % for m = seriesRange
     
     mStep             = mStepper.step(); %s;
     
@@ -106,7 +106,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
       parameters.(fieldTable{n,1}).(fieldTable{n,2}) = v;
     end
     
-    parameters.Screen.PixelResolution = 3600;
+    %parameters.Screen.PixelResolution = 3600;
     
     seriesParameters(m)       = parameters;
     

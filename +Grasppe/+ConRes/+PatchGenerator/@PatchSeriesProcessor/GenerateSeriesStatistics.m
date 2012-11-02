@@ -89,10 +89,10 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   monotonePaths             = series.Paths.Monotone;
   
   seriesFFT                 = cell(seriesRows, 6);
-  halftonePSRFTable          = cell(seriesRows, 2);
-  screenPSRFTable            = halftonePSRFTable;
-  contonePSRFTable           = halftonePSRFTable;
-  monotonePSRFTable          = halftonePSRFTable;
+  halftonePSRFTable         = cell(seriesRows, 2);
+  screenPSRFTable           = halftonePSRFTable;
+  contonePSRFTable          = halftonePSRFTable;
+  monotonePSRFTable         = halftonePSRFTable;
   
   % srfsAvailable             = isstruct(series) && all(isfield(series, {'SRF', 'FFT'})) && isstruct(series.SRF);
   srfsAvailable             = isstruct(series) && isfield(series, 'SRF') && isstruct(series.SRF);
@@ -115,8 +115,8 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   try
     
     %% Determine loop and display steps
-    dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
-    mStepper            = Grasppe.Kit.Stepper();
+    dSteps                  = min(50, max(round(numel(seriesRange)/50)*5, 10));
+    mStepper                = Grasppe.Kit.Stepper();
     
     parfor m = seriesRange % for m = seriesRange
       

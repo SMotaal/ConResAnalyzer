@@ -5,9 +5,11 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   import Grasppe.ConRes.Math;
   
-  global forceRenderComposite forceOutputTable;
+  global forceRenderComposite forceOutputTable forceRenderSRF forceRenderPRF;
   
   forceRenderComposite      = isequal(forceRenderComposite, true); %false;  
+  forceRenderSRF            = isequal(forceRenderSRF, true); %false;  
+  forceRenderPRF            = isequal(forceRenderPRF, true); %false;  
   forceOutputTable          = isequal(forceOutputTable, true); %false;
   
   INT                       = '%d';
@@ -129,32 +131,45 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
     %% Patch Variables
     mPixels                 = mDPI*mScale/25.4; %
     mfR                     = Math.VisualResolution(mPPI) * 7;
-    mfQ                     = mRES/mSize * mPixels; %mRES/mPixels * mSize/mPixels * 2;
+    mfQ                     = Math.FundamentalFrequency(mRES, [], mDPI); %mRES/mSize * mPixels; %mRES/mPixels * mSize/mPixels * 2;
     [mBP mBW]               = Math.FrequencyRange(mSize, mPPI);
     
     %% Fundamental Data Row
-    fQRows                  = min(max(1, round(mfQ) + [1:10]), size(mtSRF, 1));
+    fQRows                  = min(max(1, round(mfQ) + [0:9]), size(mtSRF, 1));
     [fQMax fQRow]           = max(mtSRF(fQRows, bandMean));
-    fQRow                   = round(mfQ) + fQRow;
+    fQRow                   = round(mfQ); % + fQRow;
     
     [mCMPPath mCMPExists]   = PatchSeriesProcessor.GetResourcePath('Patch CompositeImage', htID, 'png');
     [mSRFPath mSRFExists]   = PatchSeriesProcessor.GetResourcePath('Patch SRFPlot', htID, 'png');
     [mPRFPath mPRFExists] 	= PatchSeriesProcessor.GetResourcePath('Patch PRFPlot', htID, 'png');
     
-    if forceRenderComposite || ~(mCMPExists && mSRFExists && mPRFExists)
+    if forceRenderComposite || forceRenderSRF || forceRenderPRF || ~(mCMPExists && mSRFExists && mPRFExists)
       %% Composite Images
-      [mComp mW mH]         = composePatchImage(htID, scID, ctID, mtID);
+      if ~mCMPExists || forceRenderComposite
+        [mComp mW mH]       = composePatchImage(htID, scID, ctID, mtID);
+        PatchSeriesProcessor.SaveImage(mComp, 'Patch CompositeImage', htID);
+      else
+        mComp               = imread(mCMPPath);
+        [mH mW]             = size(mCMPPath);
+      end
+      
             
       %% Composite Plots
       % columns: [band fftSum fltSum bandMean bandStd binaryStd]
-      [mSRFPlots]           = composePatchPlots(mSRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scSRF, htSRF, ctSRF, mtSRF);
-      [mPRFPlots]           = composePatchPlots(mPRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scPRF, htPRF, ctPRF, mtPRF);
+      if ~mSRFExists || forceRenderSRF
+        mSRFPlots           = composePatchPlots(mSRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scSRF, htSRF, ctSRF, mtSRF);
+        PatchSeriesProcessor.SaveImage(mSRFPlots, 'Patch SRFPlot', htID);
+      else
+        mSRFPlots           = imread(mSRFPath);
+      end
       
-      %% Save Images
-      % PatchSeriesProcessor.SaveImage(mComp, 'Patch CompositeImage', htID);
-      PatchSeriesProcessor.SaveImage(mSRFPlots, 'Patch SRFPlot', htID);
-      PatchSeriesProcessor.SaveImage(mPRFPlots, 'Patch PRFPlot', htID);
-      
+      if ~mPRFExists || forceRenderPRF
+        mPRFPlots           = composePatchPlots(mPRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scPRF, htPRF, ctPRF, mtPRF);
+        PatchSeriesProcessor.SaveImage(mPRFPlots, 'Patch PRFPlot', htID);
+      else
+        mPRFPlots           = imread(mPRFPath);
+      end
+            
     end
     
     l1 = labelColumns(1);
@@ -194,7 +209,7 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
       srfSci, prfSci));
     
     catch err
-      debugStamp();
+      debugStamp(err);
       beep;
     end
     
@@ -251,7 +266,7 @@ function [patchPlot] = composePatchPlots(imagePath, fQ, fQRow, P, plotColumns, W
   %% Create Figure (or Reset)
   
   figWidth    = 600;
-  figHeight   = H*figWidth/W;
+  figHeight   = max(round(figWidth/2), H*figWidth/W);
   
   lineScale   = 1.5;
   

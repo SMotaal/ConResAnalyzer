@@ -1,3 +1,5 @@
-function F = FundamentalFrequency(resolution, diameter, ppi)
-  F         = resolution / (ppi/25.4) * diameter * 2;
+function F = FundamentalFrequency(lpmm, mm, ppi, ppm)
+  if nargin<4, ppm  = ppi/25.4; end
+  %diameter          = ceil(mm*ppm);
+  F                 = (ppm/lpmm)/2; %* diameter * 2;
 end

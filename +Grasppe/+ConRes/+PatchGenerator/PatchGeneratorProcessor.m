@@ -629,7 +629,8 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             dataColumn = 4;
             
             fFFT    = @(varargin) forwardFFT(varargin{:});
-            retina  = @(x) disk(x, HR);
+            retina  = @(x) gaussian(x, HR); %disk(x, HR);
+            
             
             %% Patch Images Processing
             

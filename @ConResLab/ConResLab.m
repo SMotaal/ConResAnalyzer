@@ -14,6 +14,7 @@ classdef ConResLab
     exportSeries(data);
     exportPatches(data);
     exportBlocks(data);
+    exportBlockComps(data);
     generateSeries(seriesID);
   end
   

@@ -40,6 +40,7 @@ function generateSeries( seriesID )
   
   %% Export Blocks
   ConResLab.exportBlocks(data);
+  % ConResLab.exportBlockComps(data);
   
   %% Export Patches
   ConResLab.exportPatches(data);  

@@ -77,9 +77,15 @@ function [ output_args ] = exportBlock(data) % SRF, Series )
     blockParams.Patch       = rmfield(blockParams.Patch, {'Contrast', 'Resolution'});
     blockId                 = PatchSeriesProcessor.GetParameterID(blockParams);
     blockGrid               = generateBlockGrid(meanTone, contrastRange, resolutionRange, params, seriesTable);
-    blockImage              = assembleBlockImage(blockGrid, meanTone);
     
-    PatchSeriesProcessor.SaveImage(blockImage, 'Contone BlockImage', blockId);
+    [htImg ctImg mtImg]     = assembleBlockImage(blockGrid, meanTone);
+    
+    PatchSeriesProcessor.SaveImage(htImg,   'Halftone BlockComp', blockId);
+    PatchSeriesProcessor.SaveImage(ctImg,   'Contone BlockComp',  blockId);
+    
+    %if isequal(meanTone, 50)
+      PatchSeriesProcessor.SaveImage(mtImg,   'Monotone BlockComp', blockId);
+    %end
     
   end
   
@@ -116,11 +122,14 @@ function blockGrid = generateBlockGrid(meanTone, contrastRange, resolutionRange,
   end
 end
 
-function blockImage = assembleBlockImage(blockGrid, meanTone)
+function [htImage ctImage mtImage] = assembleBlockImage(blockGrid, meanTone)
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor  
   
-  blockImages             = cell(size(blockGrid));
+  htImages                = cell(size(blockGrid));
+  ctImages                = cell(size(blockGrid));
+  mtImages                = cell(size(blockGrid));
+  %scImages                = cell(size(blockGrid));
   
   patchWidth              = [];
   patchHeight             = [];
@@ -135,26 +144,34 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
       if isempty(patchID), continue; end;
       
       try
-        blockImages{m,n}  = PatchSeriesProcessor.LoadImage('Contone Image', patchID);
+        htImages{m,n}     = PatchSeriesProcessor.LoadImage('Halftone Image', patchID);
+        ctImages{m, n}    = PatchSeriesProcessor.LoadImage('Contone Image', patchID);
+        mtImages{m, n}    = PatchSeriesProcessor.LoadImage('Monotone Image', patchID);
         
-        patchHeight       = min([patchHeight  size(blockImages{m,n}, 1)]);
-        patchWidth        = min([patchWidth   size(blockImages{m,n}, 2)]);
+        patchHeight       = min([patchHeight  size(htImages{m,n}, 1)]);
+        patchWidth        = min([patchWidth   size(htImages{m,n}, 2)]);
       catch err
+        debugstamp;
       end
     end
   end
   
-  bufferWidth             = round(patchWidth/3);
+  bufferWidth             = 0; %round(patchWidth/3);
   
   blockWidth              = (patchWidth+bufferWidth)*blockColumns;
   blockHeight             = patchHeight*blockRows;
     
-  blockImage              = ones(blockHeight, blockWidth) .* (100-meanTone)/100;
+  htImage                 = ones(blockHeight, blockWidth) .* (100-meanTone)/100;
+  ctImage                 = ones(blockHeight, blockWidth) .* (100-meanTone)/100;
+  mtImage                 = ones(blockHeight, blockWidth);
   
   for m = 1:blockRows
     for n = 1:blockColumns
-      patchImage          = im2double(blockImages{m, n});
-      if isempty(patchImage), continue; end;
+      htPatchImage        = im2double(htImages{m, n});
+      ctPatchImage        = im2double(ctImages{m, n});
+      mtPatchImage        = im2double(mtImages{m, n});
+      
+      if isempty(htPatchImage), continue; end;
       
       x1                  = 1+((n-1)*(patchWidth+bufferWidth));
       x2                  = x1+patchWidth-1;      
@@ -162,8 +179,9 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
       y2                  = y1+patchHeight-1;
       
       try
-        blockImage(y1:y2, x1:x2)  = patchImage(1:patchHeight, 1:patchWidth);
-        
+        htImage(y1:y2, x1:x2)  = htPatchImage(1:patchHeight, 1:patchWidth);
+        ctImage(y1:y2, x1:x2)  = ctPatchImage(1:patchHeight, 1:patchWidth);
+        mtImage(y1:y2, x1:x2)  = mtPatchImage(1:patchHeight, 1:patchWidth);
       catch err
         debugStamp;
       end
@@ -173,9 +191,9 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
   
   try
     pad                   = 10;
-    paddedBlock           = zeros(size(blockImage)+(pad*2));                    % blockHeight+20, blockWidth+20);
-    paddedBlock(pad+1:pad+blockHeight, pad+1:pad+blockWidth) = blockImage;
-    blockImage            = paddedBlock;
+    paddedBlock           = zeros(size(htImage)+(pad*2));                    % blockHeight+20, blockWidth+20);
+    paddedBlock(pad+1:pad+blockHeight, pad+1:pad+blockWidth) = htImage;
+    htImage            = paddedBlock;
   catch err
     debugStamp;
   end

@@ -73,7 +73,7 @@ classdef Screen < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         screened    = [];
         meantone    = tone;
         tonestep    = -1;
-        steplimit   = 0;
+        steplimit   = 0; % 5;
         tonelimit   = 5;
         tonediff    = 0;
         while isempty(screened) || (abs(meantone-tone)>tonelimit && tonestep<steplimit)

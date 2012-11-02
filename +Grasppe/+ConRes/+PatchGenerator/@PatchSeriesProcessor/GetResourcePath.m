@@ -1,4 +1,4 @@
-function [pth exists folder] = GetResourcePath(type, id, ext)
+function [pth exists folder] = GetResourcePath(type, id, ext, local)
   
   import(eval(NS.CLASS)); % PatchSeriesProcessor
   
@@ -22,6 +22,7 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
       ext = [];
     end
     
+    %% Determine group folder    
     groupFolder       = regexpi(type, '\<(screen|halftone|contone|monotone|patch)\>', 'match');
     if numel(groupFolder)==1
       groupFolder = groupFolder{1};
@@ -30,25 +31,55 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
       groupFolder     = []; %'Others';
     end
     
+    % Determine sub folder    
     subFolder         = regexpi(type, [ ...
-      '\<(image|fftdata|fftimage|retinaimage|retinafftimage|blockimage|' ...
+      '\<(image|fftdata|fftimage|retinaimage|retinafftimage|blockimage|blockcomp|' ...
       'data|output|report|compositeimage|hybridimage|srfplot|prfplot)\>'], 'match');
     
     if numel(subFolder)==1
       subFolder       = subFolder{1};
       subFolder(1)    = upper(subFolder(1));
     else
-      subFolder       = [];
+      try
+        subFolder     = subFolder{1};
+      catch err
+        subFolder     = [];
+      end
     end
     
+    %% Remove additional parameters
+    try
+      if isempty(strfind(lower(subFolder), 'block'))
+        switch lower(groupFolder)
+          case {'contone'}
+            id = regexprep(id, '(LPI|DEG)\d+', '');
+          case {'monotone'}
+            id = regexprep(id, '(RTV|CON|LPI|DEG)\d+', '');
+          case {'screen'}
+        end
+      end
+      
+      id = regexprep(id, '(^-*|(?<=-)-*|-*$)', ''); % '-+', '-');
+    end
+    
+    %% Determine parent folder
     switch lower(subFolder)
-      case {'image', 'report', 'retinaimage'} %, 'fftimage', 'retinafftimage'}
-        parentFolder  = [];
+      case {'image', 'report', 'retinaimage'} %, 'fftimage', 'retinafftimage'}        
+        parentFolder  = [];        
       otherwise
         parentFolder  = 'Resources';
     end
     
-    folder            = fullfile(getOutputPath(seriesFolder), parentFolder, groupFolder, subFolder);
+%     if ~exist('local', 'var')
+%       local = false;
+%     else
+%       local = isequal(local, true);
+%     end
+
+    local             = exist('local', 'var')>0 && isequal(local, true);
+        
+    %folder            = fullfile(getOutputPath(seriesFolder), parentFolder, groupFolder, subFolder);
+    folder            = findOutputPath(seriesFolder, parentFolder, groupFolder, subFolder, id,  ext, local);
     
     pth               = fullfile(folder, [id ext]);
     
@@ -67,6 +98,28 @@ function [pth exists folder] = GetResourcePath(type, id, ext)
   catch err
     debugStamp();
   end
+end
+
+function folder = findOutputPath(seriesFolder, parentFolder, groupFolder, subFolder, id,  ext, local)
+  paths       = {...
+    {'/Volumes', 'daflairsStoreQuattro', 'Output'}, ... %{'.','Output'}, ...{'/Volumes', 'daflairsStore 3.0', 'Output'}, ...
+    };
+  
+  localPath   = {'.','Output'};
+  
+  if isequal(local, true)
+    paths     = {paths{:}, localPath};
+  else
+    paths     = {localPath, paths{:}};
+  end
+
+  for m = 1:numel(paths)
+    folder = fullfile(paths{m}{:}, seriesFolder, parentFolder, groupFolder, subFolder);
+    if exist(fullfile(folder, [id ext]), 'file') > 0
+      return; %newfolders{end+1} = folder;
+    end
+  end
+  
 end
 
 function folder = getOutputPath(seriesFolder)
