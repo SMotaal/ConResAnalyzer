@@ -1,3 +1,5 @@
+import Grasppe.ConRes.FX;
+
 fxProcessor   = Grasppe.ConRes.PatchGenerator.Processors.UserFunction;
 
 fourier       = @(varargin) fxProcessor.fourier(varargin{:});
@@ -36,7 +38,8 @@ disk          = @(x, y)     imfilter(x,fspecial('disk',y),'replicate');
 gaussian      = @(x, y)     imfilter(x,fspecial('gaussian',round(y*3/2), y/2),'replicate');
 
 HR            = 10;
-retina        = @(x)        gaussian(x, HR); %disk(x, HR);
+%retina        = @(x)        gaussian(x, HR); %disk(x, HR);
+retina        = @(x)        FX.Retina(x, HR); % retina  = @(x) gaussian(x, HR); %disk(x, HR);
 
 retinaFFT     = @(x)        fFFT(retina(x));
 

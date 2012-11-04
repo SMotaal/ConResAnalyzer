@@ -13,31 +13,37 @@ files         = { ...
   'RTV75-MM530-SPI2540-LPI175-DEG375-DPI2400'};
 
 SPI           = 2540;
-LPI           = 175;
+LPI           = 100; %175;
 DEG           = 37.5;
 DPI           = 2400;
-GF            = 7;
-HVF           = Grasppe.ConRes.Math.VisualResolution(DPI)*GF;
+GF            = 3; % pi();
+HVF           = Grasppe.ConRes.Math.VisualResolution(DPI); %*GF;
 
 SCL           = 0.5;
 PPI           = DPI*SCL;
 PPM           = PPI/0.0254;
 
-gaussian      = @(x, y)     imfilter(x,fspecial('gaussian',round(y*3/2), y/2),'replicate');
+gaussian      = @(x, y)     imfilter(x,fspecial('gaussian',round(y*20), y),'replicate');
 
 for m = 1:numel(files)
   filename    = files{m};
   fileext     = '.png';
   
   ctinpath    = fullfile(infolder, [filename fileext]);
-  htinpath    = fullfile(infolder, [filename '-HT' fileext]);
   
+  outname     = filename;
+  outname     = regexprep(outname,'LPI\d+', ['LPI' num2str(LPI,'%3d')]);
+  outname     = regexprep(outname,'SPI\d+', ['SPI' num2str(SPI,'%3d')]);
+  outname     = regexprep(outname,'DEG\d+', ['DEG' num2str(round(DEG*10),'%3d')]);
+  outname     = regexprep(outname,'DPI\d+', ['DPI' num2str(DPI,'%3d')]);
   
-  ctimgpath   = fullfile(outfolder, [filename '-CT' fileext]);
-  htimgpath   = fullfile(outfolder, [filename '-HT' fileext]);
+  htinpath    = fullfile(infolder,  [outname '-HT' fileext]);  
   
-  ctfltpath   = fullfile(outfolder, [filename '-CT-GF' int2str(GF) fileext]);
-  htfltpath   = fullfile(outfolder, [filename '-HT-GF' int2str(GF) fileext]);
+  ctimgpath   = fullfile(outfolder, [outname '-CT' fileext]);
+  htimgpath   = fullfile(outfolder, [outname '-HT' fileext]);
+  
+  ctfltpath   = fullfile(outfolder, [outname '-CT-GF' int2str(GF) fileext]);
+  htfltpath   = fullfile(outfolder, [outname '-HT-GF' int2str(GF) fileext]);
   
 
   %if exist(ctimgpath, 'file')>0
@@ -53,8 +59,13 @@ for m = 1:numel(files)
     imwrite(htimg, htinpath, 'XResolution', DPI, 'YResolution', DPI);
   end
   
-  ctflt       = gaussian(ctimg, HVF);
-  htflt       = gaussian(htimg, HVF);
+  ctflt       = ctimg;
+  htflt       = htimg;
+  
+  for n = 1:GF
+    ctflt       = gaussian(ctflt, HVF);
+    htflt       = gaussian(htflt, HVF);
+  end
   
   
   imwrite(imresize(htimg, SCL), htimgpath, 'XResolution', PPI, 'YResolution', PPI);

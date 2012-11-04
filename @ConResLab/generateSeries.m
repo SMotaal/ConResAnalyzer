@@ -1,4 +1,4 @@
-function generateSeries( seriesID )
+function generateSeries( seriesID, parallelMode )
   %GENERATESERIES Summary of this function goes here
   %   Detailed explanation goes here
   
@@ -27,6 +27,7 @@ function generateSeries( seriesID )
   seriesProcessor         = PatchSeriesProcessor();
   
   if exist('seriesID', 'var') && ischar(seriesID)
+    
     seriesProcessor.SeriesID(seriesID);
     
     if ~isequal(seriesProcessor.SeriesID, seriesID)
@@ -35,15 +36,22 @@ function generateSeries( seriesID )
     end
   end
   
+  try
+    if isequal(parallelMode, true)
+      matlabpool close force;
+      matlabpool open;
+    end
+  end
+  
   data                    = seriesProcessor.Run;
   
   
   %% Export Blocks
-  ConResLab.exportBlocks(data);
+  % ConResLab.exportBlocks(data);
   % ConResLab.exportBlockComps(data);
   
   %% Export Patches
-  ConResLab.exportPatches(data);  
+  ConResLab.exportPatches(data);
   
   %% Export Series
   data.SRF                = PatchSeriesProcessor.LoadData('SRF', 'SRFData');

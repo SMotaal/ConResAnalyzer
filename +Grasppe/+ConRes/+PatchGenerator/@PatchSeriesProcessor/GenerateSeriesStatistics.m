@@ -118,7 +118,13 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
     dSteps                  = min(50, max(round(numel(seriesRange)/50)*5, 10));
     mStepper                = Grasppe.Kit.Stepper();
     
-    parfor m = seriesRange % for m = seriesRange
+    %matlabpool open
+    
+    seriesID            = PatchSeriesProcessor.SeriesID();
+    
+    for m = seriesRange % for m = seriesRange
+      
+      PatchSeriesProcessor.SeriesID(seriesID);
       
       mStep             = mStepper.step(); %s;
       
@@ -191,19 +197,22 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
         
         htSRFCheck                = isequal(halftoneSRF, htSRFs);
         
-        if ~htSRFCheck
-          try
-            error('Grasppe:Series:UnexpectedError', 'Halftone SRFs are not matching?');
-          catch err
-            debugStamp(err, 1);
-            rethrow(err);
-          end
-        end
+        % if ~htSRFCheck
+        %   try
+        %     error('Grasppe:Series:UnexpectedError', 'Halftone SRFs are not matching?');
+        %   catch err
+        %     debugStamp(err, 1);
+        %     rethrow(err);
+        %   end
+        % end
+        
+        htFFTs                  = cropFFTData(htFFTs);
       else
         htFFTs                  = loadData(htFFTPath);
       end
       
       %% Get Screen, Contone, Monotone FFTData
+      
       scFFTs                    = loadData(scFFTPath);
       ctFFTs                    = loadData(ctFFTPath);
       mtFFTs                    = loadData(mtFFTPath);
@@ -303,6 +312,8 @@ function stats = GenerateSeriesStatistics(series, grids, fields, processors, par
   
   try delete(mStepper); end
   
+  dispf('Outputting Series Statistics... %d of %d', seriesRows, seriesRows);
+  
   screenPSRFTable               = screenPSRFTable(screenIdxs, :);
   contonePSRFTable              = contonePSRFTable(contoneIdxs, :);
   monotonePSRFTable             = monotonePSRFTable(monotoneIdxs, :);
@@ -371,6 +382,24 @@ function saveData(pth, data)
   save(pth, 'data');
   Grasppe.ConRes.File.UpdateTimeStamp(pth);
 end
+
+function data = cropFFTData(FFT)
+  mWidth = 200;
+  for m = 1:numel(FFT)
+    try
+      y1      = round((size(FFT{m},1)-mWidth)/2);
+      y2      = y1+mWidth;
+      
+      x1      = round((size(FFT{m},2)-mWidth)/2);
+      x2      = x1+mWidth;
+      
+      data{m} = FFT{m}(y1:y2, x1:x2);
+    catch err
+      debugStamp(err);
+    end
+  end  
+end
+
 
 function img = bandPlotFFT(img, fftData, fQ)
   

@@ -3,83 +3,128 @@ function [ output_args ] = exportBlock(data) % SRF, Series )
   %   Detailed explanation goes here
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
-  import Grasppe.ConRes.Math;
   import Grasppe.ConRes.PatchGenerator.Processors.*;
+  import Grasppe.ConRes.Math;
+  import Grasppe.ConRes.FX;
   
   global forceRenderBlocks;
   
-  forceRenderBlocks         = isequal(forceRenderBlocks, true); %false;
+  forceRenderBlocks             = isequal(forceRenderBlocks, true); %false;
   
-  %   forceOutput = true;
+  RTV                           = Patch.MEANTONE;
+  CON                           = Patch.CONTRAST;
+  RES                           = Patch.RESOLUTION;
+  MM                            = Patch.SIZE;
+  SPI                           = Screen.SPI;
+  LPI                           = Screen.LPI;
+  DEG                           = Screen.ANGLE;
+  DPI                           = Scan.DPI;
+  SCL                           = Scan.SCALE;
   
-  %   INT                       = '%d';
-  %   DEC                       = @(x) ['%1.' int2str(x) 'f'];
-  %   SCI                       = '%1.3fe%d';
-  %   STR                       = '%s';
-  %   TAB                       = '\t';
+  fRTV                          = '\tRTV: %5.2f';
+  fSPI                          = '\tSPI: %5.2f';
+  fLPI                          = '\tLPI: %5.2f';
+  fDEG                          = '\tDEG: %5.2f';
+  fDPI                          = '\tDPI: %5d';
+  fRF                           = '\tRTV: %5.2f';
+  tab                           = '\t';
+  
   
   if ~exist('data', 'var')
-    data                    = PatchSeriesProcessor.LoadData();
-    %     data.SRF                = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
-    %     data.PRF                = PatchSeriesProcessor.LoadData('PRF', 'PRFData');
+    data                        = PatchSeriesProcessor.LoadData();
+    %     data.SRF                    = PatchSeriesProcessor.LoadData('SRF', 'SRFData');
+    %     data.PRF                    = PatchSeriesProcessor.LoadData('PRF', 'PRFData');
   end
   
-  parameters                = data.Series.Parameters;
+  seriesTable                   = data.Series.Table;
   
-  fieldTable                = data.Fields.Table;
-  seriesRows                = data.Grids.Halftone.Rows;
-  seriesRange               = 1:seriesRows;
+  parameters                    = struct(data.Series.Parameters(1));
   
-  %   htRows                    = data.Grids.Halftone.Rows;
-  %   scRows                    = data.Grids.Screen.Rows;
-  %   ctRows                    = data.Grids.Contone.Rows;
-  %   mtRows                    = data.Grids.Monotone.Rows;
-  %
-  %   scIdxs                    = data.Grids.Screen.Index;
-  %   ctIdxs                    = data.Grids.Contone.Index;
-  %   mtIdxs                    = data.Grids.Monotone.Index;
-  %
-  %   scRefs                    = data.Grids.Screen.Reference;
-  %   ctRefs                    = data.Grids.Contone.Reference;
-  %   mtRefs                    = data.Grids.Monotone.Reference;
+  meanToneRange                 = data.Parameters.Patch.Mean;
+  contrastRange                 = data.Parameters.Patch.Contrast;
+  resolutionRange               = data.Parameters.Patch.Resolution;
   
-  seriesTable               = data.Series.Table;
-  seriesParameters          = data.Series.Parameters;
-  seriesVariables           = data.Series.Variables;
+  spiRange                      = data.Parameters.Screen.(SPI);
+  lpiRange                      = unique([100 175 data.Parameters.Screen.(LPI)]);
+  degRange                      = data.Parameters.Screen.(DEG);
   
-  htPaths                   = data.Series.Paths.Halftone;
-  %scPaths                   = data.Series.Paths.Screen;
-  %ctPaths                   = data.Series.Paths.Contone;
-  %mtPaths                   = data.Series.Paths.Monotone;
+  meanToneSteps                 = numel(meanToneRange);
+  spiSteps                      = numel(spiRange);
+  lpiSteps                      = numel(lpiRange);
+  degSteps                      = numel(degRange);
   
-  
-  meanToneRange             = data.Parameters.Patch.Mean;
-  contrastRange             = data.Parameters.Patch.Contrast;
-  resolutionRange           = data.Parameters.Patch.Resolution;
-  baseParameters            = struct(data.Series.Parameters(1));
-  paths                     = htPaths(:,1);
-  
-  
-  try
-    baseParameters.Screen.(Screen.LPI)  = max(data.Parameters.(Screen.LPI));
-    baseParameters.Screen.(Screen.SPI)  = max(data.Parameters.(Screen.SPI));
-  end
-  
-  meanToneSteps             = numel(meanToneRange);
+  retinaFactor                  = 3;
   
   for m = 1:meanToneSteps
-    meanTone                = meanToneRange(m);
+    meanTone                    = meanToneRange(m);
     
-    params                  = baseParameters;
-    params.Patch.Mean       = meanTone;
+    params                      = parameters;
     
-    blockParams             = params;
-    blockParams.Patch       = rmfield(blockParams.Patch, {'Contrast', 'Resolution'});
-    blockId                 = PatchSeriesProcessor.GetParameterID(blockParams);
-    blockGrid               = generateBlockGrid(meanTone, contrastRange, resolutionRange, params, seriesTable);
-    blockImage              = assembleBlockImage(blockGrid, meanTone);
+    dpi                         = params.Scan.(DPI);
+    scl                         = params.Scan.(SCL);
     
-    PatchSeriesProcessor.SaveImage(blockImage, 'Contone BlockImage', blockId);
+    retinalAccuity              = Math.VisualResolution(dpi*scl/100); %seriesVariables.PixelAcuity;
+    retina                      = @(x) FX.Retina(x, retinalAccuity, retinaFactor);
+    
+    params.Patch.Mean           = meanTone;
+    
+    blockParams                 = params;
+    blockParams.Patch           = rmfield(blockParams.Patch, {CON, RES});
+    
+    ctBlockID                   = PatchSeriesProcessor.GetParameterID(blockParams, 'Contone Block');
+    
+    [ctPath, ctExists]          = PatchSeriesProcessor.GetResourcePath('BlockImage', [ctBlockID '-CT'], 'png');
+    
+    if ~ctExists
+      dispf(['Generating Contone Block:' fRTV fDPI], meanTone, dpi);  %dispf('Generating Contone Block:\tRTV: %5.0f\tCON: %5.1f\tRES: %5.2f\tDPI: %5d', ...
+      
+      ctPatchParams             = params;
+      ctPatchParams.Screen      = rmfield(ctPatchParams.Screen, {LPI, DEG});
+      
+      blockGrid                 = generateBlockGrid(meanTone, contrastRange, resolutionRange, ctPatchParams, seriesTable);
+      ctBlockImage              = assembleBlockImage(blockGrid, meanTone);
+      PatchSeriesProcessor.SaveImage(ctBlockImage, 'BlockImage', [ctBlockID '-CT']);
+    else
+      dispf(['Loading Contone Block:' fRTV fDPI], meanTone, dpi);  %dispf('Generating Contone Block:\tRTV: %5.0f\tCON: %5.1f\tRES: %5.2f\tDPI: %5d', ...
+      ctBlockImage              = PatchSeriesProcessor.LoadImage(ctPath); % 'BlockImage', [blockId '-CT']);
+    end
+    
+    dispf(['Filtering Contone Block:' fRTV fDPI fRF], meanTone, dpi, retinaFactor);  %dispf('Generating Contone Block:\tRTV: %5.0f\tCON: %5.1f\tRES: %5.2f\tDPI: %5d', ...
+    PatchSeriesProcessor.SaveImage(retina(ctBlockImage), 'BlockImage', [ctBlockID '-CT-RF' int2str(retinaFactor)]);
+    
+    for n = 1:degSteps
+      deg                       = degRange(n);
+      for o = 1:spiSteps
+        spi                     = spiRange(o);
+        for p = 1:lpiSteps
+          
+          lpi                   = lpiRange(p);
+          
+          htParams              = blockParams;
+          htParams.Screen.(SPI) = spi;
+          htParams.Screen.(LPI) = lpi;
+          htParams.Screen.(DEG) = deg;
+          htBlockID             = PatchSeriesProcessor.GetParameterID(htParams, 'Halftone Block');
+          
+          [htPath, htExists]    = PatchSeriesProcessor.GetResourcePath('BlockImage', [htBlockID '-HT'], 'png');
+          
+          if ~htExists || ~ctExists
+            dispf(['Generating Halftone Block:' fRTV fDPI fSPI fLPI fDEG], meanTone, dpi, spi, lpi, deg);
+            
+            halftoneImage       = imresize(grasppeScreen3(ctBlockImage, dpi, spi, lpi, deg), dpi/spi);
+            PatchSeriesProcessor.SaveImage(halftoneImage, 'BlockImage', [htBlockID '-HT']);
+          else
+            dispf(['Loading Halftone Block:' fRTV fDPI fSPI fLPI fDEG], meanTone, dpi, spi, lpi, deg);
+            halftoneImage       = PatchSeriesProcessor.LoadImage(htPath); % 'BlockImage', [blockId '-HT']);
+          end
+          
+          dispf(['Filtering Halftone Block:' fRTV fDPI fSPI fLPI fDEG fRF], meanTone, dpi, spi, lpi, deg, retinaFactor);
+          
+          PatchSeriesProcessor.SaveImage(retina(halftoneImage), 'BlockImage', [htBlockID '-HT-RF' int2str(retinaFactor)]);
+          
+        end
+      end
+    end
     
   end
   
@@ -106,10 +151,10 @@ function blockGrid = generateBlockGrid(meanTone, contrastRange, resolutionRange,
     for m = 1:resolutionSteps
       resolution              = resolutionRange(m);
       params.Patch.Resolution = resolution;
-            
-      patchID                 = PatchSeriesProcessor.GetParameterID(params);
       
-      if ~any(strcmpi(seriesTable(:,4), patchID)), continue; end;
+      patchID                 = PatchSeriesProcessor.GetParameterID(params, 'Contone');
+      
+      if ~any(strcmpi(seriesTable(:,5), patchID)), continue; end;
       
       blockGrid{m, n}         = patchID; %patchPath;
     end
@@ -118,7 +163,7 @@ end
 
 function blockImage = assembleBlockImage(blockGrid, meanTone)
   
-  import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor  
+  import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
   blockImages             = cell(size(blockGrid));
   
@@ -148,7 +193,7 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
   
   blockWidth              = (patchWidth+bufferWidth)*blockColumns;
   blockHeight             = patchHeight*blockRows;
-    
+  
   blockImage              = ones(blockHeight, blockWidth) .* (100-meanTone)/100;
   
   for m = 1:blockRows
@@ -157,7 +202,7 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
       if isempty(patchImage), continue; end;
       
       x1                  = 1+((n-1)*(patchWidth+bufferWidth));
-      x2                  = x1+patchWidth-1;      
+      x2                  = x1+patchWidth-1;
       y1                  = 1+((m-1)*patchHeight);
       y2                  = y1+patchHeight-1;
       
@@ -177,7 +222,7 @@ function blockImage = assembleBlockImage(blockGrid, meanTone)
     paddedBlock(pad+1:pad+blockHeight, pad+1:pad+blockWidth) = blockImage;
     blockImage            = paddedBlock;
   catch err
-    debugStamp;
+    debugStamp(err);
   end
   
   return;

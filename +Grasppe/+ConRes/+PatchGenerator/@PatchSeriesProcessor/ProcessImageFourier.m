@@ -18,12 +18,16 @@ function [FFT SRF FIMG IMG]  = ProcessImageFourier(img, bandParameters)
       
       if ischar(img{m}), IMG{m} = PatchSeriesProcessor.LoadImage(img{m});
       else IMG{m}               = img{m}; end
-      
-      if isreal(IMG{m}), FFT{m} = forwardFFT(IMG{m});
+            
+      if isreal(IMG{m})
+        if m==2
+          FFT{m} = forwardFFT(histeq(IMG{m}));
+        else
+          FFT{m} = forwardFFT(IMG{m});
+        end
       else FFT{m}               = IMG{m}; end
       
-      
-      if out2, SRF{m}           = Grasppe.Kit.ConRes.CalculateBandIntensity(FFT{m}, bandParameters{:}); end
+      if out2, SRF{m}           = Grasppe.Kit.ConRes.CalculateBandIntensity(FFT{m}, 75, bandParameters{2}); end
       if out3, FIMG{m}          = realImage(FFT{m}); end
     end
     

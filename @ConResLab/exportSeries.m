@@ -131,13 +131,18 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
     %% Patch Variables
     mPixels                 = mDPI*mScale/25.4; %
     mfR                     = Math.VisualResolution(mPPI) * 7;
-    mfQ                     = Math.FundamentalFrequency(mRES, [], mDPI); %mRES/mSize * mPixels; %mRES/mPixels * mSize/mPixels * 2;
+    mfQ                     = Math.FundamentalFrequency(mRES, mSize); % [], mDPI); %mRES/mSize * mPixels; %mRES/mPixels * mSize/mPixels * 2;
     [mBP mBW]               = Math.FrequencyRange(mSize, mPPI);
     
     %% Fundamental Data Row
-    fQRows                  = min(max(1, round(mfQ) + [0:9]), size(mtSRF, 1));
-    [fQMax fQRow]           = max(mtSRF(fQRows, bandMean));
-    fQRow                   = round(mfQ); % + fQRow;
+    fRow                    = Math.FundamentalRow(mtSRF, mfQ, bandMean);
+    % dataRows                = size(mtSRF, 1);
+    % fQRange                 = -1:+1;
+    % fQRows                  = round(mfQ) + fQRange;
+    % fQRows(fQRows<1)        = 1;
+    % fQRows(fQRows>dataRows) = dataRows;
+    % [fMax fIdx]             = max(mtSRF(fQRows, bandMean));
+    % fQRow                   = fQRows(fIdx); %round(mfQ); % + fQRow;
     
     [mCMPPath mCMPExists]   = PatchSeriesProcessor.GetResourcePath('Patch CompositeImage', htID, 'png');
     [mSRFPath mSRFExists]   = PatchSeriesProcessor.GetResourcePath('Patch SRFPlot', htID, 'png');
@@ -157,14 +162,14 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
       %% Composite Plots
       % columns: [band fftSum fltSum bandMean bandStd binaryStd]
       if ~mSRFExists || forceRenderSRF
-        mSRFPlots           = composePatchPlots(mSRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scSRF, htSRF, ctSRF, mtSRF);
+        mSRFPlots           = composePatchPlots(mSRFPath, mfQ, fRow, plotColumn, labelColumns, mW, mH, scSRF, htSRF, ctSRF, mtSRF);
         PatchSeriesProcessor.SaveImage(mSRFPlots, 'Patch SRFPlot', htID);
       else
         mSRFPlots           = imread(mSRFPath);
       end
       
       if ~mPRFExists || forceRenderPRF
-        mPRFPlots           = composePatchPlots(mPRFPath, mfQ, fQRow, plotColumn, labelColumns, mW, mH, scPRF, htPRF, ctPRF, mtPRF);
+        mPRFPlots           = composePatchPlots(mPRFPath, mfQ, fRow, plotColumn, labelColumns, mW, mH, scPRF, htPRF, ctPRF, mtPRF);
         PatchSeriesProcessor.SaveImage(mPRFPlots, 'Patch PRFPlot', htID);
       else
         mPRFPlots           = imread(mPRFPath);
@@ -175,7 +180,7 @@ function [ output_args ] = exportSeries(data) % SRF, Series )
     l1 = labelColumns(1);
     l2 = labelColumns(2);
     
-    lr = fQRow - 1;
+    lr = fRow - 1;
     
     % sumTable(m, :)          = [ ... % mRTV mCON mRES mfQ ...
     %   scSRF(lr, l1) htSRF(lr, l1) ctSRF(lr, l1) mtSRF(lr, l1) ...
@@ -257,7 +262,7 @@ function [patchData] = processPatchData(varargin)
   
 end
 
-function [patchPlot] = composePatchPlots(imagePath, fQ, fQRow, P, plotColumns, W, H, varargin)
+function [patchPlot] = composePatchPlots(imagePath, fQ, fRow, P, plotColumns, W, H, varargin)
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
@@ -290,7 +295,7 @@ function [patchPlot] = composePatchPlots(imagePath, fQ, fQRow, P, plotColumns, W
   dataTable     = varargin;
   rowOffset     = 2-1;
   % E       = 0;
-  fQRow         = fQRow-rowOffset-1;
+  fRow         = fRow-rowOffset-1;
   
   %% Process Data
   for n = 1:numel(dataTable)
@@ -343,7 +348,7 @@ function [patchPlot] = composePatchPlots(imagePath, fQ, fQRow, P, plotColumns, W
   %% Fundamental Data
   vData   = [];
   for n = 1:numel(dataTable)
-    vData = [vData reshape(dataTable{n}(  min(fQRow, size(dataTable{n},1)  ), plotColumns),[],1)];
+    vData = [vData reshape(dataTable{n}(  min(fRow, size(dataTable{n},1)  ), plotColumns),[],1)];
   end
   
   [fR fE] = sciparts(reshape(vData, [], 1));
@@ -372,7 +377,7 @@ function [patchPlot] = composePatchPlots(imagePath, fQ, fQRow, P, plotColumns, W
   
     
   %% Fundamental Line %round(fQ)-D %round(fQ)-D
-  line([fQRow fQRow]+1, yl, [0 0]-50, 'Color', [0.8 0 0], 'Parent', hAxes, lineOpts{:}, 'LineWidth', lineScale*2);  
+  line([fRow fRow]+1, yl, [0 0]-50, 'Color', [0.8 0 0], 'Parent', hAxes, lineOpts{:}, 'LineWidth', lineScale*2);  
 
   
   text(max(xl)*0.95, max(yl)*0.95, 0, fStr, 'Parent', hAxes, 'HorizontalAlignment', 'right', ...

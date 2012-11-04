@@ -5,7 +5,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor; % PatchSeriesProcessor
   
   global forceGenerateFFT;
-
+  
   forceGenerateFFT          = isequal(forceGenerateFFT, true); %false;
   imageTypes                = {'halftone', 'screen', 'contone', 'monotone'};
   halftoneOutput            = true;
@@ -111,7 +111,13 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
     dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
     mStepper            = Grasppe.Kit.Stepper();
     
-    parfor m = seriesRange % for m = seriesRange
+    % matlabpool open;
+    
+    seriesID            = PatchSeriesProcessor.SeriesID();
+    
+    for m = seriesRange % for m = seriesRange
+      
+      PatchSeriesProcessor.SeriesID(seriesID);
       
       mStep             = mStepper.step(); %s;
       
@@ -190,7 +196,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
           [FFT SRF FIMG]      = PatchSeriesProcessor.ProcessImageFourier( ...
             screenPaths(screenIdx,:), bandParameters);  % debugStamp(sprintf('Trying to save screen FFT (%s)', screenID), 5);
           
-          saveData(fdtPath, FFT);
+          saveFFTData(fdtPath, FFT);
           
           IMG                 = generateFourierImages(FIMG);
           
@@ -222,7 +228,7 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
           [FFT SRF FIMG]      = PatchSeriesProcessor.ProcessImageFourier( ...
             contonePaths(contoneIdx,:), bandParameters);  % debugStamp(sprintf('Trying to save contone FFT (%s)', contoneID), 5);
           
-          saveData(fdtPath, FFT);
+          saveFFTData(fdtPath, FFT);
           
           IMG                 = generateFourierImages(FIMG);
           
@@ -247,11 +253,11 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
         
         [fdtPath fdtExists] = PatchSeriesProcessor.GetResourcePath('Monotone FFTData', monotoneID, 'mat');
         
-        if ~(monotoneSRFAvailable && fftExists && ~isempty(SRF)  && fdtExists)
+        if ~(monotoneSRFAvailable && fftExists && ~isempty(SRF) && fdtExists)
           [FFT SRF FIMG]      = PatchSeriesProcessor.ProcessImageFourier( ...
             monotonePaths(monotoneIdx,:), bandParameters); % debugStamp(sprintf('Trying to save monotone FFT (%s)', monotoneID), 5);
           
-          saveData(fdtPath, FFT);
+          saveFFTData(fdtPath, FFT);
           
           IMG                 = generateFourierImages(FIMG);
           
@@ -275,6 +281,8 @@ function series = GenerateSeriesFFT(series, grids, fields, processors, parameter
   end
   
   try delete(mStepper); end
+  
+  dispf('Outputting Series FFT... %d of %d', seriesRows, seriesRows);
   
   screenSRFTable              = screenSRFTable(screenIdxs, :);
   contoneSRFTable             = contoneSRFTable(contoneIdxs, :);
@@ -302,6 +310,28 @@ end
 function saveData(pth, data)
   save(pth, 'data');
   Grasppe.ConRes.File.UpdateTimeStamp(pth);
+end
+
+function saveFFTData(pth, FFT)
+  data = cropFFTData(FFT);
+  saveData(pth, data);
+end
+
+function data = cropFFTData(FFT)
+  mWidth = 200;
+  for m = 1:numel(FFT)
+    try
+      y1      = round((size(FFT{m},1)-mWidth)/2);
+      y2      = y1+mWidth;
+      
+      x1      = round((size(FFT{m},2)-mWidth)/2);
+      x2      = x1+mWidth;
+      
+      data{m} = FFT{m}(y1:y2, x1:x2);
+    catch err
+      debugStamp(err);
+    end
+  end  
 end
 
 function IMG = generateFourierImages(FFT)

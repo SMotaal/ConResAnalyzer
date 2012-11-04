@@ -1,8 +1,11 @@
+import Grasppe.ConRes.FX;
+
 dataColumn = 4;
 
 retinaValue = 15;
 
-retina = @(x) gaussian(x, retinaValue*3/2, retinaValue/2);
+%retina = @(x) gaussian(x, retinaValue*3/2, retinaValue/2);
+retina = @(x) FX.Retina(x, retinaValue); % retina  = @(x) gaussian(x, HR); %disk(x, HR);
 
 figure
 

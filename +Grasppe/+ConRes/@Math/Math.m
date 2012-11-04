@@ -6,7 +6,8 @@ classdef Math
   end
   
   methods (Static)
-    F           = FundamentalFrequency(resolution, diameter, ppi);
+    [fQ]        = FundamentalFrequency(lpmm, mm);
+    [row]       = FundamentalRow( dataTable, row, column, rowRange);    
     [B W]       = FrequencyRange(diameter, ppi);
     [Lp Lm]     = VisualResolution(ppi, va, vd);
   end

@@ -1,7 +1,8 @@
 function data = LoadSeriesData(seriesID, varargin)
   
   import Grasppe.ConRes.PatchGenerator.PatchSeriesProcessor;
-  PatchSeriesProcessor.SeriesID('Series104d');
+  
+  PatchSeriesProcessor.SeriesID(seriesID);
   
   data = PatchSeriesProcessor.LoadData(varargin{:});
   

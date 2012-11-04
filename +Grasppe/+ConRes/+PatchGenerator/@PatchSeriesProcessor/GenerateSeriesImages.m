@@ -66,12 +66,18 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
   seriesStruct(1:2:end)         = fieldNames;
   seriesParameters(seriesRange) = struct(seriesStruct{:});
   seriesVariables(seriesRange)  = struct('Metrics', [], 'Process', []);
-
+  
   %% Determine loop and display steps
   dSteps              = min(50, max(round(numel(seriesRange)/50)*5, 10));
   mStepper            = Grasppe.Kit.Stepper();
   
-  for m = seriesRange % for m = seriesRange
+  % matlabpool open;
+  
+  seriesID            = PatchSeriesProcessor.SeriesID();
+  
+  parfor m = seriesRange % for m = seriesRange
+    
+    PatchSeriesProcessor.SeriesID(seriesID);
     
     mStep             = mStepper.step(); %s;
     
@@ -118,10 +124,10 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     patchSize                 = parameters.Patch.Size;
     imageResolution           = parameters.Scan.Resolution*parameters.Scan.Scale/100;
     
-    pixelAcuity               = Math.VisualResolution(imageResolution) * 7;
-    fundamentalFrequency      = Math.FundamentalFrequency(patchResolution, patchSize , imageResolution);
+    pixelAcuity               = Math.VisualResolution(imageResolution);
+    fundamentalFrequency      = Math.FundamentalFrequency(patchResolution, patchSize); % , imageResolution);
     [B W]                     = Math.FrequencyRange(patchSize, imageResolution);
-
+    
     metrics.BandParameters    = [B W];
     metrics.PixelAcuity       = pixelAcuity;
     metrics.Fundamental       = fundamentalFrequency;
@@ -135,7 +141,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
     %     pixelAcuity               = pixelResolution*retinalResolution*7;
     
     %% Detemine IDs
-    halftoneID                = PatchSeriesProcessor.GetParameterID(parameters);
+    halftoneID                = PatchSeriesProcessor.GetParameterID(parameters, 'halftone');
     screenID                  = [];
     contoneID                 = [];
     monotoneID                = [];
@@ -159,7 +165,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
           screenImage           = PatchSeriesProcessor.LoadImage('screen', screenID);
           screenRetina          = PatchSeriesProcessor.LoadImage('screen retinaImage', screenID);
         end
-
+        
         if ~forceGenerateImages && contoneOutput
           contoneImage          = PatchSeriesProcessor.LoadImage('contone', contoneID);
           contoneRetina         = PatchSeriesProcessor.LoadImage('contone retinaImage', contoneID);
@@ -168,7 +174,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
           monotoneImage         = PatchSeriesProcessor.LoadImage('monotone', monotoneID);
           monotoneRetina        = PatchSeriesProcessor.LoadImage('monotone retinaImage', monotoneID);
         end
-
+        
         if ~forceGenerateImages
           generateImages        = false;
         end
@@ -243,7 +249,7 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
       [pths imgs]             = processImages(referenceImage, 'monotone', monotoneID, outFlags{:});
       monotonePaths(m,:)      = pths(:);
     end
-        
+    
     
     try variables.Process     = output.Variables; end
     seriesVariables(m)        = variables;
@@ -256,10 +262,12 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
       try delete(scanProcessor);    end
       try delete(output);           end
       try delete(screenImage);      end
-    end    
+    end
   end
   
   try delete(mStepper); end
+  
+  dispf('Indexing Series Images... %d of %d', seriesRows, seriesRows);
   
   %% References
   screenIDs                   = screenIDs(screenIdxs);
@@ -290,23 +298,24 @@ function series = GenerateSeriesImages(grids, fields, processors, parameters, ta
 end
 
 % function m = mStep(m)
-%   
+%
 %   persistent M;
-%   
+%
 %   if nargin>0, M = m;
 %   else
 %     if isempty(M), M = 0; end
 %     M = M +1;
 %   end
-%   
+%
 %   m = M;
-%   
+%
 % end
 
 function [pths imgs] = processImages(src, type, id, retinalAccuity, imageOut)
   
   import(eval(NS.CLASS)); % PatchSeriesProcessor
-
+  import Grasppe.ConRes.FX;
+  
   try
     pths                    = cell(1, 2);
     imgs                    = cell(1, 2);
@@ -331,8 +340,9 @@ function [pths imgs] = processImages(src, type, id, retinalAccuity, imageOut)
     if ~retinaOut, return; end
     
     disk                    = @(x, y) imfilter(x,fspecial('disk',y),'replicate');
+    retina                  = @(x) FX.Retina(x, retinalAccuity);
     
-    imgs(2)                 = {disk(imgs{1}, retinalAccuity)};
+    imgs(2)                 = {retina(imgs{1})}; %{disk(imgs{1}, retinalAccuity)};
     pths(2)                 = {PatchSeriesProcessor.SaveImage(imgs{2}, [type ' retinaImage'], id)};
   catch err
     debugStamp(err, 1);

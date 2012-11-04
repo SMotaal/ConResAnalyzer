@@ -6,11 +6,21 @@ function str = GetParameterID(parameters, type)
   
   if ~exist('type', 'var'), type = 'normal'; end
   
+  blockMode   = false;
+  
+  try
+    [type mode]   = strtok(type);
+    [mode ext]    = strtok(mode);
+    
+    if isequal(lower(mode), 'block')
+      blockMode   = true;
+    end
+  end
+  
   switch lower(type)
     case {'screen', 'scr', 's'}
       codes.Patch.(Patch.MEANTONE)    = {'RTV', 2,  3,  1,    []  };
       codes.Patch.(Patch.SIZE)        = {'MM',  3,  3,  100,  []  };
-      % codes.Screen.(Screen.PPI)       = {'PPI', 4,  4,  1,    []  };
       codes.Screen.(Screen.SPI)       = {'SPI', 4,  4,  1,    []  };
       codes.Screen.(Screen.LPI)       = {'LPI', 3,  3,  1,    []  };
       codes.Screen.(Screen.ANGLE)     = {'DEG', 3,  3,  10,   []  };
@@ -22,22 +32,28 @@ function str = GetParameterID(parameters, type)
       codes.Scan.(Scan.SCALE)         = {'X',   3,  4,  1,    100 };
     case {'contone', 'cont', 'con', 'c'}
       codes.Patch.(Patch.MEANTONE)    = {'RTV', 2,  3,  1,    []  };
-      codes.Patch.(Patch.CONTRAST)    = {'CON', 3,  3,  10,   []  };
-      codes.Patch.(Patch.RESOLUTION)  = {'RES', 3,  3,  100,  []  };
+      if ~blockMode
+        codes.Patch.(Patch.CONTRAST)  = {'CON', 3,  3,  10,   []  };
+        codes.Patch.(Patch.RESOLUTION)= {'RES', 3,  3,  100,  []  };
+      end
       codes.Patch.(Patch.SIZE)        = {'MM',  3,  3,  100,  []  };
       codes.Screen.(Screen.SPI)       = {'SPI', 4,  4,  1,    []  };
       codes.Scan.(Scan.DPI)           = {'DPI', 4,  4,  1,    []  };
       codes.Scan.(Scan.SCALE)         = {'X',   3,  4,  1,    100 };
     case {'monotone', 'mono', 'm'}
-      codes.Patch.(Patch.RESOLUTION)  = {'RES', 3,  3,  100,  []  };
+      if ~blockMode
+        codes.Patch.(Patch.RESOLUTION)= {'RES', 3,  3,  100,  []  };
+      end      
       codes.Patch.(Patch.SIZE)        = {'MM',  3,  3,  100,  []  };
       codes.Screen.(Screen.SPI)       = {'SPI', 4,  4,  1,    []  };
       codes.Scan.(Scan.DPI)           = {'DPI', 4,  4,  1,    []  };
       codes.Scan.(Scan.SCALE)         = {'X',   3,  4,  1,    100 };
     otherwise
       codes.Patch.(Patch.MEANTONE)    = {'RTV', 2,  3,  1,    []  };
-      codes.Patch.(Patch.CONTRAST)    = {'CON', 3,  3,  10,   []  };
-      codes.Patch.(Patch.RESOLUTION)  = {'RES', 3,  3,  100,  []  };
+      if ~blockMode
+        codes.Patch.(Patch.CONTRAST)  = {'CON', 3,  3,  10,   []  };
+        codes.Patch.(Patch.RESOLUTION)= {'RES', 3,  3,  100,  []  };
+      end      
       codes.Patch.(Patch.SIZE)        = {'MM',  3,  3,  100,  []  };
       
       %% Screen codes

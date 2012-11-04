@@ -25,6 +25,8 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
     
     function sandbox(obj, params, output)
       
+      import Grasppe.ConRes.FX;
+      
       %debugging = true;
       
       try
@@ -63,7 +65,7 @@ classdef UserFunction < Grasppe.ConRes.PatchGenerator.Processors.ImageProcessor
         gaussian      = @(x, y)     imfilter(x,fspecial('gaussian',round(y*3/2), y/2),'replicate');
         
         HR            = 10;
-        retina        = @(x)        gaussian(x, evalin('caller', 'HumanFactor'));
+        retina        = @(x)        FX.Retina(x, evalin('caller', 'HumanFactor')); %@(x)        gaussian(x, evalin('caller', 'HumanFactor'));
         
         retinaFFT     = @(x)        fFFT(retina(x));
         

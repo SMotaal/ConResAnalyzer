@@ -338,6 +338,7 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
     function output = RunSeries(obj, seriescode, varargin)
       
       import(eval(NS.CLASS));
+      import Grasppe.ConRes.FX;
       
       obj.ResetProcess();
       obj.prepareTasks('Patch Series Export');
@@ -628,8 +629,9 @@ classdef PatchGeneratorProcessor < Grasppe.Occam.Process
             
             dataColumn = 4;
             
-            fFFT    = @(varargin) forwardFFT(varargin{:});
-            retina  = @(x) gaussian(x, HR); %disk(x, HR);
+            fFFT          = @(varargin) forwardFFT(varargin{:});
+            
+            retina        = @(x)        FX.Retina(x, HR); % retina  = @(x) gaussian(x, HR); %disk(x, HR);
             
             
             %% Patch Images Processing
