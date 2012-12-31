@@ -252,6 +252,9 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      *  @param fiducialIDs
      */
     public void setFiducialIDs(String[] fiducialIDs) {
+    	for (String fiducialID : fiducialIDs) {
+    		fiducialID = fiducialID.trim();
+    	}
         this.fiducialIDs = fiducialIDs;
     }
 
@@ -307,6 +310,6 @@ public class TargetDefinitionFile extends CaseFile implements IConResTargetDefin
      *  @param name
      */
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 }

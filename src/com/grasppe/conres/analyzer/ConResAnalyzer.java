@@ -53,7 +53,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
 	}
 
 /** Field description */
-  public static final String     BUILD = "0.2a-05";
+  public static final String     BUILD = "0.2a-06";
   protected MatLabManager 		 matLabManager;
   protected CaseManager          caseManager;
   protected TargetManager        targetManager;

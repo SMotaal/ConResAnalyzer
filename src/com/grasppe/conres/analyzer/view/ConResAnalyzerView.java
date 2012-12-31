@@ -19,6 +19,8 @@ import com.grasppe.conres.framework.cases.view.CaseView;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractCommand.Types;
+import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.components.AbstractModel;
 import com.grasppe.lure.components.AbstractView;
 import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
@@ -176,8 +178,11 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
   public void createView() {
 
     if (mainFrame != null) return;
+    
+    String    applicationTitle = "ConResAnalyzer (" + ConResAnalyzer.BUILD + ")";    
 
-    mainFrame = new JFrame("Tags");
+    mainFrame = new JFrame(applicationTitle);
+    
 
     // mainFrame.setUndecorated(true);
 

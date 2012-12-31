@@ -24,7 +24,21 @@ import java.io.File;
  */
 public class CaseModel {
 
-    /** Field description */
+    /**
+	 * @return the isModified
+	 */
+	public boolean isModified() {
+		return isModified;
+	}
+
+	/**
+	 * @param isModified the isModified to set
+	 */
+	public void setModified(boolean isModified) {
+		this.isModified = isModified;
+	}
+
+	/** Field description */
     public String	path;
 
     /** Field description */
@@ -41,6 +55,8 @@ public class CaseModel {
 
     /** Field description */
     public boolean	filesLoaded = false;
+    
+    public boolean isModified = false;
 
     /**
      *  @return
