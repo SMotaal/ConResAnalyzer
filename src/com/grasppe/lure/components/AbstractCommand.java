@@ -278,6 +278,29 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
      */
     @Override
     protected void finalize() throws Throwable {
+    	GrasppeKit.debugText("Finalizing", getClass().getSimpleName() , 1);
+//        try {
+//            model.detachObserver(this);
+//            observers.detachObservers();
+//            
+//            GrasppeKit.debugText("Command Finalize/Detatch Succeeded",
+//                                 model.getClass().getSimpleName() + " is no longer attached to "
+//                                 + GrasppeKit.lastSplit(toString()), dbg);
+//        } catch (Exception e) {
+//
+//            // Command has no model and can finalize immediately
+//            GrasppeKit.debugText("Command Finalize/Detatch Unnecessary",
+//                                 "No models were attached to " + GrasppeKit.lastSplit(toString()),
+//                                 2);
+//        }
+    	
+    	detatch();
+
+        super.finalize();
+    }
+    
+    public void detatch() {
+    	GrasppeKit.debugText("Detatching", getClass().getSimpleName() , 1);
         try {
             model.detachObserver(this);
             observers.detachObservers();
@@ -292,8 +315,7 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
                                  "No models were attached to " + GrasppeKit.lastSplit(toString()),
                                  2);
         }
-
-        super.finalize();
+        
     }
 
     /**
@@ -524,6 +546,9 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
 
         /** Field description */
         public static final String	FILE = "file";
+        
+        /** Field description */
+        public static final String	CASE = "case";        
 
         /** Field description */
         public static final String	EDIT = "edit";
@@ -540,4 +565,11 @@ public class AbstractCommand extends AbstractAction implements Observer, Observa
         /** Field description */
         public static final String	HELP = "help";
     }
+
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

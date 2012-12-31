@@ -14,6 +14,7 @@ import ij.io.FileInfo;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import com.grasppe.lure.components.ObservableObject;
 import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.awt.Window;
@@ -65,12 +66,13 @@ public class GrasppeKit {
     public static final JFrame	commonFrame = new JFrame();
 
     /** Field description */
-    public static boolean	debugNatively             = true;
+    public static boolean	debugNatively             = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().indexOf("-agentlib:jdwp") > 0; //true;
     private static boolean	isHooked                  = false;
     private static boolean	runningJar                = checkRunningJar();
     private static boolean	windowOpactiyNotSupported = false;
     
     public static final String FIELD_SEPARATOR = "[ ]+|\t"; //"\\s+";
+    
 
     /**
      * Constructs an instance of this class but is meant to be used internally only, it is made public for convenience.
@@ -829,7 +831,7 @@ public class GrasppeKit {
         String	output = (lText + "\t" + text + "\t" + getCallerLink(caller));
 
         if (debugNatively) System.out.println(output);
-        else IJ.showMessage(output);
+        // else IJ.showMessage(output);
     }
 
     /**
@@ -882,8 +884,9 @@ public class GrasppeKit {
      *  @param level
      */
     private static void debugTextOut(String text, int level) {
-        if ((level == 0) &&!debugCheckDefault()) return;
+        if ((level == 0) && !debugNatively && !debugCheckDefault()) return;
         else if ((level > 0) &&!debugCheckLevel(level)) return;
+        
         debugOutput(text, "L", level);
     }
 
@@ -1526,6 +1529,7 @@ public class GrasppeKit {
          * Method called by observable object during notifyObserver calls.
          */
         public void update();
+        public void detatch(Observable oberservableObject);
     }
 
 

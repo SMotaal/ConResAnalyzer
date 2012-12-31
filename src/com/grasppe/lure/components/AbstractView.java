@@ -27,134 +27,177 @@ import javax.swing.JFrame;
  */
 public abstract class AbstractView extends DebuggableComponent implements Observer {
 
-    protected ArrayList<Component>		viewComponents  = new ArrayList<Component>();
-    int									dbg                 = 0;
-    
+  protected ArrayList<Component> viewComponents = new ArrayList<Component>();
+  int                            dbg            = 0;
 
-//  private static JMenuBar                           menuBar             = null;
+//private static JMenuBar                           menuBar             = null;
 
-    /**
-     * @param controller
-     */
-    public AbstractView(AbstractController controller) {
-        super();
-        this.controller = controller;
+  /**
+   * @param controller
+   */
+  public AbstractView(AbstractController controller) {
+    super();
+    this.controller = controller;
 
-        if (getModel() != null) {
-            getModel().attachView(this);
-            updateDebugView();
-            update();
-        }
-
+    if (getModel() != null) {
+      getModel().attachView(this);
+      updateDebugView();
+      update();
     }
 
-    
+  }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#finalize()
-     */
+  /**
+   *    @throws Throwable
+   */
+  public void detatch() throws Throwable {
+    GrasppeKit.debugText("Detatching", getClass().getSimpleName(), 1);
 
-    /**
-     * 	@throws Throwable
-     */
-    @Override
-    public void finalize() throws Throwable {
+    try {
+      if (!viewComponents.isEmpty()) {
         for (Component component : viewComponents) {
-            try {
-                if (component instanceof JFrame) {
-                    ((JFrame)component).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    component.setVisible(false);
-                }
+          GrasppeKit.debugText("Detatching", component.getClass().getSimpleName(), 1);
 
-                Container	parent = component.getParent();
-
-                if (parent != null) {
-                    component.getParent().remove(component);
-                }
-            } catch (Exception exception) {
-                GrasppeKit.debugError("Terminating View Components", exception, 2);
+          try {
+            if (component instanceof JFrame) {
+              ((JFrame)component).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+              component.setVisible(false);
             }
+
+            Container parent = component.getParent();
+
+            if (parent != null) {
+              component.getParent().remove(component);
+            }
+          } catch (Exception exception) {
+            GrasppeKit.debugError("Detatching View Components", exception, 1);
+          }
         }
+      }
 
-        getModel().detachView(this);
+      getModel().detachView(this);
+      detachObservers();
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Detatching View", exception, 1);
+    }
 
-//      notifyObservers();
-        detachObservers();
+    super.detatch();
 
-//      Iterator<Observer> observerIterator = observers.getIterator();
-//
-//      while (observerIterator.hasNext()) {
-//          try {
-//              detachObserver(observerIterator.next());
-//          } catch (Exception exception) {
-//              GrasppeKit.debugError("Detaching View Observers", exception, 2);
+//  notifyObservers();
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see java.lang.Object#finalize()
+   */
+
+  /**
+   *  @throws Throwable
+   */
+  @Override
+  public void finalize() throws Throwable {
+    GrasppeKit.debugText("Finalizing", getClass().getSimpleName(), 1);
+
+//  for (Component component : viewComponents) {
+//      try {
+//          if (component instanceof JFrame) {
+//              ((JFrame)component).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//              component.setVisible(false);
 //          }
+//
+//          Container parent = component.getParent();
+//
+//          if (parent != null) {
+//              component.getParent().remove(component);
+//          }
+//      } catch (Exception exception) {
+//          GrasppeKit.debugError("Terminating View Components", exception, 2);
 //      }
-        super.finalize();
-    }
-    
-    protected void setComponentFocus(Container container) {
-        for (Component component : container.getComponents()) {
-        	if (component instanceof Container)
-        		setComponentFocus((Container)component);
-        	component.setFocusable(false);
-        }
-    }
+//  }
+//
+//  getModel().detachView(this);
+//
+////notifyObservers();
+//  detachObservers();
+//
+////Iterator<Observer> observerIterator = observers.getIterator();
+////
+////while (observerIterator.hasNext()) {
+////    try {
+////        detachObserver(observerIterator.next());
+////    } catch (Exception exception) {
+////        GrasppeKit.debugError("Detaching View Observers", exception, 2);
+////    }
+////}
 
-    /**
-     * Method called by observable object during notifyObserver calls.
-     */
+    detatch();
 
-    public void update() {
-        if (debugPanel != null) updateDebugView();
+    super.finalize();
+  }
+
+  /**
+   * Method called by observable object during notifyObserver calls.
+   */
+
+  public void update() {
+    if (debugPanel != null) updateDebugView();
+  }
+
+  /**
+   *  @return
+   */
+  protected final AbstractModel getControllerModel() {
+    return controller.getModel();
+  }
+
+  /**
+   *    @param container
+   */
+  protected void setComponentFocus(Container container) {
+    for (Component component : container.getComponents()) {
+      if (component instanceof Container) setComponentFocus((Container)component);
+      component.setFocusable(false);
     }
+  }
 
-    /**
-     *  @return
-     */
-    protected final AbstractModel getControllerModel() {
-        return controller.getModel();
-    }
-
-//  /**
-//   *    @param frame
-//   */
-//  public void setFrameMenu(JFrame frame) {
-//    if (!frame.isFocused()) return;
-//    if (frame == null || (getMenuBar() == null && menuBar==null)) return;
+///**
+// *    @param frame
+// */
+//public void setFrameMenu(JFrame frame) {
+//  if (!frame.isFocused()) return;
+//  if (frame == null || (getMenuBar() == null && menuBar==null)) return;
 ////      if (frame.getJMenuBar()!=getMenuBar())
-//    JMenuBar thisBar = null;
-//    if (getMenuBar() == null && menuBar!=null)
-//        thisBar = menuBar; // frame.setJMenuBar(menuBar);
-//    else if (getMenuBar() != null && menuBar==null)
-//        thisBar = getMenuBar(); // frame.setJMenuBar(getMenuBar());
-//    else if (getMenuBar() != null && menuBar!=null)
-//        thisBar = getMenuBar();
+//  JMenuBar thisBar = null;
+//  if (getMenuBar() == null && menuBar!=null)
+//      thisBar = menuBar; // frame.setJMenuBar(menuBar);
+//  else if (getMenuBar() != null && menuBar==null)
+//      thisBar = getMenuBar(); // frame.setJMenuBar(getMenuBar());
+//  else if (getMenuBar() != null && menuBar!=null)
+//      thisBar = getMenuBar();
 ////      else
 ////          return;
 ////      Container container = thisBar.getTopLevelAncestor();
 ////      if (container!=null)
 ////          container.remove(thisBar);
-//    
-//    JMenuBar frameBar = new JMenuBar();
-//    for(int i = 0; i < thisBar.getMenuCount(); i ++) {
-//        JMenu thisMenu = thisBar.getMenu(i);
-//        JMenu frameMenu = new JMenu(frameBar.add(thisBar.getMenu(i)).getText());
-//        for (int c = 0; c < thisMenu.getMenuComponentCount(); c++) {
-//            frameMenu.add(thisMenu.getMenuComponent(c));
-//            
-//        }
-//        frameBar.add(frameMenu);
-//    }
-//    
-//    frame.setJMenuBar(frameBar);
+//  
+//  JMenuBar frameBar = new JMenuBar();
+//  for(int i = 0; i < thisBar.getMenuCount(); i ++) {
+//      JMenu thisMenu = thisBar.getMenu(i);
+//      JMenu frameMenu = new JMenu(frameBar.add(thisBar.getMenu(i)).getText());
+//      for (int c = 0; c < thisMenu.getMenuComponentCount(); c++) {
+//          frameMenu.add(thisMenu.getMenuComponent(c));
+//          
+//      }
+//      frameBar.add(frameMenu);
 //  }
+//  
+//  frame.setJMenuBar(frameBar);
+//}
 //
-//  /**
-//   * @param menuBar the menuBar to set
-//   */
-//  public void setMenuBar(JMenuBar menuBar) {
-//      this.menuBar = menuBar;
-//  }
+///**
+// * @param menuBar the menuBar to set
+// */
+//public void setMenuBar(JMenuBar menuBar) {
+//    this.menuBar = menuBar;
+//}
 }

@@ -25,140 +25,164 @@ import java.util.Set;
  */
 public class Observers implements Observable {
 
-    protected Observable	observable;
-    protected boolean		updating = false;
-    int dbg = 0;
+  protected Observable observable;
+  protected boolean    updating = false;
+  int                  dbg      = 0;
 
-    /** Field description */
-    protected Set<Observer>	observerSet = new HashSet<Observer>();
+  /** Field description */
+  protected Set<Observer> observerSet = new HashSet<Observer>();
 
-    /**
-     */
-    private Observers() {
-        super();
+  /**
+   */
+  private Observers() {
+    super();
+  }
+
+  /**
+   *  @param observable
+   */
+  public Observers(Observable observable) {
+    this.observable = observable;
+  }
+
+  /**
+   * @param observer
+   */
+  public void attachObserver(Observer observer) {
+    if (observable == observer) return;
+
+    if (observerSet.contains(observer)) return;
+
+    GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()), dbg);
+    observerSet.add(observer);
+    notifyObservers();
+  }
+
+  /**
+   * @param observer
+   */
+  public void detachObserver(Observer observer) {
+    notifyDetatchObserver(observer);
+    observerSet.remove(observer);
+    notifyObservers();
+  }
+
+  /**
+   */
+  public void detachObservers() {
+    GrasppeKit.debugText("Detaching Observers", getClass().getSimpleName(), 1);
+    notifyDetatchObservers();
+    observerSet.clear();
+    // notifyObservers();
+  }
+
+  /**
+   * 	@param observer
+   */
+  public void notifyDetatchObserver(Observer observer) {
+    try {
+      if (observer != null) observer.detatch(observable);
+      GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()), dbg);
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()), exception, dbg);
     }
 
-    /**
-     *  @param observable
-     */
-    public Observers(Observable observable) {
-        this.observable = observable;
+  }
+
+  /**
+   */
+  public void notifyDetatchObservers() {
+    Iterator<Observer> observerIterator = observerSet.iterator();
+
+    while (observerIterator.hasNext()) {
+      try {
+
+        // Observer observer = observerIterator.next();
+        notifyDetatchObserver(observerIterator.next());
+      } catch (Exception exception) {
+        GrasppeKit.debugError("Notifying Observers", exception, 1);
+      }
     }
 
-    /**
-     * @param observer
-     */
-    public void attachObserver(Observer observer) {
-        if (observable == observer) return;
-        
-        if (observerSet.contains(observer)) return;
+  }
 
-        GrasppeKit.debugText("Observer Attaching", GrasppeKit.lastSplit(observer.toString()),dbg);
-        observerSet.add(observer);
-        notifyObservers();
-    }
-    
-    public void detachObservers() {
-		Iterator<Observer> observerIterator = observerSet.iterator();
+  /**
+   *  @param observer
+   */
+  public void notifyObserver(Observer observer) {
+    observer.update();
+  }
 
-		while (observerIterator.hasNext()) {
-			try {
-				Observer observer = observerIterator.next();
-				if (observer!=null)
-					detachObserver(observer);
-			} catch (Exception exception) {
-				GrasppeKit.debugError("Detaching Observers", exception, 2);
-			}
-		}
+  /**
+   */
+  public void notifyObservers() {
 
+    if (updating) {
+      return;
     }
 
-    /**
-     * @param observer
-     */
-    public void detachObserver(Observer observer) {
-        GrasppeKit.debugText("Observer Detaching" + GrasppeKit.lastSplit(observer.toString()),dbg);
-        observerSet.remove(observer);
-        notifyObservers();
-    }
+    updating = true;
 
-    /**
-     *  @param observer
-     */
-    public void notifyObserver(Observer observer) {
-        observer.update();
-    }
+    try {
 
-    /**
-     */
-    public void notifyObservers() {
-
-        if (updating) {
-        	return;
-        }
-
-        updating = true;
+      for (Object object : observerSet) {
+        Observer observer = (Observer)object;
 
         try {
-
-            for (Object object : observerSet) {
-                Observer	observer = (Observer)object;
-
-                try {
-                    if (observable == null) notifyObserver(observer);
-                    else observable.notifyObserver(observer);
-                } catch (Exception exception) {
-                    observerSet.remove(observer);
-
-                    exception.printStackTrace();
-                }
-            }
-        } catch (ConcurrentModificationException exception) {}
-
-        updating = false;
-    }
-
-    /**
-     *  @return
-     */
-    public String toString() {
-
-        LinkedHashSet<String>	obsererStrings = new LinkedHashSet<String>();
-
-        try {
-            observerSet.toArray();
-            for (Object object : observerSet)
-                obsererStrings.add(((Observer)object).getClass().getSimpleName());
+          if (observable == null) notifyObserver(observer);
+          else observable.notifyObserver(observer);
         } catch (Exception exception) {
-            exception.printStackTrace();
+          observerSet.remove(observer);
+
+          exception.printStackTrace();
         }
+      }
+    } catch (ConcurrentModificationException exception) {}
 
-        String	observersText = "" + observerSet.size() + ((observerSet.size() > 1) ? " observers"
-                : " observer");
+    updating = false;
+  }
 
-        if (obsererStrings.size() > 0) observersText += ": " + GrasppeKit.cat(obsererStrings, ", ");
+  /**
+   *  @return
+   */
+  public String toString() {
 
-        return observersText;
+    LinkedHashSet<String> obsererStrings = new LinkedHashSet<String>();
+
+    try {
+      observerSet.toArray();
+      for (Object object : observerSet)
+        obsererStrings.add(((Observer)object).getClass().getSimpleName());
+    } catch (Exception exception) {
+      exception.printStackTrace();
     }
 
-    /**
-     *  @return
-     */
-    public Iterator<Observer> getIterator() {
-        return observerSet.iterator();		// new HashSet<Observer>(observerSet).iterator();
-    }
+    String observersText = "" + observerSet.size() + ((observerSet.size() > 1) ? " observers"
+                                                                               : " observer");
 
-    /**
-     * @return the observerSet
-     */
-    public Set<Observer> getObserverSet() {
-        return observerSet;
-    }
+    if (obsererStrings.size() > 0) observersText += ": " + GrasppeKit.cat(obsererStrings, ", ");
 
-    /**
-     * @param observerSet the observerSet to set
-     */
-    public void setObserverSet(Set<Observer> observerSet) {
-        this.observerSet = observerSet;
-    }
+    return observersText;
+  }
+
+  /**
+   *  @return
+   */
+  public Iterator<Observer> getIterator() {
+    return observerSet.iterator();		// new HashSet<Observer>(observerSet).iterator();
+  }
+
+  /**
+   * @return the observerSet
+   */
+  public Set<Observer> getObserverSet() {
+    return observerSet;
+  }
+
+  /**
+   * @param observerSet the observerSet to set
+   */
+  public void setObserverSet(Set<Observer> observerSet) {
+    this.observerSet = observerSet;
+  }
 }

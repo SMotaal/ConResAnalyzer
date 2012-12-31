@@ -8,6 +8,8 @@
 
 package com.grasppe.lure.components;
 
+import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 /**
@@ -17,11 +19,14 @@ import com.grasppe.lure.framework.GrasppeKit.Observer;
  */
 public class BasicComponent extends AbstractComponent implements Observer {
 
+  private java.util.Vector data = new java.util.Vector();
+
   /**
-   *  
+   *
    */
   public BasicComponent() {
     super();
+
     // update();
   }
 
@@ -43,73 +48,60 @@ public class BasicComponent extends AbstractComponent implements Observer {
     }
 
   }
-  
-  private java.util.Vector data = new java.util.Vector();
+
+  /**
+   * 	@param lis
+   */
   public synchronized void addMyTestListener(MyTestListener lis) {
-      data.addElement(lis);
+    data.addElement(lis);
   }
-  public synchronized void removeMyTestListener(MyTestListener lis) {
-      data.removeElement(lis);
-  }
-  public interface MyTestListener extends java.util.EventListener {
-      void testEvent(MyTestEvent event);
-  }
-  public class MyTestEvent extends java.util.EventObject {
-      private static final long serialVersionUID = 1L;
-      public float oldValue,newValue;        
-      MyTestEvent(Object obj, float oldValue, float newValue) {
-          super(obj);
-          this.oldValue = oldValue;
-          this.newValue = newValue;
+
+  /**
+   * 	@throws Exception
+   */
+  public void detatch() throws Exception {
+	  try{
+    getModel().detachObserver(this);
+      } catch (Exception exception) {
+      	GrasppeKit.debugError("Detatching Component", exception, 1);
       }
+    detachObservers();
+
   }
-  public void notifyMyTest() {
-      java.util.Vector dataCopy;
-      synchronized(this) {
-          dataCopy = (java.util.Vector)data.clone();
-      }
-      for (int i=0; i<dataCopy.size(); i++) {
-          MyTestEvent event = new MyTestEvent(this, 0, 1);
-          ((MyTestListener)dataCopy.elementAt(i)).testEvent(event);
-      }
-  }
-  
-  
-//  private java.util.Vector data = new java.util.Vector();
-//  
-//  public synchronized void addUpdateEventListener(UpdateListener lis) {
-//      data.addElement(lis);
-//  }
-//  public synchronized void removeUpdateEventListener(UpdateListener lis) {
-//      data.removeElement(lis);
-//  }
-//  public interface UpdateListener extends java.util.EventListener {
-//      void updateEvent(UpdateEvent event);
-//  }
-//  
-//  
-//  public class UpdateEvent extends java.util.EventObject {
-//      private static final long serialVersionUID = 1L;
-//      public float oldValue,newValue;        
-//      UpdateEvent(Object obj, float oldValue, float newValue) {
-//          super(obj);
-//          this.oldValue = oldValue;
-//          this.newValue = newValue;
-//      }
-//  }
-//  
-//  public void notifyUpdate() {
-//      java.util.Vector dataCopy;
-//      synchronized(this) {
-//          dataCopy = (java.util.Vector)data.clone();
-//      }
-//      for (int i=0; i<dataCopy.size(); i++) {
-//    	  UpdateEvent event = new UpdateEvent(this, 0, 1);
-//          ((UpdateListener)dataCopy.elementAt(i)).updateEvent(event);
-//      }
-//  }
-  
-  
+
+//private java.util.Vector data = new java.util.Vector();
+//
+//public synchronized void addUpdateEventListener(UpdateListener lis) {
+//    data.addElement(lis);
+//}
+//public synchronized void removeUpdateEventListener(UpdateListener lis) {
+//    data.removeElement(lis);
+//}
+//public interface UpdateListener extends java.util.EventListener {
+//    void updateEvent(UpdateEvent event);
+//}
+//
+//
+//public class UpdateEvent extends java.util.EventObject {
+//    private static final long serialVersionUID = 1L;
+//    public float oldValue,newValue;        
+//    UpdateEvent(Object obj, float oldValue, float newValue) {
+//        super(obj);
+//        this.oldValue = oldValue;
+//        this.newValue = newValue;
+//    }
+//}
+//
+//public void notifyUpdate() {
+//    java.util.Vector dataCopy;
+//    synchronized(this) {
+//        dataCopy = (java.util.Vector)data.clone();
+//    }
+//    for (int i=0; i<dataCopy.size(); i++) {
+//      UpdateEvent event = new UpdateEvent(this, 0, 1);
+//        ((UpdateListener)dataCopy.elementAt(i)).updateEvent(event);
+//    }
+//}
 
   /*
    *  (non-Javadoc)
@@ -122,38 +114,39 @@ public class BasicComponent extends AbstractComponent implements Observer {
   @Override
   public void finalize() throws Throwable {
 
-//  for (Component component : viewComponents) {
-//  try {
-//      if (component instanceof JFrame) {
-//          ((JFrame)component).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//          component.setVisible(false);
-//      }
-//  
-//      Container parent = component.getParent();
-//  
-//      if (parent != null) {
-//          component.getParent().remove(component);
-//      }
-//  } catch (Exception exception) {
-//      GrasppeKit.debugError("Terminating View Components", exception, 2);
-//  }
-//  }
-
-    getModel().detachObserver(this);
-
-//  notifyObservers();
-    detachObservers();
-
-//  Iterator<Observer> observerIterator = observers.getIterator();
-//
-//  while (observerIterator.hasNext()) {
-//      try {
-//          detachObserver(observerIterator.next());
-//      } catch (Exception exception) {
-//          GrasppeKit.debugError("Detaching View Observers", exception, 2);
-//      }
-//  }
+    detatch();
     super.finalize();
+  }
+
+  /**
+   */
+  @Override
+  protected void finalizeUpdates() {
+
+    // TODO Auto-generated method stub
+  }
+
+  /**
+   */
+  public void notifyMyTest() {
+    java.util.Vector dataCopy;
+
+    synchronized (this) {
+      dataCopy = (java.util.Vector)data.clone();
+    }
+
+    for (int i = 0; i < dataCopy.size(); i++) {
+      MyTestEvent event = new MyTestEvent(this, 0, 1);
+
+      ((MyTestListener)dataCopy.elementAt(i)).testEvent(event);
+    }
+  }
+
+  /**
+   * 	@param lis
+   */
+  public synchronized void removeMyTestListener(MyTestListener lis) {
+    data.removeElement(lis);
   }
 
   /**
@@ -165,9 +158,49 @@ public class BasicComponent extends AbstractComponent implements Observer {
     // if (debugPanel != null) updateDebugView();
   }
 
+  /**
+
+   * 	@version        $Revision: 1.0, 12/12/03
+   * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+   */
+  public interface MyTestListener extends java.util.EventListener {
+
+    /**
+     * 	@param event
+     */
+    void testEvent(MyTestEvent event);
+  }
+
+
+  /**
+   * Class description
+   * 	@version        $Revision: 1.0, 12/12/03
+   * 	@author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>    
+   */
+  public class MyTestEvent extends java.util.EventObject {
+
+    private static final long serialVersionUID = 1L;
+
+    /** Field description */
+    public float oldValue, newValue;
+
+    /**
+     * 	@param obj
+     * 	@param oldValue
+     * 	@param newValue
+     */
+    MyTestEvent(Object obj, float oldValue, float newValue) {
+      super(obj);
+      this.oldValue = oldValue;
+      this.newValue = newValue;
+    }
+  }
+
+
 @Override
-protected void finalizeUpdates() {
+public void detatch(Observable oberservableObject) {
 	// TODO Auto-generated method stub
+	
 }
 
 ///**

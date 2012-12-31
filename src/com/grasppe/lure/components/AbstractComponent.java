@@ -80,6 +80,10 @@ public abstract class AbstractComponent extends ObservableObject {
             return lookup.get(code);
         }
     }
+    
+    public void detatch() throws Throwable {
+    	
+    }
 
     /**
      */

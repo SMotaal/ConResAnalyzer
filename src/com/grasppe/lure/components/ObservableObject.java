@@ -38,6 +38,14 @@ public abstract class ObservableObject implements Observable {
         observers.detachObserver(observer);
     }
     
+    public void notifyDetatchObserver(Observer observer){
+    	observers.notifyDetatchObserver(observer);
+    }
+    
+    public void notifyDetatchObservers(){
+    	observers.notifyDetatchObservers();
+    }    
+    
     /**
      * Detaches an observer through the observers object which will exclude the observer from future update() notify calls.
      * @param observer

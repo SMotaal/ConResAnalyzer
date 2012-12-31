@@ -21,7 +21,9 @@ import com.grasppe.conreslabs.panels.patchgenerator.PrintingModulePanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScanningModulePanel;
 import com.grasppe.conreslabs.panels.patchgenerator.ScreeningModulePanel;
 import com.grasppe.jive.fields.JiveNumericField;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 import com.javapractices.snippets.TextTransfer;
@@ -1456,4 +1458,11 @@ public class JiveModuleContainer extends JPanel implements Observer, ActionListe
 //  } 
     // String[] processStrings = sourceString. // ("(?<=\\=\\{)[^\\}](?=\\})");
   }
+
+
+@Override
+public void detatch(Observable oberservableObject) {
+	// TODO Auto-generated method stub
+	
+}
 }

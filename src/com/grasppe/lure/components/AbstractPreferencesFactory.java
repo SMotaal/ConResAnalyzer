@@ -201,8 +201,13 @@ public abstract class AbstractPreferencesFactory extends FilePreferencesFactory 
             filePath = FileManager.findFolder(FileManager.kUserDomain,
                                               FileManager.OSTypeToInt("pref"));
         } catch (FileNotFoundException exception) {
+        	try {
             filePath = GrasppeKit.cat(new String[] { System.getProperty("user.home"), "Library",
                     "Preferences" }, File.separator);
+        	} catch (Exception exception2) {
+        		GrasppeKit.debugError("Getting Preferences File", exception2, 1);
+        		filePath = ".";
+        	}
         }
 
         if (fileName != null) filePath += File.separator + fileName;
