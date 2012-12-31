@@ -14,6 +14,7 @@
  */
 package com.grasppe.conres.preferences;
 
+import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
 import com.grasppe.lure.framework.IPreferencesEnum;
 
@@ -30,16 +31,16 @@ import java.util.Map;
 public class Preferences {
 
   /** Field description */
-  public static final String	VALUE_FIELD = "value";
+  public static final String VALUE_FIELD = "value";
 
   /** Field description */
-  public static final String	COLOR_FIELD = "color";
+  public static final String COLOR_FIELD = "color";
 
   /** Field description */
-  public static final String	KEYCODE_FIELD = "keycode";
-  
+  public static final String KEYCODE_FIELD = "keycode";
+
   /** Field description */
-  public static final String	COMMAND_KEYCODE_FIELD = "commandkeycode"; 
+  public static final String COMMAND_KEYCODE_FIELD = "commandkeycode";
 
   /**
    *
@@ -67,10 +68,10 @@ public class Preferences {
     CURSOR_COLOR("Cursor Color", new int[] { 32, 32, 32 }, COLOR_FIELD, "Color for the blinking cursor"),												//
 
     /* Analysis Keys */
-    PASS_KEYCODE("Pass Keycode", KeyCode.VK_G, KEYCODE_FIELD, "Key used to indicate a good patch."),														//
-    FAIL_KEYCODE("Fail Keycode", KeyCode.VK_R, KEYCODE_FIELD, "Key used to indicate a rejected patch."),												//
-    MARGINAL_KEYCODE("Marginal Keycode", KeyCode.VK_W, KEYCODE_FIELD, "Key used to indicate a marginally accepted patch."),			//
-    CLEAR_COLUMN_KEYCODE("Clear Column Keycode", KeyCode.VK_C, KEYCODE_FIELD, "Key used to clearing a grid column."),						//
+    PASS_KEYCODE("Pass Keycode", KeyCode.VK_G.value(), KEYCODE_FIELD, "Key used to indicate a good patch."),														//
+    FAIL_KEYCODE("Fail Keycode", KeyCode.VK_R.value(), KEYCODE_FIELD, "Key used to indicate a rejected patch."),												//
+    MARGINAL_KEYCODE("Marginal Keycode", KeyCode.VK_W.value(), KEYCODE_FIELD, "Key used to indicate a marginally accepted patch."),			//
+    CLEAR_COLUMN_KEYCODE("Clear Column Keycode", KeyCode.VK_C.value(), KEYCODE_FIELD, "Key used to clearing a grid column."),						//
 
     /* Case Manager Preferences */
     DEFAULT_CASE_PATH("Default Case Path", "", VALUE_FIELD, "Path to the folder parent folder the case files"),									//
@@ -81,27 +82,30 @@ public class Preferences {
     X_ROI_OFFSET("Horizontal ROI Offset", -1, VALUE_FIELD, "Horizontal offset in millimeters"),																	//
 
     /* Global Keys */
-    CORNER_SELECTOR_KEYCODE("Corner Selector Keycode", KeyCode.VK_M, COMMAND_KEYCODE_FIELD, "Key used to indicate a good patch."),			//
-    BLOCK_SELECTOR_KEYCODE("Block Selector Keycode", KeyCode.VK_B, COMMAND_KEYCODE_FIELD, "Key used to indicate a rejected patch."),		//
-    BLOCK_ANALYZER_KEYCODE("Block Analyzer Keycode", KeyCode.VK_A, COMMAND_KEYCODE_FIELD, "Key used to indicate a rejected patch."),		//
+    CORNER_SELECTOR_KEYCODE("Corner Selector Keycode", KeyCode.VK_M.value(), COMMAND_KEYCODE_FIELD,
+                            "Key used to indicate a good patch."),																															//
+    BLOCK_SELECTOR_KEYCODE("Block Selector Keycode", KeyCode.VK_B.value(), COMMAND_KEYCODE_FIELD,
+                           "Key used to indicate a rejected patch."),			//
+    BLOCK_ANALYZER_KEYCODE("Block Analyzer Keycode", KeyCode.VK_A.value(), COMMAND_KEYCODE_FIELD,
+                           "Key used to indicate a rejected patch."),			//
     ;
 
-    private static final Map<String, Tags>	lookup = new HashMap<String, Tags>();
+    private static final Map<String, Tags> lookup = new HashMap<String, Tags>();
 
     static {
       for (Tags s : EnumSet.allOf(Tags.class))
         lookup.put(s.key(), s);
     }
 
-    private String	key;
-    private Object	defaultValue;
-    private String	fieldClass;
-    private String	description;
+    private String key;
+    private Object defaultValue;
+    private String fieldClass;
+    private String description;
 
     /**
      *  @param key
      *  @param defaultValue
-     * 	@param fieldClass
+     *  @param fieldClass
      *  @param description
      */
     private Tags(String key, Object defaultValue, String fieldClass, String description) {
@@ -149,34 +153,55 @@ public class Preferences {
   }
 
   /**
-   * 	@param preference
-   * 	@param value
+   *    @param preference
+   *    @param value
    */
   public static void put(Tags preference, Object value) {
-    PreferencesAdapter.getInstance().put(preference, value);
+    try {
+      PreferencesAdapter.getInstance().put(preference, value);
+    } catch (NoClassDefFoundError error) {
+      GrasppeKit.debugError("Put Preference", error, 5);
+    }
   }
 
   /**
-   * 	@param preference
-   * 	@param value
+   *    @param preference
+   *    @param value
    */
   public static void putArray(Tags preference, Object[] value) {
-    PreferencesAdapter.getInstance().putArray(preference, value);
+    try {
+      PreferencesAdapter.getInstance().putArray(preference, value);
+    } catch (NoClassDefFoundError error) {
+      GrasppeKit.debugError("Put Array Preference", error, 5);
+    }
   }
 
   /**
-   * 	@param preference
-   * 	@return
+   *    @param preference
+   *    @return
    */
   public static Object get(Tags preference) {
-    return PreferencesAdapter.getInstance().get(preference);
+
+    // GrasppeKit.debugText(text)
+    Object value = null;
+
+    try {
+      value = PreferencesAdapter.getInstance().get(preference);
+    } catch (NoClassDefFoundError error) {
+      GrasppeKit.debugError("Get Preference", error, 5);
+      value = preference.defaultValue();
+    }
+
+    return value;
   }
 
   /**
-   * 	@param preference
-   * 	@return
+   *    @param preference
+   *    @return
    */
   public static int getInt(Tags preference) {
-    return ((Integer)PreferencesAdapter.getInstance().get(preference)).intValue();
+    return ((Integer)get(preference)).intValue();
+
+    // return ((Integer)PreferencesAdapter.getInstance().get(preference)).intValue();
   }
 }

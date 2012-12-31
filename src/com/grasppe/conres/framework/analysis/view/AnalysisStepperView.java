@@ -16,18 +16,17 @@ import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.analysis.stepping.BlockState;
 import com.grasppe.conres.framework.analysis.stepping.SteppingStrategy;
 import com.grasppe.conres.framework.targets.TargetManager;
-import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResPatch;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
@@ -42,7 +41,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 /**
@@ -52,404 +50,419 @@ import javax.swing.border.Border;
  */
 public class AnalysisStepperView extends AbstractView implements IChildView {
 
-    protected JPanel	viewContainer = null;
+  protected static AnalysisStepperView            instance      = null;
+  protected static ArrayList<AnalysisStepperView> instances     = new ArrayList<AnalysisStepperView>();
+  protected JPanel                                viewContainer = null;
 
-//  protected SteppingPreview     canvas             = null;
-    protected PatchBoundView		patchImagePanel       = null;
-    protected BlockMapImagePanel	blockMapImagePanel    = null;
-    protected PatchInformationPanel	patchInformationPanel = null;
-    protected JLabel				label                 = null;
-    int								dbg                   = 0;
+//protected SteppingPreview     canvas             = null;
+  protected PatchBoundView        patchImagePanel       = null;
+  protected BlockMapImagePanel    blockMapImagePanel    = null;
+  protected PatchInformationPanel patchInformationPanel = null;
+  protected JLabel                label                 = null;
+  int                             dbg                   = 0;
 
-    /**
-     * @param controller
-     */
-    private AnalysisStepperView(AnalysisStepper controller) throws Exception {
-        super(controller);
-//        if (instance!=null) throw new Exception("What the f***!");
-        instances.add(this);
-        getModel().attachObserver(this);
-    }
-    
-    protected static AnalysisStepperView instance = null;
-    
-    protected static ArrayList<AnalysisStepperView> instances = new ArrayList<AnalysisStepperView>();
-    
-    public static AnalysisStepperView getInstance(AnalysisStepper controller)  throws Exception {
-    	if (instance==null || controller!=instance.getController()) {
-    		if (instance!=null)
-				try {
-					instance.finalize();
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-				}
-    		instance = new AnalysisStepperView(controller);
-    	}
-    	return instance;
-    }
+  /**
+   * @param controller
+   * 	@throws Exception
+   */
+  private AnalysisStepperView(AnalysisStepper controller) throws Exception {
+    super(controller);
 
-    /**
-     */
-    private void createView() {
-    	
-//    	SwingUtilities.invokeLater( new Runnable() {	public void run() {
+//  if (instance!=null) throw new Exception("What the f***!");
+    instances.add(this);
+    getModel().attachObserver(this);
+  }
+  
 
-        // Assemble Panel
-        JPanel	panel = new JPanel();		// panel.setBackground(Color.DARK_GRAY);
+  /**
+   */
+  private void createView() {
 
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//  SwingUtilities.invokeLater( new Runnable() {    public void run() {
 
-        JPanel	previewPanel     = new JPanel(new BorderLayout());
-        JPanel	informationPanel = new JPanel();
+    // Assemble Panel
+    JPanel panel = new JPanel();		// panel.setBackground(Color.DARK_GRAY);
 
-        informationPanel.setLayout(new BoxLayout(informationPanel, BoxLayout.Y_AXIS));
+    panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        int		pad = 1;
-        Border	padBorder = BorderFactory.createMatteBorder(0, pad, pad, pad, panel.getBackground());
-        Border	padLeft = BorderFactory.createMatteBorder(1, 2, 1, 1, panel.getBackground());
-        Border	padRight = BorderFactory.createMatteBorder(1, 1, 1, 2, panel.getBackground());
+    JPanel previewPanel     = new JPanel(new BorderLayout());
+    JPanel informationPanel = new JPanel();
 
-        blockMapImagePanel = new BlockMapImagePanel(getModel());	// blockMapImagePanel.setBackground(Color.DARK_GRAY);
-        patchInformationPanel = new PatchInformationPanel(getModel());		// patchInformationPanel.setBackground(Color.DARK_GRAY);
-        patchImagePanel = new PatchImagePanel(getModel());
+    informationPanel.setLayout(new BoxLayout(informationPanel, BoxLayout.Y_AXIS));
 
-        patchImagePanel.setBackground(Color.DARK_GRAY);
+    int    pad       = 1;
+    Border padBorder = BorderFactory.createMatteBorder(0, pad, pad, pad, panel.getBackground());
+    Border padLeft   = BorderFactory.createMatteBorder(1, 2, 1, 1, panel.getBackground());
+    Border padRight  = BorderFactory.createMatteBorder(1, 1, 1, 2, panel.getBackground());
 
-        informationPanel.add(blockMapImagePanel);		// informationPanel.add(Box.createRigidArea(new Dimension(0, 25)));
-        informationPanel.add(patchInformationPanel);
-        informationPanel.add(Box.createVerticalGlue());
+    blockMapImagePanel    = new BlockMapImagePanel(getModel());				// blockMapImagePanel.setBackground(Color.DARK_GRAY);
+    patchInformationPanel = new PatchInformationPanel(getModel());		// patchInformationPanel.setBackground(Color.DARK_GRAY);
+    patchImagePanel       = new PatchImagePanel(getModel());
 
-//      informationPanel.setLayout(subLayout);
+    patchImagePanel.setBackground(Color.DARK_GRAY);
 
-        previewPanel.add(patchImagePanel, BorderLayout.CENTER);
-        previewPanel.setBackground(Color.DARK_GRAY);
+    informationPanel.add(blockMapImagePanel);			// informationPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+    informationPanel.add(patchInformationPanel);
+    informationPanel.add(Box.createVerticalGlue());
 
-        int			patchPreviewSize = getModel().getPatchPreviewSize();
-        Dimension	previewDimension = new Dimension(patchPreviewSize, patchPreviewSize);
+//  informationPanel.setLayout(subLayout);
 
-//      previewPanel.setMaximumSize(new Dimension(patchPreviewSize,patchPreviewSize));
-        previewPanel.setPreferredSize(previewDimension);
-        previewPanel.setSize(previewDimension);
+    previewPanel.add(patchImagePanel, BorderLayout.CENTER);
+    previewPanel.setBackground(Color.DARK_GRAY);
 
-        panel.add(previewPanel);
-        panel.add(informationPanel);
+    int       patchPreviewSize = getModel().getPatchPreviewSize();
+    Dimension previewDimension = new Dimension(patchPreviewSize, patchPreviewSize);
 
-//      panel.setLayout(layout);
+//  previewPanel.setMaximumSize(new Dimension(patchPreviewSize,patchPreviewSize));
+    previewPanel.setPreferredSize(previewDimension);
+    previewPanel.setSize(previewDimension);
 
-        informationPanel.setBorder(padLeft);
-        previewPanel.setBorder(padRight);
+    panel.add(previewPanel);
+    panel.add(informationPanel);
 
-        // Assemble Frame
+//  panel.setLayout(layout);
 
-        viewContainer = new JPanel(new BorderLayout());
+    informationPanel.setBorder(padLeft);
+    previewPanel.setBorder(padRight);
 
-        viewComponents.add(viewContainer);
+    // Assemble Frame
 
+    viewContainer = new JPanel(new BorderLayout());
 
-        // setFrameMenu(viewContainer);
+    viewComponents.add(viewContainer);
 
-//      viewContainer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    // setFrameMenu(viewContainer);
 
-        viewContainer.add(panel, BorderLayout.CENTER);
+//  viewContainer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-//      viewContainer.setResizable(false);
-//      viewContainer.pack();
+    viewContainer.add(panel, BorderLayout.CENTER);
 
-//      GraphicsEnvironment   graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//      int                   frameLeft           = graphicsEnvironment.getCenterPoint().x - viewContainer.getWidth() / 2;
-//      int                   frameTop            = graphicsEnvironment.getCenterPoint().y - viewContainer.getHeight() / 2;
+//  viewContainer.setResizable(false);
+//  viewContainer.pack();
+
+//  GraphicsEnvironment   graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//  int                   frameLeft           = graphicsEnvironment.getCenterPoint().x - viewContainer.getWidth() / 2;
+//  int                   frameTop            = graphicsEnvironment.getCenterPoint().y - viewContainer.getHeight() / 2;
 //
-//      viewContainer.setLocation(frameLeft, frameTop);
+//  viewContainer.setLocation(frameLeft, frameTop);
 
-        KeyListener	keyListener = new KeyAdapter() {
+    KeyListener keyListener = new KeyAdapter() {
 
-            public void keyPressed(KeyEvent ke) {
-                if (ke.isConsumed()) return;
-                if (getController().BlockStepKey(ke.getKeyCode(), ke.getModifiers())) ke.consume();
-            }
-        };
-        viewContainer.addKeyListener(keyListener);
-        viewContainer.setFocusable(true);
-        setComponentFocus(viewContainer);
-        
+      public void keyPressed(KeyEvent ke) {
+        if (ke.isConsumed()) return;
+        if (getController().BlockStepKey(ke.getKeyCode(), ke.getModifiers())) ke.consume();
+      }
+    };
+
+    viewContainer.addKeyListener(keyListener);
+    viewContainer.setFocusable(true);
+    setComponentFocus(viewContainer);
+
 //        
-//        for (Component component : viewContainer.getComponents()) {
-//        	component.setFocusable(false);
-//        }
+//  for (Component component : viewContainer.getComponents()) {
+//    component.setFocusable(false);
+//  }
 
-        // viewContainer.addKeyListener(keyListener);
-        try {
-            getParentView().getFrame().removeKeyListener(keyListener);
-        } catch (Exception exception) {
+    // viewContainer.addKeyListener(keyListener);
+    try {
+      getParentView().getFrame().removeKeyListener(keyListener);
+    } catch (Exception exception) {
 
-            // nothing to do!
-        }
-
-        getParentView().getFrame().setFocusTraversalKeysEnabled(false);
-        getParentView().getFrame().addKeyListener(keyListener);
-        getParentView().getFrame().setVisible(true);
-
-        // Show Frame
-        viewContainer.setVisible(true);
-
-        getParentView().setContainer(viewContainer);
-
-        update();
-//    }});
+      // nothing to do!
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractView#finalize()
-     */
+    getParentView().getFrame().setFocusTraversalKeysEnabled(false);
+    getParentView().getFrame().addKeyListener(keyListener);
+    getParentView().getFrame().setVisible(true);
+
+    // Show Frame
+    viewContainer.setVisible(true);
+
+    getParentView().setContainer(viewContainer);
+
+    update();
+
+//  }});
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractView#finalize()
+   */
+
+  /**
+   * 	@throws Throwable
+   */
+  public void detatch() throws Throwable {
+    try {
+      if ((getParentView() != null) && (viewContainer != null)) {
+    	  getParentView().removeContainer(viewContainer);
+    	  viewContainer = null;
+      }
+    } catch (Exception exception) {
+      GrasppeKit.debugError("Detatching Stepper View", exception, 1);
+    }
+
+    super.detatch();
+  }
+
+  /**
+   */
+  @Override
+  protected void finalizeUpdates() {
+    update();
+  }
+
+  // This method returns a buffered image with the contents of an image
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractView#update()
+   */
+
+  /**
+   */
+  @Override
+  public void update() {
+    super.update();
+    updateView();
+  }
+
+  /**
+   */
+  @Override
+  protected void updateDebugLabels() {
+    AnalysisStepperModel model = getModel();
+
+    if (model == null) return;
+
+    try {
+      updateDebugLabel("activeBlock", model.getActiveBlock());
+    } catch (Exception exception) {
+      updateDebugLabel("activeBlock", "");
+    }
+
+    try {
+      updateDebugLabel("activePatch", model.getActivePatch());
+    } catch (Exception exception) {
+      updateDebugLabel("activePatch", "");
+    }
+
+    try {
+      updateDebugLabel("instances", instances);
+    } catch (Exception exception) {
+      updateDebugLabel("instances", "");
+    }
+
+//  updateDebugLabel("newCase", model.getNewCase());
+//  updateDebugLabel("backgroundCase", model.getBackgroundCase());
+
+    super.updateDebugLabels();
+  }
+
+  /**
+   */
+  public void updateView() {
+    if (patchImagePanel != null) patchImagePanel.update();
+    if (blockMapImagePanel != null) blockMapImagePanel.update();
+    if (patchInformationPanel != null) patchInformationPanel.update();
+
+    try {
+      viewContainer.repaint();
+      viewContainer.validate();
+    } catch (Exception exception) {}
+  }
+
+  /**
+   *  @return
+   */
+  public AnalysisManager getAnalysisManager() {
+    return getController().getAnalysisManager();
+  }
+
+  /**
+   *  @return
+   */
+  public AnalysisManagerModel getAnalysisManagerModel() {
+    return getController().getAnalysisManagerModel();
+  }
+
+  /**
+   *  @return
+   */
+  public BlockState getBlockState() {
+    return getModel().getBlockState();
+  }
+
+  /**
+   *  @return
+   */
+  public AnalysisStepper getController() {
+    return (AnalysisStepper)this.controller;
+  }
+
+  /**
+   * 	@param controller
+   * 	@return
+   * 	@throws Exception
+   */
+  public static AnalysisStepperView getInstance(AnalysisStepper controller) throws Exception {
+    if ((instance == null) || (controller != instance.getController())) {
+      if (instance != null)
+      try {
+        instance.detatch();
+      } catch (Throwable exception) {
+        exception.printStackTrace();
+      }
+      instance = new AnalysisStepperView(controller);
+    }
+
+    return instance;
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractView#getModel()
+   */
+
+  /**
+   *  @return
+   */
+  @Override
+  public AnalysisStepperModel getModel() {
+    return (AnalysisStepperModel)super.getControllerModel();
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.conres.framework.analysis.view.IChildView#getParentView()
+   */
+
+  /**
+   *  @return
+   */
+  public ConResAnalyzerView getParentView() {
+    if (getController() == null) return null;
+    if (getController().getAnalyzer() == null) return null;
+
+    return getController().getAnalyzer().getView();
+  }
+
+  /**
+   *  @return
+   */
+  public TargetManager getTargetManager() {
+    return getAnalysisManager().getTargetManager();
+  }
+
+  /**
+   *  @param visible
+   */
+  public void setVisible(boolean visible) {
+    if ((viewContainer != null) &&!visible) {
+
+//    if(patchImagePanel!=null) patchImagePanel.setVisible(false);
+////      if(patchImagePanel!=null) patchImagePanel.setVisible(false);
+      viewContainer.setVisible(false);
+      getParentView().removeContainer(viewContainer);
+
+      return;
+    }
+
+    if (visible) createView();
+  }
+
+  /**
+   * Class description
+   *  @version        $Revision: 1.0, 11/11/27
+   *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
+   */
+  public class SteppingPreview extends Canvas {
+
+    private List<SteppingStrategy> steppingHistory = new ArrayList<SteppingStrategy>();			// @SuppressWarnings("rawtypes")
 
     /**
-     * 	@throws Throwable
+     *  @param initialBlockState
      */
-    @Override
-    public void finalize() throws Throwable {
-        if ((getParentView() != null) && (viewContainer != null))
-            getParentView().removeContainer(viewContainer);
-        super.finalize();
+    public SteppingPreview(BlockState initialBlockState) {
+      super();
+
+//    blockState = initialBlockState;
+
+      // BlockState    finalState = blockState;
+//    this.image = (new BlockGrid(getBlockState())).getImage();
+//    this.repaint(1000);
+
+      updateStep();
+
+      return;
+    }
+
+    /**
+     * @param g
+     */
+    public void paint(Graphics g) {
+      super.paint(g);
+
+      int padding = 5;
+      int pWidth  = 550;
+      int pHeight = pWidth;
+      int iMax    = Math.max(getModel().getBlockState().getColumns(), getModel().getBlockState().getRows());
+      int iScale  = 200 / iMax;
+      int iWidth  = getModel().getBlockMapImage().getWidth() * iScale;
+      int iHeight = getModel().getBlockMapImage().getHeight() * iScale;
+
+//    try {
+//        g.drawImage(getModel().getPatchImage(), padding, padding, pWidth, pHeight, this);
+//    } catch (Exception exception) {}
+
+      g.drawImage(getModel().getBlockMapImage(), pWidth + padding * 4, padding, iWidth, iHeight,
+                  this);		// iWidth * iScale, iHeight * iScale, this);
+
     }
 
     /**
      */
-    @Override
-    protected void finalizeUpdates() {
-        update();
-    }
+    public void updateStep() {
 
-    // This method returns a buffered image with the contents of an image
-
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractView#update()
-     */
-
-    /**
-     */
-    @Override
-    public void update() {
-        super.update();
-        updateView();
-    }
-    
-    /**
-     */
-    public void updateView() {    	
-        if (patchImagePanel != null) patchImagePanel.update();
-        if (blockMapImagePanel != null) blockMapImagePanel.update();
-        if (patchInformationPanel != null) patchInformationPanel.update();
-
-        try {
-            viewContainer.repaint();
-            viewContainer.validate();
-        } catch (Exception exception) {}
-    }
-
-
-    /**
-     *  @return
-     */
-    public AnalysisManager getAnalysisManager() {
-        return getController().getAnalysisManager();
-    }
-
-    /**
-     *  @return
-     */
-    public AnalysisManagerModel getAnalysisManagerModel() {
-        return getController().getAnalysisManagerModel();
-    }
-
-    /**
-     *  @return
-     */
-    public BlockState getBlockState() {
-        return getModel().getBlockState();
-    }
-
-    /**
-     *  @return
-     */
-    public AnalysisStepper getController() {
-        return (AnalysisStepper)this.controller;
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractView#getModel()
-     */
-
-    /**
-     *  @return
-     */
-    @Override
-    public AnalysisStepperModel getModel() {
-        return (AnalysisStepperModel)super.getControllerModel();
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.conres.framework.analysis.view.IChildView#getParentView()
-     */
-
-    /**
-     * 	@return
-     */
-    public ConResAnalyzerView getParentView() {
-        if (getController() == null) return null;
-        if (getController().getAnalyzer() == null) return null;
-
-        return getController().getAnalyzer().getView();
-    }
-
-    /**
-     *  @return
-     */
-    public TargetManager getTargetManager() {
-        return getAnalysisManager().getTargetManager();
-    }
-
-    /**
-     * 	@param visible
-     */
-    public void setVisible(boolean visible) {
-        if ((viewContainer != null) &&!visible) {
-
-//          if(patchImagePanel!=null) patchImagePanel.setVisible(false);
-////            if(patchImagePanel!=null) patchImagePanel.setVisible(false);
-            viewContainer.setVisible(false);
-            getParentView().removeContainer(viewContainer);
-
-            return;
-        }
-
-        if (visible) createView();
-    }
-
-    /**
-     * Class description
-     *  @version        $Revision: 1.0, 11/11/27
-     *  @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
-     */
-    public class SteppingPreview extends Canvas {
-
-        private List<SteppingStrategy>	steppingHistory = new ArrayList<SteppingStrategy>();	// @SuppressWarnings("rawtypes")
-
-        /**
-         *  @param initialBlockState
-         */
-        public SteppingPreview(BlockState initialBlockState) {
-            super();
-
-//          blockState = initialBlockState;
-
-            // BlockState    finalState = blockState;
-//          this.image = (new BlockGrid(getBlockState())).getImage();
-//          this.repaint(1000);
-
-            updateStep();
-
-            return;
-        }
-
-        /**
-         * @param g
-         */
-        public void paint(Graphics g) {
-            super.paint(g);
-
-            int	padding = 5;
-            int	pWidth  = 550;
-            int	pHeight = pWidth;
-            int	iMax    = Math.max(getModel().getBlockState().getColumns(),
-                                getModel().getBlockState().getRows());
-            int	iScale  = 200 / iMax;
-            int	iWidth  = getModel().getBlockMapImage().getWidth() * iScale;
-            int	iHeight = getModel().getBlockMapImage().getHeight() * iScale;
-
-//          try {
-//              g.drawImage(getModel().getPatchImage(), padding, padding, pWidth, pHeight, this);
-//          } catch (Exception exception) {}
-
-            g.drawImage(getModel().getBlockMapImage(), pWidth + padding * 4, padding, iWidth,
-                        iHeight, this);		// iWidth * iScale, iHeight * iScale, this);
-
-        }
-
-        /**
-         */
-        public void updateStep() {
-
-            // blockState = thisStep.getFinalState();
-            int	dbg = 0;
+      // blockState = thisStep.getFinalState();
+      int dbg = 0;
 
 //
-//          BlockState    blockState = getBlockState();
-//          BlockGrid  blockMap   = new BlockGrid(blockState);
+//    BlockState    blockState = getBlockState();
+//    BlockGrid  blockMap   = new BlockGrid(blockState);
 //
-//          int           row        = blockState.getRow();
-//          int           column     = blockState.getColumn();
+//    int           row        = blockState.getRow();
+//    int           column     = blockState.getColumn();
 
-//          int firstColumn = getTargetManager().getFirstColumnIndex();
-//          if (column<firstColumn) blockState.setColumn(firstColumn);
+//    int firstColumn = getTargetManager().getFirstColumnIndex();
+//    if (column<firstColumn) blockState.setColumn(firstColumn);
 
-//            Image patchImage = getTargetManager().getPatchImage(row, column);
-//            
-//            getModel().setPatchImage(patchImage);
+//      Image patchImage = getTargetManager().getPatchImage(row, column);
+//      
+//      getModel().setPatchImage(patchImage);
 //
-//            getModel().setImage(blockMap.getImage());
+//      getModel().setImage(blockMap.getImage());
 
-            try {
-                ConResPatch	patchModel = getModel().getActivePatch();
+      try {
+        ConResPatch patchModel = getModel().getActivePatch();
 
-                GrasppeKit.debugText("Patch String", patchModel.toString(), dbg);
+        GrasppeKit.debugText("Patch String", patchModel.toString(), dbg);
 
-                String	labelString = "<html>" + patchModel.toString().replace("\n", "<br/>")
-                                     + "</html>";
+        String labelString = "<html>" + patchModel.toString().replace("\n", "<br/>") + "</html>";
 
-                if (patchModel != null) label.setText(labelString);
-            } catch (Exception exception) {}
+        if (patchModel != null) label.setText(labelString);
+      } catch (Exception exception) {}
 
-            this.repaint(1000);
+      this.repaint(1000);
 
-            return;
-        }
-        
-        
-
+      return;
     }
-    
-    /**
-     */
-    @Override
-    protected void updateDebugLabels() {
-        AnalysisStepperModel	model = getModel();
+  }
 
-        if (model == null) return;
-
-        try {
-            updateDebugLabel("activeBlock", model.getActiveBlock());
-        } catch (Exception exception) {
-            updateDebugLabel("activeBlock", "");
-        }
-
-        try {
-            updateDebugLabel("activePatch", model.getActivePatch());
-        } catch (Exception exception) {
-            updateDebugLabel("activePatch", "");
-        }
-        try {
-        	updateDebugLabel("instances", instances);
-        } catch (Exception exception) {
-        	updateDebugLabel("instances", "");
-        }
-
-//      updateDebugLabel("newCase", model.getNewCase());
-//      updateDebugLabel("backgroundCase", model.getBackgroundCase());
-
-        super.updateDebugLabels();
-    }
+@Override
+public void detatch(Observable oberservableObject) {
+	// TODO Auto-generated method stub
+	
+}
 }

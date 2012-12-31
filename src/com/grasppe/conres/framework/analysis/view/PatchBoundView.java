@@ -12,6 +12,8 @@
 package com.grasppe.conres.framework.analysis.view;
 
 import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
+import com.grasppe.lure.components.ObservableObject;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -114,4 +116,10 @@ public class PatchBoundView extends JPanel implements Observer {
 
         return model;
     }
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -16,9 +16,11 @@ import ij.io.Opener;
 
 import java.awt.event.KeyEvent;
 
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 /**
  * @author daflair
@@ -90,4 +92,10 @@ public class ImageWindowMagnifierTest implements GrasppeEventHandler {
      */
     public void update() {
     }
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

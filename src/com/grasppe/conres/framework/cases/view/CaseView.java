@@ -17,8 +17,10 @@ import com.grasppe.conres.framework.analysis.model.AnalysisStepperModel;
 import com.grasppe.conres.framework.cases.CaseManager;
 import com.grasppe.conres.framework.cases.model.CaseManagerModel;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -218,4 +220,11 @@ public class CaseView extends JPanel implements Observer {
 
         return model;
     }
+
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

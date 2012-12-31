@@ -18,6 +18,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 import com.grasppe.lure.components.AbstractController;
+import com.grasppe.lure.components.AbstractCommand.Types;
+import com.grasppe.lure.framework.GrasppeKit;
 
 /**
  * Defines Case Manager's Close Case actions and command, using the EAC pattern.
@@ -28,6 +30,14 @@ public class Quit extends ConResAnalyzerCommand {
 
     protected static final String	name        = "Quit";
     protected static final int		mnemonicKey = KeyEvent.VK_Q;
+    protected static final String type = Types.FILE;
+    
+    /**
+	 * @return the commandMenu
+	 */
+	public String getMenuKey() {
+		return type;
+	}
 
     /**
      * Constructs a realization of AbstractCommand.
@@ -56,9 +66,15 @@ public class Quit extends ConResAnalyzerCommand {
 //			// TODO Auto-generated catch block
 //			exception.printStackTrace();
 //		}
-    	if(((AbstractController)actionListener).canQuit())
+    	if(((AbstractController)actionListener).canQuit()) {
+    		try {
+				((AbstractController)actionListener).detatch();
+			} catch (Throwable exception) {
+				// TODO Auto-generated catch block
+				GrasppeKit.debugError("Detatching Failed", exception, 1);
+			}
             System.exit(0);
-        
+    	}
 
         return false;	// Action responded to in intended scenario
     }

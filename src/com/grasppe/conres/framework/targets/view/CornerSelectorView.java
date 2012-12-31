@@ -21,11 +21,13 @@ import com.grasppe.conres.io.model.ImageFile;
 import com.grasppe.conres.preferences.Preferences;
 import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.FloatingAlert;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 import ij.ImagePlus;
 
@@ -1079,6 +1081,7 @@ public class CornerSelectorView extends AbstractView
      *  @throws Throwable
      */
     private void terminate() throws Throwable {
+    	try{
         JFrame	zoomWindow = getZoomWindow();
 
 //      ImageWindow   viewContainer = getImageWindow();
@@ -1087,7 +1090,10 @@ public class CornerSelectorView extends AbstractView
 
 //      if ((viewContainer != null) && viewContainer.isDisplayable()) viewContainer.dispose();
         super.notifyObservers();
-        super.finalize();
+    	} catch (Exception exception) {
+    		GrasppeKit.debugError("Corner Selector View", exception, 2);
+    	}
+    	super.detatch();
     }
 
     /**
@@ -1573,4 +1579,11 @@ public class CornerSelectorView extends AbstractView
     public void setZoomWindow(JFrame zoomWindow) {
         this.zoomWindow = zoomWindow;
     }
+
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

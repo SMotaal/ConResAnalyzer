@@ -12,7 +12,9 @@ import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.conres.framework.targets.model.grid.ConResBlock;
 import com.grasppe.lure.components.AbstractModel;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.FloatingAlert;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -159,4 +161,10 @@ public class SelectBlockFunction extends TargetManagerFunction implements Observ
         this.model = model;
         update();
     }
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

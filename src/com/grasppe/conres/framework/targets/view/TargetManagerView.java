@@ -11,6 +11,8 @@ package com.grasppe.conres.framework.targets.view;
 import com.grasppe.conres.framework.targets.model.TargetManagerModel;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 /**
  * Class description
@@ -62,6 +64,12 @@ public class TargetManagerView extends AbstractView {
 
 	@Override
 	protected void finalizeUpdates() {
+		
+	}
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
 		
 	}
 }

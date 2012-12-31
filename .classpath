@@ -9,5 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/ij.jar" sourcepath="/Users/daflair/Documents/Workspace/libraries/ij145s/src"/>
 	<classpathentry exported="true" kind="lib" path="/Users/daflair/Documents/Workspace/ConResAnalyzer/dependencies/sanselan.jar"/>
 	<classpathentry kind="lib" path="dependencies/forms-1.3.0.jar"/>
+	<classpathentry kind="src" path="/gestures-wrapper"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

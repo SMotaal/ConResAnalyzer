@@ -18,8 +18,11 @@ import com.grasppe.conres.framework.cases.operations.OpenCase;
 import com.grasppe.conres.framework.cases.view.CaseView;
 import com.grasppe.conres.io.model.CaseFolder;
 import com.grasppe.lure.components.AbstractCommand;
+import com.grasppe.lure.components.AbstractCommand.Types;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -86,7 +89,6 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
   public ConResAnalyzerView(ConResAnalyzer controller) {
     super(controller);
   }
-
   /**
    *  @param container
    */
@@ -132,13 +134,13 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
       try {
         if (name.equals("Quit")) {
           OSXAdapter.setQuitHandler(command, command.getClass().getDeclaredMethod("perfomCommand", (Class[])null));
-          menuItem=null;
+          //menuItem=null;
         } else if (name.equals("ShowPreferences")) {
           OSXAdapter.setPreferencesHandler(command, command.getClass().getDeclaredMethod("perfomCommand", (Class[])null));
-          menuItem=null;
+          //menuItem=null;
         } else if (name.equals("About")) {
           OSXAdapter.setAboutHandler(command, command.getClass().getDeclaredMethod("perfomCommand", (Class[])null));
-          menuItem=null;
+          //menuItem=null;
         } else {}
       } catch (SecurityException exception) {
 
@@ -177,9 +179,9 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
 
     mainFrame = new JFrame("Tags");
 
-    mainFrame.setUndecorated(true);
+    // mainFrame.setUndecorated(true);
 
-    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    // mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     updateSize();
     mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -193,6 +195,11 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     setContainer(getDefaultContainer());
 
     prepareMenu();
+  }
+  
+  public void detatch() throws Throwable {
+	  if (mainFrame != null)
+		  mainFrame.dispose();
   }
 
   /**
@@ -391,11 +398,12 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
     // Define essential menu items to enforce predefined menu sequence
     ArrayList<String>	menus = new ArrayList<String>();
 
-    newMenu("file");
-    newMenu("edit");
-    newMenu("view");
-    newMenu("window");
-    newMenu("help");
+    newMenu(Types.FILE);
+    newMenu(Types.CASE);
+    newMenu(Types.EDIT);
+    newMenu(Types.VIEW);
+    newMenu(Types.WINDOW);
+    newMenu(Types.HELP);
 
     // Find all the command types (for menu classifications)
     // Create all menu items and insert
@@ -643,4 +651,10 @@ public class ConResAnalyzerView extends AbstractView implements Observer {
       super.setText(text);
     }
   }
+
+@Override
+public void detatch(Observable oberservableObject) {
+	// TODO Auto-generated method stub
+	
+}
 }

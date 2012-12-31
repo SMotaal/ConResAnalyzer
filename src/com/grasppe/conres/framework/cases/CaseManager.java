@@ -59,7 +59,7 @@ public class CaseManager extends AbstractController implements ActionListener {
         attachView(new CaseManagerView(this));
         setAnalyzer(analyzer);
     }
-
+    
     /**
      * @param model
      * @param listener

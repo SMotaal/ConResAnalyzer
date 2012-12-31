@@ -114,6 +114,13 @@ public class OpenCase extends CaseManagerCommand {
     	return getCaseManager().verifyCaseFolder(caseFolder);
     	
     }
+    
+    public boolean openCase(String casePath) throws CancellationException {
+    	CaseFolder caseFolder = new CaseFolder(casePath);
+
+        return openCase(caseFolder);
+    }
+    
     public boolean openCase(File caseFolder) throws CancellationException {
 
         boolean		canProceed    = true;

@@ -9,10 +9,12 @@
 package com.grasppe.conres.analyzer;
 
 import com.grasppe.conres.analyzer.model.ConResAnalyzerModel;
+import com.grasppe.conres.analyzer.operations.Close;
 import com.grasppe.conres.analyzer.operations.Quit;
 import com.grasppe.conres.analyzer.view.ConResAnalyzerView;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.cases.CaseManager;
+import com.grasppe.conres.framework.matlab.MatLabManager;
 import com.grasppe.conres.framework.targets.TargetManager;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
@@ -27,22 +29,38 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * Class description
- * @version        $Revision: 0.1, 11/11/08
+ * @version        $Revision: 0.1, 12/12/03
  * @author         <a href=Ómailto:saleh.amr@mac.comÓ>Saleh Abdel Motaal</a>
  */
 public class ConResAnalyzer extends AbstractController implements ActionListener {
 
-  /** Field description */
-  public static final String			BUILD = "0.2a-03";
-  protected CaseManager						caseManager;
-  protected TargetManager					targetManager;
-  protected AnalysisManager				analysisManager;
-  protected AbstractController[]	managers;			// = new AbstractController[]{caseManager, targetManager,analysisManager};
-  protected ConResAnalyzerView		analyzerView;
-  protected PreferencesManager		preferencesManager;
+  /**
+	 * @return the matlabManager
+	 */
+	public MatLabManager getMatLabManager() {
+		return matLabManager;
+	}
+
+	/**
+	 * @param matlabManager the matlabManager to set
+	 */
+	public void setMatLabManager(MatLabManager matlabManager) {
+		this.matLabManager = matlabManager;
+	}
+
+/** Field description */
+  public static final String     BUILD = "0.2a-05";
+  protected MatLabManager 		 matLabManager;
+  protected CaseManager          caseManager;
+  protected TargetManager        targetManager;
+  protected AnalysisManager      analysisManager;
+  protected AbstractController[] managers;		// = new AbstractController[]{caseManager, targetManager,analysisManager};
+  protected ConResAnalyzerView   analyzerView;
+  protected PreferencesManager   preferencesManager;
 
   // protected LinkedHashMap<String, AbstractCommand>  commands;
 
@@ -58,8 +76,16 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
     setTargetManager(new TargetManager(this));
     setAnalysisManager(new AnalysisManager(this));
     setPreferencesManager(new PreferencesManager(this));
-    managers = new AbstractController[] { caseManager, targetManager, analysisManager, preferencesManager };
+    setMatLabManager(new MatLabManager(this));
+    managers = new AbstractController[] { caseManager, targetManager, analysisManager, preferencesManager, matLabManager };
     analyzerView.createView();
+
+  }
+  
+  public ConResAnalyzer(com.mathworks.jmi.types.MLArrayRef matlabController) {
+	  this();
+	  
+	  this.getMatLabManager().setMatlabController(matlabController);
   }
 
   /**
@@ -94,7 +120,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
    */
 
   /**
-   * 	@return
+   *    @return
    */
   @Override
   public boolean canQuit() {
@@ -102,10 +128,10 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
   }
 
   /**
-   * 	@return
+   *    @return
    */
   public boolean canQuitManagers() {
-    boolean	canQuit = true;
+    boolean canQuit = true;
 
     for (AbstractController manager : managers) {
       manager.attemptQuit();
@@ -126,8 +152,65 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
    */
   @Override
   public void createCommands() {
-
+    putCommand(new Close(this));
     putCommand(new Quit(this));
+  }
+
+  /*
+   *  (non-Javadoc)
+   *   @see java.lang.Object#finalize()
+   */
+
+  /**
+   *    @throws Throwable
+   */
+  @Override
+  public void detatch() throws Throwable {
+    GrasppeKit.debugText("Detatching", getClass().getSimpleName(), 1);
+    
+	try{
+		getMatLabManager().fireAction("CloseAnalyzer");
+	} catch (Exception exception) {
+	}
+
+    notifyDetatchObservers();
+
+    SwingUtilities.invokeLater(new Runnable() {
+
+      public void run() {
+        try {
+          for (AbstractController manager : managers) {
+            manager.detatch();
+          }
+
+        } catch (Throwable exception) {
+          GrasppeKit.debugError("Detatching Manager", exception, 1);
+        }
+
+      }
+
+    });
+
+    super.detatch();
+
+    // if(commands!=null && commands.size()>0) {
+    // for (String key : commands.keySet()) {
+    // commands.get(key).finalize();
+    // }
+    // }
+    //
+    // commands.clear();
+    //
+    // if (getModel()!=null) {
+    // AbstractView[] views = getModel().views.toArray(new AbstractView[0]);
+    //
+    // for(int i = 0; i < views.length; i++) {
+    // views[i].finalize();
+    // }
+    //
+    // getModel().detachObservers();
+    // }
+
   }
 
   /**
@@ -151,7 +234,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
   /**
    */
   public void forceCommandUpdates() {
-    Iterator<AbstractCommand>	commandIterator = getCommands().values().iterator();
+    Iterator<AbstractCommand> commandIterator = getCommands().values().iterator();
 
     while (commandIterator.hasNext())
       commandIterator.next().update();
@@ -194,7 +277,7 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
    */
   @Override
   public LinkedHashMap<String, AbstractCommand> getCommands() {
-    LinkedHashMap<String, AbstractCommand>	allCommands = new LinkedHashMap<String, AbstractCommand>();
+    LinkedHashMap<String, AbstractCommand> allCommands = new LinkedHashMap<String, AbstractCommand>();
 
     for (AbstractController manager : managers)
       if (manager != null) allCommands.putAll(appendCommands(manager));
@@ -286,4 +369,6 @@ public class ConResAnalyzer extends AbstractController implements ActionListener
   public void setTargetManager(TargetManager targetManager) {
     this.targetManager = targetManager;
   }
+
+
 }

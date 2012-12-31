@@ -11,6 +11,8 @@ package com.grasppe.conres.framework.analysis.view;
 import com.grasppe.conres.framework.analysis.AnalysisManager;
 import com.grasppe.conres.framework.analysis.model.AnalysisManagerModel;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 /**
  * Class description
@@ -25,6 +27,7 @@ public class AnalysisManagerView extends AbstractView {
     public AnalysisManagerView(AnalysisManager controller) {
         super(controller);
     }
+    
 
     /**
      */
@@ -59,6 +62,12 @@ public class AnalysisManagerView extends AbstractView {
 
 	@Override
 	protected void finalizeUpdates() {
+		
+	}
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
 		
 	}
 }

@@ -12,7 +12,9 @@ import com.grasppe.conres.analyzer.PreferencesManager;
 import com.grasppe.conres.analyzer.model.PreferencesManagerModel;
 import com.grasppe.conres.preferences.Preferences.Tags;
 import com.grasppe.lure.components.AbstractView;
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeKit;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 import com.grasppe.lure.framework.GrasppeKit.Observer;
 import com.sun.snippets.ListDialog;
 
@@ -72,7 +74,7 @@ public class PreferencesManagerView extends AbstractView implements Observer, Ac
     createView();
   }
 
-  /**
+	/**
    * @return
    */
   public boolean canFinalize() {
@@ -259,5 +261,11 @@ public void actionPerformed(ActionEvent e) {
 protected void storeValues() {
     for (PreferencesFieldView field : fieldMap.values())
     	field.storeValue();
+}
+
+@Override
+public void detatch(Observable oberservableObject) {
+	// TODO Auto-generated method stub
+	
 }
 }

@@ -10,10 +10,12 @@
  */
 package com.grasppe.conres.framework.imagej;
 
+import com.grasppe.lure.components.ObservableObject;
 import com.grasppe.lure.framework.GrasppeEventDispatcher;
 import com.grasppe.lure.framework.GrasppeEventHandler;
 import com.grasppe.lure.framework.GrasppeKit;
 import com.grasppe.lure.framework.GrasppeKit.KeyCode;
+import com.grasppe.lure.framework.GrasppeKit.Observable;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -1060,4 +1062,10 @@ public class ImageWindowMagnifier extends ImageCanvas
         // When making visible and not in specific mode, default to tuning mode
         // if (visible &&!isHovering() &&!isTuning()) enterTuningMode(true);
     }
+
+	@Override
+	public void detatch(Observable oberservableObject) {
+		// TODO Auto-generated method stub
+		
+	}
 }

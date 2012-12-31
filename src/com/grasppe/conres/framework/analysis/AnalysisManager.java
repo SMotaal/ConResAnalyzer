@@ -21,7 +21,6 @@ import com.grasppe.conres.framework.targets.model.grid.ConResTarget;
 import com.grasppe.lure.components.AbstractCommand;
 import com.grasppe.lure.components.AbstractController;
 import com.grasppe.lure.framework.GrasppeKit;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -36,182 +35,186 @@ import java.util.LinkedHashMap;
  */
 public class AnalysisManager extends AbstractController {
 
-    /* (non-Javadoc)
-	 * @see com.grasppe.lure.components.AbstractController#canQuit()
-	 */
-	@Override
-	public boolean canQuit() {
-		return getAnalysisStepper().canQuit();
-	}
+  int dbg = 0;
 
-	/**
-	 * @return the analysisStepper
-	 */
-	public AnalysisStepper getAnalysisStepper() {
-		if (analysisStepper==null) {
-			analysisStepper = new AnalysisStepper(this);
-			analysisStepper.getModel().attachObserver(getCommand("ExportAnalysis"));
-		}
-		return analysisStepper;
-	}
+  /** Field description */
+  public ConResAnalyzer     analyzer;
+  protected AnalysisStepper analysisStepper;
 
-	int	dbg = 0;
+  /**
+   * @param listener
+   */
+  private AnalysisManager(ActionListener listener) {
+    super(listener);
+  }
 
-    /** Field description */
-    public ConResAnalyzer	analyzer;
-    protected AnalysisStepper analysisStepper;
+  /**
+   *  @param analyzer
+   */
+  public AnalysisManager(ConResAnalyzer analyzer) {
+    this((ActionListener)analyzer);
+    attachView(new AnalysisManagerView(this));
+    setAnalyzer(analyzer);
+    getTargetManagerModel().attachObserver(this);
+  }
 
-    /**
-     * @param listener
-     */
-    private AnalysisManager(ActionListener listener) {
-        super(listener);
+  /**
+   *  @param object1
+   *  @param object2
+   *  @return
+   */
+  private boolean areEqual(Object object1, Object object2) {
+    if ((object1 == null) || (object2 == null)) return false;
+
+    if (!object1.getClass().equals(object2.getClass()) &&!object2.getClass().equals(object1.getClass())) return false;
+
+    try {
+      return object1.equals(object2);
+    } catch (Exception exception) {
+      return false;
+    }
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractController#canQuit()
+   */
+
+  /**
+   * 	@return
+   */
+  @Override
+  public boolean canQuit() {
+    return getAnalysisStepper().canQuit();
+  }
+
+  /**
+   * Create and populate all commands from scratch.
+   */
+  @Override
+  public void createCommands() {
+    commands = new LinkedHashMap<String, AbstractCommand>();
+    putCommand(new AnalyzeBlock(this, this));
+    putCommand(new ExportAnalysis(this, this));
+  }
+
+  /*
+   *  (non-Javadoc)
+   * @see com.grasppe.lure.components.AbstractController#update()
+   */
+
+  /**
+   */
+  @Override
+  public void update() {
+    super.update();
+    updateTargetManager();
+  }
+
+  /**
+   */
+  public void updateTargetManager() {
+    boolean      updateActiveTarget, updateActiveBlock;
+
+    ConResTarget activeTarget = getTargetManagerModel().getActiveTarget();
+
+    if (activeTarget == null) {
+      getModel().setActiveTarget(null);
+      updateActiveTarget = true;
+    } else {
+
+//    if ((updateActiveTarget = areEqual(getModel().getActiveTarget(), activeTarget)) == false)
+      if (updateActiveTarget = getTargetManagerModel().hasChanged("activeTarget")) getModel().setActiveTarget(activeTarget);
     }
 
-    /**
-     *  @param analyzer
-     */
-    public AnalysisManager(ConResAnalyzer analyzer) {
-        this((ActionListener)analyzer);
-        attachView(new AnalysisManagerView(this));
-        setAnalyzer(analyzer);
-        getTargetManagerModel().attachObserver(this);
+    ConResBlock activeBlock = getTargetManagerModel().getActiveBlock();
+
+    if (activeBlock == null) {
+      getModel().setActiveBlock(null);
+      updateActiveBlock = true;
+    } else {
+
+//    if ((updateActiveBlock = areEqual(getModel().getActiveBlock(), activeBlock)) == false)
+      if (updateActiveBlock = getTargetManagerModel().hasChanged("activeBlock")) getModel().setActiveBlock(activeBlock);
     }
 
-    /**
-     * 	@param object1
-     * 	@param object2
-     * 	@return
-     */
-    private boolean areEqual(Object object1, Object object2) {
-        if ((object1 == null) || (object2 == null)) return false;
+    GrasppeKit.debugText(getClass().getSimpleName() + " Update", GrasppeKit.cat((updateActiveTarget) ? "updateActiveTarget"
+                                                                                                     : "", (updateActiveBlock)
+                                                                                                           ? "updateActiveBlock"
+                                                                                                           : ""), dbg);
 
-        if (!object1.getClass().equals(object2.getClass())
-                &&!object2.getClass().equals(object1.getClass()))
-            return false;
-
-        try {
-            return object1.equals(object2);
-        } catch (Exception exception) {
-            return false;
-        }
+    if (updateActiveTarget || updateActiveBlock) {
+      if (getAnalysisStepper() != null) getAnalysisStepper().updateActiveBlock();
+      getModel().notifyObservers();
     }
 
-    /**
-     * Create and populate all commands from scratch.
-     */
-    @Override
-    public void createCommands() {
-        commands = new LinkedHashMap<String, AbstractCommand>();
-        putCommand(new AnalyzeBlock(this, this));
-        putCommand(new ExportAnalysis(this, this));
+    return;
+
+  }
+
+  /**
+   * @return the analysisStepper
+   */
+  public AnalysisStepper getAnalysisStepper() {
+    if (analysisStepper == null) {
+      analysisStepper = new AnalysisStepper(this);
+      analysisStepper.getModel().attachObserver(getCommand("ExportAnalysis"));
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.grasppe.lure.components.AbstractController#update()
-     */
+    return analysisStepper;
+  }
 
-    /**
-     */
-    @Override
-    public void update() {
-        super.update();
-        updateTargetManager();
-    }
+  /**
+   * @return the analyzer
+   */
+  public ConResAnalyzer getAnalyzer() {
+    return analyzer;
+  }
 
-    /**
-     */
-    public void updateTargetManager() {
-        boolean	updateActiveTarget,	updateActiveBlock;
-        
-        ConResTarget activeTarget = getTargetManagerModel().getActiveTarget();
-        
-        if (activeTarget==null) {
-        	getModel().setActiveTarget(null);
-        	updateActiveTarget = true;
-        } else {
-//        	if ((updateActiveTarget = areEqual(getModel().getActiveTarget(), activeTarget)) == false)
-        	if (updateActiveTarget=getTargetManagerModel().hasChanged("activeTarget"))
-        		getModel().setActiveTarget(activeTarget);        	
-        }
-        
-        ConResBlock activeBlock = getTargetManagerModel().getActiveBlock();
+  /**
+   *  @return
+   */
+  public CaseManager getCaseManager() {
+    return getAnalyzer().getCaseManager();
+  }
 
-        if (activeBlock==null) {
-        	getModel().setActiveBlock(null);
-        	updateActiveBlock = true;
-        } else {
-//	        if ((updateActiveBlock = areEqual(getModel().getActiveBlock(), activeBlock)) == false)
-        	if (updateActiveBlock=getTargetManagerModel().hasChanged("activeBlock"))
-	            getModel().setActiveBlock(activeBlock);
-        }
+  /**
+   * Returns a correctly-cast model.
+   * @return
+   */
+  public AnalysisManagerModel getModel() {
+    return (AnalysisManagerModel)model;
+  }
 
-        GrasppeKit.debugText(getClass().getSimpleName() + " Update",
-                             GrasppeKit.cat((updateActiveTarget) ? "updateActiveTarget"
-                : "", (updateActiveBlock) ? "updateActiveBlock"
-                                          : ""), dbg);
-        
-        if (updateActiveTarget || updateActiveBlock) {
-        	if (getAnalysisStepper()!=null)
-        		getAnalysisStepper().updateActiveBlock();
-        	getModel().notifyObservers();
-        }
-        return;
+  /**
+   * @return
+   */
+  @Override
+  protected AnalysisManagerModel getNewModel() {
+    GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", dbg);
 
-    }
+    return new AnalysisManagerModel();
 
-    /**
-     * @return the analyzer
-     */
-    public ConResAnalyzer getAnalyzer() {
-        return analyzer;
-    }
+  }
 
-    /**
-     *  @return
-     */
-    public CaseManager getCaseManager() {
-        return getAnalyzer().getCaseManager();
-    }
+  /**
+   *  @return
+   */
+  public TargetManager getTargetManager() {
+    return getAnalyzer().getTargetManager();
+  }
 
-    /**
-     * Returns a correctly-cast model.
-     * @return
-     */
-    public AnalysisManagerModel getModel() {
-        return (AnalysisManagerModel)model;
-    }
+  /**
+   *  @return
+   */
+  public TargetManagerModel getTargetManagerModel() {
+    return getTargetManager().getModel();
+  }
 
-    /**
-     * @return
-     */
-    @Override
-    protected AnalysisManagerModel getNewModel() {
-        GrasppeKit.debugText(getClass().getSimpleName(), "Getting new Model", dbg);
-
-        return new AnalysisManagerModel();
-
-    }
-    
-    /**
-     * 	@return
-     */
-    public TargetManager getTargetManager() {
-        return getAnalyzer().getTargetManager();
-    }
-
-    /**
-     * 	@return
-     */
-    public TargetManagerModel getTargetManagerModel() {
-        return getTargetManager().getModel();
-    }
-
-    /**
-     * @param analyzer the analyzer to set
-     */
-    public void setAnalyzer(ConResAnalyzer analyzer) {
-        this.analyzer = analyzer;
-    }
+  /**
+   * @param analyzer the analyzer to set
+   */
+  public void setAnalyzer(ConResAnalyzer analyzer) {
+    this.analyzer = analyzer;
+  }
 }
